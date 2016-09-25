@@ -2,7 +2,7 @@ package ru.spbau.blackout;
 
 import com.badlogic.gdx.Game;
 
-import ru.spbau.blackout.ru.spbau.blackout.screens.MainMenu;
+import ru.spbau.blackout.screens.MainMenu;
 
 public class BlackoutGame extends Game {
 

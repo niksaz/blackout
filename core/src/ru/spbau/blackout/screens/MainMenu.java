@@ -1,4 +1,4 @@
-package ru.spbau.blackout.ru.spbau.blackout.screens;
+package ru.spbau.blackout.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
