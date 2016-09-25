@@ -1,6 +1,5 @@
 package ru.spbau.blackout.screens;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 
 import ru.spbau.blackout.BlackoutGame;
