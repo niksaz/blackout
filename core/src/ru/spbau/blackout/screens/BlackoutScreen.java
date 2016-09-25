@@ -4,11 +4,11 @@ import com.badlogic.gdx.Screen;
 
 import ru.spbau.blackout.BlackoutGame;
 
-class BlackoutScreen implements Screen {
+public abstract class BlackoutScreen implements Screen {
 
     protected BlackoutGame blackoutGame;
 
-    BlackoutScreen(BlackoutGame blackoutGame) {
+    protected BlackoutScreen(BlackoutGame blackoutGame) {
         this.blackoutGame = blackoutGame;
     }
 
