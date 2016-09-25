@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -30,13 +32,27 @@ public class MainMenu extends BlackoutScreen {
         addBlackoutLabel(middleTable);
 
         Drawable buttonImage =
-                new TextureRegionDrawable(new TextureRegion(new Texture(Constants.MAIN_MENU_BUTTON_PATH)));
+                new TextureRegionDrawable(new TextureRegion(new Texture(Constants.MAIN_MENU_BUTTON_TEXTURE_PATH)));
         addButton(middleTable, Constants.MAIN_MENU_BUTTON_PLAY_TEXT, buttonImage);
         addButton(middleTable, Constants.MAIN_MENU_BUTTON_SHOP_TEXT, buttonImage);
         addButton(middleTable, Constants.MAIN_MENU_BUTTON_LEADERBOARD_TEXT, buttonImage);
 
         middleTable.setFillParent(true);
         stage.addActor(middleTable);
+
+        addSettingsButton();
+    }
+
+    private void addSettingsButton() {
+        Texture settingsTexture = new Texture(Constants.MAIN_MENU_SETTINGS_TEXTURE_PATH);
+        Image settingsImage = new Image(settingsTexture);
+
+        Container<Image> space = new Container<Image>(settingsImage);
+        space.setWidth(Constants.MAIN_MENU_SETTINGS_BUTTON_SIZE);
+        space.setHeight(Constants.MAIN_MENU_SETTINGS_BUTTON_SIZE);
+        space.pad(Constants.MAIN_MENU_SETTINGS_BUTTON_PADDING);
+
+        stage.addActor(space);
     }
 
     private void addBlackoutLabel(Table table) {
@@ -52,6 +68,7 @@ public class MainMenu extends BlackoutScreen {
 
     private void addButton(Table table, String text, Drawable image) {
         BitmapFont font = new BitmapFont();
+        font.getData().setScale(Constants.MAIN_MENU_BUTTON_TEXT_SCALE);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         TextButtonStyle style = new TextButtonStyle();
