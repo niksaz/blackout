@@ -3,25 +3,19 @@ package ru.spbau.blackout.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Vector3;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.entities.Player;
+import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.rooms.GameRoom;
 
 public class GameScreen extends BlackoutScreen {
@@ -30,7 +24,7 @@ public class GameScreen extends BlackoutScreen {
 
     private PerspectiveCamera camera;
     private GameUnit[] units;
-    private Player player;
+    private Hero hero;
 
     // just for test
     private Model model;
@@ -58,7 +52,7 @@ public class GameScreen extends BlackoutScreen {
                 new Material(ColorAttribute.createDiffuse(Color.GREEN)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
 
-        player = new Player(model, 0, 0);
+        hero = new Hero(model, 0, 0);
     }
 
     @Override
@@ -67,7 +61,7 @@ public class GameScreen extends BlackoutScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         modelBatch.begin(camera);
-        modelBatch.render(player.modelInstance);
+        modelBatch.render(hero.modelInstance);
         modelBatch.end();
     }
 
@@ -85,6 +79,6 @@ public class GameScreen extends BlackoutScreen {
 //        for (GameUnit unit: units) {
 //            unit.getTexture().dispose();
 //        }
-//        player.getTexture().dispose();
+//        hero.getTexture().dispose();
     }
 }

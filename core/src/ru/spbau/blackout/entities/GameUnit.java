@@ -3,8 +3,6 @@ package ru.spbau.blackout.entities;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.sun.javafx.sg.prism.NGShape;
 
 
 public abstract class GameUnit {

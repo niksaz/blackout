@@ -5,8 +5,6 @@ package ru.spbau.blackout.rooms;
  */
 public abstract class GameRoom {
     protected String map;
-    protected int teams;
-    protected int players;
 
     public void setMap(String map) {
         this.map = map;
