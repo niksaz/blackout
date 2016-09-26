@@ -13,18 +13,22 @@ public abstract class GameUnit {
 
     // movement:
     private Vector2 velocity = new Vector2();
-    private float speed = 0;
+    private float speed = 1;
 
     // appearance
-    private Model model;
-    public ModelInstance modelInstance;
+    private ModelInstance modelInstance;
 
     public GameUnit(Model model, float x, float y) {
-        this.model = model;
         modelInstance = new ModelInstance(model, x, height, y);
+        modelInstance.transform.scale(0.001f, 0.001f, 0.001f);
     }
 
-    void update(float delta) {
+    public ModelInstance forRender(float delta) {
+        update(delta);
+        return modelInstance;
+    }
+
+    private void update(float delta) {
         float newX = position.x + velocity.x * speed * delta;
         float newY = position.y + velocity.y * speed * delta;
 

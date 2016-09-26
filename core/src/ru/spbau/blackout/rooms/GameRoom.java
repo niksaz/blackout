@@ -4,13 +4,5 @@ package ru.spbau.blackout.rooms;
  * Contains settings for particular game session.
  */
 public abstract class GameRoom {
-    protected String map;
-
-    public void setMap(String map) {
-        this.map = map;
-    }
-
-    public String getMap() {
-        return map;
-    }
+    public String mapPath;
 }

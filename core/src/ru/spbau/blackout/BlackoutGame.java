@@ -12,7 +12,7 @@ public class BlackoutGame extends Game {
 	@Override
 	public void create () {
 		GameRoom room = new TeamsRoundsRoom();
-		room.setMap("maps/duel.tmx");
+		room.mapPath =  "maps/duel.tmx";
 		setScreen(new GameScreen(this, room));
 	}
 
