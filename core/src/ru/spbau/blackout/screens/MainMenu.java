@@ -34,8 +34,8 @@ public class MainMenu extends BlackoutScreen {
     private static final float MAIN_MENU_SETTINGS_BUTTON_SIZE = 128.0f;
     private static final float MAIN_MENU_SETTINGS_BUTTON_PADDING = 12.0f;
 
-    private static final String MAIN_MENU_SETTINGS_TEXTURE_PATH = "settings.png";
-    private static final String MAIN_MENU_BUTTON_TEXTURE_PATH = "button.png";
+    private static final String MAIN_MENU_SETTINGS_TEXTURE_PATH = "images/mainmenu/settings.png";
+    private static final String MAIN_MENU_BUTTON_TEXTURE_PATH = "images/mainmenu/button.png";
     private static final String MAIN_MENU_BUTTON_PLAY_TEXT = "Play";
     private static final String MAIN_MENU_BUTTON_SHOP_TEXT = "Shop";
     private static final String MAIN_MENU_BUTTON_LEADERBOARD_TEXT = "Leaderboard";
