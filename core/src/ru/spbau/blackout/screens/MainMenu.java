@@ -18,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.utils.Constants;
 
 public class MainMenu extends BlackoutScreen {
 
@@ -45,7 +44,8 @@ public class MainMenu extends BlackoutScreen {
     public MainMenu(BlackoutGame blackoutGame) {
         super(blackoutGame);
 
-        stage = new Stage(new ExtendViewport(Constants.VIRTUAL_WORLD_WIDTH, Constants.VIRTUAL_WORLD_HEIGHT));
+        stage = new Stage(new ExtendViewport(BlackoutGame.VIRTUAL_WORLD_WIDTH,
+                                                BlackoutGame.VIRTUAL_WORLD_HEIGHT));
 
         Table middleTable = new Table();
         addBlackoutLabel(middleTable);

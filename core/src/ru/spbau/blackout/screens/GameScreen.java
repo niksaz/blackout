@@ -14,7 +14,6 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.HashSet;
-import java.util.Set;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.GameUnit;
@@ -59,6 +58,7 @@ public class GameScreen extends BlackoutScreen {
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
         units = room.getUnits();
+        hero = room.getHero();
 
         assets = new AssetManager();
         for (GameUnit unit : units) {
