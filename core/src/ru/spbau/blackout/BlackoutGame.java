@@ -3,11 +3,15 @@ package ru.spbau.blackout;
 import com.badlogic.gdx.Game;
 
 import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.play.services.PlayServices;
 import ru.spbau.blackout.rooms.TestingRoom;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.MainMenu;
 
 public class BlackoutGame extends Game {
+
+	public final PlayServices playServices;
+
 	public static final int VIRTUAL_WORLD_WIDTH = 800;
 	public static final int VIRTUAL_WORLD_HEIGHT = 480;
 
@@ -24,8 +28,12 @@ public class BlackoutGame extends Game {
 		setScreen(new GameScreen(this, room));
 	}
 
+	public BlackoutGame(PlayServices playServices) {
+		this.playServices = playServices;
+	}
+
 	@Override
-	public void create () {
+	public void create() {
 //		testGameScreen();
 		setScreen(new MainMenu(this));
 	}

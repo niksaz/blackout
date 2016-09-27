@@ -9,4 +9,5 @@ public interface PlayServices {
     void showAchievement();
     void showScore();
     boolean isSignedIn();
+    String getPlayerName();
 }
