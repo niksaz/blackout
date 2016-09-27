@@ -18,8 +18,8 @@ public class Constants {
     public static final float MAIN_MENU_SETTINGS_BUTTON_SIZE = 128.0f;
     public static final float MAIN_MENU_SETTINGS_BUTTON_PADDING = 12.0f;
 
-    public static final String MAIN_MENU_SETTINGS_TEXTURE_PATH = "settings.png";
-    public static final String MAIN_MENU_BUTTON_TEXTURE_PATH = "button.png";
+    public static final String MAIN_MENU_SETTINGS_TEXTURE_PATH = "images/mainmenu/settings.png";
+    public static final String MAIN_MENU_BUTTON_TEXTURE_PATH = "images/mainmenu/button.png";
     public static final String MAIN_MENU_BUTTON_PLAY_TEXT = "Play";
     public static final String MAIN_MENU_BUTTON_SHOP_TEXT = "Shop";
     public static final String MAIN_MENU_BUTTON_LEADERBOARD_TEXT = "Leaderboard";
