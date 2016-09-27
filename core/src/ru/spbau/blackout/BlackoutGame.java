@@ -1,17 +1,15 @@
 package ru.spbau.blackout;
 
 import com.badlogic.gdx.Game;
-import com.sun.corba.se.impl.orb.ParserTable;
 
 import ru.spbau.blackout.entities.Hero;
-import ru.spbau.blackout.rooms.GameRoom;
 import ru.spbau.blackout.rooms.TestingRoom;
 import ru.spbau.blackout.screens.GameScreen;
+import ru.spbau.blackout.screens.MainMenu;
 
 public class BlackoutGame extends Game {
-	@Override
-	public void create () {
-		// FIXME:  just for test
+	// FIXME:  just for test
+	private void testGameScreen() {
 		TestingRoom room = new TestingRoom();
 		room.map =  "maps/duel.tmx";
 
@@ -21,4 +19,10 @@ public class BlackoutGame extends Game {
 
 		setScreen(new GameScreen(this, room));
 	}
+
+	@Override
+	public void create () {
+		setScreen(new MainMenu(this));
+	}
+
 }
