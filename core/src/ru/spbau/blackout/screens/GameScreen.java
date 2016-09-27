@@ -2,21 +2,19 @@ package ru.spbau.blackout.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.ModelLoader;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.utils.Array;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.GameUnit;
@@ -28,15 +26,15 @@ public class GameScreen extends BlackoutScreen {
     private GameRoom room;
 
     private PerspectiveCamera camera;
-    private GameUnit[] units;
+    private Array<GameUnit> units;
     private Hero hero;
 
     // just for test
-    private Model model;
     private ModelBatch modelBatch;
     public Environment environment;
 
     private AssetManager assets;
+    private HashSet<Model> models = new HashSet<Model>();
     private boolean loading;
 
     public GameScreen(BlackoutGame blackoutGame, GameRoom room) {
@@ -60,18 +58,21 @@ public class GameScreen extends BlackoutScreen {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
+        units = room.getUnits();
+
         assets = new AssetManager();
-        assets.load("models/ship/mage.g3dj", Model.class);
+        for (GameUnit unit : units) {
+            assets.load(unit.getModelPath(), Model.class);
+        }
         loading = true;
     }
 
     private void doneLoading() {
-        model = assets.get("models/ship/mage.g3dj", Model.class);
-        if (model == null) {
-            throw new IllegalArgumentException();
+        for (GameUnit unit : units) {
+            Model model = assets.get(unit.getModelPath(), Model.class);
+            unit.makeInstance(model);
+            models.add(model);
         }
-        hero = new Hero(model, 0, 0);
-        hero.height = 0;
         loading = false;
     }
 
@@ -86,7 +87,9 @@ public class GameScreen extends BlackoutScreen {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             modelBatch.begin(camera);
-            modelBatch.render(hero.forRender(delta), environment);
+            for (GameUnit unit : units) {
+                modelBatch.render(unit.forRender(delta), environment);
+            }
             modelBatch.end();
         }
     }
@@ -101,7 +104,9 @@ public class GameScreen extends BlackoutScreen {
     @Override
     public void dispose() {
         modelBatch.dispose();
-        model.dispose();
+        for (Model model : models) {
+            model.dispose();
+        }
         assets.dispose();
     }
 }
