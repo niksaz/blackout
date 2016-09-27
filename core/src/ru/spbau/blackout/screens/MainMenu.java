@@ -1,6 +1,7 @@
 package ru.spbau.blackout.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -21,6 +22,24 @@ import ru.spbau.blackout.utils.Constants;
 
 public class MainMenu extends BlackoutScreen {
 
+    private static final String BLACKOUT_TEXT = "Blackout";
+
+    private static final Color MAIN_MENU_BACKGROUND_COLOR = new Color(0.1f, 0.1f, 0.1f, 1.0f);
+    private static final Color MAIN_MENU_BLACKOUT_LABEL_COLOR = Color.WHITE;
+
+    private static final float MAIN_MENU_BUTTON_PADDING = 10.f;
+    private static final float MAIN_MENU_BUTTON_TEXT_SCALE = 1.5f;
+    private static final float MAIN_MENU_BLACKOUT_LABEL_BOTTOM_PADDING = 25.0f;
+    private static final float MAIN_MENU_BLACKOUT_LABEL_SCALE = 2.5f;
+    private static final float MAIN_MENU_SETTINGS_BUTTON_SIZE = 128.0f;
+    private static final float MAIN_MENU_SETTINGS_BUTTON_PADDING = 12.0f;
+
+    private static final String MAIN_MENU_SETTINGS_TEXTURE_PATH = "settings.png";
+    private static final String MAIN_MENU_BUTTON_TEXTURE_PATH = "button.png";
+    private static final String MAIN_MENU_BUTTON_PLAY_TEXT = "Play";
+    private static final String MAIN_MENU_BUTTON_SHOP_TEXT = "Shop";
+    private static final String MAIN_MENU_BUTTON_LEADERBOARD_TEXT = "Leaderboard";
+
     private Stage stage;
 
     public MainMenu(BlackoutGame blackoutGame) {
@@ -32,10 +51,10 @@ public class MainMenu extends BlackoutScreen {
         addBlackoutLabel(middleTable);
 
         Drawable buttonImage =
-                new TextureRegionDrawable(new TextureRegion(new Texture(Constants.MAIN_MENU_BUTTON_TEXTURE_PATH)));
-        addButton(middleTable, Constants.MAIN_MENU_BUTTON_PLAY_TEXT, buttonImage);
-        addButton(middleTable, Constants.MAIN_MENU_BUTTON_SHOP_TEXT, buttonImage);
-        addButton(middleTable, Constants.MAIN_MENU_BUTTON_LEADERBOARD_TEXT, buttonImage);
+                new TextureRegionDrawable(new TextureRegion(new Texture(MAIN_MENU_BUTTON_TEXTURE_PATH)));
+        addButton(middleTable, MAIN_MENU_BUTTON_PLAY_TEXT, buttonImage);
+        addButton(middleTable, MAIN_MENU_BUTTON_SHOP_TEXT, buttonImage);
+        addButton(middleTable, MAIN_MENU_BUTTON_LEADERBOARD_TEXT, buttonImage);
 
         middleTable.setFillParent(true);
         stage.addActor(middleTable);
@@ -44,31 +63,31 @@ public class MainMenu extends BlackoutScreen {
     }
 
     private void addSettingsButton() {
-        Texture settingsTexture = new Texture(Constants.MAIN_MENU_SETTINGS_TEXTURE_PATH);
+        Texture settingsTexture = new Texture(MAIN_MENU_SETTINGS_TEXTURE_PATH);
         Image settingsImage = new Image(settingsTexture);
 
         Container<Image> space = new Container<Image>(settingsImage);
-        space.setWidth(Constants.MAIN_MENU_SETTINGS_BUTTON_SIZE);
-        space.setHeight(Constants.MAIN_MENU_SETTINGS_BUTTON_SIZE);
-        space.pad(Constants.MAIN_MENU_SETTINGS_BUTTON_PADDING);
+        space.setWidth(MAIN_MENU_SETTINGS_BUTTON_SIZE);
+        space.setHeight(MAIN_MENU_SETTINGS_BUTTON_SIZE);
+        space.pad(MAIN_MENU_SETTINGS_BUTTON_PADDING);
 
         stage.addActor(space);
     }
 
     private void addBlackoutLabel(Table table) {
         BitmapFont font = new BitmapFont();
-        font.getData().scale(Constants.MAIN_MENU_BLACKOUT_LABEL_SCALE);
+        font.getData().scale(MAIN_MENU_BLACKOUT_LABEL_SCALE);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        Label.LabelStyle style = new Label.LabelStyle(font, Constants.MAIN_MENU_BLACKOUT_LABEL_COLOR);
-        Label label = new Label(Constants.BLACKOUT_TEXT, style);
+        Label.LabelStyle style = new Label.LabelStyle(font, MAIN_MENU_BLACKOUT_LABEL_COLOR);
+        Label label = new Label(BLACKOUT_TEXT, style);
 
-        table.add(label).pad(Constants.MAIN_MENU_BLACKOUT_LABEL_BOTTOM_PADDING).row();
+        table.add(label).pad(MAIN_MENU_BLACKOUT_LABEL_BOTTOM_PADDING).row();
     }
 
     private void addButton(Table table, String text, Drawable image) {
         BitmapFont font = new BitmapFont();
-        font.getData().setScale(Constants.MAIN_MENU_BUTTON_TEXT_SCALE);
+        font.getData().setScale(MAIN_MENU_BUTTON_TEXT_SCALE);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         TextButtonStyle style = new TextButtonStyle();
@@ -78,16 +97,16 @@ public class MainMenu extends BlackoutScreen {
 
         TextButton button = new TextButton(text, style);
 
-        table.add(button).pad(Constants.MAIN_MENU_BUTTON_PADDING).row();
+        table.add(button).pad(MAIN_MENU_BUTTON_PADDING).row();
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(
-                Constants.MAIN_MENU_BACKGROUND_COLOR.r,
-                Constants.MAIN_MENU_BACKGROUND_COLOR.g,
-                Constants.MAIN_MENU_BACKGROUND_COLOR.b,
-                Constants.MAIN_MENU_BACKGROUND_COLOR.a);
+                MAIN_MENU_BACKGROUND_COLOR.r,
+                MAIN_MENU_BACKGROUND_COLOR.g,
+                MAIN_MENU_BACKGROUND_COLOR.b,
+                MAIN_MENU_BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.draw();
