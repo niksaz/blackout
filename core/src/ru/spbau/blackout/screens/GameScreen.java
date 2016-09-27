@@ -47,11 +47,11 @@ public class GameScreen extends BlackoutScreen {
     @Override
     public void show() {
         modelBatch = new ModelBatch();
-        map = new TmxMapLoader().load(room.mapPath);
+        map = new TmxMapLoader().load(room.getMap());
 
         camera = new PerspectiveCamera();
         camera.fieldOfView = 67;
-        camera.position.set(0f, 1000f, 1000f);
+        camera.position.set(0f, 10f, 10f);
         camera.lookAt(0,0,0);
         camera.near = 1f;
         camera.far = 30000f;
@@ -71,6 +71,7 @@ public class GameScreen extends BlackoutScreen {
             throw new IllegalArgumentException();
         }
         hero = new Hero(model, 0, 0);
+        hero.height = 0;
         loading = false;
     }
 

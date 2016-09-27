@@ -2,6 +2,7 @@ package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector2;
 
 
@@ -16,22 +17,25 @@ public abstract class GameUnit {
     private float speed = 1;
 
     // appearance
-    private ModelInstance modelInstance;
+    private ModelInstance model;
+    private AnimationController animation;
 
     public GameUnit(Model model, float x, float y) {
-        modelInstance = new ModelInstance(model, x, height, y);
-        modelInstance.transform.scale(0.001f, 0.001f, 0.001f);
+        this.model = new ModelInstance(model, x, height, y);
+        animation = new AnimationController(this.model);
+        animation.setAnimation("Armature|Walk", -1);
     }
 
     public ModelInstance forRender(float delta) {
         update(delta);
-        return modelInstance;
+        return model;
     }
 
     private void update(float delta) {
         float newX = position.x + velocity.x * speed * delta;
         float newY = position.y + velocity.y * speed * delta;
 
-        modelInstance.transform.setToTranslation(newX, height, newY);
+        model.transform.setToTranslation(newX, height, newY);
+        animation.update(delta);
     }
 }
