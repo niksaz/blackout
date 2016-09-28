@@ -18,11 +18,10 @@ public class BlackoutGame extends Game {
 	// FIXME:  just for test
 	private void testGameScreen() {
 		TestingRoom room = new TestingRoom();
-		room.map =  "maps/duel.tmx";
+		room.map =  "maps/duel/duel.g3db";
 
 		Hero hero = new Hero("models/magician/mage.g3dj", 0, 0);
 		hero.setHeight(0);
-		room.units.add(hero);
 		room.hero = hero;
 
 		setScreen(new GameScreen(this, room));
@@ -34,8 +33,8 @@ public class BlackoutGame extends Game {
 
 	@Override
 	public void create() {
-//		testGameScreen();
-		setScreen(new MainMenu(this));
+		testGameScreen();
+//		setScreen(new MainMenu(this));
 	}
 
 }

@@ -56,7 +56,7 @@ public abstract class GameUnit {
         this.model = new ModelInstance(model, position.x , height, position.y);
         // FIXME: just for a test:
         animation = new AnimationController(this.model);
-        animation.setAnimation("Armature|Walk", -1);
+//        animation.setAnimation("Armature|Walk", -1);
     }
 
     public ModelInstance forRender(float delta) {
