@@ -4,12 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
@@ -32,6 +35,8 @@ public class MainMenu extends BlackoutScreen {
     private static final float MAIN_MENU_BLACKOUT_LABEL_SCALE = 2.5f;
     private static final float MAIN_MENU_SETTINGS_BUTTON_SIZE = 128.0f;
     private static final float MAIN_MENU_SETTINGS_BUTTON_PADDING = 12.0f;
+    private static final float PLAYER_LABEL_MARGIN_X = 20.0f;
+    private static final float PLAYER_LABEL_MARGIN_Y = 30.0f;
 
     private static final String MAIN_MENU_SETTINGS_TEXTURE_PATH = "images/mainmenu/settings.png";
     private static final String MAIN_MENU_BUTTON_TEXTURE_PATH = "images/mainmenu/button.png";
@@ -60,6 +65,20 @@ public class MainMenu extends BlackoutScreen {
         stage.addActor(middleTable);
 
         addSettingsButton();
+
+        addPlayerName();
+    }
+
+    private void addPlayerName() {
+        LabelStyle style = new LabelStyle();
+        style.font = new BitmapFont();
+
+        String playerName = blackoutGame.playServices.getPlayerName();
+        Label label = new Label("Hello, " + playerName + "!", style);
+
+        label.setX(PLAYER_LABEL_MARGIN_X);
+        label.setY(BlackoutGame.VIRTUAL_WORLD_HEIGHT - PLAYER_LABEL_MARGIN_Y);
+        stage.addActor(label);
     }
 
     private void addSettingsButton() {
@@ -79,7 +98,7 @@ public class MainMenu extends BlackoutScreen {
         font.getData().scale(MAIN_MENU_BLACKOUT_LABEL_SCALE);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        Label.LabelStyle style = new Label.LabelStyle(font, MAIN_MENU_BLACKOUT_LABEL_COLOR);
+        LabelStyle style = new LabelStyle(font, MAIN_MENU_BLACKOUT_LABEL_COLOR);
         Label label = new Label(BLACKOUT_TEXT, style);
 
         table.add(label).pad(MAIN_MENU_BLACKOUT_LABEL_BOTTOM_PADDING).row();
