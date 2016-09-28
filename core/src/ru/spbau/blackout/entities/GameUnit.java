@@ -59,12 +59,11 @@ public abstract class GameUnit {
 //        animation.setAnimation("Armature|Walk", -1);
     }
 
-    public ModelInstance forRender(float delta) {
-        update(delta);
+    public ModelInstance getModelInstance() {
         return model;
     }
 
-    private void update(float delta) {
+    public final void update(float delta) {
         preUpdate(delta);
 
         float newX = position.x + velocity.x * speed * delta;

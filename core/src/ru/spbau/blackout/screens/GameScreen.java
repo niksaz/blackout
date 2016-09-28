@@ -19,6 +19,10 @@ import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.rooms.GameRoom;
 
 public class GameScreen extends BlackoutScreen {
+    public static final float DEFAULT_CAMERA_X_OFFSET = 2;
+    public static final float DEFAULT_CAMERA_Y_OFFSET = 0;
+    public static final float DEFAULT_CAMERA_HEIGHT = 12;
+
     private ModelInstance map;
     private GameRoom room;
 
@@ -45,8 +49,6 @@ public class GameScreen extends BlackoutScreen {
 
         camera = new PerspectiveCamera();
         camera.fieldOfView = 67;
-        camera.position.set(0f, 10f, 10f);
-        camera.lookAt(0,0,0);
         camera.near = 1f;
         camera.far = 30000f;
 
@@ -85,6 +87,22 @@ public class GameScreen extends BlackoutScreen {
         loading = false;
     }
 
+    private void update(float delta) {
+        for (GameUnit unit : units) {
+            unit.update(delta);
+        }
+        hero.update(delta);
+
+        camera.position.set(
+                DEFAULT_CAMERA_X_OFFSET + hero.position.x,
+                DEFAULT_CAMERA_HEIGHT,
+                DEFAULT_CAMERA_Y_OFFSET + hero.position.y);
+        camera.lookAt(hero.position.x, 0, hero.position.y);
+        camera.update();
+
+
+    }
+
     @Override
     public void render(float delta) {
         if (loading) {
@@ -93,14 +111,17 @@ public class GameScreen extends BlackoutScreen {
             }
             return;
         }
+
+        update(delta);
+
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         modelBatch.begin(camera);
         for (GameUnit unit : units) {
-            modelBatch.render(unit.forRender(delta), environment);
+            modelBatch.render(unit.getModelInstance(), environment);
         }
-        modelBatch.render(hero.forRender(delta), environment);
+        modelBatch.render(hero.getModelInstance(), environment);
         modelBatch.render(map, environment);
         modelBatch.end();
     }
