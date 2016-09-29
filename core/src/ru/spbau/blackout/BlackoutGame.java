@@ -14,8 +14,8 @@ public class BlackoutGame extends Game {
 
 	public final PlayServices playServices;
 
-	public static final int VIRTUAL_WORLD_WIDTH = 800;
-	public static final int VIRTUAL_WORLD_HEIGHT = 480;
+	public static final int VIRTUAL_WORLD_WIDTH = 1280;
+	public static final int VIRTUAL_WORLD_HEIGHT = 768;
 
 	public ModelBatch modelBatch;
 	public SpriteBatch spriteBatch;
