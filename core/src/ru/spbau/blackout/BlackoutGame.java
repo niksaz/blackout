@@ -41,8 +41,8 @@ public class BlackoutGame extends Game {
 		modelBatch = new ModelBatch();
 		spriteBatch = new SpriteBatch();
 
-		testGameScreen();
-//		setScreen(new MainMenu(this));
+//		testGameScreen();
+		setScreen(new MainMenu(this));
 	}
 
 }

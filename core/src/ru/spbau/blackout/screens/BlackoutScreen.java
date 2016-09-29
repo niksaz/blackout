@@ -6,9 +6,9 @@ import ru.spbau.blackout.BlackoutGame;
 
 public abstract class BlackoutScreen implements Screen {
 
-    protected BlackoutGame blackoutGame;
+    final BlackoutGame blackoutGame;
 
-    protected BlackoutScreen(BlackoutGame blackoutGame) {
+    BlackoutScreen(BlackoutGame blackoutGame) {
         this.blackoutGame = blackoutGame;
     }
 
