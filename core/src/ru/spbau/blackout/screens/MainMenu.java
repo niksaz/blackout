@@ -81,7 +81,12 @@ public class MainMenu extends MenuScreen {
         LabelStyle style = new LabelStyle();
         style.font = new BitmapFont();
 
-        String playerName = blackoutGame.playServices.getPlayerName();
+        final String playerName;
+        if (blackoutGame.playServices.isSignedIn()) {
+            playerName = blackoutGame.playServices.getPlayerName();
+        } else {
+            playerName = "unknown";
+        }
         Label label = new Label("Hello, " + playerName + "!", style);
 
         label.setX(PLAYER_LABEL_MARGIN_X);
