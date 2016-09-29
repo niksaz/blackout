@@ -7,12 +7,10 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.utils.Array;
-
 import java.util.HashSet;
 
 import ru.spbau.blackout.BlackoutGame;
@@ -21,7 +19,11 @@ import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.rooms.GameRoom;
 
 public class GameScreen extends BlackoutScreen {
-    private TiledMap map;
+    public static final float DEFAULT_CAMERA_X_OFFSET = 2;
+    public static final float DEFAULT_CAMERA_Y_OFFSET = 0;
+    public static final float DEFAULT_CAMERA_HEIGHT = 12;
+
+    private ModelInstance map;
     private GameRoom room;
 
     private PerspectiveCamera camera;
@@ -36,20 +38,20 @@ public class GameScreen extends BlackoutScreen {
     private HashSet<Model> models = new HashSet<Model>();
     private boolean loading;
 
-    public GameScreen(BlackoutGame blackoutGame, GameRoom room) {
-        super(blackoutGame);
+    public GameScreen(BlackoutGame game, GameRoom room) {
+        super(game);
         this.room = room;
+
+        units = room.getUnits();
+        hero = room.getHero();
+
+        modelBatch = game.modelBatch;
     }
 
     @Override
     public void show() {
-        modelBatch = new ModelBatch();
-        map = new TmxMapLoader().load(room.getMap());
-
         camera = new PerspectiveCamera();
         camera.fieldOfView = 67;
-        camera.position.set(0f, 10f, 10f);
-        camera.lookAt(0,0,0);
         camera.near = 1f;
         camera.far = 30000f;
 
@@ -57,23 +59,46 @@ public class GameScreen extends BlackoutScreen {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
-        units = room.getUnits();
-        hero = room.getHero();
-
         assets = new AssetManager();
         for (GameUnit unit : units) {
             assets.load(unit.getModelPath(), Model.class);
         }
+        assets.load(hero.getModelPath(), Model.class);
+        assets.load(room.getMap(), Model.class);
         loading = true;
+    }
+
+    private void doneLoadingForUnit(GameUnit unit) {
+        Model model = assets.get(unit.getModelPath(), Model.class);
+        unit.makeInstance(model);
+        models.add(model);
     }
 
     private void doneLoading() {
         for (GameUnit unit : units) {
-            Model model = assets.get(unit.getModelPath(), Model.class);
-            unit.makeInstance(model);
-            models.add(model);
+            doneLoadingForUnit(unit);
         }
+        doneLoadingForUnit(hero);
+
+        Model model = assets.get(room.getMap(), Model.class);
+        map = new ModelInstance(model);
+        models.add(model);
+
         loading = false;
+    }
+
+    private void update(float delta) {
+        for (GameUnit unit : units) {
+            unit.update(delta);
+        }
+        hero.update(delta);
+
+        camera.position.set(
+                DEFAULT_CAMERA_X_OFFSET + hero.position.x,
+                DEFAULT_CAMERA_HEIGHT,
+                DEFAULT_CAMERA_Y_OFFSET + hero.position.y);
+        camera.lookAt(hero.position.x, 0, hero.position.y);
+        camera.update();
     }
 
     @Override
@@ -82,16 +107,21 @@ public class GameScreen extends BlackoutScreen {
             if (assets.update()) {
                 doneLoading();
             }
-        } else {
-            Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-            modelBatch.begin(camera);
-            for (GameUnit unit : units) {
-                modelBatch.render(unit.forRender(delta), environment);
-            }
-            modelBatch.end();
+            return;
         }
+
+        update(delta);
+
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+        modelBatch.begin(camera);
+        for (GameUnit unit : units) {
+            modelBatch.render(unit.getModelInstance(), environment);
+        }
+        modelBatch.render(hero.getModelInstance(), environment);
+        modelBatch.render(map, environment);
+        modelBatch.end();
     }
 
     @Override
