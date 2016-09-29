@@ -11,14 +11,17 @@ public class TestingRoom extends GameRoom {
     public Array<GameUnit> units = new Array<GameUnit>();
     public Hero hero;
 
+    @Override
     public String getMap() {
         return map;
     }
 
+    @Override
     public Array<GameUnit> getUnits() {
         return units;
     }
 
+    @Override
     public Hero getHero() {
         return hero;
     }
