@@ -10,7 +10,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.android.gms.games.Games;
-import com.google.android.gms.games.PlayerEntity;
 import com.google.example.games.basegameutils.GameHelper;
 import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 
@@ -22,7 +21,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     private final static String TAG = "AndroidLauncher";
 
     private GameHelper gameHelper;
-    private final static int requestCode = 1;
+    private final static int requestCode = 918273645;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +107,8 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
     @Override
     public void showAchievement() {
-
+        if (isSignedIn()) {
+        }
     }
 
     @Override
