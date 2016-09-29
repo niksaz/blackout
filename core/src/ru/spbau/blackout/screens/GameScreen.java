@@ -45,7 +45,7 @@ public class GameScreen extends BlackoutScreen {
         units = room.getUnits();
         hero = room.getHero();
 
-//        modelBatch = game.modelBatch;
+        modelBatch = game.modelBatch;
     }
 
     @Override
@@ -58,8 +58,6 @@ public class GameScreen extends BlackoutScreen {
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
-
-        modelBatch = new ModelBatch();
 
         assets = new AssetManager();
         for (GameUnit unit : units) {

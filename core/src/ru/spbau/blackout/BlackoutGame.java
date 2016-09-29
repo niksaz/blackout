@@ -38,8 +38,8 @@ public class BlackoutGame extends Game {
 
 	@Override
 	public void create() {
-//		modelBatch = new ModelBatch();
-//		spriteBatch = new SpriteBatch();
+		modelBatch = new ModelBatch();
+		spriteBatch = new SpriteBatch();
 
 		testGameScreen();
 //		setScreen(new MainMenu(this));
