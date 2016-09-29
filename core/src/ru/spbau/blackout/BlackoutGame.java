@@ -1,6 +1,8 @@
 package ru.spbau.blackout;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.play.services.PlayServices;
@@ -14,6 +16,9 @@ public class BlackoutGame extends Game {
 
 	public static final int VIRTUAL_WORLD_WIDTH = 800;
 	public static final int VIRTUAL_WORLD_HEIGHT = 480;
+
+	public ModelBatch modelBatch;
+	public SpriteBatch spriteBatch;
 
 	// FIXME:  just for test
 	private void testGameScreen() {
@@ -33,6 +38,9 @@ public class BlackoutGame extends Game {
 
 	@Override
 	public void create() {
+//		modelBatch = new ModelBatch();
+//		spriteBatch = new SpriteBatch();
+
 		testGameScreen();
 //		setScreen(new MainMenu(this));
 	}

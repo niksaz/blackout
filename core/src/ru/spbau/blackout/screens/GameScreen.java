@@ -38,15 +38,18 @@ public class GameScreen extends BlackoutScreen {
     private HashSet<Model> models = new HashSet<Model>();
     private boolean loading;
 
-    public GameScreen(BlackoutGame blackoutGame, GameRoom room) {
-        super(blackoutGame);
+    public GameScreen(BlackoutGame game, GameRoom room) {
+        super(game);
         this.room = room;
+
+        units = room.getUnits();
+        hero = room.getHero();
+
+//        modelBatch = game.modelBatch;
     }
 
     @Override
     public void show() {
-        modelBatch = new ModelBatch();
-
         camera = new PerspectiveCamera();
         camera.fieldOfView = 67;
         camera.near = 1f;
@@ -56,8 +59,7 @@ public class GameScreen extends BlackoutScreen {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
-        units = room.getUnits();
-        hero = room.getHero();
+        modelBatch = new ModelBatch();
 
         assets = new AssetManager();
         for (GameUnit unit : units) {
@@ -99,8 +101,6 @@ public class GameScreen extends BlackoutScreen {
                 DEFAULT_CAMERA_Y_OFFSET + hero.position.y);
         camera.lookAt(hero.position.x, 0, hero.position.y);
         camera.update();
-
-
     }
 
     @Override
