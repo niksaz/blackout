@@ -20,6 +20,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
     private GameHelper gameHelper;
     private static final int REQUEST_ACHIEVEMENTS = 918273645;
+    private static final int REQUEST_LEADERBOARD = 918273644;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +97,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     @Override
-    public void unlockAchievement(int achievement_id) {
+    public void unlockAchievement(int achievementId) {
         if (isSignedIn()) {
-            Games.Achievements.unlock(gameHelper.getApiClient(), getResources().getString(achievement_id));
+            Games.Achievements.unlock(gameHelper.getApiClient(), getResources().getString(achievementId));
         } else {
             userIsNotSignedInDialog();
         }
@@ -119,7 +120,12 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     @Override
-    public void showScore() {
+    public void showLeaderboard(int leaderboardId) {
+        if (isSignedIn()) {startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(),
+                getResources().getString(leaderboardId)), REQUEST_LEADERBOARD);
+        } else {
+            userIsNotSignedInDialog();
+        }
     }
 
     @Override
@@ -168,6 +174,11 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     @Override
     public int getBuyYourFirstItemId() {
         return R.string.achievement_buy_your_first_item;
+    }
+
+    @Override
+    public int getCoinsLeaderboardId() {
+        return R.string.leaderboard_coins_earned;
     }
 
 }
