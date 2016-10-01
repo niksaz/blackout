@@ -5,7 +5,7 @@ public interface PlayServices {
     void signOut();
     void rateGame();
     void unlockAchievement(int achievementId);
-    void submitScore(int highScore);
+    void submitScore(long highScore, int leaderboardId);
     void showAchievements();
     void showLeaderboards();
     boolean isSignedIn();
@@ -16,4 +16,7 @@ public interface PlayServices {
     int getWin3vs3Battle();
     int getEarn1000coins();
     int getBuyYourFirstItemId();
+
+    int getCoinsEarnedLeaderboardId();
+    int getHighestRatingLeaderboradId();
 }

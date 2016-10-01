@@ -106,7 +106,11 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     @Override
-    public void submitScore(int highScore) {
+    public void submitScore(long highScore, int leaderboardId) {
+        if (isSignedIn()) {
+            Games.Leaderboards.submitScore(gameHelper.getApiClient(),
+                                           getResources().getString(leaderboardId), highScore);
+        }
     }
 
     @Override
@@ -174,6 +178,16 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     @Override
     public int getBuyYourFirstItemId() {
         return R.string.achievement_buy_your_first_item;
+    }
+
+    @Override
+    public int getCoinsEarnedLeaderboardId() {
+        return R.string.leaderboard_coins_earned;
+    }
+
+    @Override
+    public int getHighestRatingLeaderboradId() {
+        return R.string.leaderboard_highest_rating;
     }
 
 }
