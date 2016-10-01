@@ -52,7 +52,7 @@ public class MainMenu extends MenuScreen {
         addButton(middleTable, MAIN_MENU_BUTTON_LEADERBOARD_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                blackoutGame.playServices.showLeaderboard(blackoutGame.playServices.getCoinsLeaderboardId());
+                blackoutGame.playServices.showLeaderboards();
             }
         });
 

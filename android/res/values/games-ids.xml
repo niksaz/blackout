@@ -7,5 +7,6 @@
     <string name="achievement_win_3vs3_battle">CgkIgv_h5MkUEAIQAw</string>
     <string name="achievement_buy_your_first_item">CgkIgv_h5MkUEAIQBA</string>
     <string name="achievement_earn_1000_coins">CgkIgv_h5MkUEAIQBQ</string>
+    <string name="leaderboard_highest_rating">CgkIgv_h5MkUEAIQCA</string>
     <string name="leaderboard_coins_earned">CgkIgv_h5MkUEAIQBg</string>
 </resources>

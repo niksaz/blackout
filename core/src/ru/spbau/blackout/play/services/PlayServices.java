@@ -7,7 +7,7 @@ public interface PlayServices {
     void unlockAchievement(int achievementId);
     void submitScore(int highScore);
     void showAchievements();
-    void showLeaderboard(int leaderboardId);
+    void showLeaderboards();
     boolean isSignedIn();
     String getPlayerName();
 
@@ -16,6 +16,4 @@ public interface PlayServices {
     int getWin3vs3Battle();
     int getEarn1000coins();
     int getBuyYourFirstItemId();
-
-    int getCoinsLeaderboardId();
 }
