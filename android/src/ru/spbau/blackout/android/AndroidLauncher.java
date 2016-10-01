@@ -1,10 +1,7 @@
 package ru.spbau.blackout.android;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -18,10 +15,11 @@ import ru.spbau.blackout.play.services.PlayServices;
 
 public class AndroidLauncher extends AndroidApplication implements PlayServices {
 
-    private final static String TAG = "AndroidLauncher";
+    private static final String TAG = "AndroidLauncher";
+    private static final String NOT_SIGNED_MESSAGE = "Unsuccessful. You is not signed in to Google Play Games Services.";
 
     private GameHelper gameHelper;
-    private final static int requestCode = 918273645;
+    private static final int REQUEST_ACHIEVEMENTS = 918273645;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +96,12 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     @Override
-    public void unlockAchievement() {
+    public void unlockAchievement(int achievement_id) {
+        if (isSignedIn()) {
+            Games.Achievements.unlock(gameHelper.getApiClient(), getResources().getString(achievement_id));
+        } else {
+            userIsNotSignedInDialog();
+        }
     }
 
     @Override
@@ -106,14 +109,17 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     @Override
-    public void showAchievement() {
+    public void showAchievements() {
         if (isSignedIn()) {
+            startActivityForResult(Games.Achievements.getAchievementsIntent(gameHelper.getApiClient()),
+                                   REQUEST_ACHIEVEMENTS);
+        } else {
+            userIsNotSignedInDialog();
         }
     }
 
     @Override
     public void showScore() {
-
     }
 
     @Override
@@ -124,6 +130,44 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     @Override
     public String getPlayerName() {
         return Games.Players.getCurrentPlayer(gameHelper.getApiClient()).getDisplayName();
+    }
+
+    private void userIsNotSignedInDialog() {
+        try {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    gameHelper.makeSimpleDialog(NOT_SIGNED_MESSAGE).show();
+                }
+            });
+        } catch (Exception e) {
+            Gdx.app.log(TAG, "userIsNotSignedInDialog: " + e.getMessage() + ".");
+        }
+    }
+
+    @Override
+    public int getWin1vs1DuelId() {
+        return R.string.achievement_win_1vs1_duel;
+    }
+
+    @Override
+    public int getWin2vs2FightId() {
+        return R.string.achievement_win_2vs2_fight;
+    }
+
+    @Override
+    public int getWin3vs3Battle() {
+        return R.string.achievement_win_3vs3_battle;
+    }
+
+    @Override
+    public int getEarn1000coins() {
+        return R.string.achievement_earn_1000_coins;
+    }
+
+    @Override
+    public int getBuyYourFirstItemId() {
+        return R.string.achievement_buy_your_first_item;
     }
 
 }

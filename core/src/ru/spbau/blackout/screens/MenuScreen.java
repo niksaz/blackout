@@ -5,13 +5,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
@@ -19,17 +22,18 @@ import ru.spbau.blackout.BlackoutGame;
 
 abstract class MenuScreen extends BlackoutScreen {
 
-    protected static final Color  MENU_BACKGROUND_COLOR = new Color(0.1f, 0.1f, 0.1f, 1.0f);
+    protected static final Color  MENU_BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
     protected static final String MENU_BUTTON_UP_TEXTURE_PATH = "images/menuscreen/button_up.png";
     protected static final String MENU_BUTTON_DOWN_TEXTURE_PATH = "images/menuscreen/button_down.png";
     protected static final String MENU_SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";
+    protected static final String MENU_GAME_SERVICES_TEXTURE_PATH = "images/menuscreen/games_controller_grey.png";
 
     protected static final float  MENU_BUTTON_TEXT_SCALE = 1.5f;
     protected static final float  MENU_BUTTON_PADDING = 10.0f;
     protected static final float  PLAYER_LABEL_MARGIN_X = 20.0f;
     protected static final float  PLAYER_LABEL_MARGIN_Y = 30.0f;
-    protected static final float  MENU_SETTINGS_BUTTON_SIZE = 128.0f;
-    protected static final float  MENU_SETTINGS_BUTTON_PADDING = 12.0f;
+    protected static final float  MENU_SETTINGS_ICON_SIZE = 128.0f;
+    protected static final float  MENU_SETTINGS_ICON_PADDING = 12.0f;
 
     protected Stage stage;
     protected Label playerNameLabel;
@@ -41,7 +45,8 @@ abstract class MenuScreen extends BlackoutScreen {
         Gdx.input.setInputProcessor(stage);
 
         playerNameLabel = addPlayerNameLabel();
-        addSettingsImage();
+        final Actor controlledImage = addGooglePlayGamesServicesIcon();
+        addSettingsIcon(controlledImage);
     }
 
     protected TextButton addButton(Table table, String text, Drawable upImage, Drawable downImage, EventListener listener) {
@@ -77,18 +82,51 @@ abstract class MenuScreen extends BlackoutScreen {
         return label;
     }
 
-    private Image addSettingsImage() {
+    private Image addSettingsIcon(final Actor controlledImage) {
         final Texture settingsTexture = new Texture(MENU_SETTINGS_TEXTURE_PATH);
         Image settingsImage = new Image(settingsTexture);
 
-        final Container<Image> space = new Container<Image>(settingsImage);
-        space.setWidth(MENU_SETTINGS_BUTTON_SIZE);
-        space.setHeight(MENU_SETTINGS_BUTTON_SIZE);
-        space.pad(MENU_SETTINGS_BUTTON_PADDING);
+        settingsImage.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                controlledImage.setVisible(!controlledImage.isVisible());
+            }
+        });
 
-        stage.addActor(space);
+        final Container<Image> container = new Container<Image>(settingsImage);
+        container.setWidth(MENU_SETTINGS_ICON_SIZE);
+        container.setHeight(MENU_SETTINGS_ICON_SIZE);
+        container.pad(MENU_SETTINGS_ICON_PADDING);
+
+        stage.addActor(container);
 
         return settingsImage;
+    }
+
+    private Image addGooglePlayGamesServicesIcon() {
+        final Texture gamesServices = new Texture(MENU_GAME_SERVICES_TEXTURE_PATH);
+        Image gamesServicesImage = new Image(gamesServices);
+        gamesServicesImage.setVisible(false);
+
+        gamesServicesImage.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (blackoutGame.playServices.isSignedIn()) {
+                    blackoutGame.playServices.signOut();
+                    blackoutGame.playServices.signIn();
+                }
+            }
+        });
+
+        final Container<Image> container = new Container<Image>(gamesServicesImage);
+        container.setWidth(MENU_SETTINGS_ICON_SIZE);
+        container.setHeight(MENU_SETTINGS_ICON_SIZE);
+        container.pad(MENU_SETTINGS_ICON_PADDING);
+        container.setY(MENU_SETTINGS_ICON_SIZE);
+
+        stage.addActor(container);
+
+        return gamesServicesImage;
     }
 
     private void refreshPlayerName() {
