@@ -52,11 +52,11 @@ public abstract class GameUnit {
         this.modelPath = modelPath;
     }
 
-    public void makeInstance(Model model) {
+    public final void makeInstance(Model model) {
         this.model = new ModelInstance(model, position.x , height, position.y);
-        // FIXME: just for a test:
         animation = new AnimationController(this.model);
-//        animation.setAnimation("Armature|Walk", -1);
+
+        onInstance();
     }
 
     public ModelInstance getModelInstance() {
@@ -84,4 +84,9 @@ public abstract class GameUnit {
      * for overloading
      */
     protected void postUpdate(float delta) {}
+
+    /**
+     * for overloading
+     */
+    protected void onInstance() {}
 }

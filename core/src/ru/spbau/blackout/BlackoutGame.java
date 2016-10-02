@@ -21,11 +21,11 @@ public class BlackoutGame extends Game {
 	public SpriteBatch spriteBatch;
 
 	// FIXME:  just for test
-	private void testGameScreen() {
+	public void testGameScreen() {
 		TestingRoom room = new TestingRoom();
 		room.map =  "maps/duel/duel.g3db";
-
-		Hero hero = new Hero("models/magician/mage.g3dj", 0, 0);
+		
+		Hero hero = new Hero("models/magician/mage.g3db", 0, 0);
 		hero.setHeight(0);
 		room.hero = hero;
 
@@ -41,7 +41,6 @@ public class BlackoutGame extends Game {
 		modelBatch = new ModelBatch();
 		spriteBatch = new SpriteBatch();
 
-//		testGameScreen();
 		setScreen(new MainMenu(this));
 	}
 

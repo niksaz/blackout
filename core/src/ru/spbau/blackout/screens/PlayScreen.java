@@ -22,8 +22,19 @@ class PlayScreen extends MenuScreen {
 
         final Table middleTable = new Table();
 
-        final Drawable upImage = new TextureRegionDrawable(new TextureRegion(new Texture(MENU_BUTTON_UP_TEXTURE_PATH)));
-        final Drawable downImage = new TextureRegionDrawable(new TextureRegion(new Texture(MENU_BUTTON_DOWN_TEXTURE_PATH)));
+        final Drawable upImage = new TextureRegionDrawable(
+                new TextureRegion(new Texture(MENU_BUTTON_UP_TEXTURE_PATH)));
+        final Drawable downImage = new TextureRegionDrawable(
+                new TextureRegion(new Texture(MENU_BUTTON_DOWN_TEXTURE_PATH)));
+
+        // FIXME: just for test
+        addButton(middleTable, "FIXME: test GameScreen", upImage, downImage, new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float  y) {
+                blackoutGame.testGameScreen();
+            }
+        });
+
 
         addButton(middleTable, PLAY_SCREEN_QUICK_GAME_TEXT, upImage, downImage, null);
         addButton(middleTable, PLAY_SCREEN_INVITE_PLAYERS_TEXT, upImage, downImage, null);

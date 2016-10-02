@@ -11,4 +11,10 @@ public class Hero extends GameUnit {
     public Hero(String modelPath, Vector2 initialPosition) {
         this(modelPath, initialPosition.x, initialPosition.y);
     }
+
+    @Override
+    protected void onInstance() {
+        // FIXME: just for test:
+        animation.setAnimation("Armature|Walk", -1);
+    }
 }
