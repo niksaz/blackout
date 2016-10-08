@@ -8,7 +8,9 @@ import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.play.services.PlayServices;
 import ru.spbau.blackout.rooms.TestingRoom;
 import ru.spbau.blackout.screens.GameScreen;
-import ru.spbau.blackout.screens.MainMenu;
+import ru.spbau.blackout.screens.MainMenuTable;
+import ru.spbau.blackout.screens.MenuScreen;
+import ru.spbau.blackout.utils.ScreenManager;
 
 public class BlackoutGame extends Game {
 
@@ -41,7 +43,8 @@ public class BlackoutGame extends Game {
 		modelBatch = new ModelBatch();
 		spriteBatch = new SpriteBatch();
 
-		setScreen(new MainMenu(this));
+		ScreenManager.getInstance().initialize(this);
+		ScreenManager.getInstance().setScreen(new MenuScreen(this));
 	}
 
 }

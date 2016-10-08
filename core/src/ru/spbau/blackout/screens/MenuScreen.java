@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -16,11 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import ru.spbau.blackout.BlackoutGame;
 
-abstract class MenuScreen extends BlackoutScreen {
+public class MenuScreen extends StageScreen {
 
     protected static final Color  MENU_BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
     protected static final String MENU_BUTTON_UP_TEXTURE_PATH = "images/menuscreen/button_up.png";
@@ -35,21 +33,32 @@ abstract class MenuScreen extends BlackoutScreen {
     protected static final float  MENU_SETTINGS_ICON_SIZE = 128.0f;
     protected static final float  MENU_SETTINGS_ICON_PADDING = 12.0f;
 
-    protected Stage stage;
     protected Label playerNameLabel;
+    protected Table middleTable;
 
-    MenuScreen(BlackoutGame blackoutGame) {
+    public MenuScreen(BlackoutGame blackoutGame) {
         super(blackoutGame);
 
-        stage = new Stage(new ExtendViewport(BlackoutGame.VIRTUAL_WORLD_WIDTH, BlackoutGame.VIRTUAL_WORLD_HEIGHT));
-        Gdx.input.setInputProcessor(stage);
+        addLeftPaneElements();
 
-        playerNameLabel = addPlayerNameLabel();
-        final Actor controlledImage = addGooglePlayGamesServicesIcon();
-        addSettingsIcon(controlledImage);
+        changeMiddleTable(MainMenuTable.getTable(blackoutGame, this));
     }
 
-    protected TextButton addButton(Table table, String text, Drawable upImage, Drawable downImage, EventListener listener) {
+    void changeMiddleTable(Table table) {
+        if (middleTable != null) {
+            middleTable.remove();
+        }
+        middleTable = table;
+        stage.addActor(middleTable);
+    }
+
+    private void addLeftPaneElements() {
+        playerNameLabel = addPlayerNameLabel();
+        final Actor playServicesIcon = addGooglePlayGamesServicesIcon();
+        addSettingsIcon(playServicesIcon);
+    }
+
+    public static TextButton addButton(Table table, String text, Drawable upImage, Drawable downImage, EventListener listener) {
         final BitmapFont font = new BitmapFont();
         font.getData().setScale(MENU_BUTTON_TEXT_SCALE);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -77,6 +86,7 @@ abstract class MenuScreen extends BlackoutScreen {
 
         label.setX(PLAYER_LABEL_MARGIN_X);
         label.setY(BlackoutGame.VIRTUAL_WORLD_HEIGHT - PLAYER_LABEL_MARGIN_Y);
+
         stage.addActor(label);
 
         return label;
@@ -84,7 +94,7 @@ abstract class MenuScreen extends BlackoutScreen {
 
     private Image addSettingsIcon(final Actor controlledImage) {
         final Texture settingsTexture = new Texture(MENU_SETTINGS_TEXTURE_PATH);
-        Image settingsImage = new Image(settingsTexture);
+        final Image settingsImage = new Image(settingsTexture);
 
         settingsImage.addListener(new ClickListener() {
             @Override
@@ -93,12 +103,11 @@ abstract class MenuScreen extends BlackoutScreen {
             }
         });
 
-        final Container<Image> container = new Container<Image>(settingsImage);
-        container.setWidth(MENU_SETTINGS_ICON_SIZE);
-        container.setHeight(MENU_SETTINGS_ICON_SIZE);
-        container.pad(MENU_SETTINGS_ICON_PADDING);
-
-        stage.addActor(container);
+        final Container<Image> settingsContainer = new Container<Image>(settingsImage);
+        settingsContainer.setWidth(MENU_SETTINGS_ICON_SIZE);
+        settingsContainer.setHeight(MENU_SETTINGS_ICON_SIZE);
+        settingsContainer.pad(MENU_SETTINGS_ICON_PADDING);
+        stage.addActor(settingsContainer);
 
         return settingsImage;
     }
@@ -113,18 +122,17 @@ abstract class MenuScreen extends BlackoutScreen {
             public void clicked(InputEvent event, float x, float y) {
                 if (blackoutGame.playServices.isSignedIn()) {
                     blackoutGame.playServices.signOut();
-                    blackoutGame.playServices.signIn();
                 }
+                blackoutGame.playServices.signIn();
             }
         });
 
-        final Container<Image> container = new Container<Image>(gamesServicesImage);
-        container.setWidth(MENU_SETTINGS_ICON_SIZE);
-        container.setHeight(MENU_SETTINGS_ICON_SIZE);
-        container.pad(MENU_SETTINGS_ICON_PADDING);
-        container.setY(MENU_SETTINGS_ICON_SIZE);
-
-        stage.addActor(container);
+        final Container<Image> playContainer = new Container<Image>(gamesServicesImage);
+        playContainer.setWidth(MENU_SETTINGS_ICON_SIZE);
+        playContainer.setHeight(MENU_SETTINGS_ICON_SIZE);
+        playContainer.pad(MENU_SETTINGS_ICON_PADDING);
+        playContainer.setY(MENU_SETTINGS_ICON_SIZE);
+        stage.addActor(playContainer);
 
         return gamesServicesImage;
     }
