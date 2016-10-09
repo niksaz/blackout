@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.play.services.BlackoutSnapshot;
-import ru.spbau.blackout.play.services.PlayServicesListenerInCore;
 import ru.spbau.blackout.play.services.PlayServices;
+import ru.spbau.blackout.play.services.PlayServicesListenerInCore;
 import ru.spbau.blackout.rooms.TestingRoom;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;

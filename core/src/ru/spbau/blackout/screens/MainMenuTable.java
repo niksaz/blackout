@@ -4,10 +4,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -25,7 +27,7 @@ public class MainMenuTable {
 
     private static final String BLACKOUT_TEXT = "Blackout";
     private static final String MAIN_MENU_BUTTON_PLAY_TEXT = "Play";
-    private static final String MAIN_MENU_BUTTON_SHOP_TEXT = "Shop";
+    private static final String MAIN_MENU_BUTTON_SHOP_TEXT = "* Add 10 gold";
     private static final String MAIN_MENU_BUTTON_ACHIEVEMENTS_TEXT = "Achievements";
     private static final String MAIN_MENU_BUTTON_LEADERBOARD_TEXT = "Leaderboard";
 
@@ -42,7 +44,12 @@ public class MainMenuTable {
                 screen.changeMiddleTable(PlayScreenTable.getTable(game, screen));
             }
         });
-        addButton(middleTable, MAIN_MENU_BUTTON_SHOP_TEXT, upImage, downImage, null);
+        addButton(middleTable, MAIN_MENU_BUTTON_SHOP_TEXT, upImage, downImage, new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.getSnapshot().changeGold(10);
+            }
+        });
         addButton(middleTable, MAIN_MENU_BUTTON_ACHIEVEMENTS_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

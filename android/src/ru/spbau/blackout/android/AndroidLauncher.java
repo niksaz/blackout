@@ -11,6 +11,7 @@ import com.google.example.games.basegameutils.GameHelper;
 import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.play.services.BlackoutSnapshot;
 import ru.spbau.blackout.play.services.PlayServices;
 import ru.spbau.blackout.play.services.PlayServicesListener;
 
@@ -22,8 +23,10 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     private static final int REQUEST_ACHIEVEMENTS = 918273645;
     private static final int REQUEST_LEADERBOARDS = 918273644;
 
+    private BlackoutGame game;
     private GameHelper gameHelper;
     private PlayServicesListener coreListener;
+    private boolean foreground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +52,8 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         SnapshotManager.getInstance().initialize(this);
 
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        initialize(new BlackoutGame(this), config);
+        game = new BlackoutGame(this);
+        initialize(game, config);
     }
 
     public GameHelper getGameHelper() {
@@ -66,14 +70,20 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
     @Override
     protected void onStart() {
+        foreground = true;
         super.onStart();
         gameHelper.onStart(this);
     }
 
     @Override
     protected void onStop() {
+        foreground = false;
         super.onStop();
-        gameHelper.onStop();
+        writeSnapshot(game.getSnapshot());
+    }
+
+    public boolean isForeground() {
+        return foreground;
     }
 
     @Override
@@ -169,6 +179,19 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
             Gdx.app.log(TAG, "startLoadingSnapshot: " + e.getMessage());
         }
 
+    }
+
+    public void writeSnapshot(final BlackoutSnapshot blackoutSnapshot) {
+        try {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    SnapshotManager.getInstance().writeSnapshot(blackoutSnapshot);
+                }
+            });
+        } catch (Exception e) {
+            Gdx.app.log(TAG, "writeSnapshot: " + e.getMessage());
+        }
     }
 
     private void userIsNotSignedInDialog() {

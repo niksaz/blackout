@@ -16,4 +16,8 @@ public class BlackoutSnapshot implements Serializable {
         this.gold = gold;
     }
 
+    public void changeGold(int delta) {
+        gold += delta;
+    }
+
 }

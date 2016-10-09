@@ -27,6 +27,7 @@ class SnapshotManager {
     private static final String CANNOT_LOAD_SNAPSHOT = "Can not load snapshot";
 
     private AndroidLauncher launcher;
+    private Snapshot snapshot;
 
     private SnapshotManager() {}
 
@@ -61,19 +62,13 @@ class SnapshotManager {
                                 .await();
 
                         if (result.getStatus().isSuccess()) {
-                            Snapshot snapshot = result.getSnapshot();
+                            snapshot = result.getSnapshot();
                             try {
                                 byte[] gameData = snapshot.getSnapshotContents().readFully();
+                                Games.Snapshots.discardAndClose(launcher.getGameHelper().getApiClient(), snapshot);
                                 if (gameData == null || gameData.length == 0) {
                                     Log.v(TAG, "NO game data");
-                                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                                    ObjectOutputStream oos = new ObjectOutputStream(out);
-                                    oos.writeObject(new BlackoutSnapshot());
-                                    oos.close();
-                                    gameData = out.toByteArray();
-                                    snapshot.getSnapshotContents().writeBytes(gameData);
-                                    SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().build();
-                                    Games.Snapshots.commitAndClose(launcher.getGameHelper().getApiClient(), snapshot, metadataChange);
+                                    writeSnapshot(new BlackoutSnapshot());
                                     doAgain = true;
                                 } else {
                                     ByteArrayInputStream in = new ByteArrayInputStream(gameData);
@@ -106,6 +101,44 @@ class SnapshotManager {
             }
         };
 
+        task.execute();
+    }
+
+    void writeSnapshot(final BlackoutSnapshot blackoutSnapshot) {
+        AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                Snapshots.OpenSnapshotResult result = Games.Snapshots
+                        .open(launcher.getGameHelper().getApiClient(), GAME_SAVED_NAME, true)
+                        .await();
+
+                if (result.getStatus().isSuccess()) {
+                    snapshot = result.getSnapshot();
+                    try {
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        ObjectOutputStream oos = new ObjectOutputStream(out);
+                        oos.writeObject(blackoutSnapshot);
+                        oos.close();
+
+                        snapshot.getSnapshotContents().writeBytes(out.toByteArray());
+                        SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().build();
+                        Games.Snapshots.commitAndClose(launcher.getGameHelper().getApiClient(), snapshot, metadataChange);
+                    } catch (IOException e) {
+                        Log.v(TAG, "IOException " + e.getMessage());
+                    }
+                } else {
+                    Log.v(TAG, "Cannot close snapshot");
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                if (!launcher.isForeground()) {
+                    launcher.getGameHelper().onStop();
+                }
+            }
+        };
         task.execute();
     }
 

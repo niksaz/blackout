@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Align;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.utils.ScreenManager;
@@ -27,19 +28,19 @@ class MenuScreen extends StageScreen {
     private static final String MENU_SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";
     private static final String MENU_GAME_SERVICES_TEXTURE_PATH = "images/menuscreen/games_controller_grey.png";
 
-    private static final float  MENU_BUTTON_TEXT_SCALE = 1.5f;
-    private static final float  MENU_BUTTON_PADDING = 10.0f;
-    private static final float  PLAYER_LABEL_MARGIN_X = 20.0f;
-    private static final float  PLAYER_LABEL_MARGIN_Y = 30.0f;
-    private static final float  MENU_SETTINGS_ICON_SIZE = 128.0f;
-    private static final float  MENU_SETTINGS_ICON_PADDING = 12.0f;
+    private static final float TEXT_SCALE = 1.5f;
+    private static final float MENU_BUTTON_PADDING = 10.0f;
+    private static final float CORNER_LABEL_MARGIN = 20.0f;
+    private static final float MENU_SETTINGS_ICON_SIZE = 128.0f;
+    private static final float MENU_SETTINGS_ICON_PADDING = 12.0f;
 
-    private Label playerNameLabel;
+    private Label goldLabel;
     private Table middleTable;
 
     MenuScreen(BlackoutGame blackoutGame) {
         super(blackoutGame);
         addLeftPaneElements();
+        addRightPaneElements();
         changeMiddleTable(MainMenuTable.getTable(blackoutGame, this));
     }
 
@@ -52,14 +53,22 @@ class MenuScreen extends StageScreen {
     }
 
     private void addLeftPaneElements() {
-        playerNameLabel = addPlayerNameLabel();
+        addLabelWithTextAt(
+                "Hello, " + blackoutGame.playServices.getPlayerName(),
+                CORNER_LABEL_MARGIN,
+                stage.getViewport().getWorldHeight() - CORNER_LABEL_MARGIN,
+                Align.topLeft);
         final Actor playServicesIcon = addGooglePlayGamesServicesIcon();
         addSettingsIcon(playServicesIcon);
     }
 
+    private void addRightPaneElements() {
+        goldLabel = addLabelWithTextAt("", 0, 0, 0);
+    }
+
     static TextButton addButton(Table table, String text, Drawable upImage, Drawable downImage, EventListener listener) {
         final BitmapFont font = new BitmapFont();
-        font.getData().setScale(MENU_BUTTON_TEXT_SCALE);
+        font.getData().setScale(TEXT_SCALE);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         final TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
@@ -77,15 +86,14 @@ class MenuScreen extends StageScreen {
         return button;
     }
 
-    private Label addPlayerNameLabel() {
+    private Label addLabelWithTextAt(CharSequence text, float x, float y, int align) {
         final Label.LabelStyle style = new Label.LabelStyle();
-        style.font = new BitmapFont();
+        final BitmapFont font = new BitmapFont();
+        font.getData().scale(TEXT_SCALE);
+        style.font = font;
 
-        final Label label = new Label("", style);
-
-        label.setX(PLAYER_LABEL_MARGIN_X);
-        label.setY(BlackoutGame.VIRTUAL_WORLD_HEIGHT - PLAYER_LABEL_MARGIN_Y);
-
+        final Label label = new Label(text, style);
+        label.setPosition(x, y, align);
         stage.addActor(label);
 
         return label;
@@ -134,24 +142,24 @@ class MenuScreen extends StageScreen {
         return gamesServicesImage;
     }
 
-    private void refreshPlayerName() {
-        final String playerName;
-        if (blackoutGame.playServices.isSignedIn()) {
-            playerName = blackoutGame.playServices.getPlayerName();
-        } else {
-            playerName = "unknown";
-        }
-        playerNameLabel.setText("Hello, " + playerName + "!");
-    }
-
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(
                 MENU_BACKGROUND_COLOR.r, MENU_BACKGROUND_COLOR.g,
                 MENU_BACKGROUND_COLOR.b, MENU_BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        refreshPlayerName();
+        refreshGoldLabel();
+
         super.render(delta);
+    }
+
+    private void refreshGoldLabel() {
+        goldLabel.setText("Gold: " + blackoutGame.getSnapshot().getGold());
+        goldLabel.setSize(goldLabel.getPrefWidth(), goldLabel.getPrefHeight());
+        goldLabel.setPosition(
+                stage.getViewport().getWorldWidth() - CORNER_LABEL_MARGIN,
+                stage.getViewport().getWorldHeight() - CORNER_LABEL_MARGIN,
+                Align.topRight);
     }
 
 }
