@@ -27,4 +27,15 @@ abstract class StageScreen extends BlackoutScreen {
         stage.getViewport().update(width, height, true);
     }
 
+    @Override
+    public void render(float delta) {
+        stage.draw();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        stage.dispose();
+    }
+
 }

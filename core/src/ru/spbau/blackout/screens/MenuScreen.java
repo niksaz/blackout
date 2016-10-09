@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.utils.ScreenManager;
 
 public class MenuScreen extends StageScreen {
 
@@ -38,9 +39,7 @@ public class MenuScreen extends StageScreen {
 
     public MenuScreen(BlackoutGame blackoutGame) {
         super(blackoutGame);
-
         addLeftPaneElements();
-
         changeMiddleTable(MainMenuTable.getTable(blackoutGame, this));
     }
 
@@ -120,10 +119,8 @@ public class MenuScreen extends StageScreen {
         gamesServicesImage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (blackoutGame.playServices.isSignedIn()) {
-                    blackoutGame.playServices.signOut();
-                }
-                blackoutGame.playServices.signIn();
+                blackoutGame.playServices.signOut();
+                ScreenManager.getInstance().disposeScreen();
             }
         });
 
@@ -153,15 +150,8 @@ public class MenuScreen extends StageScreen {
                 MENU_BACKGROUND_COLOR.r, MENU_BACKGROUND_COLOR.g,
                 MENU_BACKGROUND_COLOR.b, MENU_BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         refreshPlayerName();
-        stage.draw();
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        stage.dispose();
+        super.render(delta);
     }
 
 }

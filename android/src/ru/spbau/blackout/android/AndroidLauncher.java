@@ -12,38 +12,56 @@ import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.PlayServices;
+import ru.spbau.blackout.play.services.PlayServicesListener;
 
 public class AndroidLauncher extends AndroidApplication implements PlayServices {
 
     private static final String TAG = "AndroidLauncher";
     private static final String NOT_SIGNED_MESSAGE = "Unsuccessful. You is not signed in to Google Play Games Services.";
 
-    private GameHelper gameHelper;
     private static final int REQUEST_ACHIEVEMENTS = 918273645;
     private static final int REQUEST_LEADERBOARDS = 918273644;
+
+    private GameHelper gameHelper;
+    private PlayServicesListener coreListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        initialize(new BlackoutGame(this), config);
-
         GameHelperListener gameHelperListener = new GameHelperListener() {
             @Override
             public void onSignInFailed() {
-                Gdx.app.log(TAG, "FAIL");
+                coreListener.onSignInFailed();
             }
 
             @Override
             public void onSignInSucceeded() {
-                Gdx.app.log(TAG, "SUCCESS");
+                coreListener.onSignInSucceeded();
             }
         };
 
-        gameHelper = new GameHelper(this, GameHelper.CLIENT_GAMES);
+        gameHelper = new GameHelper(this, GameHelper.CLIENT_ALL);
         gameHelper.enableDebugLog(true);
+        gameHelper.setConnectOnStart(false);
         gameHelper.setup(gameHelperListener);
+
+        SnapshotManager.getInstance().initialize(this);
+
+        AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+        initialize(new BlackoutGame(this), config);
+    }
+
+    public GameHelper getGameHelper() {
+        return gameHelper;
+    }
+
+    public PlayServicesListener getCoreListener() {
+        return coreListener;
+    }
+
+    public void setCoreListener(PlayServicesListener coreListener) {
+        this.coreListener = coreListener;
     }
 
     @Override
@@ -74,7 +92,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
                 }
             });
         } catch (Exception e) {
-            Gdx.app.log(TAG, "Log in failed: " + e.getMessage() + ".");
+            Gdx.app.log(TAG, "Log in failed: " + e.getMessage());
         }
     }
 
@@ -88,12 +106,8 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
                 }
             });
         } catch (Exception e) {
-            Gdx.app.log(TAG, "Log out failed: " + e.getMessage() + ".");
+            Gdx.app.log(TAG, "Log out failed: " + e.getMessage());
         }
-    }
-
-    @Override
-    public void rateGame() {
     }
 
     @Override
@@ -142,6 +156,21 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         return Games.Players.getCurrentPlayer(gameHelper.getApiClient()).getDisplayName();
     }
 
+    @Override
+    public void startLoadingSnapshot() {
+        try {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    SnapshotManager.getInstance().startLoadingSnapshot();
+                }
+            });
+        } catch (Exception e) {
+            Gdx.app.log(TAG, "startLoadingSnapshot: " + e.getMessage());
+        }
+
+    }
+
     private void userIsNotSignedInDialog() {
         try {
             runOnUiThread(new Runnable() {
@@ -151,7 +180,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
                 }
             });
         } catch (Exception e) {
-            Gdx.app.log(TAG, "userIsNotSignedInDialog: " + e.getMessage() + ".");
+            Gdx.app.log(TAG, "userIsNotSignedInDialog: " + e.getMessage());
         }
     }
 
