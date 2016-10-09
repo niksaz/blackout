@@ -16,9 +16,9 @@ import ru.spbau.blackout.utils.ScreenManager;
 public class LoadScreen extends StageScreen implements CorePlayServicesListener {
 
     private static final Color LABEL_COLOR = Color.WHITE;
-    private static final float LABEL_SCALE = 1.5f;
+    private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
 
-    protected static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
+    private static final float LABEL_SCALE = 1.5f;
     private static final float LABEL_BOTTOM_PADDING = 25.0f;
 
     private static final String STARTED_LOG_IN = "Logging in...";
@@ -63,6 +63,10 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
 
     @Override
     public void finishedLoadingSnapshot() {
+        if (blackoutGame.getSnapshot() == null) {
+            Gdx.app.exit();
+        }
+
         PlayServicesListenerInCore.getInstance().removeListener(this);
         middleTable.remove();
         middleTable = null;

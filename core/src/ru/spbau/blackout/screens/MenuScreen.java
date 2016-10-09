@@ -19,25 +19,25 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.utils.ScreenManager;
 
-public class MenuScreen extends StageScreen {
+class MenuScreen extends StageScreen {
 
-    protected static final Color  MENU_BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
-    protected static final String MENU_BUTTON_UP_TEXTURE_PATH = "images/menuscreen/button_up.png";
-    protected static final String MENU_BUTTON_DOWN_TEXTURE_PATH = "images/menuscreen/button_down.png";
-    protected static final String MENU_SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";
-    protected static final String MENU_GAME_SERVICES_TEXTURE_PATH = "images/menuscreen/games_controller_grey.png";
+    private static final Color  MENU_BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
+    static final String MENU_BUTTON_UP_TEXTURE_PATH = "images/menuscreen/button_up.png";
+    static final String MENU_BUTTON_DOWN_TEXTURE_PATH = "images/menuscreen/button_down.png";
+    private static final String MENU_SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";
+    private static final String MENU_GAME_SERVICES_TEXTURE_PATH = "images/menuscreen/games_controller_grey.png";
 
-    protected static final float  MENU_BUTTON_TEXT_SCALE = 1.5f;
-    protected static final float  MENU_BUTTON_PADDING = 10.0f;
-    protected static final float  PLAYER_LABEL_MARGIN_X = 20.0f;
-    protected static final float  PLAYER_LABEL_MARGIN_Y = 30.0f;
-    protected static final float  MENU_SETTINGS_ICON_SIZE = 128.0f;
-    protected static final float  MENU_SETTINGS_ICON_PADDING = 12.0f;
+    private static final float  MENU_BUTTON_TEXT_SCALE = 1.5f;
+    private static final float  MENU_BUTTON_PADDING = 10.0f;
+    private static final float  PLAYER_LABEL_MARGIN_X = 20.0f;
+    private static final float  PLAYER_LABEL_MARGIN_Y = 30.0f;
+    private static final float  MENU_SETTINGS_ICON_SIZE = 128.0f;
+    private static final float  MENU_SETTINGS_ICON_PADDING = 12.0f;
 
-    protected Label playerNameLabel;
-    protected Table middleTable;
+    private Label playerNameLabel;
+    private Table middleTable;
 
-    public MenuScreen(BlackoutGame blackoutGame) {
+    MenuScreen(BlackoutGame blackoutGame) {
         super(blackoutGame);
         addLeftPaneElements();
         changeMiddleTable(MainMenuTable.getTable(blackoutGame, this));
@@ -57,7 +57,7 @@ public class MenuScreen extends StageScreen {
         addSettingsIcon(playServicesIcon);
     }
 
-    public static TextButton addButton(Table table, String text, Drawable upImage, Drawable downImage, EventListener listener) {
+    static TextButton addButton(Table table, String text, Drawable upImage, Drawable downImage, EventListener listener) {
         final BitmapFont font = new BitmapFont();
         font.getData().setScale(MENU_BUTTON_TEXT_SCALE);
         font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);

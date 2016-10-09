@@ -18,6 +18,8 @@ import ru.spbau.blackout.play.services.BlackoutSnapshot;
 
 class SnapshotManager {
 
+    private static final int MAX_ATTEMPTS = 3;
+
     private static SnapshotManager manager;
 
     private static final String TAG = "SnapshotManager";
@@ -50,43 +52,48 @@ class SnapshotManager {
             @Override
             protected BlackoutSnapshot doInBackground(Void... voids) {
                 BlackoutSnapshot resultSnapshot = null;
-                boolean doAgain;
-                do {
-                    doAgain = false;
-                    Snapshots.OpenSnapshotResult result = Games.Snapshots
-                            .open(launcher.getGameHelper().getApiClient(), GAME_SAVED_NAME, true)
-                            .await();
+                for (int i = 0; i < MAX_ATTEMPTS; i++) {
+                    boolean doAgain;
+                    do {
+                        doAgain = false;
+                        Snapshots.OpenSnapshotResult result = Games.Snapshots
+                                .open(launcher.getGameHelper().getApiClient(), GAME_SAVED_NAME, true)
+                                .await();
 
-                    if (result.getStatus().isSuccess()) {
-                        Snapshot snapshot = result.getSnapshot();
-                        try {
-                            byte[] gameData = snapshot.getSnapshotContents().readFully();
-                            if (gameData == null || gameData.length == 0) {
-                                Log.v(TAG, "NO game data");
-                                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                                ObjectOutputStream oos = new ObjectOutputStream(out);
-                                oos.writeObject(new BlackoutSnapshot());
-                                oos.close();
-                                gameData = out.toByteArray();
-                                snapshot.getSnapshotContents().writeBytes(gameData);
-                                SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().build();
-                                Games.Snapshots.commitAndClose(launcher.getGameHelper().getApiClient(), snapshot, metadataChange);
-                                doAgain = true;
-                            } else {
-                                ByteArrayInputStream in = new ByteArrayInputStream(gameData);
-                                ObjectInputStream ois = new ObjectInputStream(in);
-                                resultSnapshot = (BlackoutSnapshot) ois.readObject();
-                                ois.close();
+                        if (result.getStatus().isSuccess()) {
+                            Snapshot snapshot = result.getSnapshot();
+                            try {
+                                byte[] gameData = snapshot.getSnapshotContents().readFully();
+                                if (gameData == null || gameData.length == 0) {
+                                    Log.v(TAG, "NO game data");
+                                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                                    ObjectOutputStream oos = new ObjectOutputStream(out);
+                                    oos.writeObject(new BlackoutSnapshot());
+                                    oos.close();
+                                    gameData = out.toByteArray();
+                                    snapshot.getSnapshotContents().writeBytes(gameData);
+                                    SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().build();
+                                    Games.Snapshots.commitAndClose(launcher.getGameHelper().getApiClient(), snapshot, metadataChange);
+                                    doAgain = true;
+                                } else {
+                                    ByteArrayInputStream in = new ByteArrayInputStream(gameData);
+                                    ObjectInputStream ois = new ObjectInputStream(in);
+                                    resultSnapshot = (BlackoutSnapshot) ois.readObject();
+                                    ois.close();
+                                }
+                            } catch (IOException e) {
+                                Log.v(TAG, "IOException " + e.getMessage());
+                            } catch (ClassNotFoundException e) {
+                                Log.v(TAG, "ClassNotFoundException " + e.getMessage());
                             }
-                        } catch (IOException e) {
-                            Log.v(TAG, "IOException " + e.getMessage());
-                        } catch (ClassNotFoundException e) {
-                            Log.v(TAG, "ClassNotFoundException " + e.getMessage());
+                        } else {
+                            Log.v(TAG, CANNOT_LOAD_SNAPSHOT);
                         }
-                    } else {
-                        Log.v(TAG, CANNOT_LOAD_SNAPSHOT);
+                    } while (doAgain);
+                    if (resultSnapshot != null) {
+                        break;
                     }
-                } while (doAgain);
+                }
                 return resultSnapshot;
             }
 

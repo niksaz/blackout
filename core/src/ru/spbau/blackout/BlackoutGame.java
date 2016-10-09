@@ -33,7 +33,7 @@ public class BlackoutGame extends Game {
 		hero.setHeight(0);
 		room.hero = hero;
 
-		setScreen(new GameScreen(this, room));
+		ScreenManager.getInstance().setScreen(new GameScreen(this, room));
 	}
 
 	public void setSnapshot(BlackoutSnapshot snapshot) {

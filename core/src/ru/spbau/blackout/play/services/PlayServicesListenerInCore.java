@@ -1,6 +1,5 @@
 package ru.spbau.blackout.play.services;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 
 import ru.spbau.blackout.BlackoutGame;

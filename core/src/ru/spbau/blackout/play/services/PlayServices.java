@@ -19,7 +19,7 @@ public interface PlayServices {
     int getBuyYourFirstItemId();
 
     int getCoinsEarnedLeaderboardId();
-    int getHighestRatingLeaderboradId();
+    int getHighestRatingLeaderboardId();
 
     void setCoreListener(PlayServicesListener coreListener);
 }

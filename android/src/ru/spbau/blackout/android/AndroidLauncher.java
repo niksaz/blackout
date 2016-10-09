@@ -215,7 +215,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     @Override
-    public int getHighestRatingLeaderboradId() {
+    public int getHighestRatingLeaderboardId() {
         return R.string.leaderboard_highest_rating;
     }
 
