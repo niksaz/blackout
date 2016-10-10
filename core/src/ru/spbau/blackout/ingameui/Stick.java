@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import ru.spbau.blackout.units.Rpx;
-import ru.spbau.blackout.units.Vpx;
 
 public class Stick {
     /**
