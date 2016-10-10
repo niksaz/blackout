@@ -145,7 +145,6 @@ public class GameScreen extends BlackoutScreen {
         for (Model model : models) {
             model.dispose();
         }
-        
         assets.dispose();
     }
 

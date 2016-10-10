@@ -14,12 +14,6 @@ public class Hero extends GameUnit {
     }
 
     @Override
-    protected void onInstance() {
-        // FIXME: just for test:
-        animation.setAnimation("Armature|Walk", -1);
-    }
-
-    @Override
     protected void postUpdate(float delta) {
 //        Gdx.app.error("Position", getPosition().x + " " + getPosition().y);
     }
