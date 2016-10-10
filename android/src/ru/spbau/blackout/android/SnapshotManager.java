@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.BlackoutSnapshot;
 
 class SnapshotManager {
@@ -65,12 +66,12 @@ class SnapshotManager {
                             snapshot = result.getSnapshot();
                             try {
                                 byte[] gameData = snapshot.getSnapshotContents().readFully();
-                                Games.Snapshots.discardAndClose(launcher.getGameHelper().getApiClient(), snapshot);
                                 if (gameData == null || gameData.length == 0) {
                                     Log.v(TAG, "NO game data");
-                                    writeSnapshot(new BlackoutSnapshot());
+                                    commitAndClose(snapshot, new BlackoutSnapshot());
                                     doAgain = true;
                                 } else {
+                                    Games.Snapshots.discardAndClose(launcher.getGameHelper().getApiClient(), snapshot);
                                     ByteArrayInputStream in = new ByteArrayInputStream(gameData);
                                     ObjectInputStream ois = new ObjectInputStream(in);
                                     resultSnapshot = (BlackoutSnapshot) ois.readObject();
@@ -115,14 +116,7 @@ class SnapshotManager {
                 if (result.getStatus().isSuccess()) {
                     snapshot = result.getSnapshot();
                     try {
-                        ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        ObjectOutputStream oos = new ObjectOutputStream(out);
-                        oos.writeObject(blackoutSnapshot);
-                        oos.close();
-
-                        snapshot.getSnapshotContents().writeBytes(out.toByteArray());
-                        SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().build();
-                        Games.Snapshots.commitAndClose(launcher.getGameHelper().getApiClient(), snapshot, metadataChange);
+                        commitAndClose(snapshot, blackoutSnapshot);
                     } catch (IOException e) {
                         Log.v(TAG, "IOException " + e.getMessage());
                     }
@@ -140,6 +134,17 @@ class SnapshotManager {
             }
         };
         task.execute();
+    }
+
+    private void commitAndClose(Snapshot snapshot, BlackoutSnapshot blackoutSnapshot) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(out);
+        oos.writeObject(blackoutSnapshot);
+        oos.close();
+
+        snapshot.getSnapshotContents().writeBytes(out.toByteArray());
+        SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().build();
+        Games.Snapshots.commitAndClose(launcher.getGameHelper().getApiClient(), snapshot, metadataChange);
     }
 
 }
