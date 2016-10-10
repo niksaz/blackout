@@ -14,18 +14,18 @@ import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
 class PlayScreenTable  {
 
-    private static final String PLAY_SCREEN_BACK_TEXT = "Back to main menu";
-    private static final String PLAY_SCREEN_QUICK_GAME_TEXT = "Quick Game";
-    private static final String PLAY_SCREEN_INVITE_PLAYERS_TEXT = "Invite Players";
-    private static final String PLAY_SCREEN_SHOW_INVITATIONS_TEXT = "Show Invitations";
+    private static final String BACK_TEXT = "Back to main menu";
+    private static final String QUICK_GAME_TEXT = "Quick Game";
+    private static final String INVITE_PLAYERS_TEXT = "Invite Players";
+    private static final String SHOW_INVITATIONS_TEXT = "Show Invitations";
 
     public static Table getTable(final BlackoutGame game, final MenuScreen screen) {
         final Table middleTable = new Table();
 
         final Drawable upImage = new TextureRegionDrawable(
-                new TextureRegion(new Texture(MenuScreen.MENU_BUTTON_UP_TEXTURE_PATH)));
+                new TextureRegion(new Texture(MenuScreen.BUTTON_UP_TEXTURE_PATH)));
         final Drawable downImage = new TextureRegionDrawable(
-                new TextureRegion(new Texture(MenuScreen.MENU_BUTTON_DOWN_TEXTURE_PATH)));
+                new TextureRegion(new Texture(MenuScreen.BUTTON_DOWN_TEXTURE_PATH)));
 
         // FIXME: just for test
         addButton(middleTable, "FIXME: test GameScreen", upImage, downImage, new ClickListener() {
@@ -35,10 +35,10 @@ class PlayScreenTable  {
             }
         });
 
-        addButton(middleTable, PLAY_SCREEN_QUICK_GAME_TEXT, upImage, downImage, null);
-        addButton(middleTable, PLAY_SCREEN_INVITE_PLAYERS_TEXT, upImage, downImage, null);
-        addButton(middleTable, PLAY_SCREEN_SHOW_INVITATIONS_TEXT, upImage, downImage, null);
-        addButton(middleTable, PLAY_SCREEN_BACK_TEXT, upImage, downImage, new ClickListener() {
+        addButton(middleTable, QUICK_GAME_TEXT, upImage, downImage, null);
+        addButton(middleTable, INVITE_PLAYERS_TEXT, upImage, downImage, null);
+        addButton(middleTable, SHOW_INVITATIONS_TEXT, upImage, downImage, null);
+        addButton(middleTable, BACK_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 screen.changeMiddleTable(MainMenuTable.getTable(game, screen));

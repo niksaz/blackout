@@ -22,17 +22,17 @@ import ru.spbau.blackout.utils.ScreenManager;
 
 class MenuScreen extends StageScreen {
 
-    private static final Color  MENU_BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
-    static final String MENU_BUTTON_UP_TEXTURE_PATH = "images/menuscreen/button_up.png";
-    static final String MENU_BUTTON_DOWN_TEXTURE_PATH = "images/menuscreen/button_down.png";
-    private static final String MENU_SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";
-    private static final String MENU_GAME_SERVICES_TEXTURE_PATH = "images/menuscreen/games_controller_grey.png";
+    private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
+    static final String BUTTON_UP_TEXTURE_PATH = "images/menuscreen/button_up.png";
+    static final String BUTTON_DOWN_TEXTURE_PATH = "images/menuscreen/button_down.png";
+    private static final String SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";
+    private static final String GAME_SERVICES_TEXTURE_PATH = "images/menuscreen/games_controller_grey.png";
 
     private static final float TEXT_SCALE = 1.5f;
-    private static final float MENU_BUTTON_PADDING = 10.0f;
+    private static final float BUTTON_PADDING = 10.0f;
     private static final float CORNER_LABEL_MARGIN = 20.0f;
-    private static final float MENU_SETTINGS_ICON_SIZE = 128.0f;
-    private static final float MENU_SETTINGS_ICON_PADDING = 12.0f;
+    private static final float SETTINGS_ICON_SIZE = 128.0f;
+    private static final float SETTINGS_ICON_PADDING = 12.0f;
 
     private Label goldLabel;
     private Table middleTable;
@@ -81,7 +81,7 @@ class MenuScreen extends StageScreen {
             button.addListener(listener);
         }
 
-        table.add(button).pad(MENU_BUTTON_PADDING).row();
+        table.add(button).pad(BUTTON_PADDING).row();
 
         return button;
     }
@@ -100,7 +100,7 @@ class MenuScreen extends StageScreen {
     }
 
     private Image addSettingsIcon(final Actor controlledImage) {
-        final Texture settingsTexture = new Texture(MENU_SETTINGS_TEXTURE_PATH);
+        final Texture settingsTexture = new Texture(SETTINGS_TEXTURE_PATH);
         final Image settingsImage = new Image(settingsTexture);
 
         settingsImage.addListener(new ClickListener() {
@@ -111,16 +111,16 @@ class MenuScreen extends StageScreen {
         });
 
         final Container<Image> settingsContainer = new Container<Image>(settingsImage);
-        settingsContainer.setWidth(MENU_SETTINGS_ICON_SIZE);
-        settingsContainer.setHeight(MENU_SETTINGS_ICON_SIZE);
-        settingsContainer.pad(MENU_SETTINGS_ICON_PADDING);
+        settingsContainer.setWidth(SETTINGS_ICON_SIZE);
+        settingsContainer.setHeight(SETTINGS_ICON_SIZE);
+        settingsContainer.pad(SETTINGS_ICON_PADDING);
         stage.addActor(settingsContainer);
 
         return settingsImage;
     }
 
     private Image addGooglePlayGamesServicesIcon() {
-        final Texture gamesServices = new Texture(MENU_GAME_SERVICES_TEXTURE_PATH);
+        final Texture gamesServices = new Texture(GAME_SERVICES_TEXTURE_PATH);
         Image gamesServicesImage = new Image(gamesServices);
         gamesServicesImage.setVisible(false);
 
@@ -133,10 +133,10 @@ class MenuScreen extends StageScreen {
         });
 
         final Container<Image> playContainer = new Container<Image>(gamesServicesImage);
-        playContainer.setWidth(MENU_SETTINGS_ICON_SIZE);
-        playContainer.setHeight(MENU_SETTINGS_ICON_SIZE);
-        playContainer.pad(MENU_SETTINGS_ICON_PADDING);
-        playContainer.setY(MENU_SETTINGS_ICON_SIZE);
+        playContainer.setWidth(SETTINGS_ICON_SIZE);
+        playContainer.setHeight(SETTINGS_ICON_SIZE);
+        playContainer.pad(SETTINGS_ICON_PADDING);
+        playContainer.setY(SETTINGS_ICON_SIZE);
         stage.addActor(playContainer);
 
         return gamesServicesImage;
@@ -145,8 +145,8 @@ class MenuScreen extends StageScreen {
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(
-                MENU_BACKGROUND_COLOR.r, MENU_BACKGROUND_COLOR.g,
-                MENU_BACKGROUND_COLOR.b, MENU_BACKGROUND_COLOR.a);
+                BACKGROUND_COLOR.r, BACKGROUND_COLOR.g,
+                BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         refreshGoldLabel();
 
