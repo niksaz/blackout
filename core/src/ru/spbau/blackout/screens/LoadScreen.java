@@ -42,12 +42,12 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
 
         addLabel(STARTED_LOG_IN);
 
-        blackoutGame.playServices.signIn();
+        game.playServices.signIn();
     }
 
     @Override
     public void onSignInFailed() {
-        blackoutGame.playServices.signIn();
+        game.playServices.signIn();
     }
 
     @Override
@@ -58,12 +58,12 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
                 addLabel(STARTED_LOADING);
             }
         });
-        blackoutGame.playServices.startLoadingSnapshot();
+        game.playServices.startLoadingSnapshot();
     }
 
     @Override
     public void finishedLoadingSnapshot() {
-        if (blackoutGame.getSnapshot() == null) {
+        if (game.getSnapshot() == null) {
             Gdx.app.exit();
         }
 
@@ -74,7 +74,7 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
-                ScreenManager.getInstance().setScreen(new MenuScreen(blackoutGame));
+                ScreenManager.getInstance().setScreen(new MenuScreen(game));
             }
         });
     }

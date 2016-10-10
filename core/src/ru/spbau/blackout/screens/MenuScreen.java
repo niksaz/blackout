@@ -54,7 +54,7 @@ class MenuScreen extends StageScreen {
 
     private void addLeftPaneElements() {
         addLabelWithTextAt(
-                "Hello, " + blackoutGame.playServices.getPlayerName(),
+                "Hello, " + game.playServices.getPlayerName(),
                 CORNER_LABEL_MARGIN,
                 stage.getViewport().getWorldHeight() - CORNER_LABEL_MARGIN,
                 Align.topLeft);
@@ -127,7 +127,7 @@ class MenuScreen extends StageScreen {
         gamesServicesImage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                blackoutGame.playServices.signOut();
+                game.playServices.signOut();
                 ScreenManager.getInstance().disposeScreen();
             }
         });
@@ -154,7 +154,7 @@ class MenuScreen extends StageScreen {
     }
 
     private void refreshGoldLabel() {
-        goldLabel.setText("Gold: " + blackoutGame.getSnapshot().getGold());
+        goldLabel.setText("Gold: " + game.getSnapshot().getGold());
         goldLabel.setSize(goldLabel.getPrefWidth(), goldLabel.getPrefHeight());
         goldLabel.setPosition(
                 stage.getViewport().getWorldWidth() - CORNER_LABEL_MARGIN,
