@@ -20,7 +20,7 @@ public class IngameUI {
         stage = new Stage(new ScreenViewport(camera), screen.getGame().spriteBatch);
         Gdx.input.setInputProcessor(stage);
 
-        stick = new Stick(stage);
+        stick = new Stick(stage, screen.getHero());
     }
 
     public void resize(int width, int height) {

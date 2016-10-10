@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import java.util.HashSet;
 
@@ -19,8 +20,8 @@ import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.rooms.GameRoom;
 
 public class GameScreen extends BlackoutScreen {
-    public static final float DEFAULT_CAMERA_X_OFFSET = 2;
-    public static final float DEFAULT_CAMERA_Y_OFFSET = 0;
+    public static final float DEFAULT_CAMERA_X_OFFSET = 0;
+    public static final float DEFAULT_CAMERA_Y_OFFSET = -2;
     public static final float DEFAULT_CAMERA_HEIGHT = 12;
 
     private ModelInstance map;
@@ -96,11 +97,12 @@ public class GameScreen extends BlackoutScreen {
         }
         hero.update(delta);
 
+        Vector2 heroPos = hero.getPosition();
         camera.position.set(
-                DEFAULT_CAMERA_X_OFFSET + hero.position.x,
-                DEFAULT_CAMERA_HEIGHT,
-                DEFAULT_CAMERA_Y_OFFSET + hero.position.y);
-        camera.lookAt(hero.position.x, 0, hero.position.y);
+                DEFAULT_CAMERA_X_OFFSET + heroPos.x,
+                DEFAULT_CAMERA_Y_OFFSET + heroPos.y,
+                DEFAULT_CAMERA_HEIGHT + hero.getHeight());
+        camera.lookAt(heroPos.x, heroPos.y, hero.getHeight());
         camera.update();
     }
 
@@ -143,6 +145,11 @@ public class GameScreen extends BlackoutScreen {
         for (Model model : models) {
             model.dispose();
         }
+        
         assets.dispose();
+    }
+
+    public Hero getHero() {
+        return hero;
     }
 }
