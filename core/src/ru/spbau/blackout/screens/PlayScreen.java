@@ -31,7 +31,7 @@ class PlayScreen extends MenuScreen {
         addButton(middleTable, "FIXME: test GameScreen", upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float  y) {
-                blackoutGame.testGameScreen();
+                PlayScreen.this.game.testGameScreen();
             }
         });
 
@@ -43,7 +43,7 @@ class PlayScreen extends MenuScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 // FIXME: ScreenManager
-                blackoutGame.setScreen(new MainMenu(blackoutGame));
+                PlayScreen.this.game.setScreen(new MainMenu(PlayScreen.this.game));
             }
         });
 

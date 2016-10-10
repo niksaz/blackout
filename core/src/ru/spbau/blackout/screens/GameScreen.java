@@ -16,6 +16,7 @@ import java.util.HashSet;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.rooms.GameRoom;
 
 public class GameScreen extends BlackoutScreen {
@@ -29,9 +30,9 @@ public class GameScreen extends BlackoutScreen {
     private PerspectiveCamera camera;
     private Array<GameUnit> units;
     private Hero hero;
+    private IngameUI ui;
 
     // just for test
-    private ModelBatch modelBatch;
     public Environment environment;
 
     private AssetManager assets;
@@ -45,20 +46,23 @@ public class GameScreen extends BlackoutScreen {
         units = room.getUnits();
         hero = room.getHero();
 
-        modelBatch = game.modelBatch;
+        ui = new IngameUI(this);
     }
 
     @Override
     public void show() {
+        // initialize main camera
         camera = new PerspectiveCamera();
         camera.fieldOfView = 67;
         camera.near = 1f;
         camera.far = 30000f;
 
+        // initialize environment
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
+        // start loading
         assets = new AssetManager();
         for (GameUnit unit : units) {
             assets.load(unit.getModelPath(), Model.class);
@@ -115,13 +119,15 @@ public class GameScreen extends BlackoutScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        modelBatch.begin(camera);
+        game.modelBatch.begin(camera);
         for (GameUnit unit : units) {
-            modelBatch.render(unit.getModelInstance(), environment);
+            game.modelBatch.render(unit.getModelInstance(), environment);
         }
-        modelBatch.render(hero.getModelInstance(), environment);
-        modelBatch.render(map, environment);
-        modelBatch.end();
+        game.modelBatch.render(hero.getModelInstance(), environment);
+        game.modelBatch.render(map, environment);
+        game.modelBatch.end();
+
+        ui.draw();
     }
 
     @Override
@@ -129,11 +135,12 @@ public class GameScreen extends BlackoutScreen {
         camera.viewportWidth = width;
         camera.viewportHeight = height;
         camera.update();
+        ui.resize(width, height);
     }
 
     @Override
     public void dispose() {
-        modelBatch.dispose();
+        game.modelBatch.dispose();
         for (Model model : models) {
             model.dispose();
         }

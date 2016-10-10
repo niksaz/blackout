@@ -111,9 +111,9 @@ abstract class MenuScreen extends BlackoutScreen {
         gamesServicesImage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (blackoutGame.playServices.isSignedIn()) {
-                    blackoutGame.playServices.signOut();
-                    blackoutGame.playServices.signIn();
+                if (game.playServices.isSignedIn()) {
+                    game.playServices.signOut();
+                    game.playServices.signIn();
                 }
             }
         });
@@ -131,8 +131,8 @@ abstract class MenuScreen extends BlackoutScreen {
 
     private void refreshPlayerName() {
         final String playerName;
-        if (blackoutGame.playServices.isSignedIn()) {
-            playerName = blackoutGame.playServices.getPlayerName();
+        if (game.playServices.isSignedIn()) {
+            playerName = game.playServices.getPlayerName();
         } else {
             playerName = "unknown";
         }

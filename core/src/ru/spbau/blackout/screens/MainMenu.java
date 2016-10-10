@@ -39,20 +39,20 @@ public class MainMenu extends MenuScreen {
         addButton(middleTable, MAIN_MENU_BUTTON_PLAY_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                blackoutGame.setScreen(new PlayScreen(blackoutGame));
+                MainMenu.this.game.setScreen(new PlayScreen(MainMenu.this.game));
             }
         });
         addButton(middleTable, MAIN_MENU_BUTTON_SHOP_TEXT, upImage, downImage, null);
         addButton(middleTable, MAIN_MENU_BUTTON_ACHIEVEMENTS_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                blackoutGame.playServices.showAchievements();
+                MainMenu.this.game.playServices.showAchievements();
             }
         });
         addButton(middleTable, MAIN_MENU_BUTTON_LEADERBOARD_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                blackoutGame.playServices.showLeaderboards();
+                MainMenu.this.game.playServices.showLeaderboards();
             }
         });
 
