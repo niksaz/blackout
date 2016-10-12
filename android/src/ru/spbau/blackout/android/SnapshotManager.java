@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.BlackoutSnapshot;
 
 class SnapshotManager {
