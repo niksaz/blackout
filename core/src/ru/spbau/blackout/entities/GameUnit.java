@@ -140,7 +140,7 @@ public class GameUnit {
     public final void makeInstance(Model model) {
         this.model = new ModelInstance(model, getPosition().x, height, getPosition().y);
         animation = new AnimationController(this.model);
-//        animation.setAnimation(Animations.STAY, -1);
+        animation.setAnimation(Animations.STAY, -1);
 
         onInstance();
     }
