@@ -6,83 +6,109 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import ru.spbau.blackout.entities.Hero;
-import ru.spbau.blackout.screens.GameScreen;
+import ru.spbau.blackout.units.Cm;
 import ru.spbau.blackout.units.Rpx;
 
 public class Stick extends DragListener {
-    /**
-     * All constants in centimeters.
-     */
     public static final class MainImg {
-        public static final float SIZE = 2f;
-        public static final float START_X = 0.3f;
-        private static final float START_Y = 0.3f;
+        public static final class CmC {
+            public static final float SIZE = 2f;
+            public static final float START_X = 0.3f;
+            private static final float START_Y = 0.3f;
+        }
+
+        public static final class RpxC {
+            public static final class X {
+                public static final int SIZE = Rpx.X.fromCm(CmC.SIZE);
+                private static final int START = Rpx.X.fromCm(CmC.START_X);
+                public static final float MAX_AT = MAX_FACTOR * (SIZE / 2);
+                public static final float CENTER = SIZE / 2;
+            }
+
+            public static final class Y {
+                public static final int SIZE = Rpx.Y.fromCm(CmC.SIZE);
+                private static final int START = Rpx.Y.fromCm(CmC.START_Y);
+                public static final float MAX_AT = MAX_FACTOR * (SIZE / 2);
+                public static final float CENTER = SIZE / 2;
+            }
+        }
 
         private static final float MAX_FACTOR = 0.8f;
-        public static final float MAX_AT_X = MAX_FACTOR * (SIZE / 2);
-        public static final float MAX_AT_Y = MAX_FACTOR * (SIZE / 2);
-
         public static final String IMAGE_PATH = "images/ingame_ui/stick_main.png";
     }
 
     public static final class TouchImg {
-        private static final float SIZE = 0.8f;
+        public static final class CmC {
+            private static final float SIZE = 0.3f;
+        }
+
+        public static final class RpxC {
+            public static final class X {
+                private static final float SIZE = Rpx.X.fromCm(CmC.SIZE);
+                private static final float CENTER = Rpx.X.fromCm(CmC.SIZE / 2);
+            }
+            public static final class Y {
+                private static final float SIZE = Rpx.Y.fromCm(CmC.SIZE);
+                private static final float CENTER = Rpx.Y.fromCm(CmC.SIZE / 2);
+            }
+        }
+
 
         public static final String IMAGE_PATH = "images/ingame_ui/stick_touch.png";
     }
 
-    private Vector2 velocity = new Vector2();
+    private final Vector2 velocity = new Vector2();
     private final Hero hero;
+    private final Image touchImage;
 
     public Stick(Stage stage, Hero hero) {
         this.hero = hero;
-        final Table table = new Table();
 
-        table.left().bottom();
-        table.padLeft(Rpx.X.fromCm(MainImg.START_X));
-        table.padBottom(Rpx.Y.fromCm(MainImg.START_Y));
+        touchImage = new Image(new Texture(TouchImg.IMAGE_PATH));
+        touchImage.setSize(TouchImg.RpxC.X.SIZE, TouchImg.RpxC.Y.SIZE);
+        touchImage.setPosition(
+                MainImg.RpxC.X.CENTER + MainImg.RpxC.X.START,
+                MainImg.RpxC.Y.CENTER + MainImg.RpxC.Y.START
+        );
+        stage.addActor(touchImage);
 
         Image mainImg = new Image(new Texture(MainImg.IMAGE_PATH));
-        mainImg.setSize(Rpx.X.fromCm(MainImg.SIZE), Rpx.Y.fromCm(MainImg.SIZE));
+        mainImg.setSize(MainImg.RpxC.X.SIZE, MainImg.RpxC.Y.SIZE);
+        mainImg.setPosition(MainImg.RpxC.X.START, MainImg.RpxC.Y.START);
         mainImg.addListener(this);
-
-        table.add(mainImg).size(Rpx.X.fromCm(MainImg.SIZE), Rpx.Y.fromCm(MainImg.SIZE));
-
-        stage.addActor(table);
+        stage.addActor(mainImg);
     }
 
     @Override
     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-        update(x, y);
+        movedTo(x, y);
         return super.touchDown(event, x, y, pointer, button);
     }
 
     @Override
     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-        updateShifted(0, 0);
         super.touchUp(event, x, y, pointer, button);
+        movedTo(MainImg.RpxC.X.CENTER, MainImg.RpxC.Y.CENTER);
     }
 
     @Override
     public void drag(InputEvent event, float x, float y, int pointer) {
-        update(x, y);
+        super.drag(event, x, y, pointer);
+        movedTo(x, y);
     }
 
-    private void update(float x, float y) {
-        updateShifted(
-                x - Rpx.X.fromCm(MainImg.SIZE / 2),
-                y - Rpx.Y.fromCm(MainImg.SIZE / 2)
+    private void movedTo(float x, float y) {
+        touchImage.setPosition(
+                x + MainImg.RpxC.X.START - TouchImg.RpxC.X.CENTER,
+                y + MainImg.RpxC.Y.START - TouchImg.RpxC.Y.CENTER
         );
-    }
 
-    private void updateShifted(float x, float y) {
         velocity.set(
-                x / Rpx.X.fromCm(MainImg.MAX_AT_X),
-                y / Rpx.Y.fromCm(MainImg.MAX_AT_Y)
+                (x - MainImg.RpxC.X.CENTER) / MainImg.RpxC.X.MAX_AT,
+                (y - MainImg.RpxC.Y.CENTER) / MainImg.RpxC.Y.MAX_AT
         );
 
         float len = velocity.len();

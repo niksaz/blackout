@@ -57,8 +57,8 @@ public class BlackoutGame extends Game {
 		spriteBatch = new SpriteBatch();
 
 		ScreenManager.getInstance().initialize(this);
-//		ScreenManager.getInstance().setScreen(new LoadScreen(this));
-        testGameScreen();
+		ScreenManager.getInstance().setScreen(new LoadScreen(this));
+//        testGameScreen();
 	}
 
 }
