@@ -17,7 +17,7 @@ public class GameUnit {
     // TODO: find or make an acceptable model
 
     public static class Animations {
-        public static final String WALK = "Armature|CastForward";
+        public static final String WALK = "Armature|Walk";
 //        public static final String WALK = "Armature|Walk"; // TODO: walk animation
         public static final String STAY = "Armature|Stay";
         public static final float WALK_SPEED_FACTOR = 2f;
