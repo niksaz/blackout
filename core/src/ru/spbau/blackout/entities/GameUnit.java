@@ -1,39 +1,57 @@
 package ru.spbau.blackout.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
+import ru.spbau.blackout.Utils;
 /**
  * Because the game is designed not as a game with many units,
  * but as a game with highly customized units, there is no class like `UnitType`.
  * So it contains all additional information like a path to its model.
  */
-public abstract class GameUnit {
+public class GameUnit {
+    // TODO: find or make an acceptable model
+
+    public static class Animations {
+        public static final String WALK = "Armature|Walk";
+//        public static final String WALK = "Armature|Walk"; // TODO: walk animation
+        public static final String STAY = "Armature|Stay";
+        public static final float WALK_SPEED_FACTOR = 3f;
+    }
+
     public static final float DEFAULT_HEIGHT = 5;
-
-    public Vector2 position = new Vector2();
-
-    public float height = DEFAULT_HEIGHT;
+    public static final float DEFAULT_SPEED = 10f;
 
     // movement:
-    protected Vector2 velocity = new Vector2();
-    protected float speed = 1;
+    final private Vector2 velocity = new Vector2();
+    final private Vector2 selfVelocity = new Vector2();
+    private float height = DEFAULT_HEIGHT;
 
-    // appearance
+    // position:
+    final private Vector2 position = new Vector2();
+    private float speed = DEFAULT_SPEED;
+
+    // appearance:
     protected ModelInstance model;
     protected AnimationController animation;
-
+    private float animationSpeed = 1f;
     protected String modelPath;
 
     public GameUnit(String modelPath, float initialX, float initialY) {
         this.modelPath = modelPath;
-        this.position = new Vector2(initialX, initialY);
+        this.position.set(initialX, initialY);
     }
 
     public GameUnit(String modelPath, Vector2 initialPosition) {
         this(modelPath, initialPosition.x, initialPosition.y);
+    }
+
+    public GameUnit(String modelPath) {
+        this(modelPath, 0, 0);
     }
 
     public float getHeight() {
@@ -42,6 +60,70 @@ public abstract class GameUnit {
 
     public void setHeight(float height) {
         this.height = height;
+    }
+
+    public Vector2 getSelfVelocity() {
+        return selfVelocity;
+    }
+
+    /**
+     * Rotation in radians.
+     */
+    public void setRotation(float rad) {
+        // FIXME: should use setRotation method instead. But doesn't exist
+        model.transform.setToRotationRad(Vector3.Y, rad);
+    }
+
+    /**
+     * Rotates unit to the given direction.
+     */
+    public void setDirection(Vector2 direction) {
+        setRotation(Utils.angleVec(direction));
+    }
+
+    public void setSelfVelocity(final Vector2 vel) {
+        // avoid excessive allocation
+        // Vector2 old = new Vector2(selfVelocity);
+        final float oldX = selfVelocity.x;
+        final float oldY = selfVelocity.y;
+
+        selfVelocity.set(vel.x, vel.y);
+        if (Utils.isZeroVec(selfVelocity)) {
+            // on stop walking
+            if (!Utils.isZeroVec(oldX, oldY)) {
+                animation.setAnimation(Animations.STAY, -1);
+                animationSpeed = 1f;
+            }
+        } else {
+            // on start walking
+            if (Utils.isZeroVec(oldX, oldY)) {
+                animation.setAnimation(Animations.WALK, -1);
+            }
+
+            animationSpeed = selfVelocity.len() * Animations.WALK_SPEED_FACTOR;
+            setDirection(selfVelocity);
+        }
+    }
+
+    public Vector2 getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(Vector2 velocity) {
+        this.velocity.set(velocity);
+    }
+
+    public void addVelocity(Vector2 velocity) {
+        this.velocity.x += velocity.x;
+        this.velocity.y += velocity.y;
+    }
+
+    public Vector2 getPosition() {
+        return position;
+    }
+
+    public void setPosition(float x, float y) {
+        position.set(x, y);
     }
 
     public String getModelPath() {
@@ -53,8 +135,9 @@ public abstract class GameUnit {
     }
 
     public final void makeInstance(Model model) {
-        this.model = new ModelInstance(model, position.x , height, position.y);
+        this.model = new ModelInstance(model, getPosition().x, height, getPosition().y);
         animation = new AnimationController(this.model);
+        animation.setAnimation(Animations.STAY, -1);
 
         onInstance();
     }
@@ -66,11 +149,13 @@ public abstract class GameUnit {
     public final void update(float delta) {
         preUpdate(delta);
 
-        float newX = position.x + velocity.x * speed * delta;
-        float newY = position.y + velocity.y * speed * delta;
+        float newX = getPosition().x + (getVelocity().x + getSelfVelocity().x * speed) * delta;
+        float newY = getPosition().y + (getVelocity().y + getSelfVelocity().y * speed) * delta;
 
-        model.transform.setToTranslation(newX, height, newY);
-        animation.update(delta);
+        setPosition(newX, newY);
+        model.transform.setTranslation(getPosition().x, getHeight(), getPosition().y);
+
+        animation.update(delta * animationSpeed);
 
         postUpdate(delta);
     }

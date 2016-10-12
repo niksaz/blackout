@@ -9,13 +9,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
+import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.units.Rpx;
 
-public class Stick {
+public class Stick extends DragListener {
     /**
      * All constants in centimeters.
      */
-    private static final class MainImg {
+    public static final class MainImg {
         public static final float SIZE = 2f;
         public static final float START_X = 0.3f;
         private static final float START_Y = 0.3f;
@@ -27,16 +29,18 @@ public class Stick {
         public static final String IMAGE_PATH = "images/ingame_ui/stick_main.png";
     }
 
-    private static final class TouchImg {
+    public static final class TouchImg {
         private static final float SIZE = 0.8f;
 
         public static final String IMAGE_PATH = "images/ingame_ui/stick_touch.png";
     }
 
     private Vector2 velocity = new Vector2();
+    private final Hero hero;
 
-    public Stick(Stage stage) {
-        Table table = new Table();
+    public Stick(Stage stage, Hero hero) {
+        this.hero = hero;
+        final Table table = new Table();
 
         table.left().bottom();
         table.padLeft(Rpx.X.fromCm(MainImg.START_X));
@@ -44,33 +48,52 @@ public class Stick {
 
         Image mainImg = new Image(new Texture(MainImg.IMAGE_PATH));
         mainImg.setSize(Rpx.X.fromCm(MainImg.SIZE), Rpx.Y.fromCm(MainImg.SIZE));
-        mainImg.addListener(new DragListener() {
-            @Override
-            public void drag(InputEvent event, float x, float y, int pointer) {
-                velocity.set(
-                        (x - Rpx.X.fromCm(MainImg.SIZE / 2)) / Rpx.X.fromCm(MainImg.MAX_AT_X),
-                        (y - Rpx.Y.fromCm(MainImg.SIZE / 2)) / Rpx.Y.fromCm(MainImg.MAX_AT_Y)
-                );
-
-                if (velocity.x < -1) {
-                    velocity.x = -1;
-                }
-                if (velocity.x > 1) {
-                    velocity.x = 1;
-                }
-                if (velocity.y < -1) {
-                    velocity.y = -1;
-                }
-                if (velocity.y > 1) {
-                    velocity.y = 1;
-                }
-
-                Gdx.app.error("MyTag", velocity.x + " " + velocity.y);
-            }
-        });
+        mainImg.addListener(this);
 
         table.add(mainImg).size(Rpx.X.fromCm(MainImg.SIZE), Rpx.Y.fromCm(MainImg.SIZE));
 
         stage.addActor(table);
+    }
+
+    @Override
+    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+        update(x, y);
+        return super.touchDown(event, x, y, pointer, button);
+    }
+
+    @Override
+    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+        updateShifted(0, 0);
+        super.touchUp(event, x, y, pointer, button);
+    }
+
+    @Override
+    public void drag(InputEvent event, float x, float y, int pointer) {
+        update(x, y);
+    }
+
+    private void update(float x, float y) {
+        updateShifted(
+                x - Rpx.X.fromCm(MainImg.SIZE / 2),
+                y - Rpx.Y.fromCm(MainImg.SIZE / 2)
+        );
+    }
+
+    private void updateShifted(float x, float y) {
+        velocity.set(
+                x / Rpx.X.fromCm(MainImg.MAX_AT_X),
+                y / Rpx.Y.fromCm(MainImg.MAX_AT_Y)
+        );
+
+        float len = velocity.len();
+        if (len > 1) {
+            velocity.x /= len;
+            velocity.y /= len;
+        }
+
+        // convert from (x,y) plane to (x, z) plane
+        velocity.y = -velocity.y;
+
+        hero.setSelfVelocity(velocity);
     }
 }

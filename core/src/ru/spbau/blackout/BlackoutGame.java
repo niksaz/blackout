@@ -29,9 +29,10 @@ public class BlackoutGame extends Game {
 		TestingRoom room = new TestingRoom();
 		room.map =  "maps/duel/duel.g3db";
 		
-		Hero hero = new Hero("models/magician/mage.g3db", 0, 0);
+		Hero hero = new Hero("models/wizard/wizard.g3db", 0, 0);
 		hero.setHeight(0);
 		room.hero = hero;
+
 
 		ScreenManager.getInstance().setScreen(new GameScreen(this, room));
 	}
@@ -56,7 +57,8 @@ public class BlackoutGame extends Game {
 		spriteBatch = new SpriteBatch();
 
 		ScreenManager.getInstance().initialize(this);
-		ScreenManager.getInstance().setScreen(new LoadScreen(this));
+//		ScreenManager.getInstance().setScreen(new LoadScreen(this));
+        testGameScreen();
 	}
 
 }
