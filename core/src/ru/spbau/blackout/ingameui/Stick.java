@@ -90,6 +90,10 @@ public class Stick extends DragListener {
             velocity.x /= len;
             velocity.y /= len;
         }
+
+        // convert from (x,y) plane to (x, z) plane
+        velocity.y = -velocity.y;
+
         hero.setSelfVelocity(velocity);
     }
 }

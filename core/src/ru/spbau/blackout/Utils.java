@@ -16,4 +16,9 @@ public final class Utils {
     public static boolean isZeroVec(float x, float y) {
         return floatEq(x, 0) && floatEq(y, 0);
     }
+
+    public static float angleVec(Vector2 vec) {
+        // convert from (x,y) plane to (x,z) plane
+        return -vec.angleRad();
+    }
 }

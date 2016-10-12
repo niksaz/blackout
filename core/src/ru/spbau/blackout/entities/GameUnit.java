@@ -17,10 +17,12 @@ public class GameUnit {
     // TODO: find or make an acceptable model
 
     public static class Animations {
-        public static final String WALK = "Armature|Walk";
-        public static final String STAY = "Armature|Hit"; // TODO: normal animation
+        public static final String WALK = "Armature|CastForward";
+//        public static final String WALK = "Armature|Walk"; // TODO: walk animation
+        public static final String STAY = "Armature|Stay";
         public static final float WALK_SPEED_FACTOR = 2f;
     }
+
 
     public static final float DEFAULT_HEIGHT = 5;
 
@@ -72,14 +74,14 @@ public class GameUnit {
      */
     public void setRotation(float rad) {
         // FIXME: should use setRotation method instead. But doesn't exist
-        model.transform.setToRotationRad(Vector3.Z, rad);
+        model.transform.setToRotationRad(Vector3.Y, rad);
     }
 
     /**
      * Rotates unit to the given direction.
      */
     public void setDirection(Vector2 direction) {
-        setRotation(direction.angleRad());
+        setRotation(Utils.angleVec(direction));
     }
 
     public void setSelfVelocity(final Vector2 vel) {
@@ -136,9 +138,9 @@ public class GameUnit {
     }
 
     public final void makeInstance(Model model) {
-        this.model = new ModelInstance(model, getPosition().x, getPosition().y, height);
+        this.model = new ModelInstance(model, getPosition().x, height, getPosition().y);
         animation = new AnimationController(this.model);
-        animation.setAnimation(Animations.STAY, -1);
+//        animation.setAnimation(Animations.STAY, -1);
 
         onInstance();
     }
@@ -154,7 +156,7 @@ public class GameUnit {
         float newY = getPosition().y + (getVelocity().y + getSelfVelocity().y * speed) * delta;
 
         setPosition(newX, newY);
-        model.transform.setTranslation(getPosition().x, getPosition().y, getHeight());
+        model.transform.setTranslation(getPosition().x, getHeight(), getPosition().y);
 
         animation.update(delta * animationSpeed);
 

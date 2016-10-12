@@ -21,8 +21,9 @@ import ru.spbau.blackout.rooms.GameRoom;
 
 public class GameScreen extends BlackoutScreen {
     public static final float DEFAULT_CAMERA_X_OFFSET = 0;
-    public static final float DEFAULT_CAMERA_Y_OFFSET = -2;
+    public static final float DEFAULT_CAMERA_Y_OFFSET = 2;
     public static final float DEFAULT_CAMERA_HEIGHT = 12;
+//    public static final float DEFAULT_CAMERA_HEIGHT = 5;
 
     private ModelInstance map;
     private GameRoom room;
@@ -59,8 +60,8 @@ public class GameScreen extends BlackoutScreen {
 
         // initialize environment
         environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 2f, 2f, 2f, 100f));
+        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, 0f, -1f));
 
         // start loading
         assets = new AssetManager();
@@ -100,9 +101,9 @@ public class GameScreen extends BlackoutScreen {
         Vector2 heroPos = hero.getPosition();
         camera.position.set(
                 DEFAULT_CAMERA_X_OFFSET + heroPos.x,
-                DEFAULT_CAMERA_Y_OFFSET + heroPos.y,
-                DEFAULT_CAMERA_HEIGHT + hero.getHeight());
-        camera.lookAt(heroPos.x, heroPos.y, hero.getHeight());
+                DEFAULT_CAMERA_HEIGHT + hero.getHeight(),
+                DEFAULT_CAMERA_Y_OFFSET + heroPos.y);
+        camera.lookAt(heroPos.x, hero.getHeight(), heroPos.y);
         camera.update();
     }
 
