@@ -11,6 +11,7 @@ public interface PlayServices {
     String getPlayerName();
 
     void startLoadingSnapshot();
+    void saveSnapshot(BlackoutSnapshot blackoutSnapshot);
 
     int getWin1vs1DuelId();
     int getWin2vs2FightId();

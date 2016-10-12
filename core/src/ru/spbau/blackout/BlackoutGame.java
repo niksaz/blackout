@@ -15,7 +15,7 @@ import ru.spbau.blackout.utils.ScreenManager;
 
 public class BlackoutGame extends Game {
 
-	public final PlayServices playServices;
+	public static PlayServices playServices = null;
 	private BlackoutSnapshot snapshot;
 
 	public static final int VIRTUAL_WORLD_WIDTH = 1280;
@@ -46,7 +46,7 @@ public class BlackoutGame extends Game {
 	}
 
 	public BlackoutGame(PlayServices playServices) {
-		this.playServices = playServices;
+		BlackoutGame.playServices = playServices;
 		PlayServicesListenerInCore.getInstance().initialize(this);
 		playServices.setCoreListener(PlayServicesListenerInCore.getInstance());
 	}
@@ -58,7 +58,6 @@ public class BlackoutGame extends Game {
 
 		ScreenManager.getInstance().initialize(this);
 		ScreenManager.getInstance().setScreen(new LoadScreen(this));
-//        testGameScreen();
 	}
 
 }

@@ -14,13 +14,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.BlackoutSnapshot;
 
 class SnapshotManager {
-
-    private static final int MAX_ATTEMPTS = 3;
-
     private static SnapshotManager manager;
 
     private static final String TAG = "SnapshotManager";
@@ -54,7 +50,8 @@ class SnapshotManager {
             @Override
             protected BlackoutSnapshot doInBackground(Void... voids) {
                 BlackoutSnapshot resultSnapshot = null;
-                for (int i = 0; i < MAX_ATTEMPTS; i++) {
+                boolean first = true;
+                for (int i = 0; ; i++) {
                     boolean doAgain;
                     do {
                         doAgain = false;
@@ -66,12 +63,19 @@ class SnapshotManager {
                             snapshot = result.getSnapshot();
                             try {
                                 byte[] gameData = snapshot.getSnapshotContents().readFully();
-                                if (gameData == null || gameData.length == 0) {
+                                if (first || gameData == null || gameData.length == 0) {
                                     Log.v(TAG, "NO game data");
-                                    commitAndClose(snapshot, new BlackoutSnapshot());
+                                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                                    ObjectOutputStream oos = new ObjectOutputStream(out);
+                                    oos.writeObject(new BlackoutSnapshot());
+                                    oos.close();
+
+                                    snapshot.getSnapshotContents().writeBytes(out.toByteArray());
+                                    SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().build();
+                                    Games.Snapshots.commitAndClose(launcher.getGameHelper().getApiClient(), snapshot, metadataChange);
                                     doAgain = true;
+                                    first = false;
                                 } else {
-                                    Games.Snapshots.discardAndClose(launcher.getGameHelper().getApiClient(), snapshot);
                                     ByteArrayInputStream in = new ByteArrayInputStream(gameData);
                                     ObjectInputStream ois = new ObjectInputStream(in);
                                     resultSnapshot = (BlackoutSnapshot) ois.readObject();
@@ -83,6 +87,7 @@ class SnapshotManager {
                                 Log.v(TAG, "ClassNotFoundException " + e.getMessage());
                             }
                         } else {
+                            Log.v(TAG, result.getStatus().toString());
                             Log.v(TAG, CANNOT_LOAD_SNAPSHOT);
                         }
                     } while (doAgain);
@@ -105,7 +110,7 @@ class SnapshotManager {
         task.execute();
     }
 
-    void writeSnapshot(final BlackoutSnapshot blackoutSnapshot) {
+    void saveSnapshot(final BlackoutSnapshot blackoutSnapshot) {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -128,9 +133,6 @@ class SnapshotManager {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                if (!launcher.isForeground()) {
-                    launcher.getGameHelper().onStop();
-                }
             }
         };
         task.execute();

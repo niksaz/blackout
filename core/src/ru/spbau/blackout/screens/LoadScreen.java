@@ -41,7 +41,6 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
         stage.addActor(middleTable);
 
         addLabel(STARTED_LOG_IN);
-
         game.playServices.signIn();
     }
 
