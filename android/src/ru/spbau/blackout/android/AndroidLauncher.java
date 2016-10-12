@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.snapshot.Snapshot;
 import com.google.example.games.basegameutils.GameHelper;
 import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 
@@ -79,7 +80,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     protected void onStop() {
         foreground = false;
         super.onStop();
-        writeSnapshot(game.getSnapshot());
     }
 
     public boolean isForeground() {
@@ -181,17 +181,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
     }
 
-    public void writeSnapshot(final BlackoutSnapshot blackoutSnapshot) {
-        try {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    SnapshotManager.getInstance().writeSnapshot(blackoutSnapshot);
-                }
-            });
-        } catch (Exception e) {
-            Gdx.app.log(TAG, "writeSnapshot: " + e.getMessage());
-        }
+    @Override
+    public void saveSnapshot(BlackoutSnapshot blackoutSnapshot) {
+        SnapshotManager.getInstance().saveSnapshot(blackoutSnapshot);
     }
 
     private void userIsNotSignedInDialog() {
