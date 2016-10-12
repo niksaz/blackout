@@ -20,28 +20,25 @@ public class GameUnit {
         public static final String WALK = "Armature|Walk";
 //        public static final String WALK = "Armature|Walk"; // TODO: walk animation
         public static final String STAY = "Armature|Stay";
-        public static final float WALK_SPEED_FACTOR = 2f;
+        public static final float WALK_SPEED_FACTOR = 3f;
     }
 
-
     public static final float DEFAULT_HEIGHT = 5;
-
-    final private Vector2 position = new Vector2();
-    public float height = DEFAULT_HEIGHT;
+    public static final float DEFAULT_SPEED = 10f;
 
     // movement:
-    final protected Vector2 velocity = new Vector2();
-    /**
-     *
-     */
-    final protected Vector2 selfVelocity = new Vector2();
-    protected float speed = 7f;
+    final private Vector2 velocity = new Vector2();
+    final private Vector2 selfVelocity = new Vector2();
+    private float height = DEFAULT_HEIGHT;
 
-    // appearance
+    // position:
+    final private Vector2 position = new Vector2();
+    private float speed = DEFAULT_SPEED;
+
+    // appearance:
     protected ModelInstance model;
     protected AnimationController animation;
-    protected float animationSpeed = 1f;
-
+    private float animationSpeed = 1f;
     protected String modelPath;
 
     public GameUnit(String modelPath, float initialX, float initialY) {

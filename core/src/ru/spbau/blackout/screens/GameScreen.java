@@ -22,7 +22,7 @@ import ru.spbau.blackout.rooms.GameRoom;
 public class GameScreen extends BlackoutScreen {
     public static final float DEFAULT_CAMERA_X_OFFSET = 0;
     public static final float DEFAULT_CAMERA_Y_OFFSET = 2;
-    public static final float DEFAULT_CAMERA_HEIGHT = 12;
+    public static final float DEFAULT_CAMERA_HEIGHT = 18;
 //    public static final float DEFAULT_CAMERA_HEIGHT = 5;
 
     private ModelInstance map;
