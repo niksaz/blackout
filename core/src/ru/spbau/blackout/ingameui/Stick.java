@@ -8,8 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
+import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.units.Rpx;
 
 public class Stick extends DragListener {

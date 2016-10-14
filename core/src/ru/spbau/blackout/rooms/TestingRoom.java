@@ -1,14 +1,13 @@
 package ru.spbau.blackout.rooms;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.Array;
 
-import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 
 public class TestingRoom extends GameRoom {
     public String map;
-    public Array<GameUnit> units = new Array<GameUnit>();
+    public Array<GameObject> objects = new Array<GameObject>();
     public Hero hero;
 
     @Override
@@ -17,8 +16,8 @@ public class TestingRoom extends GameRoom {
     }
 
     @Override
-    public Array<GameUnit> getUnits() {
-        return units;
+    public Array<GameObject> getObjects() {
+        return objects;
     }
 
     @Override

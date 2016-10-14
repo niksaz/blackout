@@ -11,10 +11,9 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import java.util.HashSet;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.rooms.GameRoom;
@@ -28,7 +27,7 @@ public class GameScreen extends BlackoutScreen {
     private GameRoom room;
 
     private PerspectiveCamera camera;
-    private Array<GameUnit> units;
+    private Array<GameObject> units;
     private Hero hero;
     private IngameUI ui;
 
@@ -42,7 +41,7 @@ public class GameScreen extends BlackoutScreen {
         super(game);
         this.room = room;
 
-        units = room.getUnits();
+        units = room.getObjects();
         hero = room.getHero();
 
         ui = new IngameUI(this);
@@ -66,7 +65,7 @@ public class GameScreen extends BlackoutScreen {
         // start loading
         assets = new AssetManager();
         ui.load(assets);
-        for (GameUnit unit : units) {
+        for (GameObject unit : units) {
             assets.load(unit.getModelPath(), Model.class);
         }
         assets.load(hero.getModelPath(), Model.class);
@@ -96,7 +95,7 @@ public class GameScreen extends BlackoutScreen {
         update(delta);
 
         game.modelBatch.begin(camera);
-        for (GameUnit unit : units) {
+        for (GameObject unit : units) {
             game.modelBatch.render(unit.getModelInstance(), environment);
         }
         game.modelBatch.render(hero.getModelInstance(), environment);
@@ -125,13 +124,13 @@ public class GameScreen extends BlackoutScreen {
         return hero;
     }
 
-    private void doneLoadingForUnit(GameUnit unit) {
+    private void doneLoadingForUnit(GameObject unit) {
         Model model = assets.get(unit.getModelPath(), Model.class);
         unit.makeInstance(model);
     }
 
     private void doneLoading() {
-        for (GameUnit unit : units) {
+        for (GameObject unit : units) {
             doneLoadingForUnit(unit);
         }
         doneLoadingForUnit(hero);
@@ -143,7 +142,7 @@ public class GameScreen extends BlackoutScreen {
     }
 
     private void update(float delta) {
-        for (GameUnit unit : units) {
+        for (GameObject unit : units) {
             unit.update(delta);
         }
         hero.update(delta);
