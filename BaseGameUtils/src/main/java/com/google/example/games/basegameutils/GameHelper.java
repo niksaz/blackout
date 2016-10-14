@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.content.SharedPreferences;
@@ -375,7 +376,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
             }
         } else {
             debugLog("Not attempting to connect becase mConnectOnStart=false");
-
+            mConnectOnStart = true;
             // NOTICE:
             // FILE EXPLICITLY CHANGED. SHOULD NOT HAVE THIS BEHAVIOUR
 //            debugLog("Instead, reporting a sign-in failure.");
@@ -928,8 +929,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     }
 
     /** Shows an error dialog that's appropriate for the failure reason. */
-    public static void showFailureDialog(Activity activity, int actResp,
-                                         int errorCode) {
+    public static void showFailureDialog(Activity activity, int actResp, int errorCode) {
         if (activity == null) {
             Log.e("GameHelper", "*** No Activity. Can't show failure dialog!");
             return;
@@ -970,7 +970,7 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
         errorDialog.show();
     }
 
-    static Dialog makeSimpleDialog(Activity activity, String text) {
+    static Dialog makeSimpleDialog(final Activity activity, String text) {
         return (new AlertDialog.Builder(activity)).setMessage(text)
                 .setNeutralButton(android.R.string.ok, null).create();
     }

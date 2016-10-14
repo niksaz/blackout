@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.CorePlayServicesListener;
-import ru.spbau.blackout.play.services.PlayServicesListenerInCore;
+import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.utils.ScreenManager;
 
 public class LoadScreen extends StageScreen implements CorePlayServicesListener {
@@ -34,19 +34,14 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
     public void show() {
         super.show();
 
-        PlayServicesListenerInCore.getInstance().addListener(this);
+        PlayServicesInCore.getInstance().addListener(this);
 
         middleTable = new Table();
         middleTable.setFillParent(true);
         stage.addActor(middleTable);
 
         addLabel(STARTED_LOG_IN);
-        game.playServices.signIn();
-    }
-
-    @Override
-    public void onSignInFailed() {
-        game.playServices.signIn();
+        PlayServicesInCore.getInstance().getPlayServices().signIn();
     }
 
     @Override
@@ -57,16 +52,12 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
                 addLabel(STARTED_LOADING);
             }
         });
-        game.playServices.startLoadingSnapshot();
+        PlayServicesInCore.getInstance().getPlayServices().startLoadingSnapshot();
     }
 
     @Override
     public void finishedLoadingSnapshot() {
-        if (game.getSnapshot() == null) {
-            Gdx.app.exit();
-        }
-
-        PlayServicesListenerInCore.getInstance().removeListener(this);
+        PlayServicesInCore.getInstance().removeListener(this);
         middleTable.remove();
         middleTable = null;
 

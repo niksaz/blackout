@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.utils.ScreenManager;
 
 class MenuScreen extends StageScreen {
@@ -54,7 +55,7 @@ class MenuScreen extends StageScreen {
 
     private void addLeftPaneElements() {
         addLabelWithTextAt(
-                "Hello, " + game.playServices.getPlayerName(),
+                "Hello, " + PlayServicesInCore.getInstance().getPlayServices().getPlayerName(),
                 CORNER_LABEL_MARGIN,
                 stage.getViewport().getWorldHeight() - CORNER_LABEL_MARGIN,
                 Align.topLeft);
@@ -127,7 +128,7 @@ class MenuScreen extends StageScreen {
         gamesServicesImage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.playServices.signOut();
+                PlayServicesInCore.getInstance().getPlayServices().signOut();
                 ScreenManager.getInstance().disposeScreen();
             }
         });
@@ -154,7 +155,7 @@ class MenuScreen extends StageScreen {
     }
 
     private void refreshGoldLabel() {
-        goldLabel.setText("Gold: " + game.getSnapshot().getGold());
+        goldLabel.setText("Gold: " + PlayServicesInCore.getInstance().getSnapshot().getGold());
         goldLabel.setSize(goldLabel.getPrefWidth(), goldLabel.getPrefHeight());
         goldLabel.setPosition(
                 stage.getViewport().getWorldWidth() - CORNER_LABEL_MARGIN,

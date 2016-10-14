@@ -1,13 +1,16 @@
 package ru.spbau.blackout.android;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.android.gms.games.Games;
-import com.google.android.gms.games.snapshot.Snapshot;
+import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.example.games.basegameutils.GameHelper;
 import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 
@@ -21,10 +24,19 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     private static final String TAG = "AndroidLauncher";
     private static final String NOT_SIGNED_MESSAGE = "Unsuccessful. You is not signed in to Google Play Games Services.";
 
+    private static final String RESULT_APP_MISCONFIGURED_MS =
+        "The application is incorrectly configured. Check that the package name and signing" +
+        " certificate match the client ID created in Developer Console. Also, " +
+        "if the application is not yet published, check that the account you are trying" +
+        " to sign in with is listed as a tester account. See logs for more information.";
+    private static final String RESULT_SIGN_IN_FAILED_MS =
+        "Failed to sign in. Please check your network connection and try again.";
+    private static final String RESULT_LICENSE_FAILED_MS = "License check failed.";
+    private static final String DEFAULT_MS = "Unknown error.";
+
     private static final int REQUEST_ACHIEVEMENTS = 918273645;
     private static final int REQUEST_LEADERBOARDS = 918273644;
 
-    private BlackoutGame game;
     private GameHelper gameHelper;
     private PlayServicesListener coreListener;
     private boolean foreground;
@@ -36,7 +48,40 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         GameHelperListener gameHelperListener = new GameHelperListener() {
             @Override
             public void onSignInFailed() {
-                coreListener.onSignInFailed();
+                GameHelper.SignInFailureReason reason = gameHelper.getSignInError();
+                Log.v(TAG, reason.toString());
+
+                int resultCode = reason.getActivityResultCode();
+                final String text;
+
+                switch (resultCode) {
+                    case GamesActivityResultCodes.RESULT_APP_MISCONFIGURED:
+                        text = RESULT_APP_MISCONFIGURED_MS;
+                        break;
+
+                    case GamesActivityResultCodes.RESULT_SIGN_IN_FAILED:
+                        text = RESULT_SIGN_IN_FAILED_MS;
+                        break;
+
+                    case GamesActivityResultCodes.RESULT_LICENSE_FAILED:
+                        text = RESULT_LICENSE_FAILED_MS;
+                        break;
+
+                    default:
+                        text = DEFAULT_MS;
+                        break;
+                }
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setCancelable(false);
+                builder.setMessage(text);
+                builder.setNeutralButton(R.string.try_again, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        signIn();
+                    }
+                });
+                builder.create().show();
             }
 
             @Override
@@ -47,13 +92,14 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
         gameHelper = new GameHelper(this, GameHelper.CLIENT_ALL);
         gameHelper.enableDebugLog(true);
+        gameHelper.setShowErrorDialogs(false);
         gameHelper.setConnectOnStart(false);
         gameHelper.setup(gameHelperListener);
 
         SnapshotManager.getInstance().initialize(this);
 
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        game = new BlackoutGame(this);
+        final BlackoutGame game = new BlackoutGame(this);
         initialize(game, config);
     }
 
@@ -82,7 +128,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         super.onStop();
     }
 
-    public boolean isForeground() {
+    boolean isForeground() {
         return foreground;
     }
 

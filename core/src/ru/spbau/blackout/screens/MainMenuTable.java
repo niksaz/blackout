@@ -15,10 +15,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.play.services.PlayServicesInCore;
 
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
-public class MainMenuTable {
+class MainMenuTable {
 
     private static final Color BLACKOUT_LABEL_COLOR = Color.WHITE;
 
@@ -31,7 +32,7 @@ public class MainMenuTable {
     private static final String BUTTON_ACHIEVEMENTS_TEXT = "Achievements";
     private static final String BUTTON_LEADERBOARD_TEXT = "Leaderboard";
 
-    public static Table getTable(final BlackoutGame game, final MenuScreen screen) {
+    static Table getTable(final BlackoutGame game, final MenuScreen screen) {
         final Table middleTable = new Table();
         addBlackoutLabel(middleTable);
 
@@ -47,19 +48,19 @@ public class MainMenuTable {
         addButton(middleTable, BUTTON_SHOP_TEXT, upImage, downImage, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.getSnapshot().changeGold(10);
+                PlayServicesInCore.getInstance().getSnapshot().changeGold(10);
             }
         });
         addButton(middleTable, BUTTON_ACHIEVEMENTS_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.playServices.showAchievements();
+                PlayServicesInCore.getInstance().getPlayServices().showAchievements();
             }
         });
         addButton(middleTable, BUTTON_LEADERBOARD_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.playServices.showLeaderboards();
+                PlayServicesInCore.getInstance().getPlayServices().showLeaderboards();
             }
         });
 
