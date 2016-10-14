@@ -3,6 +3,7 @@ package ru.spbau.blackout;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.physics.box2d.Box2D;
 
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
@@ -57,6 +58,7 @@ public class BlackoutGame extends Game {
 	public void create() {
 		modelBatch = new ModelBatch();
 		spriteBatch = new SpriteBatch();
+        Box2D.init();
 
 		ScreenManager.getInstance().initialize(this);
 		ScreenManager.getInstance().setScreen(new LoadScreen(this));
