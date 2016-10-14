@@ -37,7 +37,6 @@ public class GameScreen extends BlackoutScreen {
     public Environment environment;
 
     private AssetManager assets;
-    private HashSet<Model> models = new HashSet<Model>();
     private boolean loading;
 
     public GameScreen(BlackoutGame game, GameRoom room) {
@@ -76,7 +75,6 @@ public class GameScreen extends BlackoutScreen {
     private void doneLoadingForUnit(GameUnit unit) {
         Model model = assets.get(unit.getModelPath(), Model.class);
         unit.makeInstance(model);
-        models.add(model);
     }
 
     private void doneLoading() {
@@ -85,9 +83,7 @@ public class GameScreen extends BlackoutScreen {
         }
         doneLoadingForUnit(hero);
 
-        Model model = assets.get(room.getMap(), Model.class);
-        map = new ModelInstance(model);
-        models.add(model);
+        map = new ModelInstance(assets.get(room.getMap(), Model.class));
 
         loading = false;
     }
@@ -109,17 +105,21 @@ public class GameScreen extends BlackoutScreen {
 
     @Override
     public void render(float delta) {
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
         if (loading) {
             if (assets.update()) {
                 doneLoading();
             }
+            /*float progress = assets.getProgress();
+            if(assets.isLoaded(LOADING_SCREEN)) {
+            }*/
+            // TODO: loading screen with progress bar
             return;
         }
 
         update(delta);
-
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         game.modelBatch.begin(camera);
         for (GameUnit unit : units) {
@@ -142,10 +142,6 @@ public class GameScreen extends BlackoutScreen {
 
     @Override
     public void dispose() {
-        game.modelBatch.dispose();
-        for (Model model : models) {
-            model.dispose();
-        }
         assets.dispose();
     }
 

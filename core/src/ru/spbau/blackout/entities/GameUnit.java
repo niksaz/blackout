@@ -91,13 +91,13 @@ public class GameUnit {
         if (Utils.isZeroVec(selfVelocity)) {
             // on stop walking
             if (!Utils.isZeroVec(oldX, oldY)) {
-                animation.setAnimation(Animations.STAY, -1);
+//                animation.setAnimation(Animations.STAY, -1);
                 animationSpeed = 1f;
             }
         } else {
             // on start walking
             if (Utils.isZeroVec(oldX, oldY)) {
-                animation.setAnimation(Animations.WALK, -1);
+//                animation.setAnimation(Animations.WALK, -1);
             }
 
             animationSpeed = selfVelocity.len() * Animations.WALK_SPEED_FACTOR;
@@ -137,7 +137,7 @@ public class GameUnit {
     public final void makeInstance(Model model) {
         this.model = new ModelInstance(model, getPosition().x, height, getPosition().y);
         animation = new AnimationController(this.model);
-        animation.setAnimation(Animations.STAY, -1);
+//        animation.setAnimation(Animations.STAY, -1);
 
         onInstance();
     }
