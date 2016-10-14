@@ -18,7 +18,7 @@ public final class Utils {
     }
 
     public static float angleVec(Vector2 vec) {
-        // convert from (x,y) plane to (x,z) plane
+        // minus due to conversion between (x,y) plane and (x,z) plane
         return -vec.angleRad();
     }
 }

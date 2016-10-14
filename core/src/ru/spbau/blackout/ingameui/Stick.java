@@ -8,8 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
-import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.units.Rpx;
 
 public class Stick extends DragListener {
@@ -57,10 +56,10 @@ public class Stick extends DragListener {
     }
 
     private Vector2 velocity = new Vector2(0, 0);
-    private GameUnit unit;
+    private DynamicObject unit;
     private Image touchImage;
 
-    public Stick(GameUnit unit) {
+    public Stick(DynamicObject unit) {
         this.unit = unit;
     }
 

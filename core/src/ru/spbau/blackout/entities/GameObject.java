@@ -28,14 +28,6 @@ public abstract class GameObject {
         this.position.set(initialX, initialY);
     }
 
-    public GameObject(String modelPath, Vector2 initialPosition) {
-        this(modelPath, initialPosition.x, initialPosition.y);
-    }
-
-    public GameObject(String modelPath) {
-        this(modelPath, 0, 0);
-    }
-
     public final float getHeight() {
         return height;
     }
