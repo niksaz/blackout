@@ -173,6 +173,7 @@ class SnapshotManager {
                 shouldTry = false;
 
                 if (!launcher.getGameHelper().getApiClient().isConnected()) {
+                    shouldTry = true;
                     break;
                 }
 
@@ -193,6 +194,11 @@ class SnapshotManager {
 
                             snapshot.getSnapshotContents().writeBytes(out.toByteArray());
                             SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().build();
+
+                            if (!launcher.getGameHelper().getApiClient().isConnected()) {
+                                shouldTry = true;
+                                break;
+                            }
                             Games.Snapshots.commitAndClose(launcher.getGameHelper().getApiClient(), snapshot, metadataChange);
                         } catch (IOException e) {
                             shouldTry = true;
