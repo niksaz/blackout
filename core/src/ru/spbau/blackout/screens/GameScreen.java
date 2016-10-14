@@ -11,10 +11,9 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import java.util.HashSet;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.rooms.GameRoom;
@@ -23,13 +22,12 @@ public class GameScreen extends BlackoutScreen {
     public static final float DEFAULT_CAMERA_X_OFFSET = 0;
     public static final float DEFAULT_CAMERA_Y_OFFSET = 2;
     public static final float DEFAULT_CAMERA_HEIGHT = 18;
-//    public static final float DEFAULT_CAMERA_HEIGHT = 5;
 
     private ModelInstance map;
     private GameRoom room;
 
     private PerspectiveCamera camera;
-    private Array<GameUnit> units;
+    private Array<GameObject> units;
     private Hero hero;
     private IngameUI ui;
 
@@ -37,14 +35,13 @@ public class GameScreen extends BlackoutScreen {
     public Environment environment;
 
     private AssetManager assets;
-    private HashSet<Model> models = new HashSet<Model>();
     private boolean loading;
 
     public GameScreen(BlackoutGame game, GameRoom room) {
         super(game);
         this.room = room;
 
-        units = room.getUnits();
+        units = room.getObjects();
         hero = room.getHero();
 
         ui = new IngameUI(this);
@@ -52,6 +49,8 @@ public class GameScreen extends BlackoutScreen {
 
     @Override
     public void show() {
+        super.show();
+
         // initialize main camera
         camera = new PerspectiveCamera();
         camera.fieldOfView = 67;
@@ -65,7 +64,8 @@ public class GameScreen extends BlackoutScreen {
 
         // start loading
         assets = new AssetManager();
-        for (GameUnit unit : units) {
+        ui.load(assets);
+        for (GameObject unit : units) {
             assets.load(unit.getModelPath(), Model.class);
         }
         assets.load(hero.getModelPath(), Model.class);
@@ -73,56 +73,29 @@ public class GameScreen extends BlackoutScreen {
         loading = true;
     }
 
-    private void doneLoadingForUnit(GameUnit unit) {
-        Model model = assets.get(unit.getModelPath(), Model.class);
-        unit.makeInstance(model);
-        models.add(model);
-    }
-
-    private void doneLoading() {
-        for (GameUnit unit : units) {
-            doneLoadingForUnit(unit);
-        }
-        doneLoadingForUnit(hero);
-
-        Model model = assets.get(room.getMap(), Model.class);
-        map = new ModelInstance(model);
-        models.add(model);
-
-        loading = false;
-    }
-
-    private void update(float delta) {
-        for (GameUnit unit : units) {
-            unit.update(delta);
-        }
-        hero.update(delta);
-
-        Vector2 heroPos = hero.getPosition();
-        camera.position.set(
-                DEFAULT_CAMERA_X_OFFSET + heroPos.x,
-                DEFAULT_CAMERA_HEIGHT + hero.getHeight(),
-                DEFAULT_CAMERA_Y_OFFSET + heroPos.y);
-        camera.lookAt(heroPos.x, hero.getHeight(), heroPos.y);
-        camera.update();
-    }
-
     @Override
     public void render(float delta) {
+        super.render(delta);
+
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
         if (loading) {
             if (assets.update()) {
                 doneLoading();
             }
+            /*float progress = assets.getProgress();
+            if(assets.isLoaded(LOADING_SCREEN)) {
+            }*/
+
+            // TODO: loading screen with progress bar
             return;
         }
 
         update(delta);
 
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
         game.modelBatch.begin(camera);
-        for (GameUnit unit : units) {
+        for (GameObject unit : units) {
             game.modelBatch.render(unit.getModelInstance(), environment);
         }
         game.modelBatch.render(hero.getModelInstance(), environment);
@@ -134,6 +107,7 @@ public class GameScreen extends BlackoutScreen {
 
     @Override
     public void resize(int width, int height) {
+        super.resize(width, height);
         camera.viewportWidth = width;
         camera.viewportHeight = height;
         camera.update();
@@ -142,14 +116,43 @@ public class GameScreen extends BlackoutScreen {
 
     @Override
     public void dispose() {
-        game.modelBatch.dispose();
-        for (Model model : models) {
-            model.dispose();
-        }
+        super.dispose();
         assets.dispose();
     }
 
     public Hero getHero() {
         return hero;
+    }
+
+    private void doneLoadingForUnit(GameObject unit) {
+        Model model = assets.get(unit.getModelPath(), Model.class);
+        unit.makeInstance(model);
+    }
+
+    private void doneLoading() {
+        for (GameObject unit : units) {
+            doneLoadingForUnit(unit);
+        }
+        doneLoadingForUnit(hero);
+
+        map = new ModelInstance(assets.get(room.getMap(), Model.class));
+        ui.doneLoading(assets);
+
+        loading = false;
+    }
+
+    private void update(float delta) {
+        for (GameObject unit : units) {
+            unit.update(delta);
+        }
+        hero.update(delta);
+
+        Vector2 heroPos = hero.getPosition();
+        camera.position.set(
+                DEFAULT_CAMERA_X_OFFSET + heroPos.x,
+                DEFAULT_CAMERA_HEIGHT + hero.getHeight(),
+                DEFAULT_CAMERA_Y_OFFSET + heroPos.y);
+        camera.lookAt(heroPos.x, hero.getHeight(), heroPos.y);
+        camera.update();
     }
 }

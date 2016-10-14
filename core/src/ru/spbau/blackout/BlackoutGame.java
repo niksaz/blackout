@@ -4,6 +4,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 
+import ru.spbau.blackout.entities.Decoration;
+import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.play.services.PlayServices;
 import ru.spbau.blackout.play.services.PlayServicesInCore;
@@ -24,11 +26,11 @@ public class BlackoutGame extends Game {
 	public void testGameScreen() {
 		TestingRoom room = new TestingRoom();
 		room.map =  "maps/duel/duel.g3db";
-		
-		Hero hero = new Hero("models/wizard/wizard.g3db", 0, 0);
-		hero.setHeight(0);
-		room.hero = hero;
 
+		room.hero = new Hero("models/wizard/wizard.g3db", 0, 0);
+
+        GameObject stone = new Decoration("models/stone/stone.g3db", 10, 10);
+        room.objects.add(stone);
 
 		ScreenManager.getInstance().setScreen(new GameScreen(this, room));
 	}

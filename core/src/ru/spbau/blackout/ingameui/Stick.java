@@ -1,5 +1,6 @@
 package ru.spbau.blackout.ingameui;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -7,7 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
-import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.units.Rpx;
 
 public class Stick extends DragListener {
@@ -54,24 +56,12 @@ public class Stick extends DragListener {
         public static final String IMAGE_PATH = "images/ingame_ui/stick_touch.png";
     }
 
-    private final Vector2 velocity = new Vector2(0, 0);
-    private final Hero hero;
-    private final Image touchImage;
+    private Vector2 velocity = new Vector2(0, 0);
+    private GameUnit unit;
+    private Image touchImage;
 
-    public Stick(Stage stage, Hero hero) {
-        this.hero = hero;
-
-        touchImage = new Image(new Texture(TouchImg.IMAGE_PATH));
-        touchImage.setSize(TouchImg.X.SIZE, TouchImg.Y.SIZE);
-        updateTouchPosition();
-        stage.addActor(touchImage);
-
-        // must go after touch image initialization to be in the front layer
-        Image mainImg = new Image(new Texture(MainImg.IMAGE_PATH));
-        mainImg.setSize(MainImg.X.SIZE, MainImg.Y.SIZE);
-        mainImg.setPosition(MainImg.X.START, MainImg.Y.START);
-        mainImg.addListener(this);
-        stage.addActor(mainImg);
+    public Stick(GameUnit unit) {
+        this.unit = unit;
     }
 
     @Override
@@ -92,6 +82,25 @@ public class Stick extends DragListener {
         movedTo(x, y);
     }
 
+    public void load(AssetManager assets) {
+        assets.load(TouchImg.IMAGE_PATH, Texture.class);
+        assets.load(MainImg.IMAGE_PATH, Texture.class);
+    }
+
+    public void doneLoading(AssetManager assets, Stage stage) {
+        touchImage = new Image(assets.get(TouchImg.IMAGE_PATH, Texture.class));
+        touchImage.setSize(TouchImg.X.SIZE, TouchImg.Y.SIZE);
+        updateTouchPosition();
+        stage.addActor(touchImage);
+
+        // must go after touch image initialization to be in the foreground
+        Image mainImg = new Image(assets.get(MainImg.IMAGE_PATH, Texture.class));
+        mainImg.setSize(MainImg.X.SIZE, MainImg.Y.SIZE);
+        mainImg.setPosition(MainImg.X.START, MainImg.Y.START);
+        mainImg.addListener(this);
+        stage.addActor(mainImg);
+    }
+
     private void movedTo(float x, float y) {
         velocity.set(
                 (x - MainImg.X.CENTER) / MainImg.X.MAX_AT,
@@ -105,7 +114,7 @@ public class Stick extends DragListener {
             velocity.y /= len;
         }
 
-        hero.setSelfVelocity(velocity);
+        unit.setSelfVelocity(velocity);
         updateTouchPosition();
     }
 
