@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -19,6 +18,7 @@ import com.badlogic.gdx.utils.Align;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.PlayServicesInCore;
+import ru.spbau.blackout.utils.AssetLoader;
 import ru.spbau.blackout.utils.ScreenManager;
 
 class MenuScreen extends StageScreen {
@@ -29,7 +29,6 @@ class MenuScreen extends StageScreen {
     private static final String SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";
     private static final String GAME_SERVICES_TEXTURE_PATH = "images/menuscreen/games_controller_grey.png";
 
-    private static final float TEXT_SCALE = 1.5f;
     private static final float BUTTON_PADDING = 10.0f;
     private static final float CORNER_LABEL_MARGIN = 20.0f;
     private static final float SETTINGS_ICON_SIZE = 128.0f;
@@ -68,12 +67,8 @@ class MenuScreen extends StageScreen {
     }
 
     static TextButton addButton(Table table, String text, Drawable upImage, Drawable downImage, EventListener listener) {
-        final BitmapFont font = new BitmapFont();
-        font.getData().setScale(TEXT_SCALE);
-        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-
         final TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.font = font;
+        style.font = AssetLoader.getInstance().getFont();
         style.up = upImage;
         style.down = downImage;
 
@@ -89,9 +84,7 @@ class MenuScreen extends StageScreen {
 
     private Label addLabelWithTextAt(CharSequence text, float x, float y, int align) {
         final Label.LabelStyle style = new Label.LabelStyle();
-        final BitmapFont font = new BitmapFont();
-        font.getData().scale(TEXT_SCALE);
-        style.font = font;
+        style.font = AssetLoader.getInstance().getFont();
 
         final Label label = new Label(text, style);
         label.setPosition(x, y, align);

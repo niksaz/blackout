@@ -24,7 +24,7 @@ import static com.google.android.gms.games.snapshot.Snapshots.RESOLUTION_POLICY_
 
 class SnapshotManager {
 
-    private static SnapshotManager manager;
+    private static SnapshotManager instance;
 
     private static final String TAG = "SnapshotManager";
     private static final String GAME_SAVED_NAME = "GAME_SAVED_NAME";
@@ -37,7 +37,7 @@ class SnapshotManager {
     private static final int MAX_ATTEMPTS = 3;
     private static final int CONFLICT_RESOLUTION_POLICY = RESOLUTION_POLICY_MOST_RECENTLY_MODIFIED;
 
-    private static final long AWAIT_TIME_MS = 5000;
+    private static final long AWAIT_TIME_MS = 10000;
 
     private AndroidLauncher launcher;
     private Snapshot snapshot;
@@ -47,10 +47,10 @@ class SnapshotManager {
     private SnapshotManager() {}
 
     static SnapshotManager getInstance() {
-        if (manager == null) {
-            manager = new SnapshotManager();
+        if (instance == null) {
+            instance = new SnapshotManager();
         }
-        return manager;
+        return instance;
     }
 
     void initialize(AndroidLauncher launcher) {
@@ -101,6 +101,9 @@ class SnapshotManager {
                             ObjectInputStream objectStream = new ObjectInputStream(byteStream);
                             blackoutSnapshot = (BlackoutSnapshot) objectStream.readObject();
                             objectStream.close();
+                            if (blackoutSnapshot == null) {
+                                blackoutSnapshot = new BlackoutSnapshot();
+                            }
                         } catch (ClassNotFoundException | IOException e) {
                             blackoutSnapshot = new BlackoutSnapshot();
                         }

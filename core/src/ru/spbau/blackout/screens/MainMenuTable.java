@@ -2,7 +2,6 @@ package ru.spbau.blackout.screens;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,15 +15,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.PlayServicesInCore;
+import ru.spbau.blackout.utils.AssetLoader;
 
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
 class MainMenuTable {
 
-    private static final Color BLACKOUT_LABEL_COLOR = Color.WHITE;
+    private static final Color BLACKOUT_LABEL_COLOR = Color.BLACK;
 
     private static final float BLACKOUT_LABEL_BOTTOM_PADDING = 25.0f;
-    private static final float BLACKOUT_LABEL_SCALE = 2.5f;
 
     private static final String BLACKOUT_TEXT = "Blackout";
     private static final String BUTTON_PLAY_TEXT = "Play";
@@ -69,11 +68,7 @@ class MainMenuTable {
     }
 
     private static Label addBlackoutLabel(Table table) {
-        final BitmapFont font = new BitmapFont();
-        font.getData().scale(BLACKOUT_LABEL_SCALE);
-        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-
-        final LabelStyle style = new LabelStyle(font, BLACKOUT_LABEL_COLOR);
+        final LabelStyle style = new LabelStyle(AssetLoader.getInstance().getFontBlackoutLabel(), BLACKOUT_LABEL_COLOR);
         final Label label = new Label(BLACKOUT_TEXT, style);
 
         table.add(label).pad(BLACKOUT_LABEL_BOTTOM_PADDING).row();

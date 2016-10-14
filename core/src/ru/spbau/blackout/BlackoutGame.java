@@ -12,6 +12,7 @@ import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.rooms.TestingRoom;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
+import ru.spbau.blackout.utils.AssetLoader;
 import ru.spbau.blackout.utils.ScreenManager;
 
 public class BlackoutGame extends Game {
@@ -45,6 +46,7 @@ public class BlackoutGame extends Game {
 		modelBatch = new ModelBatch();
 		spriteBatch = new SpriteBatch();
 
+		AssetLoader.getInstance().loadFonts();
 		ScreenManager.getInstance().initialize(this);
 		ScreenManager.getInstance().setScreen(new LoadScreen(this));
 	}
