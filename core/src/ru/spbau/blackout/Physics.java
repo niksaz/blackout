@@ -17,7 +17,6 @@ public class Physics {
     // FIXME: just for test. Remove in release version.
     private final Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
 
-
     public Physics() {
         // without gravity, with sleeping
         world = new World(Vector2.Zero, true);
@@ -29,11 +28,15 @@ public class Physics {
         // TODO: interpolation
         while (accumulator >= WORLD_STEP) {
             world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-            delta -= WORLD_STEP;
+            accumulator -= WORLD_STEP;
         }
     }
 
     public void debugRender(Camera camera) {
         debugRenderer.render(world, camera.combined);
+    }
+
+    public World getWorld() {
+        return world;
     }
 }

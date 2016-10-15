@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 import ru.spbau.blackout.BlackoutGame;
@@ -30,7 +28,7 @@ public class GameScreen extends BlackoutScreen {
     private GameRoom room;
 
     private PerspectiveCamera camera;
-    private Array<GameObject> units;
+    private Array<GameObject> gameObjects;
     private Hero hero;
     private IngameUI ui;
 
@@ -46,7 +44,7 @@ public class GameScreen extends BlackoutScreen {
         this.room = room;
 
         // getting information from room
-        units = room.getObjects();
+        gameObjects = room.getObjects();
         hero = room.getHero();
 
         // initialize main camera
@@ -72,8 +70,8 @@ public class GameScreen extends BlackoutScreen {
 
         // start loading
         ui.load(assets);
-        for (GameObject unit : units) {
-            assets.load(unit.getModelPath(), Model.class);
+        for (GameObject object : gameObjects) {
+            assets.load(object.getModelPath(), Model.class);
         }
         assets.load(hero.getModelPath(), Model.class);
         assets.load(room.getMap(), Model.class);
@@ -88,20 +86,13 @@ public class GameScreen extends BlackoutScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         if (loading) {
-            if (assets.update()) {
-                doneLoading();
-            }
-            /*float progress = assets.getProgress();
-            if(assets.isLoaded(LOADING_SCREEN)) {
-            }*/
-
-            // TODO: loading screen with progress bar
+            doLoading();
             return;
         }
 
         game.modelBatch.begin(camera);
-        for (GameObject unit : units) {
-            game.modelBatch.render(unit.getModelInstance(), environment);
+        for (GameObject object : gameObjects) {
+            game.modelBatch.render(object.getModelInstance(), environment);
         }
         game.modelBatch.render(hero.getModelInstance(), environment);
         game.modelBatch.render(map, environment);
@@ -133,16 +124,23 @@ public class GameScreen extends BlackoutScreen {
         return hero;
     }
 
-    private void doneLoadingForUnit(GameObject unit) {
-        Model model = assets.get(unit.getModelPath(), Model.class);
-        unit.makeInstance(model);
+    private void doLoading() {
+        if (assets.update()) {
+            doneLoading();
+        }
+        /*float progress = assets.getProgress();
+        if(assets.isLoaded(LOADING_SCREEN)) {
+        }*/
+
+        // TODO: loading screen with a progress bar
     }
 
     private void doneLoading() {
-        for (GameObject unit : units) {
-            doneLoadingForUnit(unit);
+        Gdx.app.log("blackout:GameScreen", "done loading");
+
+        for (GameObject object : gameObjects) {
+            object.makeInstance(assets.get(object.getModelPath(), Model.class));
         }
-        doneLoadingForUnit(hero);
 
         map = new ModelInstance(assets.get(room.getMap(), Model.class));
         ui.doneLoading(assets);
@@ -150,11 +148,13 @@ public class GameScreen extends BlackoutScreen {
         loading = false;
     }
 
+    /**
+     * Updates game world on every frame.
+     */
     private void update(final float delta) {
-        for (GameObject unit : units) {
-            unit.update(delta);
+        for (GameObject object : gameObjects) {
+            object.update(delta);
         }
-        hero.update(delta);
 
         Vector2 heroPos = hero.getPosition();
         camera.position.set(
