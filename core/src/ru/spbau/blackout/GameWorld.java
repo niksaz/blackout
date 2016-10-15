@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
+import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.Iterator;
@@ -74,16 +75,27 @@ public class GameWorld implements Iterable<GameObject> {
     public FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {
         FrictionJointDef frictionDef = new FrictionJointDef();
 
-        frictionDef.localAnchorA.set(0,0);
-        frictionDef.localAnchorB.set(0,0);
-
         frictionDef.maxForce = linearFriction;
         frictionDef.maxTorque = angularFriction;
 
-        frictionDef.bodyA = body;
-        frictionDef.bodyB = ground;
+        frictionDef.initialize(body, ground, Vector2.Zero);
 
         return (FrictionJoint) world.createJoint(frictionDef);
+    }
+
+    public Body addController(Body body) {
+        // Create a controller's body
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.position.set(body.getPosition().x, body.getPosition().y);
+        Body controller = world.createBody(bodyDef);
+
+        // Glue it with the target body
+        WeldJointDef jointDef = new WeldJointDef();
+        jointDef.initialize(body, controller, Vector2.Zero);
+        world.createJoint(jointDef);
+
+        return controller;
     }
 
     private void step() {

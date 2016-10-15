@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import ru.spbau.blackout.entities.DynamicObject;
+import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.units.Rpx;
 
 public class Stick extends DragListener {
@@ -56,7 +57,7 @@ public class Stick extends DragListener {
     }
 
     private Vector2 velocity = new Vector2(0, 0);
-    private DynamicObject object;
+    private GameUnit object;
     private Image touchImage;
 
     @Override
@@ -82,7 +83,7 @@ public class Stick extends DragListener {
         assets.load(MainImg.IMAGE_PATH, Texture.class);
     }
 
-    public void doneLoading(AssetManager assets, Stage stage, DynamicObject object) {
+    public void doneLoading(AssetManager assets, Stage stage, GameUnit object) {
         this.object = object;
 
         // touch image initialization
@@ -112,7 +113,7 @@ public class Stick extends DragListener {
             velocity.y /= len;
         }
 
-        object.setSelfVelocity(velocity);
+        object.setSelfVelocityDirection(velocity);
         updateTouchPosition();
     }
 

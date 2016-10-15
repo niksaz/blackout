@@ -8,7 +8,7 @@ import ru.spbau.blackout.GameWorld;
 public class Hero extends GameUnit {
     protected Hero(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
-        body.applyForceToCenter(0, 1000, true);
+        body.applyLinearImpulse(0, 20, getPosition().x, getPosition().y, true);
     }
 
     @Override
