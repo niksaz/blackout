@@ -6,21 +6,18 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 
 import ru.spbau.blackout.Physics;
-import ru.spbau.blackout.Utils;
-import sun.security.provider.SHA;
+
+import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
 public abstract class GameObject {
     // physics:
     protected Body body;
     float height;
-    private final Vector2 position = new Vector2();
 
     // appearance:
     protected ModelInstance model;
@@ -37,41 +34,49 @@ public abstract class GameObject {
     }
 
 
+    // Transform:
+
+    public void setTransform(float x, float y, float angle) {
+        body.setTransform(x, y, angle);
+        model.transform.setToRotationRad(Vector3.Z, angle);
+        fixTop(model);
+        model.transform.setTranslation(x, y, height);
+    }
+
+
     // Rotation
 
     /**
      * Set rotation in radians.
      */
-    public void setRotation(float rad) {
-        model.transform.setToRotationRad(Vector3.Y, rad);
-        body.getTransform().setRotation(rad);
+    public void setRotation(float angle) {
+        Vector2 pos = getPosition();
+        setTransform(pos.x, pos.y, angle);
     }
 
     /**
      * Rotates object to the given direction.
      */
     public void setDirection(Vector2 direction) {
-        setRotation(Utils.angleVec(direction));
+        setRotation(direction.angleRad());
     }
 
     /**
      *  The current rotation in radians.
      */
     public float getRotation() {
-        return body.getTransform().getRotation();
+        return body.getAngle();
     }
 
 
     // Position:
 
     public Vector2 getPosition() {
-        return position;
+        return body.getPosition();
     }
 
     public void setPosition(float x, float y) {
-        position.set(x, y);
-        body.getTransform().setPosition(position);
-        model.transform.setTranslation(body.getPosition().x, height, body.getPosition().y);
+        setTransform(x, y, getRotation());
     }
 
 
@@ -158,7 +163,7 @@ public abstract class GameObject {
          * Rotates object to the given direction.
          */
         public void setDirection(Vector2 direction) {
-            rotation = Utils.angleVec(direction);
+            rotation = direction.angleRad();
         }
 
         public abstract GameObject makeInstance(Model model, Physics physics);

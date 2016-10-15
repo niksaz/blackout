@@ -103,8 +103,7 @@ public class Stick extends DragListener {
     private void movedTo(float x, float y) {
         velocity.set(
                 (x - MainImg.X.CENTER) / MainImg.X.MAX_AT,
-                // minus due to conversion from (x,y) plane to (x, z) plane
-                -(y - MainImg.Y.CENTER) / MainImg.Y.MAX_AT
+                (y - MainImg.Y.CENTER) / MainImg.Y.MAX_AT
         );
 
         float len = velocity.len();
@@ -124,8 +123,7 @@ public class Stick extends DragListener {
                 + velocity.x * MainImg.X.MAX_AT,
                 MainImg.Y.START + MainImg.Y.CENTER  // move (0,0) to the center of mainImg
                 - TouchImg.Y.CENTER                 // move pivot to the center of image
-                // minus due to conversion between (x,y) plane and (x,z) plane
-                -velocity.y * MainImg.Y.MAX_AT
+                + velocity.y * MainImg.Y.MAX_AT
         );
     }
 }

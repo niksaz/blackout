@@ -20,9 +20,11 @@ import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.rooms.GameRoom;
 import ru.spbau.blackout.utils.ScreenManager;
 
+import static ru.spbau.blackout.utils.Utils.fixTop;
+
 public class GameScreen extends BlackoutScreen {
     public static final float DEFAULT_CAMERA_X_OFFSET = 0;
-    public static final float DEFAULT_CAMERA_Y_OFFSET = 2;
+    public static final float DEFAULT_CAMERA_Y_OFFSET = -2;
     public static final float DEFAULT_CAMERA_HEIGHT = 20;
 
     private ModelInstance map;
@@ -54,8 +56,8 @@ public class GameScreen extends BlackoutScreen {
 
         // initialize environment
         environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 2f, 2f, 2f, 100f));
-        environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, 0f, -1f));
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 100f));
+        environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.2f, 0f, 0.2f, -1f));
     }
 
     @Override
@@ -116,9 +118,9 @@ public class GameScreen extends BlackoutScreen {
         Vector2 charPos = character.getPosition();
         camera.position.set(
                 DEFAULT_CAMERA_X_OFFSET + charPos.x,
-                DEFAULT_CAMERA_HEIGHT + character.getHeight(),
-                DEFAULT_CAMERA_Y_OFFSET + charPos.y);
-        camera.lookAt(charPos.x, character.getHeight(), charPos.y);
+                DEFAULT_CAMERA_Y_OFFSET + charPos.y,
+                DEFAULT_CAMERA_HEIGHT + character.getHeight());
+        camera.lookAt(charPos.x, charPos.y, character.getHeight());
         camera.update();
 
         physics.update(delta);
@@ -201,8 +203,9 @@ public class GameScreen extends BlackoutScreen {
             // FIXME: assert that character != null
 
             map = new ModelInstance(assets.get(mapPath, Model.class));
-            ui.doneLoading(assets, character);
+            fixTop(map);
 
+            ui.doneLoading(assets, character);
             GameScreen.this.doneLoading();
 
             ScreenManager.getInstance().disposeScreen();
