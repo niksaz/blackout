@@ -1,5 +1,6 @@
 package ru.spbau.blackout;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -31,6 +32,12 @@ public class GameWorld implements Iterable<GameObject> {
     }
 
     public void update(float delta) {
+//        Gdx.app.error("WTF", "frame!");
+
+        if (delta > WORLD_STEP) {
+            Gdx.app.log("blackout:performance", "big delta time: " + delta);
+        }
+
         accumulator += delta;
 
         while (accumulator >= WORLD_STEP) {
@@ -48,9 +55,11 @@ public class GameWorld implements Iterable<GameObject> {
     }
 
     private void step() {
-        for (GameObject object : gameObjects) {
-            object.update(WORLD_STEP);
-        }
+//        Gdx.app.error("WTF", "step!");
+
+//        for (GameObject object : gameObjects) {
+//            object.update(Gdx.graphics.getDeltaTime());
+//        }
 
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }

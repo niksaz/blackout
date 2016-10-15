@@ -1,5 +1,6 @@
 package ru.spbau.blackout.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
@@ -34,11 +35,11 @@ public abstract class GameObject implements RenderableProvider {
         body.createFixture(def.fixtureDef);
 
         setPosition(def.getPosition().x, def.getPosition().y);
-
     }
 
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
+        updateTransform();
         model.getRenderables(renderables, pool);
     }
 
@@ -46,16 +47,27 @@ public abstract class GameObject implements RenderableProvider {
         // nothing
     }
 
+    // FIXME: remove
+    public ModelInstance getModel() {
+        updateTransform();
+        return model;
+    }
 
     // Transform:
 
     public void setTransform(float x, float y, float angle) {
         body.setTransform(x, y, angle);
-        model.transform.setToRotationRad(Vector3.Z, angle);
-        fixTop(model);
-        model.transform.setTranslation(x, y, height);
     }
 
+    /**
+     * Model instance model to the physic body.
+     */
+    private void updateTransform() {
+        model.transform.setToRotationRad(Vector3.Z, body.getAngle());
+        fixTop(model);
+        Vector2 pos = body.getPosition();
+        model.transform.setTranslation(pos.x, pos.y, height);
+    }
 
     // Rotation
 

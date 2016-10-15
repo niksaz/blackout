@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.particles.ParallelArray;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -78,7 +79,10 @@ public class GameScreen extends BlackoutScreen {
 
         ModelBatch modelBatch = BlackoutGame.getInstance().modelBatch;
         modelBatch.begin(camera);
-        modelBatch.render(gameWorld, environment);
+//        modelBatch.render(gameWorld, environment);
+        for (GameObject object : gameWorld) {
+            modelBatch.render(object.getModel(), environment);
+        }
         modelBatch.render(map, environment);
         modelBatch.end();
 
@@ -105,6 +109,7 @@ public class GameScreen extends BlackoutScreen {
         return character;
     }
 
+    boolean wtf = true;
     /**
      * Updates game world on every frame.
      */
@@ -116,6 +121,20 @@ public class GameScreen extends BlackoutScreen {
                 DEFAULT_CAMERA_HEIGHT + character.getHeight());
         camera.lookAt(charPos.x, charPos.y, character.getHeight());
         camera.update();
+
+        // FIXME: remove
+
+//        GameObject object = gameWorld.iterator().next();
+//        if (wtf) {
+//            object.update(delta);
+//            wtf = false;
+//        } else {
+//            wtf = true;
+//        }
+
+        for (GameObject object : gameWorld) {
+            object.update(delta);
+        }
 
         gameWorld.update(delta);
     }

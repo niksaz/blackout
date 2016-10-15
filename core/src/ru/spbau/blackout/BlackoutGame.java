@@ -53,7 +53,7 @@ public class BlackoutGame extends Game {
         room.objectDefs.add(stone);
 
 
-		ScreenManager.getInstance().setScreen(new GameScreen(this, room));
+		ScreenManager.getInstance().setScreen(new GameScreen(room));
 	}
 
 	protected BlackoutGame() {}
@@ -71,6 +71,6 @@ public class BlackoutGame extends Game {
 
 		AssetLoader.getInstance().loadFonts();
 		ScreenManager.getInstance().initialize(this);
-		ScreenManager.getInstance().setScreen(new LoadScreen(this));
+		ScreenManager.getInstance().setScreen(new LoadScreen());
 	}
 }

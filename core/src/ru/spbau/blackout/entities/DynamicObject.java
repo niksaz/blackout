@@ -82,7 +82,7 @@ public abstract class DynamicObject extends GameObject {
         float newY = getPosition().y + (getVelocity().y + getSelfVelocity().y * speed) * delta;
         setPosition(newX, newY);
 
-        animation.update(delta * animationSpeed);
+        animation.update(delta * animationSpeed); // FIXME: shouldn't be here
     }
 
     public static abstract class Definition extends GameObject.Definition {
