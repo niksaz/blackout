@@ -7,25 +7,22 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 
-import org.ietf.jgss.GSSManager;
-
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.play.services.PlayServices;
 import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.rooms.TestingRoom;
-import ru.spbau.blackout.screens.BlackoutScreen;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
 import ru.spbau.blackout.utils.AssetLoader;
 import ru.spbau.blackout.utils.ScreenManager;
 
 public class BlackoutGame extends Game {
-    private static BlackoutGame instance = new BlackoutGame();
+    private static final BlackoutGame INSTANCE = new BlackoutGame();
 
     public static BlackoutGame getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     public static final int VIRTUAL_WORLD_WIDTH = 1280;

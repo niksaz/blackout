@@ -47,12 +47,6 @@ public abstract class GameObject implements RenderableProvider {
         // nothing
     }
 
-    // FIXME: remove
-    public ModelInstance getModel() {
-//        updateTransform();
-        return model;
-    }
-
     // Transform:
 
     public void setTransform(float x, float y, float angle) {
@@ -121,14 +115,12 @@ public abstract class GameObject implements RenderableProvider {
         public static final float DEFAULT_ROTATION = 0;
 
         public static final float DEFAULT_DENSITY = 1f;
-        public static final float DEFAULT_FRICTION = 0.4f;
-        public static final float RESTITUTION = 0f;
 
         // physics
         public float rotation = DEFAULT_ROTATION;
         public float height = DEFAULT_HEIGHT;
         private final FixtureDef fixtureDef = new FixtureDef();
-        private final BodyDef bodyDef = new BodyDef();
+        protected final BodyDef bodyDef = new BodyDef();
 
         // appearance:
         public String modelPath;
@@ -139,8 +131,8 @@ public abstract class GameObject implements RenderableProvider {
             // setup fixture
             fixtureDef.shape = shape;
             fixtureDef.density = DEFAULT_DENSITY;
-            fixtureDef.friction = DEFAULT_FRICTION;
-            fixtureDef.restitution = RESTITUTION;
+            fixtureDef.friction = 0;
+            fixtureDef.restitution = 0;
 
             // setup body
             bodyDef.position.set(initialX, initialY);

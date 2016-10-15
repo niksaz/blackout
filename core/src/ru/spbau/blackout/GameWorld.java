@@ -12,9 +12,8 @@ import java.util.Iterator;
 import ru.spbau.blackout.entities.GameObject;
 
 public class GameWorld implements Iterable<GameObject> {
-
-    public static final float WORLD_STEP = 1 / 30f;
-    public static final int VELOCITY_ITERATIONS = 6;
+    public static final float WORLD_STEP = 1 / 58f;
+    public static final int VELOCITY_ITERATIONS = 2;
     public static final int POSITION_ITERATIONS = 2;
 
     private final Array<GameObject> gameObjects = new Array<>();
@@ -52,7 +51,7 @@ public class GameWorld implements Iterable<GameObject> {
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
         for (GameObject object : gameObjects) {
-            object.update(Gdx.graphics.getDeltaTime());
+            object.update(WORLD_STEP);
         }
     }
 }
