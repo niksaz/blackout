@@ -4,6 +4,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 
 import org.ietf.jgss.GSSManager;
 
@@ -31,11 +33,17 @@ public class BlackoutGame extends Game {
 		TestingRoom room = new TestingRoom();
 		room.map =  "maps/duel/duel.g3db";
 
-        Hero.Definition hero = new Hero.Definition("models/wizard/wizard.g3db", 0, 0);
+        Shape heroShape = new CircleShape();
+        heroShape.setRadius(6f);
+        Hero.Definition hero = new Hero.Definition("models/wizard/wizard.g3db", heroShape, 0, 0);
         room.objectDefs.add(hero);
         room.character = hero;
 
-        GameObject.Definition stone = new Decoration.Definition("models/stone/stone.g3db", 10, 10);
+        Shape stoneShape = new CircleShape();
+        heroShape.setRadius(6f);
+        GameObject.Definition stone = new Decoration.Definition(
+                "models/stone/stone.g3db", stoneShape, 10, 10
+        );
         room.objectDefs.add(stone);
 
 

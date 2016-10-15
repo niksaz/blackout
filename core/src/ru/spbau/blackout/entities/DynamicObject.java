@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.Physics;
 import ru.spbau.blackout.Utils;
@@ -90,9 +91,8 @@ public abstract class DynamicObject extends GameObject {
         // Movement:
         private float speed = DEFAULT_SPEED;
 
-        public Definition(String modelPath, float initialX, float initialY) {
-            super(modelPath, initialX, initialY);
-            bodyDef.type = BodyDef.BodyType.DynamicBody;
+        public Definition(String modelPath, Shape shape, float initialX, float initialY) {
+            super(modelPath, shape, initialX, initialY);
         }
 
         public float getSpeed() {
@@ -101,6 +101,11 @@ public abstract class DynamicObject extends GameObject {
 
         public void setSpeed(float speed) {
             this.speed = speed;
+        }
+
+        @Override
+        public BodyDef.BodyType getBodyType() {
+            return BodyDef.BodyType.DynamicBody;
         }
     }
 }
