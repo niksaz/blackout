@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -20,6 +19,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.play.services.PlayServicesInCore;
 
 import static ru.spbau.blackout.BlackoutGame.hostName;
 import static ru.spbau.blackout.BlackoutGame.portNumber;
@@ -29,10 +29,9 @@ class PlayScreenTable  {
 
     private static final String TAG = "PlayScreenTable";
 
+    private static final String SINGLE_PLAYER_GAME_TEXT = "Single player game";
+    private static final String MULTIPLAYER_GAME_TEXT = "Multiplayer game";
     private static final String BACK_TEXT = "Back to main menu";
-    private static final String QUICK_GAME_TEXT = "Quick Game";
-    private static final String INVITE_PLAYERS_TEXT = "Invite Players";
-    private static final String SHOW_INVITATIONS_TEXT = "Show Invitations";
 
     static Table getTable(final BlackoutGame game, final MenuScreen screen) {
         final Table middleTable = new Table();
@@ -42,38 +41,34 @@ class PlayScreenTable  {
         final Drawable downImage = new TextureRegionDrawable(
                 new TextureRegion(new Texture(MenuScreen.BUTTON_DOWN_TEXTURE_PATH)));
 
-        // FIXME: just for test
-        addButton(middleTable, "FIXME: test GameScreen", upImage, downImage, new ClickListener() {
+        addButton(middleTable, SINGLE_PLAYER_GAME_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float  y) {
                 game.testGameScreen();
             }
         });
 
-        addButton(middleTable, QUICK_GAME_TEXT, upImage, downImage, new ChangeListener() {
+        addButton(middleTable, MULTIPLAYER_GAME_TEXT, upImage, downImage, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                final TextButton textButton = (TextButton) actor;
                 new Thread(() -> {
                     try (
                         Socket echoSocket = new Socket(hostName, portNumber);
                         PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
                         BufferedReader in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()))
                     ) {
-                        String userInput = "hello from android client";
-                        out.println(userInput);
-                        String serverResponse = in.readLine();
-                        Gdx.app.postRunnable(() -> textButton.setText("echo: " + serverResponse));
+                        Gdx.app.log(TAG, "Started");
+                        out.println(PlayServicesInCore.getInstance().getPlayServices().getPlayerName());
+                        final String response = in.readLine();
                     } catch (UnknownHostException e) {
                         Gdx.app.log(TAG, "Don't know about host " + hostName);
                     } catch (IOException e) {
                         Gdx.app.log(TAG, "Couldn't get I/O for the connection to " + hostName);
                     }
-                }).run();
+                    Gdx.app.log(TAG, "Stopped");
+                }).start();
             }
         });
-        addButton(middleTable, INVITE_PLAYERS_TEXT, upImage, downImage, null);
-        addButton(middleTable, SHOW_INVITATIONS_TEXT, upImage, downImage, null);
         addButton(middleTable, BACK_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
