@@ -49,7 +49,7 @@ public abstract class GameObject implements RenderableProvider {
 
     // FIXME: remove
     public ModelInstance getModel() {
-        updateTransform();
+//        updateTransform();
         return model;
     }
 
@@ -62,11 +62,12 @@ public abstract class GameObject implements RenderableProvider {
     /**
      * Model instance model to the physic body.
      */
-    private void updateTransform() {
+    protected void updateTransform() {
         model.transform.setToRotationRad(Vector3.Z, body.getAngle());
         fixTop(model);
         Vector2 pos = body.getPosition();
         model.transform.setTranslation(pos.x, pos.y, height);
+//        model.calculateTransforms();
     }
 
     // Rotation

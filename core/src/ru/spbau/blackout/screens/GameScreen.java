@@ -79,10 +79,7 @@ public class GameScreen extends BlackoutScreen {
 
         ModelBatch modelBatch = BlackoutGame.getInstance().modelBatch;
         modelBatch.begin(camera);
-//        modelBatch.render(gameWorld, environment);
-        for (GameObject object : gameWorld) {
-            modelBatch.render(object.getModel(), environment);
-        }
+        modelBatch.render(gameWorld, environment);
         modelBatch.render(map, environment);
         modelBatch.end();
 
@@ -109,11 +106,13 @@ public class GameScreen extends BlackoutScreen {
         return character;
     }
 
-    boolean wtf = true;
     /**
      * Updates game world on every frame.
      */
     private void update(final float delta) {
+        gameWorld.update(delta);
+
+        // Must go after gameWorld.update to be synced.
         Vector2 charPos = character.getPosition();
         camera.position.set(
                 DEFAULT_CAMERA_X_OFFSET + charPos.x,
@@ -121,22 +120,6 @@ public class GameScreen extends BlackoutScreen {
                 DEFAULT_CAMERA_HEIGHT + character.getHeight());
         camera.lookAt(charPos.x, charPos.y, character.getHeight());
         camera.update();
-
-        // FIXME: remove
-
-//        GameObject object = gameWorld.iterator().next();
-//        if (wtf) {
-//            object.update(delta);
-//            wtf = false;
-//        } else {
-//            wtf = true;
-//        }
-
-        for (GameObject object : gameWorld) {
-            object.update(delta);
-        }
-
-        gameWorld.update(delta);
     }
 
     private void doneLoading() {
