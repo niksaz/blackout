@@ -34,15 +34,15 @@ public class BlackoutGame extends Game {
 		room.map =  "maps/duel/duel.g3db";
 
         Shape heroShape = new CircleShape();
-        heroShape.setRadius(6f);
+        heroShape.setRadius(0.7f);
         Hero.Definition hero = new Hero.Definition("models/wizard/wizard.g3db", heroShape, 0, 0);
         room.objectDefs.add(hero);
         room.character = hero;
 
         Shape stoneShape = new CircleShape();
-        heroShape.setRadius(6f);
+        heroShape.setRadius(1.5f);
         GameObject.Definition stone = new Decoration.Definition(
-                "models/stone/stone.g3db", stoneShape, 10, 10
+                "models/stone/stone.g3db", stoneShape, 0, -10
         );
         room.objectDefs.add(stone);
 

@@ -78,6 +78,7 @@ public abstract class DynamicObject extends GameObject {
     public void update(float delta) {
         super.update(delta);
 
+
         float newX = getPosition().x + (getVelocity().x + getSelfVelocity().x * speed) * delta;
         float newY = getPosition().y + (getVelocity().y + getSelfVelocity().y * speed) * delta;
         setPosition(newX, newY);

@@ -25,8 +25,12 @@ public abstract class GameObject {
 
     protected GameObject(Definition def, Model model, Physics physics) {
         this.model = new ModelInstance(model);
+
         body = physics.getWorld().createBody(def.bodyDef);
+        body.createFixture(def.fixtureDef);
+
         setPosition(def.getPosition().x, def.getPosition().y);
+
     }
 
     public void update(float delta) {
@@ -166,10 +170,13 @@ public abstract class GameObject {
             rotation = direction.angleRad();
         }
 
-        public abstract GameObject makeInstance(Model model, Physics physics);
+        public void dispose() {
+            fixtureDef.shape.dispose();
+        }
 
+        public abstract GameObject makeInstance(Model model, Physics physics);
         public abstract BodyDef.BodyType getBodyType();
 //        public abstract float getDensity();
-//        public abstract float getFriction();
+//        public abstract float getFriction();i
     }
 }

@@ -24,8 +24,8 @@ import static ru.spbau.blackout.utils.Utils.fixTop;
 
 public class GameScreen extends BlackoutScreen {
     public static final float DEFAULT_CAMERA_X_OFFSET = 0;
-    public static final float DEFAULT_CAMERA_Y_OFFSET = -2;
-    public static final float DEFAULT_CAMERA_HEIGHT = 20;
+    public static final float DEFAULT_CAMERA_Y_OFFSET = -1;
+    public static final float DEFAULT_CAMERA_HEIGHT = 12;
 
     private ModelInstance map;
 
