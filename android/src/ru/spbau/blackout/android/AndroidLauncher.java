@@ -1,7 +1,6 @@
 package ru.spbau.blackout.android;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,19 +38,22 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
     private GameHelper gameHelper;
     private PlayServicesListener coreListener;
-    private boolean foreground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        GameHelperListener gameHelperListener = new GameHelperListener() {
+        final GameHelperListener gameHelperListener = new GameHelperListener() {
             @Override
             public void onSignInFailed() {
-                GameHelper.SignInFailureReason reason = gameHelper.getSignInError();
+                final GameHelper.SignInFailureReason reason = gameHelper.getSignInError();
+                if (reason == null) {
+                    gameHelper.beginUserInitiatedSignIn();
+                    return;
+                }
                 Log.v(TAG, reason.toString());
 
-                int resultCode = reason.getActivityResultCode();
+                final int resultCode = reason.getActivityResultCode();
                 final String text;
 
                 switch (resultCode) {
@@ -72,15 +74,10 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
                         break;
                 }
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setCancelable(false);
                 builder.setMessage(text);
-                builder.setNeutralButton(R.string.try_again, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        signIn();
-                    }
-                });
+                builder.setNeutralButton(R.string.try_again, (dialogInterface, i) -> signIn());
                 builder.create().show();
             }
 
@@ -98,7 +95,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
         SnapshotManager.getInstance().initialize(this);
 
-        AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+        final AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         final BlackoutGame game = new BlackoutGame(this);
         initialize(game, config);
     }
@@ -117,19 +114,13 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
     @Override
     protected void onStart() {
-        foreground = true;
         super.onStart();
         gameHelper.onStart(this);
     }
 
     @Override
     protected void onStop() {
-        foreground = false;
         super.onStop();
-    }
-
-    boolean isForeground() {
-        return foreground;
     }
 
     @Override
@@ -141,12 +132,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     @Override
     public void signIn() {
         try {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    gameHelper.beginUserInitiatedSignIn();
-                }
-            });
+            runOnUiThread(() -> gameHelper.beginUserInitiatedSignIn());
         } catch (Exception e) {
             Gdx.app.log(TAG, "Log in failed: " + e.getMessage());
         }
@@ -155,12 +141,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     @Override
     public void signOut() {
         try {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    gameHelper.signOut();
-                }
-            });
+            runOnUiThread(() -> gameHelper.signOut());
         } catch (Exception e) {
             Gdx.app.log(TAG, "Log out failed: " + e.getMessage());
         }
@@ -215,12 +196,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     @Override
     public void startLoadingSnapshot() {
         try {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    SnapshotManager.getInstance().startLoadingSnapshot();
-                }
-            });
+            runOnUiThread(() -> SnapshotManager.getInstance().startLoadingSnapshot());
         } catch (Exception e) {
             Gdx.app.log(TAG, "startLoadingSnapshot: " + e.getMessage());
         }
@@ -234,12 +210,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
     private void userIsNotSignedInDialog() {
         try {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    gameHelper.makeSimpleDialog(NOT_SIGNED_MESSAGE).show();
-                }
-            });
+            runOnUiThread(() -> gameHelper.makeSimpleDialog(NOT_SIGNED_MESSAGE).show());
         } catch (Exception e) {
             Gdx.app.log(TAG, "userIsNotSignedInDialog: " + e.getMessage());
         }
