@@ -1,10 +1,13 @@
 package ru.spbau.blackout;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
+import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.Iterator;
@@ -19,10 +22,31 @@ public class GameWorld implements Iterable<GameObject> {
     private final Array<GameObject> gameObjects = new Array<>();
     private final World world;
     private float accumulator = 0;
+    private Body ground;
 
     public GameWorld() {
         // without gravity, without sleeping
         world = new World(Vector2.Zero, false);
+
+        {
+            BodyDef def = new BodyDef();
+            def.type = BodyDef.BodyType.StaticBody;
+            def.position.set(0, 0);
+            ground = world.createBody(def);
+        }
+
+        {
+            CircleShape shape = new CircleShape();
+            shape.setRadius(10000f); // infinity radius
+
+            FixtureDef fixtureDef = new FixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.isSensor = true; // no collisions with the ground
+
+            ground.createFixture(fixtureDef);
+
+            shape.dispose();
+        }
     }
 
     @Override
@@ -47,11 +71,26 @@ public class GameWorld implements Iterable<GameObject> {
         return def.addToWorld(world);
     }
 
-    private void step() {
-        world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+    public FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {
+        FrictionJointDef frictionDef = new FrictionJointDef();
 
+        frictionDef.localAnchorA.set(0,0);
+        frictionDef.localAnchorB.set(0,0);
+
+        frictionDef.maxForce = linearFriction;
+        frictionDef.maxTorque = angularFriction;
+
+        frictionDef.bodyA = body;
+        frictionDef.bodyB = ground;
+
+        return (FrictionJoint) world.createJoint(frictionDef);
+    }
+
+    private void step() {
         for (GameObject object : gameObjects) {
             object.update(WORLD_STEP);
         }
+
+        world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }
 }

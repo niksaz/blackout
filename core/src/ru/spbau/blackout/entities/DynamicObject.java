@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
+import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
 
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Utils;
@@ -21,7 +22,6 @@ public abstract class DynamicObject extends GameObject {
     // Movement:
     final private Vector2 selfVelocity = new Vector2();
     private float maxImpulse;
-    private FrictionJoint friction;
 
     // Appearance:
     protected final AnimationController animation;
@@ -32,8 +32,6 @@ public abstract class DynamicObject extends GameObject {
         maxImpulse = def.maxImpulse;
         animation = new AnimationController(this.model);
         animation.setAnimation(Animations.STAY, -1);
-
-
     }
 
     public final Vector2 getSelfVelocity() {
@@ -70,7 +68,7 @@ public abstract class DynamicObject extends GameObject {
 
 //        Vector2 velocity = body.getLinearVelocity();
 //        body.setLinearVelocity(selfVelocity.x * maxImpulse, selfVelocity.y * maxImpulse);
-
+        
         animation.update(delta * animationSpeed); // FIXME: shouldn't be here
     }
 
