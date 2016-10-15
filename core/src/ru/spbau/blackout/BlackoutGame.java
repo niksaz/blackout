@@ -17,6 +17,9 @@ import ru.spbau.blackout.utils.ScreenManager;
 
 public class BlackoutGame extends Game {
 
+    public static final String hostName = "10.181.216.201";
+    public static final int portNumber = 54321;
+
 	public static final int VIRTUAL_WORLD_WIDTH = 1280;
 	public static final int VIRTUAL_WORLD_HEIGHT = 768;
 

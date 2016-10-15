@@ -1,25 +1,40 @@
 package ru.spbau.blackout.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 import ru.spbau.blackout.BlackoutGame;
 
+import static ru.spbau.blackout.BlackoutGame.hostName;
+import static ru.spbau.blackout.BlackoutGame.portNumber;
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
 class PlayScreenTable  {
+
+    private static final String TAG = "PlayScreenTable";
 
     private static final String BACK_TEXT = "Back to main menu";
     private static final String QUICK_GAME_TEXT = "Quick Game";
     private static final String INVITE_PLAYERS_TEXT = "Invite Players";
     private static final String SHOW_INVITATIONS_TEXT = "Show Invitations";
 
-    public static Table getTable(final BlackoutGame game, final MenuScreen screen) {
+    static Table getTable(final BlackoutGame game, final MenuScreen screen) {
         final Table middleTable = new Table();
 
         final Drawable upImage = new TextureRegionDrawable(
@@ -35,7 +50,28 @@ class PlayScreenTable  {
             }
         });
 
-        addButton(middleTable, QUICK_GAME_TEXT, upImage, downImage, null);
+        addButton(middleTable, QUICK_GAME_TEXT, upImage, downImage, new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                final TextButton textButton = (TextButton) actor;
+                new Thread(() -> {
+                    try (
+                        Socket echoSocket = new Socket(hostName, portNumber);
+                        PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
+                        BufferedReader in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()))
+                    ) {
+                        String userInput = "hello from android client";
+                        out.println(userInput);
+                        String serverResponse = in.readLine();
+                        Gdx.app.postRunnable(() -> textButton.setText("echo: " + serverResponse));
+                    } catch (UnknownHostException e) {
+                        Gdx.app.log(TAG, "Don't know about host " + hostName);
+                    } catch (IOException e) {
+                        Gdx.app.log(TAG, "Couldn't get I/O for the connection to " + hostName);
+                    }
+                }).run();
+            }
+        });
         addButton(middleTable, INVITE_PLAYERS_TEXT, upImage, downImage, null);
         addButton(middleTable, SHOW_INVITATIONS_TEXT, upImage, downImage, null);
         addButton(middleTable, BACK_TEXT, upImage, downImage, new ClickListener() {
