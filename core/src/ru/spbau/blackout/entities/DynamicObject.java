@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 
-import ru.spbau.blackout.Physics;
+import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Utils;
 
 public abstract class DynamicObject extends GameObject {
@@ -25,8 +25,8 @@ public abstract class DynamicObject extends GameObject {
     protected final AnimationController animation;
     private float animationSpeed = 1f;
 
-    protected DynamicObject(Definition def, Model model, Physics physics) {
-        super(def, model, physics);
+    protected DynamicObject(Definition def, Model model, GameWorld gameWorld) {
+        super(def, model, gameWorld);
         speed = def.speed;
         animation = new AnimationController(this.model);
         animation.setAnimation(Animations.STAY, -1);
@@ -77,7 +77,6 @@ public abstract class DynamicObject extends GameObject {
     @Override
     public void update(float delta) {
         super.update(delta);
-
 
         float newX = getPosition().x + (getVelocity().x + getSelfVelocity().x * speed) * delta;
         float newY = getPosition().y + (getVelocity().y + getSelfVelocity().y * speed) * delta;

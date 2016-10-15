@@ -62,7 +62,7 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
-                ScreenManager.getInstance().setScreen(new MenuScreen(game));
+                ScreenManager.getInstance().setScreen(new MenuScreen(BlackoutGame.getInstance()));
             }
         });
     }

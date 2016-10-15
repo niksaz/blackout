@@ -6,12 +6,6 @@ import ru.spbau.blackout.BlackoutGame;
 
 public abstract class BlackoutScreen implements Screen {
 
-    final protected BlackoutGame game;
-
-    BlackoutScreen(BlackoutGame game) {
-        this.game = game;
-    }
-
     @Override
     public void show() {
     }
@@ -39,9 +33,4 @@ public abstract class BlackoutScreen implements Screen {
     @Override
     public void dispose() {
     }
-
-    public BlackoutGame getGame() {
-        return game;
-    }
-
 }

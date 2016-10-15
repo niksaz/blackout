@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
@@ -13,7 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.Physics;
+import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
@@ -27,26 +28,24 @@ public class GameScreen extends BlackoutScreen {
     public static final float DEFAULT_CAMERA_Y_OFFSET = -1;
     public static final float DEFAULT_CAMERA_HEIGHT = 12;
 
-    private ModelInstance map;
-
-    private PerspectiveCamera camera;
-    private final Array<GameObject> gameObjects = new Array<>();
-    private Hero character;
-    private final IngameUI ui = new IngameUI(this);
-
-    public Environment environment;
-    private final Physics physics = new Physics();
-
     // should be here, not in loading screen because it owns all assets
     private final AssetManager assets = new AssetManager();
 
-    // nullable
+    // null if loading is done
     private LoadingScreen loadingScreen;
 
-    public GameScreen(BlackoutGame game, GameRoom room) {
-        super(game);
+    // appearance:
+    private ModelInstance map;
+    private PerspectiveCamera camera;
+    public Environment environment;
 
-        loadingScreen = new LoadingScreen(game, room);
+    private Hero character;
+    private final IngameUI ui = new IngameUI(this);
+
+    private final GameWorld gameWorld = new GameWorld();
+
+    public GameScreen(GameRoom room) {
+        loadingScreen = new LoadingScreen(room);
 
         // initialize main camera
         camera = new PerspectiveCamera();
@@ -77,12 +76,11 @@ public class GameScreen extends BlackoutScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        game.modelBatch.begin(camera);
-        for (GameObject object : gameObjects) {
-            game.modelBatch.render(object.getModelInstance(), environment);
-        }
-        game.modelBatch.render(map, environment);
-        game.modelBatch.end();
+        ModelBatch modelBatch = BlackoutGame.getInstance().modelBatch;
+        modelBatch.begin(camera);
+        modelBatch.render(gameWorld, environment);
+        modelBatch.render(map, environment);
+        modelBatch.end();
 
         ui.draw();
 
@@ -111,10 +109,6 @@ public class GameScreen extends BlackoutScreen {
      * Updates game world on every frame.
      */
     private void update(final float delta) {
-        for (GameObject object : gameObjects) {
-            object.update(delta);
-        }
-
         Vector2 charPos = character.getPosition();
         camera.position.set(
                 DEFAULT_CAMERA_X_OFFSET + charPos.x,
@@ -123,7 +117,7 @@ public class GameScreen extends BlackoutScreen {
         camera.lookAt(charPos.x, charPos.y, character.getHeight());
         camera.update();
 
-        physics.update(delta);
+        gameWorld.update(delta);
     }
 
     private void doneLoading() {
@@ -135,9 +129,7 @@ public class GameScreen extends BlackoutScreen {
         final Hero.Definition characterDef;
         final String mapPath;
 
-        LoadingScreen(BlackoutGame game, GameRoom room) {
-            super(game);
-
+        LoadingScreen(GameRoom room) {
             // getting information from room
             objectDefs = room.getObjectDefs();
             characterDef = room.getCharacter();
@@ -193,8 +185,7 @@ public class GameScreen extends BlackoutScreen {
             Gdx.app.log("blackout:GameScreen", "done loading");
 
             for (GameObject.Definition def : objectDefs) {
-                GameObject obj = def.makeInstance(assets.get(def.modelPath, Model.class), physics);
-                gameObjects.add(obj);
+                GameObject obj = def.makeInstance(assets.get(def.modelPath, Model.class), gameWorld);
                 if (def == characterDef) {
                     // FIXME: assert that obj instanceof Hero
                     character = (Hero)obj;

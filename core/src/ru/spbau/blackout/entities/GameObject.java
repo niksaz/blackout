@@ -2,19 +2,24 @@ package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.Renderable;
+import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 
-import ru.spbau.blackout.Physics;
+import ru.spbau.blackout.GameWorld;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
-public abstract class GameObject {
+public abstract class GameObject implements RenderableProvider {
     // physics:
     protected Body body;
     float height;
@@ -22,15 +27,19 @@ public abstract class GameObject {
     // appearance:
     protected ModelInstance model;
 
-
-    protected GameObject(Definition def, Model model, Physics physics) {
+    protected GameObject(Definition def, Model model, GameWorld gameWorld) {
         this.model = new ModelInstance(model);
 
-        body = physics.getWorld().createBody(def.bodyDef);
+        body = gameWorld.addObject(this, def);
         body.createFixture(def.fixtureDef);
 
         setPosition(def.getPosition().x, def.getPosition().y);
 
+    }
+
+    @Override
+    public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
+        model.getRenderables(renderables, pool);
     }
 
     public void update(float delta) {
@@ -84,13 +93,6 @@ public abstract class GameObject {
     }
 
 
-    // ModelInstance
-
-    public ModelInstance getModelInstance() {
-        return model;
-    }
-
-
     // Height:
 
     public void setHeight(float height) {
@@ -105,8 +107,9 @@ public abstract class GameObject {
         public static final float DEFAULT_HEIGHT = 0;
         public static final float DEFAULT_ROTATION = 0;
 
-        public static final float DEFAULT_DENSITY = 0.5f;
+        public static final float DEFAULT_DENSITY = 1f;
         public static final float DEFAULT_FRICTION = 0.4f;
+        public static final float RESTITUTION = 0f;
 
         // physics
         public float rotation = DEFAULT_ROTATION;
@@ -124,7 +127,7 @@ public abstract class GameObject {
             fixtureDef.shape = shape;
             fixtureDef.density = DEFAULT_DENSITY;
             fixtureDef.friction = DEFAULT_FRICTION;
-            fixtureDef.restitution = 0;
+            fixtureDef.restitution = RESTITUTION;
 
             // setup body
             bodyDef.position.set(initialX, initialY);
@@ -174,7 +177,11 @@ public abstract class GameObject {
             fixtureDef.shape.dispose();
         }
 
-        public abstract GameObject makeInstance(Model model, Physics physics);
+        public Body addToWorld(World world) {
+            return world.createBody(bodyDef);
+        }
+
+        public abstract GameObject makeInstance(Model model, GameWorld gameWorld);
         public abstract BodyDef.BodyType getBodyType();
 //        public abstract float getDensity();
 //        public abstract float getFriction();i
