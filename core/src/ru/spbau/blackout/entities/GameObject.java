@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 
 import ru.spbau.blackout.Physics;
 import ru.spbau.blackout.Utils;
@@ -15,28 +16,31 @@ public abstract class GameObject {
     // physics:
     protected Body body;
     float height;
+    private final Vector2 position = new Vector2();
 
     // appearance:
     protected ModelInstance model;
 
+
     protected GameObject(Definition def, Model model, Physics physics) {
-        this.model = new ModelInstance(model, def.getPosition().x, def.height, def.getPosition().y);
+        this.model = new ModelInstance(model);
         body = physics.getWorld().createBody(def.bodyDef);
+        setPosition(def.getPosition().x, def.getPosition().y);
     }
 
-    public final float getHeight() {
-        return height;
+    public void update(float delta) {
+        // nothing
     }
 
-    public void setHeight(float height) {
-        this.height = height;
-    }
+
+    // Rotation
 
     /**
-     * Rotation in radians.
+     * Set rotation in radians.
      */
     public void setRotation(float rad) {
         model.transform.setToRotationRad(Vector3.Y, rad);
+        body.getTransform().setRotation(rad);
     }
 
     /**
@@ -46,16 +50,42 @@ public abstract class GameObject {
         setRotation(Utils.angleVec(direction));
     }
 
-    /*public Vector2 getPosition() {
+    /**
+     *  The current rotation in radians.
+     */
+    public float getRotation() {
+        return body.getTransform().getRotation();
+    }
+
+
+    // Position:
+
+    public Vector2 getPosition() {
         return position;
     }
 
     public void setPosition(float x, float y) {
         position.set(x, y);
-    }*/
+        body.getTransform().setPosition(position);
+        model.transform.setTranslation(body.getPosition().x, height, body.getPosition().y);
+    }
 
-    public void update(float delta) {
-        // nothing
+
+    // ModelInstance
+
+    public ModelInstance getModelInstance() {
+        return model;
+    }
+
+
+    // Height:
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    public final float getHeight() {
+        return height;
     }
 
     public static abstract class Definition {

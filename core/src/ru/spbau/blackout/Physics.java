@@ -14,9 +14,6 @@ public class Physics {
 
     private float accumulator = 0;
 
-    // FIXME: just for test. Remove in release version.
-    private final Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
-
     public Physics() {
         // without gravity, with sleeping
         world = new World(Vector2.Zero, true);
@@ -30,10 +27,6 @@ public class Physics {
             world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
             accumulator -= WORLD_STEP;
         }
-    }
-
-    public void debugRender(Camera camera) {
-        debugRenderer.render(world, camera.combined);
     }
 
     public World getWorld() {

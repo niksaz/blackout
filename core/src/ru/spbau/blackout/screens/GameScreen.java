@@ -18,6 +18,7 @@ import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.rooms.GameRoom;
+import ru.spbau.blackout.utils.ScreenManager;
 
 public class GameScreen extends BlackoutScreen {
     public static final float DEFAULT_CAMERA_X_OFFSET = 0;
@@ -25,27 +26,25 @@ public class GameScreen extends BlackoutScreen {
     public static final float DEFAULT_CAMERA_HEIGHT = 20;
 
     private ModelInstance map;
-    private GameRoom room;
 
     private PerspectiveCamera camera;
-    private Array<GameObject> gameObjects;
-    private Hero hero;
-    private IngameUI ui;
+    private final Array<GameObject> gameObjects = new Array<>();
+    private Hero character;
+    private final IngameUI ui = new IngameUI(this);
 
-    // just for test
     public Environment environment;
+    private final Physics physics = new Physics();
 
-    private AssetManager assets;
-    private boolean loading;
-    private final Physics physics;
+    // should be here, not in loading screen because it owns all assets
+    private final AssetManager assets = new AssetManager();
+
+    // nullable
+    private LoadingScreen loadingScreen;
 
     public GameScreen(BlackoutGame game, GameRoom room) {
         super(game);
-        this.room = room;
 
-        // getting information from room
-        gameObjects = room.getObjects();
-        hero = room.getHero();
+        loadingScreen = new LoadingScreen(game, room);
 
         // initialize main camera
         camera = new PerspectiveCamera();
@@ -57,25 +56,16 @@ public class GameScreen extends BlackoutScreen {
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 2f, 2f, 2f, 100f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, 0f, -1f));
-
-        // initialize some other things
-        physics = new Physics();
-        ui = new IngameUI(this);
-        assets = new AssetManager();
     }
 
     @Override
     public void show() {
         super.show();
 
-        // start loading
-        ui.load(assets);
-        for (GameObject object : gameObjects) {
-            assets.load(object.getModelPath(), Model.class);
+        // if not loaded yet
+        if (loadingScreen != null) {
+            ScreenManager.getInstance().setScreen(loadingScreen);
         }
-        assets.load(hero.getModelPath(), Model.class);
-        assets.load(room.getMap(), Model.class);
-        loading = true;
     }
 
     @Override
@@ -85,22 +75,14 @@ public class GameScreen extends BlackoutScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        if (loading) {
-            doLoading();
-            return;
-        }
-
         game.modelBatch.begin(camera);
         for (GameObject object : gameObjects) {
             game.modelBatch.render(object.getModelInstance(), environment);
         }
-        game.modelBatch.render(hero.getModelInstance(), environment);
         game.modelBatch.render(map, environment);
         game.modelBatch.end();
 
         ui.draw();
-
-        physics.debugRender(camera);
 
         update(delta);
     }
@@ -117,35 +99,10 @@ public class GameScreen extends BlackoutScreen {
     @Override
     public void dispose() {
         super.dispose();
-        assets.dispose();
     }
 
-    public Hero getHero() {
-        return hero;
-    }
-
-    private void doLoading() {
-        if (assets.update()) {
-            doneLoading();
-        }
-        /*float progress = assets.getProgress();
-        if(assets.isLoaded(LOADING_SCREEN)) {
-        }*/
-
-        // TODO: loading screen with a progress bar
-    }
-
-    private void doneLoading() {
-        Gdx.app.log("blackout:GameScreen", "done loading");
-
-        for (GameObject object : gameObjects) {
-            object.makeInstance(assets.get(object.getModelPath(), Model.class));
-        }
-
-        map = new ModelInstance(assets.get(room.getMap(), Model.class));
-        ui.doneLoading(assets);
-
-        loading = false;
+    public Hero getCharacter() {
+        return character;
     }
 
     /**
@@ -156,14 +113,99 @@ public class GameScreen extends BlackoutScreen {
             object.update(delta);
         }
 
-        Vector2 heroPos = hero.getPosition();
+        Vector2 charPos = character.getPosition();
         camera.position.set(
-                DEFAULT_CAMERA_X_OFFSET + heroPos.x,
-                DEFAULT_CAMERA_HEIGHT + hero.getHeight(),
-                DEFAULT_CAMERA_Y_OFFSET + heroPos.y);
-        camera.lookAt(heroPos.x, hero.getHeight(), heroPos.y);
+                DEFAULT_CAMERA_X_OFFSET + charPos.x,
+                DEFAULT_CAMERA_HEIGHT + character.getHeight(),
+                DEFAULT_CAMERA_Y_OFFSET + charPos.y);
+        camera.lookAt(charPos.x, character.getHeight(), charPos.y);
         camera.update();
 
         physics.update(delta);
+    }
+
+    private void doneLoading() {
+        loadingScreen = null;
+    }
+
+    private class LoadingScreen extends BlackoutScreen {
+        final Array<GameObject.Definition> objectDefs;
+        final Hero.Definition characterDef;
+        final String mapPath;
+
+        LoadingScreen(BlackoutGame game, GameRoom room) {
+            super(game);
+
+            // getting information from room
+            objectDefs = room.getObjectDefs();
+            characterDef = room.getCharacter();
+            mapPath = room.getMap();
+        }
+
+        @Override
+        public void show() {
+            super.show();
+
+            // start loading
+            ui.load(assets);
+            for (GameObject.Definition def : objectDefs) {
+                assets.load(def.modelPath, Model.class);
+            }
+            assets.load(mapPath, Model.class);
+        }
+
+        @Override
+        public void render(float delta) {
+            super.render(delta);
+
+            Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+            doLoading();
+
+            float progress = assets.getProgress();
+            // TODO: show progress
+
+            // TODO: beautiful loading screen
+            /*if(assets.isLoaded(LOADING_SCREEN)) {
+            }*/
+        }
+
+        @Override
+        public void resize(int width, int height) {
+            super.resize(width, height);
+        }
+
+        @Override
+        public void dispose() {
+            super.dispose();
+        }
+
+        private void doLoading() {
+            if (assets.update()) {
+                doneLoading();
+            }
+        }
+
+        private void doneLoading() {
+            Gdx.app.log("blackout:GameScreen", "done loading");
+
+            for (GameObject.Definition def : objectDefs) {
+                GameObject obj = def.makeInstance(assets.get(def.modelPath, Model.class), physics);
+                gameObjects.add(obj);
+                if (def == characterDef) {
+                    // FIXME: assert that obj instanceof Hero
+                    character = (Hero)obj;
+                }
+            }
+            // FIXME: assert that character != null
+
+            map = new ModelInstance(assets.get(mapPath, Model.class));
+            ui.doneLoading(assets, character);
+
+            GameScreen.this.doneLoading();
+
+            ScreenManager.getInstance().disposeScreen();
+        }
     }
 }

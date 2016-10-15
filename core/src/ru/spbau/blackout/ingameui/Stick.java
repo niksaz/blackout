@@ -56,12 +56,8 @@ public class Stick extends DragListener {
     }
 
     private Vector2 velocity = new Vector2(0, 0);
-    private DynamicObject unit;
+    private DynamicObject object;
     private Image touchImage;
-
-    public Stick(DynamicObject unit) {
-        this.unit = unit;
-    }
 
     @Override
     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -86,12 +82,16 @@ public class Stick extends DragListener {
         assets.load(MainImg.IMAGE_PATH, Texture.class);
     }
 
-    public void doneLoading(AssetManager assets, Stage stage) {
+    public void doneLoading(AssetManager assets, Stage stage, DynamicObject object) {
+        this.object = object;
+
+        // touch image initialization
         touchImage = new Image(assets.get(TouchImg.IMAGE_PATH, Texture.class));
         touchImage.setSize(TouchImg.X.SIZE, TouchImg.Y.SIZE);
         updateTouchPosition();
         stage.addActor(touchImage);
 
+        // main image initialization
         // must go after touch image initialization to be in the foreground
         Image mainImg = new Image(assets.get(MainImg.IMAGE_PATH, Texture.class));
         mainImg.setSize(MainImg.X.SIZE, MainImg.Y.SIZE);
@@ -113,7 +113,7 @@ public class Stick extends DragListener {
             velocity.y /= len;
         }
 
-        unit.setSelfVelocity(velocity);
+        object.setSelfVelocity(velocity);
         updateTouchPosition();
     }
 
@@ -123,7 +123,7 @@ public class Stick extends DragListener {
                 - TouchImg.X.CENTER                 // move pivot to the center of image
                 + velocity.x * MainImg.X.MAX_AT,
                 MainImg.Y.START + MainImg.Y.CENTER  // move (0,0) to the center of mainImg
-                - TouchImg.X.CENTER                 // move pivot to the center of image
+                - TouchImg.Y.CENTER                 // move pivot to the center of image
                 // minus due to conversion between (x,y) plane and (x,z) plane
                 -velocity.y * MainImg.Y.MAX_AT
         );
