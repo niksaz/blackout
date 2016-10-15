@@ -2,7 +2,6 @@ package ru.spbau.blackout.screens;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -15,15 +14,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.play.services.PlayServicesInCore;
+import ru.spbau.blackout.utils.AssetLoader;
 
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
-public class MainMenuTable {
+class MainMenuTable {
 
-    private static final Color BLACKOUT_LABEL_COLOR = Color.WHITE;
+    private static final Color BLACKOUT_LABEL_COLOR = Color.BLACK;
 
     private static final float BLACKOUT_LABEL_BOTTOM_PADDING = 25.0f;
-    private static final float BLACKOUT_LABEL_SCALE = 2.5f;
 
     private static final String BLACKOUT_TEXT = "Blackout";
     private static final String BUTTON_PLAY_TEXT = "Play";
@@ -31,7 +31,7 @@ public class MainMenuTable {
     private static final String BUTTON_ACHIEVEMENTS_TEXT = "Achievements";
     private static final String BUTTON_LEADERBOARD_TEXT = "Leaderboard";
 
-    public static Table getTable(final BlackoutGame game, final MenuScreen screen) {
+    static Table getTable(final BlackoutGame game, final MenuScreen screen) {
         final Table middleTable = new Table();
         addBlackoutLabel(middleTable);
 
@@ -47,19 +47,19 @@ public class MainMenuTable {
         addButton(middleTable, BUTTON_SHOP_TEXT, upImage, downImage, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.getSnapshot().changeGold(10);
+                PlayServicesInCore.getInstance().getSnapshot().changeGold(10);
             }
         });
         addButton(middleTable, BUTTON_ACHIEVEMENTS_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.playServices.showAchievements();
+                PlayServicesInCore.getInstance().getPlayServices().showAchievements();
             }
         });
         addButton(middleTable, BUTTON_LEADERBOARD_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.playServices.showLeaderboards();
+                PlayServicesInCore.getInstance().getPlayServices().showLeaderboards();
             }
         });
 
@@ -68,11 +68,7 @@ public class MainMenuTable {
     }
 
     private static Label addBlackoutLabel(Table table) {
-        final BitmapFont font = new BitmapFont();
-        font.getData().scale(BLACKOUT_LABEL_SCALE);
-        font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-
-        final LabelStyle style = new LabelStyle(font, BLACKOUT_LABEL_COLOR);
+        final LabelStyle style = new LabelStyle(AssetLoader.getInstance().getFontBlackoutLabel(), BLACKOUT_LABEL_COLOR);
         final Label label = new Label(BLACKOUT_TEXT, style);
 
         table.add(label).pad(BLACKOUT_LABEL_BOTTOM_PADDING).row();

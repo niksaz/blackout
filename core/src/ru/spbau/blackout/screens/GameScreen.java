@@ -10,9 +10,12 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.Physics;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
@@ -21,7 +24,7 @@ import ru.spbau.blackout.rooms.GameRoom;
 public class GameScreen extends BlackoutScreen {
     public static final float DEFAULT_CAMERA_X_OFFSET = 0;
     public static final float DEFAULT_CAMERA_Y_OFFSET = 2;
-    public static final float DEFAULT_CAMERA_HEIGHT = 18;
+    public static final float DEFAULT_CAMERA_HEIGHT = 20;
 
     private ModelInstance map;
     private GameRoom room;
@@ -36,20 +39,15 @@ public class GameScreen extends BlackoutScreen {
 
     private AssetManager assets;
     private boolean loading;
+    private final Physics physics;
 
     public GameScreen(BlackoutGame game, GameRoom room) {
         super(game);
         this.room = room;
 
+        // getting information from room
         units = room.getObjects();
         hero = room.getHero();
-
-        ui = new IngameUI(this);
-    }
-
-    @Override
-    public void show() {
-        super.show();
 
         // initialize main camera
         camera = new PerspectiveCamera();
@@ -62,8 +60,17 @@ public class GameScreen extends BlackoutScreen {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 2f, 2f, 2f, 100f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, 0f, -1f));
 
-        // start loading
+        // initialize some other things
+        physics = new Physics();
+        ui = new IngameUI(this);
         assets = new AssetManager();
+    }
+
+    @Override
+    public void show() {
+        super.show();
+
+        // start loading
         ui.load(assets);
         for (GameObject unit : units) {
             assets.load(unit.getModelPath(), Model.class);
@@ -92,8 +99,6 @@ public class GameScreen extends BlackoutScreen {
             return;
         }
 
-        update(delta);
-
         game.modelBatch.begin(camera);
         for (GameObject unit : units) {
             game.modelBatch.render(unit.getModelInstance(), environment);
@@ -103,6 +108,10 @@ public class GameScreen extends BlackoutScreen {
         game.modelBatch.end();
 
         ui.draw();
+
+        physics.debugRender(camera);
+
+        update(delta);
     }
 
     @Override
@@ -141,7 +150,7 @@ public class GameScreen extends BlackoutScreen {
         loading = false;
     }
 
-    private void update(float delta) {
+    private void update(final float delta) {
         for (GameObject unit : units) {
             unit.update(delta);
         }
@@ -154,5 +163,7 @@ public class GameScreen extends BlackoutScreen {
                 DEFAULT_CAMERA_Y_OFFSET + heroPos.y);
         camera.lookAt(heroPos.x, hero.getHeight(), heroPos.y);
         camera.update();
+
+        physics.update(delta);
     }
 }

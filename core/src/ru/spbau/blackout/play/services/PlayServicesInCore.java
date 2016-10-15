@@ -1,37 +1,35 @@
 package ru.spbau.blackout.play.services;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 
-import ru.spbau.blackout.BlackoutGame;
+public class PlayServicesInCore implements PlayServicesListener {
 
-public class PlayServicesListenerInCore implements PlayServicesListener {
+    private static PlayServicesInCore listener;
 
-    private static final String TAG = "PlayServicesListenerInCore";
-
-    private static PlayServicesListenerInCore listener;
-
-    private BlackoutGame game;
+    private PlayServices playServices;
+    private BlackoutSnapshot snapshot;
     private final Array<CorePlayServicesListener> listeners = new Array<CorePlayServicesListener>();
 
-    private PlayServicesListenerInCore() {}
+    private PlayServicesInCore() {}
 
-    public static PlayServicesListenerInCore getInstance() {
+    public static PlayServicesInCore getInstance() {
         if (listener == null) {
-            listener = new PlayServicesListenerInCore();
+            listener = new PlayServicesInCore();
         }
         return listener;
     }
 
-    public void initialize(BlackoutGame game) {
-        this.game = game;
+    public void initialize(PlayServices playServices) {
+        this.playServices = playServices;
+        this.snapshot = null;
     }
 
-    @Override
-    public void onSignInFailed() {
-        for (CorePlayServicesListener listener : listeners) {
-            listener.onSignInFailed();
-        }
+    public PlayServices getPlayServices() {
+        return playServices;
+    }
+
+    public BlackoutSnapshot getSnapshot() {
+        return snapshot;
     }
 
     @Override
@@ -51,11 +49,10 @@ public class PlayServicesListenerInCore implements PlayServicesListener {
 
     @Override
     public void finishedLoadingSnapshot(BlackoutSnapshot snapshot) {
-        game.setSnapshot(snapshot);
+        this.snapshot = snapshot;
         for (CorePlayServicesListener listener : listeners) {
             listener.finishedLoadingSnapshot();
         }
     }
-
 
 }
