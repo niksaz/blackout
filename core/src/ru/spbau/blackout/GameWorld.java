@@ -17,7 +17,7 @@ import ru.spbau.blackout.entities.GameObject;
 
 public class GameWorld implements Iterable<GameObject> {
     public static final float WORLD_STEP = 1 / 58f;
-    public static final int VELOCITY_ITERATIONS = 2;
+    public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
     private final Array<GameObject> gameObjects = new Array<>();

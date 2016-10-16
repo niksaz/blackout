@@ -11,7 +11,8 @@ public class ShellObject extends DynamicObject {
     }
 
     @Override
-    void updateVelocityForSecondStep() {
+    public void updateForSecondStep() {
+        super.updateForSecondStep();
         body.setLinearVelocity(0, 0);
     }
 

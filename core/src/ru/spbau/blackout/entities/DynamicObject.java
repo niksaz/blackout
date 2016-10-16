@@ -43,13 +43,7 @@ public abstract class DynamicObject extends GameObject {
     public void updateForSecondStep() {
         super.updateForSecondStep();
         velocity.set(body.getLinearVelocity());
-        updateVelocityForSecondStep();
     }
-
-    /**
-     * Used to ensure that all derived classes update velocity before a second step.
-     */
-    abstract void updateVelocityForSecondStep();
 
     public static abstract class Definition extends GameObject.Definition {
         public Definition(String modelPath, Shape shape, float initialX, float initialY) {
