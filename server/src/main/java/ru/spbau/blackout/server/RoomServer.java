@@ -1,31 +1,24 @@
-package ru.spbau.blackout;
+package ru.spbau.blackout.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class Server {
+public class RoomServer {
 
-    private static final int PORT = 54321;
-
-    private final ArrayList<RoomClientThread> roomClientThreads;
+    private final ArrayList<ru.spbau.blackout.server.RoomClientThread> roomClientThreads = new ArrayList<>();
     private final int port;
 
-    public static void main(String[] args) throws IOException {
-        new Server(PORT).run();
-    }
-
-    private Server(int port) {
-        roomClientThreads = new ArrayList<>();
+    public RoomServer(int port) {
         this.port = port;
     }
 
-    private void run() {
+    public void run() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
                 final Socket nextSocket = serverSocket.accept();
-                final RoomClientThread nextThread = new RoomClientThread(this, nextSocket);
+                final ru.spbau.blackout.server.RoomClientThread nextThread = new ru.spbau.blackout.server.RoomClientThread(this, nextSocket);
                 synchronized (System.out) {
                     System.out.println("New thread for a connection is created");
                 }
@@ -41,13 +34,17 @@ public class Server {
         }
     }
 
-    void discard(RoomClientThread clientThread) {
+    void discard(ru.spbau.blackout.server.RoomClientThread clientThread) {
         synchronized (roomClientThreads) {
             roomClientThreads.remove(clientThread);
         }
         synchronized (System.out) {
             System.out.println("Thread is discarded");
         }
+    }
+
+    ArrayList<ru.spbau.blackout.server.RoomClientThread> getRoomClients() {
+        return roomClientThreads;
     }
 
 }
