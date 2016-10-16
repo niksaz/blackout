@@ -8,13 +8,8 @@ import ru.spbau.blackout.GameWorld;
 public class Hero extends GameUnit {
     protected Hero(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
-        body.applyLinearImpulse(0, 20, getPosition().x, getPosition().y, true);
-    }
-
-    @Override
-    public void update(float delta) {
-        super.update(delta);
-    }
+        velocity.set(0, -15);
+     }
 
     public static class Definition extends GameUnit.Definition {
         public Definition(String modelPath, Shape shape, float initialX, float initialY) {

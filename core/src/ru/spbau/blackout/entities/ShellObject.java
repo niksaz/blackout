@@ -10,6 +10,11 @@ public class ShellObject extends DynamicObject {
         super(def, model, gameWorld);
     }
 
+    @Override
+    void updateVelocityForSecondStep() {
+        body.setLinearVelocity(0, 0);
+    }
+
     public static class Definition extends DynamicObject.Definition {
         public Definition(String modelPath, Shape shape, float initialX, float initialY) {
             super(modelPath, shape, initialX, initialY);

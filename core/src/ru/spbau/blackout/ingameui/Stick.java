@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
-import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.units.Rpx;
 
@@ -113,7 +112,7 @@ public class Stick extends DragListener {
             velocity.y /= len;
         }
 
-        object.setSelfVelocityDirection(velocity);
+        object.setSelfVelocity(velocity);
         updateTouchPosition();
     }
 

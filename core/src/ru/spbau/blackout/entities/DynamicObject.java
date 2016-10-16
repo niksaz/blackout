@@ -15,21 +15,41 @@ public abstract class DynamicObject extends GameObject {
         public static final String DEFAULT = "Armature|Stay";
     }
 
+    protected final Vector2 velocity = new Vector2();
+
     // Appearance:
     protected final AnimationController animation;
-    protected float animationSpeed = 1f;
 
     protected DynamicObject(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
         animation = new AnimationController(this.model);
         animation.setAnimation(Animations.DEFAULT, -1);
     }
+    protected float animationSpeed = 1f;
 
     @Override
-    public void update(float delta) {
-        super.update(delta);
-        animation.update(delta * animationSpeed); // FIXME: shouldn't be here
+    public void updateState(float delta) {
+        super.updateState(delta);
+        animation.update(delta * animationSpeed);
     }
+
+    @Override
+    public void updateForFirstStep() {
+        super.updateForFirstStep();
+        body.setLinearVelocity(velocity);
+    }
+
+    @Override
+    public void updateForSecondStep() {
+        super.updateForSecondStep();
+        velocity.set(body.getLinearVelocity());
+        updateVelocityForSecondStep();
+    }
+
+    /**
+     * Used to ensure that all derived classes update velocity before a second step.
+     */
+    abstract void updateVelocityForSecondStep();
 
     public static abstract class Definition extends GameObject.Definition {
         public Definition(String modelPath, Shape shape, float initialX, float initialY) {

@@ -58,6 +58,10 @@ public class GameWorld implements Iterable<GameObject> {
     public void update(float delta) {
         accumulator += delta;
 
+        for (GameObject object : gameObjects) {
+            object.updateState(delta);
+        }
+
         while (accumulator >= WORLD_STEP) {
             step();
             accumulator -= WORLD_STEP;
@@ -100,9 +104,13 @@ public class GameWorld implements Iterable<GameObject> {
 
     private void step() {
         for (GameObject object : gameObjects) {
-            object.update(WORLD_STEP);
+            object.updateForFirstStep();
         }
+        world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
+        for (GameObject object : gameObjects) {
+            object.updateForSecondStep();
+        }
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }
 }

@@ -1,9 +1,7 @@
 package ru.spbau.blackout.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 
@@ -22,42 +20,38 @@ public abstract class GameUnit extends DynamicObject {
     public static final float DEFAULT_ANGULAR_FRICTION = 5f;
 
     // Movement:
-    final private Vector2 selfVelocityDirection = new Vector2();
-    private float maxSelfVelocity;
-    private final FrictionJoint friction;
-    private final Body controller;
+    final private Vector2 selfVelocity = new Vector2();
+    private float selfVelocityScale;
+    private final FrictionJoint frictionJoint;
 
     protected GameUnit(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
-        maxSelfVelocity = def.maxSelfVelocity;
+        selfVelocityScale = def.maxSelfVelocity;
         animation.setAnimation(Animations.STAY, -1);
 
-        friction = gameWorld.addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
-        controller = gameWorld.addController(body);
+        frictionJoint = gameWorld.addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
     }
 
     @Override
-    public void update(float delta) {
-        super.update(delta);
-
-        Gdx.app.error("WTF", "" + controller.getPosition());
+    void updateVelocityForSecondStep() {
+        body.setLinearVelocity(
+                selfVelocity.x * selfVelocityScale,
+                selfVelocity.y * selfVelocityScale
+        );
     }
 
-    public final Vector2 getSelfVelocityDirection() {
-        return selfVelocityDirection;
+    public final Vector2 getSelfVelocity() {
+        return selfVelocity;
     }
 
-    /**
-     * Gets _NORMALIZED_ vector.
-     */
-    public void setSelfVelocityDirection(final Vector2 vel) {
+    public void setSelfVelocity(final Vector2 vel) {
         // avoid excessive allocation
-        // Vector2 old = new Vector2(selfVelocityDirection);
-        final float oldX = selfVelocityDirection.x;
-        final float oldY = selfVelocityDirection.y;
+        // Vector2 old = new Vector2(selfVelocity);
+        final float oldX = selfVelocity.x;
+        final float oldY = selfVelocity.y;
 
-        selfVelocityDirection.set(vel.x, vel.y);
-        if (Utils.isZeroVec(selfVelocityDirection)) {
+        selfVelocity.set(vel.x, vel.y);
+        if (Utils.isZeroVec(selfVelocity)) {
             // on stop walking
             if (!Utils.isZeroVec(oldX, oldY)) {
                 animation.setAnimation(Animations.STAY, -1);
@@ -69,8 +63,8 @@ public abstract class GameUnit extends DynamicObject {
                 animation.setAnimation(Animations.WALK, -1);
             }
 
-            animationSpeed = selfVelocityDirection.len() * Animations.WALK_SPEED_FACTOR;
-            setDirection(selfVelocityDirection);
+            animationSpeed = selfVelocity.len() * Animations.WALK_SPEED_FACTOR;
+            setDirection(selfVelocity);
         }
     }
 

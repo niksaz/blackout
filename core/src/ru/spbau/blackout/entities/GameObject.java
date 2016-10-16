@@ -43,9 +43,13 @@ public abstract class GameObject implements RenderableProvider {
         model.getRenderables(renderables, pool);
     }
 
-    public void update(float delta) {
-        // nothing
-    }
+    /**
+     * Update things not connected with physics.
+     */
+    public void updateState(float delta) {}
+
+    public void updateForFirstStep() {}
+    public void updateForSecondStep() {}
 
     // Transform:
 
