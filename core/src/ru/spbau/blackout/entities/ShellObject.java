@@ -5,19 +5,25 @@ import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameWorld;
 
-public class Decoration extends StaticObject {
-    protected Decoration(Definition def, Model model, GameWorld gameWorld) {
+public class ShellObject extends DynamicObject {
+    protected ShellObject(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
     }
 
-    public static class Definition extends StaticObject.Definition {
+    @Override
+    public void updateForSecondStep() {
+        super.updateForSecondStep();
+        body.setLinearVelocity(0, 0);
+    }
+
+    public static class Definition extends DynamicObject.Definition {
         public Definition(String modelPath, Shape shape, float initialX, float initialY) {
             super(modelPath, shape, initialX, initialY);
         }
 
         @Override
         public GameObject makeInstance(Model model, GameWorld gameWorld) {
-            return new Decoration(this, model, gameWorld);
+            return new ShellObject(this, model, gameWorld);
         }
     }
 }

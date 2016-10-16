@@ -1,88 +1,198 @@
 package ru.spbau.blackout.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.Renderable;
+import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 
-import ru.spbau.blackout.Utils;
+import ru.spbau.blackout.GameWorld;
 
-/**
- * Because the game is designed not as a game with many objects,
- * but as a game with highly customized objects, there is no class like `UnitType`.
- * So it contains all additional information like a path to its model.
- */
-public abstract class GameObject {
-    public static final float DEFAULT_HEIGHT = 0;
+import static ru.spbau.blackout.utils.Utils.fixTop;
 
-    // position:
-    final private Vector2 position = new Vector2();
-    float height = DEFAULT_HEIGHT;
+
+public abstract class GameObject implements RenderableProvider {
+    // physics:
+    protected Body body;
+    float height;
 
     // appearance:
     protected ModelInstance model;
-    private String modelPath;
 
-    public GameObject(String modelPath, float initialX, float initialY) {
-        this.modelPath = modelPath;
-        this.position.set(initialX, initialY);
+    protected GameObject(Definition def, Model model, GameWorld gameWorld) {
+        this.model = new ModelInstance(model);
+
+        body = gameWorld.addObject(this, def);
+        body.createFixture(def.fixtureDef);
+
+        setPosition(def.getPosition().x, def.getPosition().y);
     }
 
-    public GameObject(String modelPath, Vector2 initialPosition) {
-        this(modelPath, initialPosition.x, initialPosition.y);
-    }
-
-    public GameObject(String modelPath) {
-        this(modelPath, 0, 0);
-    }
-
-    public final float getHeight() {
-        return height;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
+    @Override
+    public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
+        updateTransform();
+        model.getRenderables(renderables, pool);
     }
 
     /**
-     * Rotation in radians.
+     * Update things not connected with physics.
      */
-    public void setRotation(float rad) {
-        model.transform.setToRotationRad(Vector3.Y, rad);
+    public void updateState(float delta) {}
+
+    public void updateForFirstStep() {}
+    public void updateForSecondStep() {}
+
+    // Transform:
+
+    public void setTransform(float x, float y, float angle) {
+        body.setTransform(x, y, angle);
+    }
+
+    /**
+     * Model instance model to the physic body.
+     */
+    protected void updateTransform() {
+        model.transform.setToRotationRad(Vector3.Z, body.getAngle());
+        fixTop(model);
+        Vector2 pos = body.getPosition();
+        model.transform.setTranslation(pos.x, pos.y, height);
+//        model.calculateTransforms();
+    }
+
+    // Rotation
+
+    /**
+     * Set rotation in radians.
+     */
+    public void setRotation(float angle) {
+        Vector2 pos = getPosition();
+        setTransform(pos.x, pos.y, angle);
     }
 
     /**
      * Rotates object to the given direction.
      */
     public void setDirection(Vector2 direction) {
-        setRotation(Utils.angleVec(direction));
+        setRotation(direction.angleRad());
     }
 
+    /**
+     *  The current rotation in radians.
+     */
+    public float getRotation() {
+        return body.getAngle();
+    }
+
+
+    // Position:
+
     public Vector2 getPosition() {
-        return position;
+        return body.getPosition();
     }
 
     public void setPosition(float x, float y) {
-        position.set(x, y);
+        setTransform(x, y, getRotation());
     }
 
-    public String getModelPath() {
-        return modelPath;
+
+    // Height:
+
+    public void setHeight(float height) {
+        this.height = height;
     }
 
-    public void setModelPath(String modelPath) {
-        this.modelPath = modelPath;
+    public final float getHeight() {
+        return height;
     }
 
-    public void makeInstance(Model model) {
-        this.model = new ModelInstance(model, getPosition().x, height, getPosition().y);
-    }
+    public static abstract class Definition {
+        public static final float DEFAULT_HEIGHT = 0;
+        public static final float DEFAULT_ROTATION = 0;
 
-    public final ModelInstance getModelInstance() {
-        return model;
-    }
+        public static final float DEFAULT_DENSITY = 1f;
 
-    public void update(float delta) {
-        model.transform.setTranslation(getPosition().x, getHeight(), getPosition().y);
+        // physics
+        public float rotation = DEFAULT_ROTATION;
+        public float height = DEFAULT_HEIGHT;
+        private final FixtureDef fixtureDef = new FixtureDef();
+        protected final BodyDef bodyDef = new BodyDef();
+
+        // appearance:
+        public String modelPath;
+
+        public Definition(String modelPath, Shape shape, float initialX, float initialY) {
+            this.modelPath = modelPath;
+
+            // setup fixture
+            fixtureDef.shape = shape;
+            fixtureDef.density = DEFAULT_DENSITY;
+            fixtureDef.friction = 0;
+            fixtureDef.restitution = 0;
+
+            // setup body
+            bodyDef.position.set(initialX, initialY);
+            bodyDef.type = getBodyType();
+        }
+
+        public void setDensity(float density) {
+            fixtureDef.density = density;
+        }
+
+        public void setFriction(float friction) {
+            fixtureDef.friction = friction;
+        }
+
+        public float getDensity() {
+            return fixtureDef.density;
+        }
+
+        public float getFriction() {
+            return fixtureDef.friction;
+        }
+
+        public void setHeight(float height) {
+            this.height = height;
+        }
+
+        public float getHeight() {
+            return height;
+        }
+
+        public Vector2 getPosition() {
+            return bodyDef.position;
+        }
+
+        public void setPosition(float x, float y) {
+            bodyDef.position.set(x, y);
+        }
+
+        /**
+         * Rotates object to the given direction.
+         */
+        public void setDirection(Vector2 direction) {
+            rotation = direction.angleRad();
+        }
+
+        public void dispose() {
+            fixtureDef.shape.dispose();
+        }
+
+        public Body addToWorld(World world) {
+            return world.createBody(bodyDef);
+        }
+
+        public abstract GameObject makeInstance(Model model, GameWorld gameWorld);
+        public abstract BodyDef.BodyType getBodyType();
+//        public abstract float getDensity();
+//        public abstract float getFriction();i
     }
 }

@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.screens.GameScreen;
 
 
@@ -18,18 +20,18 @@ public class IngameUI {
     public IngameUI(GameScreen screen) {
         this.screen = screen;
         camera = new OrthographicCamera();
-        stage = new Stage(new ScreenViewport(camera), screen.getGame().spriteBatch);
+        stage = new Stage(new ScreenViewport(camera), BlackoutGame.getInstance().spriteBatch);
         Gdx.input.setInputProcessor(stage);
 
-        stick = new Stick(screen.getHero());
+        stick = new Stick();
     }
 
     public void load(AssetManager assets) {
         stick.load(assets);
     }
 
-    public void doneLoading(AssetManager assets) {
-        stick.doneLoading(assets, stage);
+    public void doneLoading(AssetManager assets, Hero character) {
+        stick.doneLoading(assets, stage, character);
     }
 
     public void resize(int width, int height) {

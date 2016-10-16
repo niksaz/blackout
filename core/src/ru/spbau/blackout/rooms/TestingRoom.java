@@ -5,10 +5,10 @@ import com.badlogic.gdx.utils.Array;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 
-public class TestingRoom extends GameRoom {
+public class TestingRoom implements GameRoom {
     public String map;
-    public Array<GameObject> objects = new Array<GameObject>();
-    public Hero hero;
+    public Array<GameObject.Definition> objectDefs = new Array<>();
+    public Hero.Definition character;
 
     @Override
     public String getMap() {
@@ -16,12 +16,12 @@ public class TestingRoom extends GameRoom {
     }
 
     @Override
-    public Array<GameObject> getObjects() {
-        return objects;
+    public Array<GameObject.Definition> getObjectDefs() {
+        return objectDefs;
     }
 
     @Override
-    public Hero getHero() {
-        return hero;
+    public Hero.Definition getCharacter() {
+        return character;
     }
 }

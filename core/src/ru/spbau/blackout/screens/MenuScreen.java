@@ -37,11 +37,12 @@ class MenuScreen extends StageScreen {
     private Label goldLabel;
     private Table middleTable;
 
-    MenuScreen(BlackoutGame blackoutGame) {
-        super(blackoutGame);
+    MenuScreen() {
+        super();
+
         addLeftPaneElements();
         addRightPaneElements();
-        changeMiddleTable(MainMenuTable.getTable(blackoutGame, this));
+        changeMiddleTable(MainMenuTable.getTable(BlackoutGame.getInstance(), this));
     }
 
     void changeMiddleTable(Table table) {

@@ -24,8 +24,8 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
 
     private Table middleTable;
 
-    public LoadScreen(BlackoutGame blackoutGame) {
-        super(blackoutGame);
+    public LoadScreen() {
+        super();
     }
 
     @Override
@@ -62,7 +62,7 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
         Gdx.app.postRunnable(new Runnable() {
             @Override
             public void run() {
-                ScreenManager.getInstance().setScreen(new MenuScreen(game));
+                ScreenManager.getInstance().setScreen(new MenuScreen());
             }
         });
     }

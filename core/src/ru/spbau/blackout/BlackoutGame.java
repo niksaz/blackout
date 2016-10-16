@@ -3,6 +3,9 @@ package ru.spbau.blackout;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
@@ -16,12 +19,16 @@ import ru.spbau.blackout.utils.AssetLoader;
 import ru.spbau.blackout.utils.ScreenManager;
 
 public class BlackoutGame extends Game {
+    private static final BlackoutGame INSTANCE = new BlackoutGame();
+    public static BlackoutGame getInstance() {
+        return INSTANCE;
+    }
 
     public static final String hostName = "10.181.216.201";
     public static final int portNumber = 54321;
 
 	public static final int VIRTUAL_WORLD_WIDTH = 1280;
-	public static final int VIRTUAL_WORLD_HEIGHT = 768;
+    public static final int VIRTUAL_WORLD_HEIGHT = 768;
 
 	public ModelBatch modelBatch;
 	public SpriteBatch spriteBatch;
@@ -31,27 +38,38 @@ public class BlackoutGame extends Game {
 		TestingRoom room = new TestingRoom();
 		room.map =  "maps/duel/duel.g3db";
 
-		room.hero = new Hero("models/wizard/wizard.g3db", 0, 0);
+        Shape heroShape = new CircleShape();
+        heroShape.setRadius(0.7f);
+        Hero.Definition hero = new Hero.Definition("models/wizard/wizard.g3db", heroShape, 0, 0);
+		room.objectDefs.add(hero);
+        room.character = hero;
 
-        GameObject stone = new Decoration("models/stone/stone.g3db", 10, 10);
-        room.objects.add(stone);
+        Shape stoneShape = new CircleShape();
+        heroShape.setRadius(1.5f);
+        GameObject.Definition stone = new Decoration.Definition(
+                "models/stone/stone.g3db", stoneShape, 0, -20
+        );
+        room.objectDefs.add(stone);
 
-		ScreenManager.getInstance().setScreen(new GameScreen(this, room));
+
+		ScreenManager.getInstance().setScreen(new GameScreen(room));
 	}
 
-	public BlackoutGame(PlayServices playServices) {
-		PlayServicesInCore.getInstance().initialize(playServices);
-		playServices.setCoreListener(PlayServicesInCore.getInstance());
-	}
+	protected BlackoutGame() {}
+
+    public void initializePlayServices(PlayServices playServices) {
+        PlayServicesInCore.getInstance().initialize(playServices);
+        playServices.setCoreListener(PlayServicesInCore.getInstance());
+    }
 
 	@Override
 	public void create() {
 		modelBatch = new ModelBatch();
 		spriteBatch = new SpriteBatch();
+        Box2D.init();
 
 		AssetLoader.getInstance().loadFonts();
 		ScreenManager.getInstance().initialize(this);
-		ScreenManager.getInstance().setScreen(new LoadScreen(this));
+		ScreenManager.getInstance().setScreen(new LoadScreen());
 	}
-
 }

@@ -1,42 +1,66 @@
 package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 
-import ru.spbau.blackout.Utils;
+import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.utils.Utils;
 
-public abstract class GameUnit extends GameObject {
-    public static class Animations {
+import static ru.spbau.blackout.utils.Utils.isZeroVec;
+import static ru.spbau.blackout.utils.Utils.projectVec;
+import static ru.spbau.blackout.utils.Utils.sqr;
+
+public abstract class GameUnit extends DynamicObject {
+    public static class Animations extends DynamicObject.Animations {
         public static final String WALK = "Armature|Walk";
-        //        public static final String WALK = "Armature|Walk"; // TODO: walk animation
         public static final String STAY = "Armature|Stay";
+
         public static final float WALK_SPEED_FACTOR = 3f;
     }
 
-    public static final float DEFAULT_SPEED = 10f;
+    public static final float SLOW_DOWN_FACTOR = 0.02f;
+
+    public static final float DEFAULT_LINEAR_FRICTION = 5f;
+    public static final float DEFAULT_ANGULAR_FRICTION = 5f;
 
     // Movement:
-    final private Vector2 velocity = new Vector2();
     final private Vector2 selfVelocity = new Vector2();
-    private float height = DEFAULT_HEIGHT;
-    private float speed = DEFAULT_SPEED;
+    private float selfVelocityScale;
+    private final FrictionJoint frictionJoint;
 
-    // Appearance:
-    protected AnimationController animation;
-    private float animationSpeed = 1f;
+    protected GameUnit(Definition def, Model model, GameWorld gameWorld) {
+        super(def, model, gameWorld);
+        selfVelocityScale = def.selfVelocityScale;
+        animation.setAnimation(Animations.STAY, -1);
 
-    public GameUnit(String modelPath, float initialX, float initialY) {
-        super(modelPath, initialX, initialY);
+        frictionJoint = gameWorld.addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
     }
 
-    public GameUnit(String modelPath, Vector2 initialPosition) {
-        this(modelPath, initialPosition.x, initialPosition.y);
-    }
+    @Override
+    public void updateForSecondStep() {
+        super.updateForSecondStep();
 
-    public GameUnit(String modelPath) {
-        this(modelPath, 0, 0);
+        float projection = projectVec(selfVelocity, velocity);
+        if (projection < 0) {
+            float slowDown = -projection * selfVelocityScale * SLOW_DOWN_FACTOR;
+
+//             decrease velocity
+            if (velocity.len2() <= sqr(slowDown)) {
+                velocity.set(0, 0);
+            } else {
+                velocity.set(
+                        velocity.x - Math.signum(velocity.x) * slowDown,
+                        velocity.y - Math.signum(velocity.y) * slowDown
+                );
+            }
+        }
+
+        body.setLinearVelocity(
+                selfVelocity.x * selfVelocityScale,
+                selfVelocity.y * selfVelocityScale
+        );
     }
 
     public final Vector2 getSelfVelocity() {
@@ -67,32 +91,13 @@ public abstract class GameUnit extends GameObject {
         }
     }
 
-    public final Vector2 getVelocity() {
-        return velocity;
-    }
+    public static abstract class Definition extends DynamicObject.Definition {
+        public static final float DEFAULT_SELF_VELOCITY_SCALE = 7f;
 
-    public void setVelocity(Vector2 velocity) {
-        this.velocity.set(velocity);
-    }
+        public float selfVelocityScale = DEFAULT_SELF_VELOCITY_SCALE;
 
-    public void addVelocity(Vector2 velocity) {
-        this.velocity.x += velocity.x;
-        this.velocity.y += velocity.y;
-    }
-
-    @Override
-    public void makeInstance(Model model) {
-        super.makeInstance(model);
-        animation = new AnimationController(this.model);
-        animation.setAnimation(Animations.STAY, -1);
-    }
-
-    @Override
-    public void update(float delta) {
-        float newX = getPosition().x + (getVelocity().x + getSelfVelocity().x * speed) * delta;
-        float newY = getPosition().y + (getVelocity().y + getSelfVelocity().y * speed) * delta;
-        setPosition(newX, newY);
-        animation.update(delta * animationSpeed);
-        super.update(delta); // should be called after position changes
+        public Definition(String modelPath, Shape shape, float initialX, float initialY) {
+            super(modelPath, shape, initialX, initialY);
+        }
     }
 }
