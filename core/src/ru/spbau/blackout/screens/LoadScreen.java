@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
-import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.CorePlayServicesListener;
 import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.utils.AssetLoader;
@@ -44,12 +43,7 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
 
     @Override
     public void onSignInSucceeded() {
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                addLabel(STARTED_LOADING);
-            }
-        });
+        Gdx.app.postRunnable(() -> addLabel(STARTED_LOADING));
         PlayServicesInCore.getInstance().getPlayServices().startLoadingSnapshot();
     }
 
@@ -59,12 +53,7 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
         middleTable.remove();
         middleTable = null;
 
-        Gdx.app.postRunnable(new Runnable() {
-            @Override
-            public void run() {
-                ScreenManager.getInstance().setScreen(new MenuScreen());
-            }
-        });
+        Gdx.app.postRunnable(() -> ScreenManager.getInstance().setScreen(new MenuScreen()));
     }
 
     @Override

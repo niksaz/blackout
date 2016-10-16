@@ -2,8 +2,6 @@ package ru.spbau.blackout.screens;
 
 import com.badlogic.gdx.Screen;
 
-import ru.spbau.blackout.BlackoutGame;
-
 public abstract class BlackoutScreen implements Screen {
 
     @Override

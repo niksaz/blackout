@@ -8,7 +8,7 @@ import ru.spbau.blackout.screens.BlackoutScreen;
 public class ScreenManager {
 
     private static ScreenManager screenManager;
-    private final Array<BlackoutScreen> screens = new Array<BlackoutScreen>();
+    private final Array<BlackoutScreen> screens = new Array<>();
     private BlackoutGame game;
 
     private ScreenManager() {}

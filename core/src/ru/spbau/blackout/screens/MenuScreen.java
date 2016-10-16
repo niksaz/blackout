@@ -105,7 +105,7 @@ class MenuScreen extends StageScreen {
             }
         });
 
-        final Container<Image> settingsContainer = new Container<Image>(settingsImage);
+        final Container<Image> settingsContainer = new Container<>(settingsImage);
         settingsContainer.setWidth(SETTINGS_ICON_SIZE);
         settingsContainer.setHeight(SETTINGS_ICON_SIZE);
         settingsContainer.pad(SETTINGS_ICON_PADDING);
@@ -127,7 +127,7 @@ class MenuScreen extends StageScreen {
             }
         });
 
-        final Container<Image> playContainer = new Container<Image>(gamesServicesImage);
+        final Container<Image> playContainer = new Container<>(gamesServicesImage);
         playContainer.setWidth(SETTINGS_ICON_SIZE);
         playContainer.setHeight(SETTINGS_ICON_SIZE);
         playContainer.pad(SETTINGS_ICON_PADDING);

@@ -34,8 +34,8 @@ public class AssetLoader {
     public void loadFonts() {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(FONT_PATH));
         fontBlackoutLabel = generator.generateFont(
-                getParameter(generator, FONT_BLACKOUT_LABEL_SIZE, FONT_BLACKOUT_LABEL_WIDTH));
-        font = generator.generateFont(getParameter(generator, FONT_SIZE, FONT_WIDTH));
+                getParameter(FONT_BLACKOUT_LABEL_SIZE, FONT_BLACKOUT_LABEL_WIDTH));
+        font = generator.generateFont(getParameter(FONT_SIZE, FONT_WIDTH));
         generator.dispose();
     }
 
@@ -48,7 +48,7 @@ public class AssetLoader {
         return font;
     }
 
-    private FreeTypeFontParameter getParameter(FreeTypeFontGenerator generator, int font_size, float width) {
+    private FreeTypeFontParameter getParameter(int font_size, float width) {
         final FreeTypeFontParameter parameter = new FreeTypeFontParameter();
         parameter.size = font_size;
         parameter.borderWidth = width;
