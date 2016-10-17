@@ -19,6 +19,7 @@ import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.rooms.GameRoom;
+import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.ScreenManager;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
@@ -40,12 +41,13 @@ public class GameScreen extends BlackoutScreen {
     public Environment environment;
 
     private Hero character;
-    private final IngameUI ui = new IngameUI(this);
+    private final IngameUI ui;
 
     private final GameWorld gameWorld = new GameWorld();
 
-    public GameScreen(GameRoom room) {
+    public GameScreen(GameRoom room, GameSettings settings) {
         loadingScreen = new LoadingScreen(room);
+        ui = new IngameUI(this, settings.ui);
 
         // initialize main camera
         camera = new PerspectiveCamera();

@@ -15,6 +15,7 @@ import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.rooms.TestingRoom;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
+import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.AssetLoader;
 import ru.spbau.blackout.utils.ScreenManager;
 
@@ -24,8 +25,8 @@ public class BlackoutGame extends Game {
         return INSTANCE;
     }
 
-    public static final String hostName = "10.181.216.201";
-    public static final int portNumber = 54321;
+    public static final String HOST_NAME = "10.181.216.201";
+    public static final int PORT_NUMBER = 54321;
 
 	public static final int VIRTUAL_WORLD_WIDTH = 1280;
     public static final int VIRTUAL_WORLD_HEIGHT = 768;
@@ -51,8 +52,9 @@ public class BlackoutGame extends Game {
         );
         room.objectDefs.add(stone);
 
+        GameSettings settings = new GameSettings();  // just default settings
 
-		ScreenManager.getInstance().setScreen(new GameScreen(room));
+		ScreenManager.getInstance().setScreen(new GameScreen(room, settings));
 	}
 
 	protected BlackoutGame() {}
