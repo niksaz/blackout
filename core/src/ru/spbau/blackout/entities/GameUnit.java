@@ -44,7 +44,7 @@ public abstract class GameUnit extends DynamicObject {
 
         float projection = projectVec(selfVelocity, velocity);
         if (projection < 0) {
-            float slowDown = -projection * selfVelocityScale * SLOW_DOWN_FACTOR;
+            float slowDown = -projection * SLOW_DOWN_FACTOR;
 
 //             decrease velocity
             if (velocity.len2() <= sqr(slowDown)) {
@@ -58,8 +58,8 @@ public abstract class GameUnit extends DynamicObject {
         }
 
         body.setLinearVelocity(
-                selfVelocity.x * selfVelocityScale,
-                selfVelocity.y * selfVelocityScale
+                selfVelocity.x,
+                selfVelocity.y
         );
     }
 
@@ -68,27 +68,23 @@ public abstract class GameUnit extends DynamicObject {
     }
 
     public void setSelfVelocity(final Vector2 vel) {
-        // avoid excessive allocation
-        // Vector2 old = new Vector2(selfVelocity);
-        final float oldX = selfVelocity.x;
-        final float oldY = selfVelocity.y;
-
-        selfVelocity.set(vel.x, vel.y);
-        if (Utils.isZeroVec(selfVelocity)) {
+        if (Utils.isZeroVec(vel)) {
             // on stop walking
-            if (!Utils.isZeroVec(oldX, oldY)) {
+            if (!Utils.isZeroVec(selfVelocity.x, selfVelocity.y)) {
                 animation.setAnimation(Animations.STAY, -1);
                 animationSpeed = 1f;
             }
         } else {
             // on start walking
-            if (Utils.isZeroVec(oldX, oldY)) {
+            if (Utils.isZeroVec(selfVelocity.x, selfVelocity.y)) {
                 animation.setAnimation(Animations.WALK, -1);
             }
 
-            animationSpeed = selfVelocity.len() * Animations.WALK_SPEED_FACTOR;
-            setDirection(selfVelocity);
+            animationSpeed = vel.len() * Animations.WALK_SPEED_FACTOR;
+            setDirection(vel);
         }
+
+        selfVelocity.set(vel.x * selfVelocityScale, vel.y * selfVelocityScale);
     }
 
     public static abstract class Definition extends DynamicObject.Definition {
