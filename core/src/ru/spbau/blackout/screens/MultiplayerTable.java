@@ -90,7 +90,6 @@ class MultiplayerTable {
                                 status.setText(playersSentence(Integer.parseInt(readLine))));
                         Thread.sleep(POLLING_TIME_MS);
                     } catch (NumberFormatException | InterruptedException ignored) {
-                        Gdx.app.log(TAG, "catched expect");
                     }
                     out.println("");
                 }

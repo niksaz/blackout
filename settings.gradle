@@ -1,1 +1,1 @@
-include 'android', 'core', ':BaseGameUtils', ':server'
+include ':android', ':core', ':BaseGameUtils', ':server'
