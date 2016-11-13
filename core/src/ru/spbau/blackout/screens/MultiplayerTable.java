@@ -22,8 +22,8 @@ import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.utils.AssetLoader;
 
-import static ru.spbau.blackout.BlackoutGame.hostName;
-import static ru.spbau.blackout.BlackoutGame.portNumber;
+import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
+import static ru.spbau.blackout.BlackoutGame.PORT_NUMBER;
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
 class MultiplayerTable {
@@ -75,9 +75,9 @@ class MultiplayerTable {
     private void runUpdateThread() {
         new Thread(() -> {
             try (
-                Socket echoSocket = new Socket(hostName, portNumber);
-                PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()))
+                    Socket echoSocket = new Socket(HOST_NAME, PORT_NUMBER);
+                    PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()))
             ) {
                 Gdx.app.log(TAG, "Started");
                 out.println(PlayServicesInCore.getInstance().getPlayServices().getPlayerName());
@@ -94,9 +94,9 @@ class MultiplayerTable {
                     out.println("");
                 }
             } catch (UnknownHostException e) {
-                Gdx.app.log(TAG, "Don't know about host " + hostName);
+                Gdx.app.log(TAG, "Don't know about host " + HOST_NAME);
             } catch (IOException e) {
-                Gdx.app.log(TAG, "Couldn't get I/O for the connection to " + hostName);
+                Gdx.app.log(TAG, "Couldn't get I/O for the connection to " + HOST_NAME);
             }
             finally {
                 Gdx.app.postRunnable(() -> screen.changeMiddleTable(PlayScreenTable.getTable(game, screen)));

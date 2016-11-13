@@ -8,32 +8,29 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
+import java.util.function.Function;
+
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.units.Rpx;
 
 public class Stick extends DragListener {
     public static final class MainImg {
         public static final class InCentimeters {
-            public static final float SIZE = 1.5f;
-            public static final float START_X = 0.6f;
-            private static final float START_Y = 0.6f;
+            private static final float SIZE = 1.5f;
         }
 
         public static final class X {
             public static final int SIZE = Rpx.X.fromCm(InCentimeters.SIZE);
-            private static final int START = Rpx.X.fromCm(InCentimeters.START_X);
-            public static final float MAX_AT = MAX_FACTOR * (SIZE / 2);
+            public static final float MAX_AT = (SIZE - TouchImg.X.SIZE) / 2;
             public static final float CENTER = SIZE / 2;
         }
 
         public static final class Y {
             public static final int SIZE = Rpx.Y.fromCm(InCentimeters.SIZE);
-            private static final int START = Rpx.Y.fromCm(InCentimeters.START_Y);
-            public static final float MAX_AT = MAX_FACTOR * (SIZE / 2);
+            public static final float MAX_AT = (SIZE - TouchImg.Y.SIZE) / 2;
             public static final float CENTER = SIZE / 2;
         }
 
-        private static final float MAX_FACTOR = 0.8f;
         public static final String IMAGE_PATH = "images/ingame_ui/stick_main.png";
     }
 
@@ -58,6 +55,11 @@ public class Stick extends DragListener {
     private Vector2 velocity = new Vector2(0, 0);
     private GameUnit object;
     private Image touchImage;
+    private Settings settings;
+
+    public Stick(Settings settings) {
+        this.settings = settings;
+    }
 
     @Override
     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -95,7 +97,7 @@ public class Stick extends DragListener {
         // must go after touch image initialization to be in the foreground
         Image mainImg = new Image(assets.get(MainImg.IMAGE_PATH, Texture.class));
         mainImg.setSize(MainImg.X.SIZE, MainImg.Y.SIZE);
-        mainImg.setPosition(MainImg.X.START, MainImg.Y.START);
+        mainImg.setPosition(settings.startX, settings.startY);
         mainImg.addListener(this);
         stage.addActor(mainImg);
     }
@@ -118,12 +120,22 @@ public class Stick extends DragListener {
 
     private void updateTouchPosition() {
         touchImage.setPosition(
-                MainImg.X.START + MainImg.X.CENTER  // move (0,0) to the center of mainImg
-                - TouchImg.X.CENTER                 // move pivot to the center of image
-                + velocity.x * MainImg.X.MAX_AT,
-                MainImg.Y.START + MainImg.Y.CENTER  // move (0,0) to the center of mainImg
-                - TouchImg.Y.CENTER                 // move pivot to the center of image
-                + velocity.y * MainImg.Y.MAX_AT
+                settings.startX + MainImg.X.CENTER  // move (0,0) to the center of mainImg
+                        - TouchImg.X.CENTER                 // move pivot to the center of image
+                        + velocity.x * MainImg.X.MAX_AT,
+                settings.startY + MainImg.Y.CENTER  // move (0,0) to the center of mainImg
+                        - TouchImg.Y.CENTER                 // move pivot to the center of image
+                        + velocity.y * MainImg.Y.MAX_AT
         );
+    }
+
+    public static class Settings {
+        public static class Defaults {
+            public static final float START_X = 0.6f;
+            public static final float START_Y = 0.6f;
+        }
+
+        public int startX = Rpx.X.fromCm(Defaults.START_X);
+        public int startY = Rpx.Y.fromCm(Defaults.START_Y);
     }
 }

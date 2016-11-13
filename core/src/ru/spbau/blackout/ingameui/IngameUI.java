@@ -17,13 +17,13 @@ public class IngameUI {
     OrthographicCamera camera;
     Stick stick;
 
-    public IngameUI(GameScreen screen) {
+    public IngameUI(GameScreen screen, Settings settings) {
         this.screen = screen;
         camera = new OrthographicCamera();
         stage = new Stage(new ScreenViewport(camera), BlackoutGame.getInstance().spriteBatch);
         Gdx.input.setInputProcessor(stage);
 
-        stick = new Stick();
+        stick = new Stick(settings.stickSettings);
     }
 
     public void load(AssetManager assets) {
@@ -40,5 +40,9 @@ public class IngameUI {
 
     public void draw() {
         stage.draw();
+    }
+
+    public static class Settings {
+        public Stick.Settings stickSettings = new Stick.Settings();
     }
 }
