@@ -76,6 +76,17 @@ project(":core") {
     }
 }
 
+project(":server") {
+    apply plugin: "java"
+    apply plugin: "application"
+
+    mainClassName = "ru.spbau.blackout.server.Main"
+
+    dependencies {
+        compile project(":core")
+    }
+}
+
 tasks.eclipse.doLast {
     delete ".project"
 }
