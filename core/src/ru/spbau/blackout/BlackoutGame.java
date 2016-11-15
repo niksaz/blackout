@@ -20,29 +20,41 @@ import ru.spbau.blackout.utils.AssetLoader;
 import ru.spbau.blackout.utils.ScreenManager;
 
 public class BlackoutGame extends Game {
-    private static final BlackoutGame INSTANCE = new BlackoutGame();
-    public static BlackoutGame getInstance() {
-        return INSTANCE;
-    }
+
+    private static final BlackoutGame INSTANCE = new BlackoutGame(new ScreenManager());
 
     public static final String HOST_NAME = "10.181.216.201";
     public static final int PORT_NUMBER = 54321;
 
-	public static final int VIRTUAL_WORLD_WIDTH = 1280;
+    public static final int VIRTUAL_WORLD_WIDTH = 1280;
     public static final int VIRTUAL_WORLD_HEIGHT = 768;
 
-	public ModelBatch modelBatch;
-	public SpriteBatch spriteBatch;
+    private ScreenManager screenManager;
+
+    public static BlackoutGame getInstance() {
+        return INSTANCE;
+    }
+
+    protected BlackoutGame(ScreenManager screenManager) {
+        this.screenManager = screenManager;
+    }
+
+    public ScreenManager getScreenManager() {
+        return screenManager;
+    }
+
+    public ModelBatch modelBatch;
+    public SpriteBatch spriteBatch;
 
 	// FIXME:  just for test
-	public void testGameScreen() {
-		TestingRoom room = new TestingRoom();
-		room.map =  "maps/duel/duel.g3db";
+    public void testGameScreen() {
+        TestingRoom room = new TestingRoom();
+        room.map =  "maps/duel/duel.g3db";
 
         Shape heroShape = new CircleShape();
         heroShape.setRadius(0.7f);
         Hero.Definition hero = new Hero.Definition("models/wizard/wizard.g3db", heroShape, 0, 0);
-		room.objectDefs.add(hero);
+        room.objectDefs.add(hero);
         room.character = hero;
 
         Shape stoneShape = new CircleShape();
@@ -54,10 +66,8 @@ public class BlackoutGame extends Game {
 
         GameSettings settings = new GameSettings();  // just default settings
 
-		ScreenManager.getInstance().setScreen(new GameScreen(room, settings));
+        screenManager.setScreen(new GameScreen(room, settings));
 	}
-
-	protected BlackoutGame() {}
 
     public void initializePlayServices(PlayServices playServices) {
         PlayServicesInCore.getInstance().initialize(playServices);
@@ -71,7 +81,6 @@ public class BlackoutGame extends Game {
         Box2D.init();
 
 		AssetLoader.getInstance().loadFonts();
-		ScreenManager.getInstance().initialize(this);
-		ScreenManager.getInstance().setScreen(new LoadScreen());
+        screenManager.setScreen(new LoadScreen());
 	}
 }

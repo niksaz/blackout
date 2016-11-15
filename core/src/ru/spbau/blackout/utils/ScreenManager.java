@@ -7,26 +7,11 @@ import ru.spbau.blackout.screens.BlackoutScreen;
 
 public class ScreenManager {
 
-    private static ScreenManager screenManager;
     private final Array<BlackoutScreen> screens = new Array<>();
-    private BlackoutGame game;
-
-    private ScreenManager() {}
-
-    public static ScreenManager getInstance() {
-        if (screenManager == null) {
-            screenManager = new ScreenManager();
-        }
-        return screenManager;
-    }
-
-    public void initialize(BlackoutGame game) {
-        this.game = game;
-    }
 
     public void setScreen(BlackoutScreen screen) {
         screens.add(screen);
-        game.setScreen(screen);
+        BlackoutGame.getInstance().setScreen(screen);
     }
 
     public void disposeScreen() {
@@ -40,7 +25,7 @@ public class ScreenManager {
             }
             screens.pop().dispose();
         }
-        game.setScreen(screens.peek());
+        BlackoutGame.getInstance().setScreen(screens.peek());
     }
 
 }

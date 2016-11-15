@@ -67,7 +67,7 @@ public class GameScreen extends BlackoutScreen {
 
         // if not loaded yet
         if (loadingScreen != null) {
-            ScreenManager.getInstance().setScreen(loadingScreen);
+            BlackoutGame.getInstance().getScreenManager().setScreen(loadingScreen);
         }
     }
 
@@ -202,7 +202,7 @@ public class GameScreen extends BlackoutScreen {
             ui.doneLoading(assets, character);
             GameScreen.this.doneLoading();
 
-            ScreenManager.getInstance().disposeScreen();
+            BlackoutGame.getInstance().getScreenManager().disposeScreen();
         }
     }
 }

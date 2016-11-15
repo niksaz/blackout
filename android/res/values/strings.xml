@@ -2,4 +2,24 @@
 <resources>
     <string name="app_name">Blackout</string>
     <string name="try_again">Try again</string>
+
+    <string name="not_signed_message">
+        Unsuccessful. You is not signed in to Google Play Games Services.</string>
+    <string name="result_app_misconfigured_ms">
+        The application is incorrectly configured. Check that the package name and signing
+        certificate match the client ID created in Developer Console. Also,
+        if the application is not yet published, check that the account you are trying
+        to sign in with is listed as a tester account. See logs for more information</string>
+    <string name="result_sign_in_failed_ms">
+        Failed to sign in. Please check your network connection and try again.</string>
+    <string name="result_license_failed_ms">"License check failed."</string>
+    <string name="result_default_error">Unknown error.</string>
+
+    <string name="game_saved_name">GAME_SAVED_NAME</string>
+
+    <string name="default_load_message">Could not connect to the server.</string>
+    <string name="status_network_error_no_data_message">
+        Network error while loading game info. Check your internet connection and try again.</string>
+    <string name="status_license_check_failed_message">
+        "You do not have license for this game."</string>
 </resources>

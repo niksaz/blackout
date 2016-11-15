@@ -1,7 +1,6 @@
 package ru.spbau.blackout.android;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -24,36 +23,16 @@ import static com.google.android.gms.games.snapshot.Snapshots.RESOLUTION_POLICY_
 
 class SnapshotManager {
 
-    private static SnapshotManager instance;
-
     private static final String TAG = "SnapshotManager";
-    private static final String GAME_SAVED_NAME = "GAME_SAVED_NAME";
-    private static final String DEFAULT_MESSAGE = "Could not connect to the server.";
-    private static final String STATUS_NETWORK_ERROR_NO_DATA_MESSAGE
-            = "Network error while loading game info. Check your internet connection and try again.";
-    private static final String STATUS_LICENSE_CHECK_FAILED_MESSAGE
-            = "You do not have license for this game.";
 
-    private static final int MAX_ATTEMPTS = 3;
+    private static final int MAX_ATTEMPTS = 5;
     private static final int CONFLICT_RESOLUTION_POLICY = RESOLUTION_POLICY_MOST_RECENTLY_MODIFIED;
 
     private static final long AWAIT_TIME_MS = 10000;
 
-    private AndroidLauncher launcher;
-    private Snapshot snapshot;
-    private BlackoutSnapshot blackoutSnapshot;
-    private String resultMessage;
+    private final AndroidLauncher launcher;
 
-    private SnapshotManager() {}
-
-    static SnapshotManager getInstance() {
-        if (instance == null) {
-            instance = new SnapshotManager();
-        }
-        return instance;
-    }
-
-    void initialize(AndroidLauncher launcher) {
+    SnapshotManager(AndroidLauncher launcher) {
         this.launcher = launcher;
     }
 
@@ -62,40 +41,41 @@ class SnapshotManager {
     }
 
     void saveSnapshot(BlackoutSnapshot blackoutSnapshot) {
-        new SavingTask().execute(blackoutSnapshot);
+        new SavingTask(blackoutSnapshot).execute();
     }
 
     /**
      *  Must sign in before initiating this task.
      */
-    private class LoadingAsyncTask extends AsyncTask<Void, Void, Void> {
+    private class LoadingAsyncTask extends AsyncTask<Void, Void, LoadingAsyncTaskResult> {
         @Override
-        protected Void doInBackground(Void... voids) {
-            blackoutSnapshot = null;
-            resultMessage = DEFAULT_MESSAGE;
-            boolean shouldTry = true;
+        protected LoadingAsyncTaskResult doInBackground(Void... voids) {
+            BlackoutSnapshot blackoutSnapshot = null;
+            String resultMessage = launcher.getString(R.string.default_load_message);
 
-            for (int attempts = 0; blackoutSnapshot == null && shouldTry && attempts < MAX_ATTEMPTS; attempts++) {
-                shouldTry = false;
+            retry_loop:
+            for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
 
                 if (!launcher.getGameHelper().getApiClient().isConnected()) {
                     break;
                 }
 
                 Snapshots.OpenSnapshotResult result = Games.Snapshots
-                    .open(launcher.getGameHelper().getApiClient(), GAME_SAVED_NAME, true,
-                            CONFLICT_RESOLUTION_POLICY)
+                    .open(launcher.getGameHelper().getApiClient(),
+                          launcher.getString(R.string.game_saved_name), true,
+                          CONFLICT_RESOLUTION_POLICY)
                     .await(AWAIT_TIME_MS, TimeUnit.MILLISECONDS);
 
 
-                Log.v(TAG, "LoadingAsyncTask: " + result.getStatus().toString());
+                Log.v(TAG, "LoadingAsyncTask: " + result.getStatus() + " " + result.getStatus());
                 switch (result.getStatus().getStatusCode()) {
                     case GamesStatusCodes.STATUS_OK:
-                        snapshot = result.getSnapshot();
+                        final Snapshot snapshot = result.getSnapshot();
                         try {
                             byte[] gameData = snapshot.getSnapshotContents().readFully();
                             if (gameData == null) {
-                                gameData = new byte[0];
+                                blackoutSnapshot = new BlackoutSnapshot();
+                                break retry_loop;
                             }
                             ByteArrayInputStream byteStream = new ByteArrayInputStream(gameData);
                             ObjectInputStream objectStream = new ObjectInputStream(byteStream);
@@ -105,127 +85,144 @@ class SnapshotManager {
                                 blackoutSnapshot = new BlackoutSnapshot();
                             }
                         } catch (ClassNotFoundException | IOException e) {
+                            launcher.log(TAG, "Exception while loading snapshot " + e.getMessage());
                             blackoutSnapshot = new BlackoutSnapshot();
                         }
-                        break;
+                        break retry_loop;
 
-                    case GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND:
                     case GamesStatusCodes.STATUS_SNAPSHOT_CREATION_FAILED:
                     case GamesStatusCodes.STATUS_SNAPSHOT_CONFLICT:
                     case GamesStatusCodes.STATUS_INTERRUPTED:
-                        shouldTry = true;
-                        break;
-
-                    case GamesStatusCodes.STATUS_NETWORK_ERROR_NO_DATA:
-                        resultMessage = STATUS_NETWORK_ERROR_NO_DATA_MESSAGE;
+                    case GamesStatusCodes.STATUS_TIMEOUT:
                         break;
 
                     case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
                         launcher.getGameHelper().reconnectClient();
-                        shouldTry = true;
                         break;
+
+                    case GamesStatusCodes.STATUS_NETWORK_ERROR_NO_DATA:
+                        resultMessage =
+                                launcher.getString(R.string.status_network_error_no_data_message);
+                        break retry_loop;
 
                     case GamesStatusCodes.STATUS_LICENSE_CHECK_FAILED:
-                        resultMessage = STATUS_LICENSE_CHECK_FAILED_MESSAGE;
-                        break;
+                        resultMessage =
+                                launcher.getString(R.string.status_license_check_failed_message);
+                        break retry_loop;
 
+                    case GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND:
                     case GamesStatusCodes.STATUS_SNAPSHOT_CONTENTS_UNAVAILABLE:
                     case GamesStatusCodes.STATUS_SNAPSHOT_FOLDER_UNAVAILABLE:
                     case GamesStatusCodes.STATUS_SNAPSHOT_CONFLICT_MISSING:
-                    case GamesStatusCodes.STATUS_TIMEOUT:
                     case GamesStatusCodes.STATUS_INTERNAL_ERROR:
                     default:
-                        break;
+                        break retry_loop;
                 }
             }
 
-            return null;
+            return new LoadingAsyncTaskResult(blackoutSnapshot, resultMessage);
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            if (blackoutSnapshot != null) {
-                launcher.getCoreListener().finishedLoadingSnapshot(blackoutSnapshot);
+        protected void onPostExecute(LoadingAsyncTaskResult result) {
+            if (result.getSnapshot() != null) {
+                launcher.getCoreListener().finishedLoadingSnapshot(result.getSnapshot());
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(launcher.getContext());
                 builder.setCancelable(false);
-                builder.setMessage(resultMessage);
-                builder.setNeutralButton(R.string.try_again, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        new LoadingAsyncTask().execute();
-                    }
-                });
+                builder.setMessage(result.getMessage());
+                builder.setNeutralButton(R.string.try_again,
+                                         (dialogInterface, i) -> new LoadingAsyncTask().execute());
                 builder.create().show();
             }
+        }
+    }
+
+    private static class LoadingAsyncTaskResult {
+        BlackoutSnapshot snapshot;
+        String message;
+
+        LoadingAsyncTaskResult(BlackoutSnapshot snapshot, String message) {
+            this.snapshot = snapshot;
+            this.message = message;
+        }
+
+        BlackoutSnapshot getSnapshot() {
+            return snapshot;
+        }
+
+        String getMessage() {
+            return message;
         }
     }
 
     /**
      *  Must sign in before initiating this task.
      */
-    private class SavingTask extends AsyncTask<BlackoutSnapshot, Void, Void> {
+    private class SavingTask extends AsyncTask<Void, Void, Void> {
+
+        private final BlackoutSnapshot blackoutSnapshot;
+
+        SavingTask(BlackoutSnapshot blackoutSnapshot) {
+            this.blackoutSnapshot = blackoutSnapshot;
+        }
+
         @Override
-        protected Void doInBackground(BlackoutSnapshot... blackoutSnapshots) {
-            boolean shouldTry = true;
-
-            for (int attempts = 0; shouldTry && attempts < MAX_ATTEMPTS; attempts++) {
-                shouldTry = false;
-
+        protected Void doInBackground(Void... voids) {
+            retry_loop:
+            for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
                 if (!launcher.getGameHelper().getApiClient().isConnected()) {
-                    shouldTry = true;
                     break;
                 }
 
                 Snapshots.OpenSnapshotResult result = Games.Snapshots
-                        .open(launcher.getGameHelper().getApiClient(), GAME_SAVED_NAME, true,
-                                CONFLICT_RESOLUTION_POLICY)
+                        .open(launcher.getGameHelper().getApiClient(),
+                              launcher.getString(R.string.game_saved_name), true,
+                              CONFLICT_RESOLUTION_POLICY)
                         .await(AWAIT_TIME_MS, TimeUnit.MILLISECONDS);
 
                 Log.v(TAG, "SavingTask: " + result.getStatus().toString());
                 switch (result.getStatus().getStatusCode()) {
                     case GamesStatusCodes.STATUS_OK:
-                        snapshot = result.getSnapshot();
+                        final Snapshot snapshot = result.getSnapshot();
                         try {
                             ByteArrayOutputStream out = new ByteArrayOutputStream();
                             ObjectOutputStream oos = new ObjectOutputStream(out);
-                            oos.writeObject(blackoutSnapshots[0]);
+                            oos.writeObject(blackoutSnapshot);
                             oos.close();
 
                             snapshot.getSnapshotContents().writeBytes(out.toByteArray());
                             SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().build();
 
                             if (!launcher.getGameHelper().getApiClient().isConnected()) {
-                                shouldTry = true;
                                 break;
                             }
                             Games.Snapshots.commitAndClose(launcher.getGameHelper().getApiClient(), snapshot, metadataChange);
                         } catch (IOException e) {
-                            shouldTry = true;
+                            launcher.log(TAG, "Exception while saving snapshot " + e.getMessage());
+                            break;
                         }
-                        break;
+                        break retry_loop;
 
-                    case GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND:
                     case GamesStatusCodes.STATUS_SNAPSHOT_CREATION_FAILED:
                     case GamesStatusCodes.STATUS_SNAPSHOT_CONFLICT:
+                    case GamesStatusCodes.STATUS_TIMEOUT:
                     case GamesStatusCodes.STATUS_INTERRUPTED:
-                        shouldTry = true;
                         break;
 
                     case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
                         launcher.getGameHelper().reconnectClient();
-                        shouldTry = true;
                         break;
 
+                    case GamesStatusCodes.STATUS_SNAPSHOT_NOT_FOUND:
                     case GamesStatusCodes.STATUS_NETWORK_ERROR_NO_DATA:
                     case GamesStatusCodes.STATUS_LICENSE_CHECK_FAILED:
                     case GamesStatusCodes.STATUS_SNAPSHOT_CONTENTS_UNAVAILABLE:
                     case GamesStatusCodes.STATUS_SNAPSHOT_FOLDER_UNAVAILABLE:
                     case GamesStatusCodes.STATUS_SNAPSHOT_CONFLICT_MISSING:
-                    case GamesStatusCodes.STATUS_TIMEOUT:
                     case GamesStatusCodes.STATUS_INTERNAL_ERROR:
                     default:
-                        break;
+                        break retry_loop;
                 }
             }
             return null;

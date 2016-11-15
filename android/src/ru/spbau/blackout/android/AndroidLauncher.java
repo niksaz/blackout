@@ -21,71 +21,16 @@ import ru.spbau.blackout.play.services.PlayServicesListener;
 public class AndroidLauncher extends AndroidApplication implements PlayServices {
 
     private static final String TAG = "AndroidLauncher";
-    private static final String NOT_SIGNED_MESSAGE = "Unsuccessful. You is not signed in to Google Play Games Services.";
-
-    private static final String RESULT_APP_MISCONFIGURED_MS =
-        "The application is incorrectly configured. Check that the package name and signing" +
-        " certificate match the client ID created in Developer Console. Also, " +
-        "if the application is not yet published, check that the account you are trying" +
-        " to sign in with is listed as a tester account. See logs for more information.";
-    private static final String RESULT_SIGN_IN_FAILED_MS =
-        "Failed to sign in. Please check your network connection and try again.";
-    private static final String RESULT_LICENSE_FAILED_MS = "License check failed.";
-    private static final String DEFAULT_MS = "Unknown error.";
-
-    private static final int REQUEST_ACHIEVEMENTS = 918273645;
-    private static final int REQUEST_LEADERBOARDS = 918273644;
 
     private GameHelper gameHelper;
     private PlayServicesListener coreListener;
+    private SnapshotManager snapshotManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final GameHelperListener gameHelperListener = new GameHelperListener() {
-            @Override
-            public void onSignInFailed() {
-                final GameHelper.SignInFailureReason reason = gameHelper.getSignInError();
-                if (reason == null) {
-                    gameHelper.beginUserInitiatedSignIn();
-                    return;
-                }
-                Log.v(TAG, reason.toString());
-
-                final int resultCode = reason.getActivityResultCode();
-                final String text;
-
-                switch (resultCode) {
-                    case GamesActivityResultCodes.RESULT_APP_MISCONFIGURED:
-                        text = RESULT_APP_MISCONFIGURED_MS;
-                        break;
-
-                    case GamesActivityResultCodes.RESULT_SIGN_IN_FAILED:
-                        text = RESULT_SIGN_IN_FAILED_MS;
-                        break;
-
-                    case GamesActivityResultCodes.RESULT_LICENSE_FAILED:
-                        text = RESULT_LICENSE_FAILED_MS;
-                        break;
-
-                    default:
-                        text = DEFAULT_MS;
-                        break;
-                }
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setCancelable(false);
-                builder.setMessage(text);
-                builder.setNeutralButton(R.string.try_again, (dialogInterface, i) -> signIn());
-                builder.create().show();
-            }
-
-            @Override
-            public void onSignInSucceeded() {
-                coreListener.onSignInSucceeded();
-            }
-        };
+        final GameHelperListener gameHelperListener = new FailureResistantGameHelperListener();
 
         gameHelper = new GameHelper(this, GameHelper.CLIENT_ALL);
         gameHelper.enableDebugLog(true);
@@ -93,7 +38,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         gameHelper.setConnectOnStart(false);
         gameHelper.setup(gameHelperListener);
 
-        SnapshotManager.getInstance().initialize(this);
+        snapshotManager = new SnapshotManager(this);
 
         final AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         final BlackoutGame game = BlackoutGame.getInstance();
@@ -153,7 +98,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         if (isSignedIn()) {
             Games.Achievements.unlock(gameHelper.getApiClient(), getResources().getString(achievementId));
         } else {
-            userIsNotSignedInDialog();
+            showUserIsNotSignedInDialog();
         }
     }
 
@@ -169,18 +114,19 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     public void showAchievements() {
         if (isSignedIn()) {
             startActivityForResult(Games.Achievements.getAchievementsIntent(gameHelper.getApiClient()),
-                                   REQUEST_ACHIEVEMENTS);
+                                   RequestCodes.REQUEST_ACHIEVEMENTS.ordinal());
         } else {
-            userIsNotSignedInDialog();
+            showUserIsNotSignedInDialog();
         }
     }
 
     @Override
     public void showLeaderboards() {
-        if (isSignedIn()) {startActivityForResult(Games.Leaderboards.getAllLeaderboardsIntent(gameHelper.getApiClient()),
-                                                  REQUEST_LEADERBOARDS);
+        if (isSignedIn()) {
+            startActivityForResult(Games.Leaderboards.getAllLeaderboardsIntent(gameHelper.getApiClient()),
+                                   RequestCodes.REQUEST_LEADERBOARDS.ordinal());
         } else {
-            userIsNotSignedInDialog();
+            showUserIsNotSignedInDialog();
         }
     }
 
@@ -197,7 +143,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     @Override
     public void startLoadingSnapshot() {
         try {
-            runOnUiThread(() -> SnapshotManager.getInstance().startLoadingSnapshot());
+            runOnUiThread(() -> snapshotManager.startLoadingSnapshot());
         } catch (Exception e) {
             Gdx.app.log(TAG, "startLoadingSnapshot: " + e.getMessage());
         }
@@ -206,14 +152,15 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
     @Override
     public void saveSnapshot(BlackoutSnapshot blackoutSnapshot) {
-        SnapshotManager.getInstance().saveSnapshot(blackoutSnapshot);
+        snapshotManager.saveSnapshot(blackoutSnapshot);
     }
 
-    private void userIsNotSignedInDialog() {
+    private void showUserIsNotSignedInDialog() {
         try {
-            runOnUiThread(() -> gameHelper.makeSimpleDialog(NOT_SIGNED_MESSAGE).show());
+            runOnUiThread(() ->
+                    gameHelper.makeSimpleDialog(getString(R.string.not_signed_message)).show());
         } catch (Exception e) {
-            Gdx.app.log(TAG, "userIsNotSignedInDialog: " + e.getMessage());
+            Gdx.app.log(TAG, "showUserIsNotSignedInDialog: " + e.getMessage());
         }
     }
 
@@ -252,4 +199,51 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         return R.string.leaderboard_highest_rating;
     }
 
+    private enum RequestCodes {
+        REQUEST_ACHIEVEMENTS, REQUEST_LEADERBOARDS
+    }
+
+    private class FailureResistantGameHelperListener implements GameHelperListener {
+        @Override
+        public void onSignInFailed() {
+            final GameHelper.SignInFailureReason reason = gameHelper.getSignInError();
+            if (reason == null) {
+                gameHelper.beginUserInitiatedSignIn();
+                return;
+            }
+            Log.v(TAG, reason.toString());
+
+            final int resultCode = reason.getActivityResultCode();
+            final String text;
+
+            switch (resultCode) {
+                case GamesActivityResultCodes.RESULT_APP_MISCONFIGURED:
+                    text = getString(R.string.result_app_misconfigured_ms);
+                    break;
+
+                case GamesActivityResultCodes.RESULT_SIGN_IN_FAILED:
+                    text = getString(R.string.result_sign_in_failed_ms);
+                    break;
+
+                case GamesActivityResultCodes.RESULT_LICENSE_FAILED:
+                    text = getString(R.string.result_license_failed_ms);
+                    break;
+
+                default:
+                    text = getString(R.string.result_default_error);
+                    break;
+            }
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setCancelable(false);
+            builder.setMessage(text);
+            builder.setNeutralButton(R.string.try_again, (dialogInterface, i) -> signIn());
+            builder.create().show();
+        }
+
+        @Override
+        public void onSignInSucceeded() {
+            coreListener.onSignInSucceeded();
+        }
+    }
 }

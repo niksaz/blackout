@@ -123,7 +123,7 @@ class MenuScreen extends StageScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 PlayServicesInCore.getInstance().getPlayServices().signOut();
-                ScreenManager.getInstance().disposeScreen();
+                BlackoutGame.getInstance().getScreenManager().disposeScreen();
             }
         });
 
