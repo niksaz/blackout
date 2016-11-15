@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 
 class RoomClientThread extends Thread {
 
@@ -30,12 +29,9 @@ class RoomClientThread extends Thread {
             synchronized (System.out) {
                 System.out.println(inputLine + " connected");
             }
-            final ArrayList<RoomClientThread> clients = server.getRoomClients();
             do {
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                synchronized (clients) {
-                    out.println(clients.size());
-                }
+                out.println(server.getPlayersNumber().get());
             } while (in.readLine() != null);
         } catch (IOException ignored) {
         } finally {

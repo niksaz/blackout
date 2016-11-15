@@ -80,7 +80,7 @@ class MultiplayerTable {
                     BufferedReader in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()))
             ) {
                 Gdx.app.log(TAG, "Started");
-                out.println(PlayServicesInCore.getInstance().getPlayServices().getPlayerName());
+                out.println(BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().getPlayerName());
 
                 String inputLine;
                 while (!shouldClose.get() && (inputLine = in.readLine()) != null) {

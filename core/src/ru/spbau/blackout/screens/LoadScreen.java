@@ -32,25 +32,25 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
     public void show() {
         super.show();
 
-        PlayServicesInCore.getInstance().addListener(this);
+        BlackoutGame.getInstance().getPlayServicesInCore().addListener(this);
 
         middleTable = new Table();
         middleTable.setFillParent(true);
         stage.addActor(middleTable);
 
         addLabel(STARTED_LOG_IN);
-        PlayServicesInCore.getInstance().getPlayServices().signIn();
+        BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().signIn();
     }
 
     @Override
     public void onSignInSucceeded() {
         Gdx.app.postRunnable(() -> addLabel(STARTED_LOADING));
-        PlayServicesInCore.getInstance().getPlayServices().startLoadingSnapshot();
+        BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().startLoadingSnapshot();
     }
 
     @Override
     public void finishedLoadingSnapshot() {
-        PlayServicesInCore.getInstance().removeListener(this);
+        BlackoutGame.getInstance().getPlayServicesInCore().removeListener(this);
         middleTable.remove();
         middleTable = null;
 

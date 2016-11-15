@@ -24,23 +24,28 @@ public class BlackoutGame extends Game {
     private static final BlackoutGame INSTANCE = new BlackoutGame(new ScreenManager());
 
     public static final String HOST_NAME = "10.181.216.201";
-    public static final int PORT_NUMBER = 54321;
+    public static final int PORT_NUMBER = 48800;
 
     public static final int VIRTUAL_WORLD_WIDTH = 1280;
     public static final int VIRTUAL_WORLD_HEIGHT = 768;
 
     private ScreenManager screenManager;
+    private PlayServicesInCore playServicesInCore;
 
     public static BlackoutGame getInstance() {
         return INSTANCE;
     }
 
-    protected BlackoutGame(ScreenManager screenManager) {
+    private BlackoutGame(ScreenManager screenManager) {
         this.screenManager = screenManager;
     }
 
     public ScreenManager getScreenManager() {
         return screenManager;
+    }
+
+    public PlayServicesInCore getPlayServicesInCore() {
+        return playServicesInCore;
     }
 
     public ModelBatch modelBatch;
@@ -70,8 +75,8 @@ public class BlackoutGame extends Game {
 	}
 
     public void initializePlayServices(PlayServices playServices) {
-        PlayServicesInCore.getInstance().initialize(playServices);
-        playServices.setCoreListener(PlayServicesInCore.getInstance());
+        playServicesInCore = new PlayServicesInCore(playServices);
+        playServices.setCoreListener(playServicesInCore);
     }
 
 	@Override

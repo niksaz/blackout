@@ -2,6 +2,8 @@ package ru.spbau.blackout.play.services;
 
 import java.io.Serializable;
 
+import ru.spbau.blackout.BlackoutGame;
+
 public class BlackoutSnapshot implements Serializable {
 
     private int gold;
@@ -27,7 +29,7 @@ public class BlackoutSnapshot implements Serializable {
     }
 
     private void saveState() {
-        PlayServicesInCore.getInstance().getPlayServices().saveSnapshot(this);
+        BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().saveSnapshot(this);
     }
 
 }

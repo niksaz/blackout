@@ -4,24 +4,12 @@ import com.badlogic.gdx.utils.Array;
 
 public class PlayServicesInCore implements PlayServicesListener {
 
-    private static PlayServicesInCore listener;
-
     private PlayServices playServices;
     private BlackoutSnapshot snapshot;
-    private final Array<CorePlayServicesListener> listeners = new Array<CorePlayServicesListener>();
+    private final Array<CorePlayServicesListener> listeners = new Array<>();
 
-    private PlayServicesInCore() {}
-
-    public static PlayServicesInCore getInstance() {
-        if (listener == null) {
-            listener = new PlayServicesInCore();
-        }
-        return listener;
-    }
-
-    public void initialize(PlayServices playServices) {
+    public PlayServicesInCore(PlayServices playServices) {
         this.playServices = playServices;
-        this.snapshot = null;
     }
 
     public PlayServices getPlayServices() {

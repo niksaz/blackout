@@ -47,19 +47,19 @@ class MainMenuTable {
         addButton(middleTable, BUTTON_SHOP_TEXT, upImage, downImage, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                PlayServicesInCore.getInstance().getSnapshot().changeGold(10);
+                BlackoutGame.getInstance().getPlayServicesInCore().getSnapshot().changeGold(10);
             }
         });
         addButton(middleTable, BUTTON_ACHIEVEMENTS_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                PlayServicesInCore.getInstance().getPlayServices().showAchievements();
+                BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().showAchievements();
             }
         });
         addButton(middleTable, BUTTON_LEADERBOARD_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                PlayServicesInCore.getInstance().getPlayServices().showLeaderboards();
+                BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().showLeaderboards();
             }
         });
 
