@@ -19,7 +19,6 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.utils.AssetLoader;
 
 import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
@@ -30,6 +29,7 @@ class MultiplayerTable {
 
     private static final String TAG = "MultiplayerTable";
     private static final String BACK_TEXT = "Back";
+    public static final String GAME_IS_STARTED = "START";
 
     private static final int POLLING_TIME_MS = 250;
 
@@ -86,9 +86,14 @@ class MultiplayerTable {
                 while (!shouldClose.get() && (inputLine = in.readLine()) != null) {
                     try {
                         final String readLine = inputLine;
-                        Gdx.app.postRunnable(() ->
-                                status.setText(playersSentence(Integer.parseInt(readLine))));
-                        Thread.sleep(POLLING_TIME_MS);
+                        if (inputLine.equals(GAME_IS_STARTED)) {
+                            BlackoutGame.getInstance().testGameScreen();
+                            break;
+                        } else {
+                            Gdx.app.postRunnable(() ->
+                                    status.setText(playersSentence(Integer.parseInt(readLine))));
+                            Thread.sleep(POLLING_TIME_MS);
+                        }
                     } catch (NumberFormatException | InterruptedException ignored) {
                     }
                     out.println("");
