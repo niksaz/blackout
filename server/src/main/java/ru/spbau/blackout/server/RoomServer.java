@@ -3,22 +3,26 @@ package ru.spbau.blackout.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RoomServer {
 
+    private static int PLAYERS_NUMBER = 2;
+
     private final int port;
     private final Deque<RoomClientThread> roomClientThreads = new ConcurrentLinkedDeque<>();
     private final AtomicInteger playersNumber = new AtomicInteger();
 
-    public AtomicInteger getPlayersNumber() {
-        return playersNumber;
-    }
-
     public RoomServer(int port) {
         this.port = port;
+    }
+
+    public int getPlayersNumber() {
+        return playersNumber.get();
     }
 
     public void run() {
@@ -32,6 +36,7 @@ public class RoomServer {
                 roomClientThreads.add(nextThread);
                 playersNumber.addAndGet(1);
                 nextThread.start();
+                maybePlayGame(PLAYERS_NUMBER);
             }
         } catch (IOException e) {
             synchronized (System.out) {
@@ -42,11 +47,24 @@ public class RoomServer {
         }
     }
 
+    private synchronized void maybePlayGame(int playersForGame) {
+        if (playersNumber.get() >= playersForGame) {
+            playersNumber.addAndGet(-playersForGame);
+            List<RoomClientThread> clients = new ArrayList<>(playersForGame);
+            for (int playerIndex = 0; playerIndex < playersForGame; playerIndex++) {
+                clients.add(roomClientThreads.removeFirst());
+            }
+            final Thread game = new Game(clients);
+            game.start();
+        }
+    }
+
     void discard(RoomClientThread clientThread) {
+        playersNumber.decrementAndGet();
         roomClientThreads.remove(clientThread);
-        playersNumber.addAndGet(-1);
+
         synchronized (System.out) {
-            System.out.println("Thread is discarded");
+            System.out.println("Thread was disconnected.");
         }
     }
 

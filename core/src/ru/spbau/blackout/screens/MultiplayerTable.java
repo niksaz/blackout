@@ -25,7 +25,7 @@ import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
 import static ru.spbau.blackout.BlackoutGame.PORT_NUMBER;
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
-class MultiplayerTable {
+public class MultiplayerTable {
 
     private static final String TAG = "MultiplayerTable";
     private static final String BACK_TEXT = "Back";

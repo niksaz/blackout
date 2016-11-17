@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import ru.spbau.blackout.screens.MultiplayerTable;
 
 class RoomClientThread extends Thread {
 
@@ -12,6 +15,7 @@ class RoomClientThread extends Thread {
 
     private final RoomServer server;
     private final Socket socket;
+    private final AtomicBoolean gameStarting = new AtomicBoolean();
 
     RoomClientThread(RoomServer server, Socket socket) {
         this.server = server;
@@ -30,13 +34,25 @@ class RoomClientThread extends Thread {
                 System.out.println(inputLine + " connected");
             }
             do {
-                //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                out.println(server.getPlayersNumber().get());
+                if (gameStarting.get()) {
+                    out.println(MultiplayerTable.GAME_IS_STARTED);
+                    break;
+                } else {
+                    //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                    out.println(server.getPlayersNumber());
+
+                }
             } while (in.readLine() != null);
         } catch (IOException ignored) {
         } finally {
-            server.discard(this);
+            if (!gameStarting.get()) {
+                server.discard(this);
+            }
         }
+    }
+
+    public void startGame(Game game) {
+        gameStarting.set(true);
     }
 
 }
