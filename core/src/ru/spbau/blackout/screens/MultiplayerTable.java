@@ -35,12 +35,10 @@ public class MultiplayerTable {
 
     private final Table middleTable;
     private final Label status;
-    private final BlackoutGame game;
     private final MenuScreen screen;
     private final AtomicBoolean shouldClose;
 
-    private MultiplayerTable(BlackoutGame game, MenuScreen screen) {
-        this.game = game;
+    private MultiplayerTable(MenuScreen screen) {
         this.screen = screen;
 
         middleTable = new Table();
@@ -51,8 +49,8 @@ public class MultiplayerTable {
         shouldClose = new AtomicBoolean(false);
     }
 
-    static Table getTable(final BlackoutGame game, final MenuScreen screen) {
-        final MultiplayerTable result = new MultiplayerTable(game, screen);
+    static Table getTable(final MenuScreen screen) {
+        final MultiplayerTable result = new MultiplayerTable(screen);
 
         result.runUpdateThread();
 
@@ -104,7 +102,8 @@ public class MultiplayerTable {
                 Gdx.app.log(TAG, "Couldn't get I/O for the connection to " + HOST_NAME);
             }
             finally {
-                Gdx.app.postRunnable(() -> screen.changeMiddleTable(PlayScreenTable.getTable(game, screen)));
+                Gdx.app.postRunnable(() ->
+                        screen.changeMiddleTable(PlayScreenTable.getTable(screen)));
             }
             Gdx.app.log(TAG, "Stopped");
         }).start();

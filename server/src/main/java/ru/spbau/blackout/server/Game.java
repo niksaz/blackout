@@ -4,9 +4,9 @@ import java.util.List;
 
 class Game extends Thread {
 
-    private final List<RoomClientThread> clients;
+    private final List<ClientThread> clients;
 
-    Game(List<RoomClientThread> clients) {
+    Game(List<ClientThread> clients) {
         this.clients = clients;
     }
 
@@ -14,8 +14,9 @@ class Game extends Thread {
         synchronized (System.out) {
             System.out.println("New game has just started!");
         }
-        for (RoomClientThread thread : clients) {
+        for (ClientThread thread : clients) {
             thread.startGame(this);
         }
+
     }
 }

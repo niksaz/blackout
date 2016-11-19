@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.utils.AssetLoader;
 
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
@@ -31,7 +30,7 @@ class MainMenuTable {
     private static final String BUTTON_ACHIEVEMENTS_TEXT = "Achievements";
     private static final String BUTTON_LEADERBOARD_TEXT = "Leaderboard";
 
-    static Table getTable(final BlackoutGame game, final MenuScreen screen) {
+    static Table getTable(final MenuScreen screen) {
         final Table middleTable = new Table();
         addBlackoutLabel(middleTable);
 
@@ -41,7 +40,7 @@ class MainMenuTable {
         addButton(middleTable, BUTTON_PLAY_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                screen.changeMiddleTable(PlayScreenTable.getTable(game, screen));
+                screen.changeMiddleTable(PlayScreenTable.getTable(screen));
             }
         });
         addButton(middleTable, BUTTON_SHOP_TEXT, upImage, downImage, new ChangeListener() {

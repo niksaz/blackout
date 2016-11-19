@@ -20,7 +20,7 @@ class PlayScreenTable  {
     private static final String MULTIPLAYER_GAME_TEXT = "Multiplayer game";
     private static final String BACK_TEXT = "Back";
 
-    static Table getTable(final BlackoutGame game, final MenuScreen screen) {
+    static Table getTable(final MenuScreen screen) {
         final Table middleTable = new Table();
 
         final Drawable upImage = new TextureRegionDrawable(
@@ -31,20 +31,20 @@ class PlayScreenTable  {
         addButton(middleTable, SINGLE_PLAYER_GAME_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float  y) {
-                game.testGameScreen();
+                BlackoutGame.getInstance().testGameScreen();
             }
         });
 
         addButton(middleTable, MULTIPLAYER_GAME_TEXT, upImage, downImage, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                screen.changeMiddleTable(MultiplayerTable.getTable(game, screen));
+                screen.changeMiddleTable(MultiplayerTable.getTable(screen));
             }
         });
         addButton(middleTable, BACK_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                screen.changeMiddleTable(MainMenuTable.getTable(game, screen));
+                screen.changeMiddleTable(MainMenuTable.getTable(screen));
             }
         });
 

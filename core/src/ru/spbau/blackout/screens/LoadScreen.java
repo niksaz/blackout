@@ -8,9 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.CorePlayServicesListener;
-import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.utils.AssetLoader;
-import ru.spbau.blackout.utils.ScreenManager;
 
 public class LoadScreen extends StageScreen implements CorePlayServicesListener {
 

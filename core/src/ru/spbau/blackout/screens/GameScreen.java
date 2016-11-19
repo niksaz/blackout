@@ -20,7 +20,6 @@ import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.rooms.GameRoom;
 import ru.spbau.blackout.settings.GameSettings;
-import ru.spbau.blackout.utils.ScreenManager;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
 

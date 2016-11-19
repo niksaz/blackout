@@ -9,15 +9,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import ru.spbau.blackout.screens.MultiplayerTable;
 
-class RoomClientThread extends Thread {
+class ClientThread extends Thread {
 
     private static final int READ_TIMEOUT_MS = 5000;
 
     private final RoomServer server;
     private final Socket socket;
-    private final AtomicBoolean gameStarting = new AtomicBoolean();
+    private final AtomicBoolean gameStarted = new AtomicBoolean();
 
-    RoomClientThread(RoomServer server, Socket socket) {
+    ClientThread(RoomServer server, Socket socket) {
         this.server = server;
         this.socket = socket;
     }
@@ -34,7 +34,7 @@ class RoomClientThread extends Thread {
                 System.out.println(inputLine + " connected");
             }
             do {
-                if (gameStarting.get()) {
+                if (gameStarted.get()) {
                     out.println(MultiplayerTable.GAME_IS_STARTED);
                     break;
                 } else {
@@ -45,14 +45,14 @@ class RoomClientThread extends Thread {
             } while (in.readLine() != null);
         } catch (IOException ignored) {
         } finally {
-            if (!gameStarting.get()) {
+            if (!gameStarted.get()) {
                 server.discard(this);
             }
         }
     }
 
     public void startGame(Game game) {
-        gameStarting.set(true);
+        gameStarted.set(true);
     }
 
 }

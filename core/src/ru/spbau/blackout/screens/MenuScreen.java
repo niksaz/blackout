@@ -17,9 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.utils.AssetLoader;
-import ru.spbau.blackout.utils.ScreenManager;
 
 class MenuScreen extends StageScreen {
 
@@ -42,7 +40,7 @@ class MenuScreen extends StageScreen {
 
         addLeftPaneElements();
         addRightPaneElements();
-        changeMiddleTable(MainMenuTable.getTable(BlackoutGame.getInstance(), this));
+        changeMiddleTable(MainMenuTable.getTable(this));
     }
 
     void changeMiddleTable(Table table) {

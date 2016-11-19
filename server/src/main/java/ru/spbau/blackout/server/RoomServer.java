@@ -14,7 +14,7 @@ public class RoomServer {
     private static int PLAYERS_NUMBER = 2;
 
     private final int port;
-    private final Deque<RoomClientThread> roomClientThreads = new ConcurrentLinkedDeque<>();
+    private final Deque<ClientThread> clientThreads = new ConcurrentLinkedDeque<>();
     private final AtomicInteger playersNumber = new AtomicInteger();
 
     public RoomServer(int port) {
@@ -29,11 +29,11 @@ public class RoomServer {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
                 final Socket nextSocket = serverSocket.accept();
-                final RoomClientThread nextThread = new RoomClientThread(this, nextSocket);
+                final ClientThread nextThread = new ClientThread(this, nextSocket);
                 synchronized (System.out) {
                     System.out.println("New thread for a connection is created");
                 }
-                roomClientThreads.add(nextThread);
+                clientThreads.add(nextThread);
                 playersNumber.addAndGet(1);
                 nextThread.start();
                 maybePlayGame(PLAYERS_NUMBER);
@@ -50,18 +50,18 @@ public class RoomServer {
     private synchronized void maybePlayGame(int playersForGame) {
         if (playersNumber.get() >= playersForGame) {
             playersNumber.addAndGet(-playersForGame);
-            List<RoomClientThread> clients = new ArrayList<>(playersForGame);
+            List<ClientThread> clients = new ArrayList<>(playersForGame);
             for (int playerIndex = 0; playerIndex < playersForGame; playerIndex++) {
-                clients.add(roomClientThreads.removeFirst());
+                clients.add(clientThreads.removeFirst());
             }
             final Thread game = new Game(clients);
             game.start();
         }
     }
 
-    void discard(RoomClientThread clientThread) {
+    void discard(ClientThread clientThread) {
         playersNumber.decrementAndGet();
-        roomClientThreads.remove(clientThread);
+        clientThreads.remove(clientThread);
 
         synchronized (System.out) {
             System.out.println("Thread was disconnected.");
