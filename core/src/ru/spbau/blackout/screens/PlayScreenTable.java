@@ -14,13 +14,13 @@ import ru.spbau.blackout.BlackoutGame;
 
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
-class PlayScreenTable  {
+public class PlayScreenTable  {
 
     private static final String SINGLE_PLAYER_GAME_TEXT = "Single player game";
     private static final String MULTIPLAYER_GAME_TEXT = "Multiplayer game";
     private static final String BACK_TEXT = "Back";
 
-    static Table getTable(final MenuScreen screen) {
+    public static Table getTable(final MenuScreen screen) {
         final Table middleTable = new Table();
 
         final Drawable upImage = new TextureRegionDrawable(

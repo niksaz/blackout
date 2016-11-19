@@ -19,7 +19,7 @@ import com.badlogic.gdx.utils.Align;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.utils.AssetLoader;
 
-class MenuScreen extends StageScreen {
+public class MenuScreen extends StageScreen {
 
     private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
     static final String BUTTON_UP_TEXTURE_PATH = "images/menuscreen/button_up.png";
@@ -43,7 +43,7 @@ class MenuScreen extends StageScreen {
         changeMiddleTable(MainMenuTable.getTable(this));
     }
 
-    void changeMiddleTable(Table table) {
+    public void changeMiddleTable(Table table) {
         if (middleTable != null) {
             middleTable.remove();
         }
@@ -114,7 +114,7 @@ class MenuScreen extends StageScreen {
 
     private Image addGooglePlayGamesServicesIcon() {
         final Texture gamesServices = new Texture(GAME_SERVICES_TEXTURE_PATH);
-        Image gamesServicesImage = new Image(gamesServices);
+        final Image gamesServicesImage = new Image(gamesServices);
         gamesServicesImage.setVisible(false);
 
         gamesServicesImage.addListener(new ClickListener() {

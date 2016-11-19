@@ -8,8 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
-import java.util.function.Function;
-
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.units.Rpx;
 

@@ -9,52 +9,48 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RoomServer {
+class RoomServer {
 
-    private static int PLAYERS_NUMBER = 2;
+    private static final int PLAYERS_NUMBER = 2;
 
     private final int port;
     private final Deque<ClientThread> clientThreads = new ConcurrentLinkedDeque<>();
     private final AtomicInteger playersNumber = new AtomicInteger();
 
-    public RoomServer(int port) {
+     RoomServer(int port) {
         this.port = port;
     }
 
-    public int getPlayersNumber() {
+    int getPlayersNumber() {
         return playersNumber.get();
     }
 
-    public void run() {
+    @SuppressWarnings("InfiniteLoopStatement")
+    void run() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            while (true) {
+            do {
                 final Socket nextSocket = serverSocket.accept();
                 final ClientThread nextThread = new ClientThread(this, nextSocket);
-                synchronized (System.out) {
-                    System.out.println("New thread for a connection is created");
-                }
+                log("New thread for a connection is created.");
                 clientThreads.add(nextThread);
                 playersNumber.addAndGet(1);
                 nextThread.start();
                 maybePlayGame(PLAYERS_NUMBER);
-            }
+            } while (true);
         } catch (IOException e) {
-            synchronized (System.out) {
-                System.out.println("Exception caught when trying to listen on port "
-                        + port + " or listening for a connection");
-                System.out.println(e.getMessage());
-            }
+            log("Exception caught when trying to listen on port " + port +
+                " or listening for a connection:" + e.getMessage());
         }
     }
 
     private synchronized void maybePlayGame(int playersForGame) {
         if (playersNumber.get() >= playersForGame) {
             playersNumber.addAndGet(-playersForGame);
-            List<ClientThread> clients = new ArrayList<>(playersForGame);
+            final List<ClientThread> clients = new ArrayList<>(playersForGame);
             for (int playerIndex = 0; playerIndex < playersForGame; playerIndex++) {
                 clients.add(clientThreads.removeFirst());
             }
-            final Thread game = new Game(clients);
+            final Thread game = new Game(this, clients);
             game.start();
         }
     }
@@ -62,10 +58,12 @@ public class RoomServer {
     void discard(ClientThread clientThread) {
         playersNumber.decrementAndGet();
         clientThreads.remove(clientThread);
-
-        synchronized (System.out) {
-            System.out.println("Thread was disconnected.");
-        }
+        log("Client named " + clientThread.getClientName() + " disconnected.");
     }
 
+    void log(String message) {
+        synchronized (System.out) {
+            System.out.println(message);
+        }
+    }
 }

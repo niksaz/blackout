@@ -8,7 +8,6 @@ import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Utils;
 
-import static ru.spbau.blackout.utils.Utils.isZeroVec;
 import static ru.spbau.blackout.utils.Utils.projectVec;
 import static ru.spbau.blackout.utils.Utils.sqr;
 

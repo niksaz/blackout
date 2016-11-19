@@ -1,21 +1,23 @@
 package ru.spbau.blackout.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
-import ru.spbau.blackout.screens.MultiplayerTable;
+import ru.spbau.blackout.network.GameState;
+import ru.spbau.blackout.network.Network;
 
 class ClientThread extends Thread {
 
-    private static final int READ_TIMEOUT_MS = 5000;
+    private static final String UNKNOWN = "UNKNOWN";
 
     private final RoomServer server;
     private final Socket socket;
-    private final AtomicBoolean gameStarted = new AtomicBoolean();
+    private String name = UNKNOWN;
+    private Game game;
+    private AtomicReference<GameState> clientGameState = new AtomicReference<>(GameState.WAITING);
 
     ClientThread(RoomServer server, Socket socket) {
         this.server = server;
@@ -25,34 +27,64 @@ class ClientThread extends Thread {
     public void run() {
         try (
             Socket socket = this.socket;
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
-            socket.setSoTimeout(READ_TIMEOUT_MS);
-            String inputLine = in.readLine();
-            synchronized (System.out) {
-                System.out.println(inputLine + " connected");
-            }
-            do {
-                if (gameStarted.get()) {
-                    out.println(MultiplayerTable.GAME_IS_STARTED);
-                    break;
-                } else {
-                    //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                    out.println(server.getPlayersNumber());
+            socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
+            name = in.readUTF();
+            server.log(name + " connected.");
 
+            state_updating_loop:
+            do {
+                GameState currentState = clientGameState.get();
+                if (currentState == GameState.WAITING) {
+                    final Game currentGame;
+                    synchronized (this) {
+                        currentGame = game;
+                    }
+                    if (currentGame != null) {
+                        clientGameState.set(game.getGameState());
+                    }
+                } else {
+                    clientGameState.set(game.getGameState());
                 }
-            } while (in.readLine() != null);
+
+                currentState = clientGameState.get();
+                out.writeObject(currentState);
+                switch (currentState) {
+                    case WAITING:
+                        out.writeInt(server.getPlayersNumber());
+                        break;
+                    case FINISHED:
+                        break state_updating_loop;
+                    default:
+                        break;
+                }
+                out.flush();
+
+                try {
+                    sleep(Network.STATE_UPDATE_CYCLE_MS);
+                } catch (InterruptedException ignored) {
+                }
+            } while (true);
         } catch (IOException ignored) {
         } finally {
-            if (!gameStarted.get()) {
+            if (clientGameState.get() == GameState.WAITING) {
                 server.discard(this);
             }
+            clientGameState.set(GameState.FINISHED);
         }
     }
 
-    public void startGame(Game game) {
-        gameStarted.set(true);
+    String getClientName() {
+        return name;
     }
 
+    synchronized void setGame(Game game) {
+        this.game = game;
+    }
+
+    GameState getClientGameState() {
+        return clientGameState.get();
+    }
 }

@@ -1,14 +1,12 @@
 package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.model.Animation;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameWorld;
-import ru.spbau.blackout.utils.Utils;
 
 public abstract class DynamicObject extends GameObject {
     public static class Animations {
