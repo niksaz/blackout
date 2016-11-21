@@ -1,6 +1,7 @@
 package ru.spbau.blackout.rooms;
 
-import com.badlogic.gdx.utils.Array;
+import java.io.Serializable;
+import java.util.List;
 
 import java.io.Serializable;
 
@@ -12,6 +13,6 @@ import ru.spbau.blackout.entities.Hero;
  */
 public interface GameSessionSettings extends Serializable {
     String getMap();
-    Array<GameObject.Definition> getObjectDefs();
+    List<GameObject.Definition> getObjectDefs();
     Hero.Definition getCharacter();
 }

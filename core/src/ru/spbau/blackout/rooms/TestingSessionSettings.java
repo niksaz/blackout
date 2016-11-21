@@ -1,6 +1,7 @@
 package ru.spbau.blackout.rooms;
 
-import com.badlogic.gdx.utils.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.io.Serializable;
 
@@ -9,7 +10,7 @@ import ru.spbau.blackout.entities.Hero;
 
 public class TestingSessionSettings implements GameSessionSettings {
     public String map;
-    public Array<GameObject.Definition> objectDefs = new Array<>();
+    public List<GameObject.Definition> objectDefs = new ArrayList<>();
     public Hero.Definition character;
 
     //@Override
@@ -18,7 +19,7 @@ public class TestingSessionSettings implements GameSessionSettings {
     }
 
     @Override
-    public Array<GameObject.Definition> getObjectDefs() {
+    public List<GameObject.Definition> getObjectDefs() {
         return objectDefs;
     }
 

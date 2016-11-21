@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.rooms.TestingSessionSettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.MenuScreen;
@@ -22,6 +23,7 @@ import static ru.spbau.blackout.BlackoutGame.PORT_NUMBER;
 public class AndroidClientThread extends Thread {
 
     private static final String TAG = "AndroidClientThread";
+    private static final String WAITING = "Waiting for a game.";
     private static final String READY_TO_START_MS = "Starting a game. Prepare yourself.";
     private static final String IN_PROCESS = "In process.";
 
@@ -46,39 +48,30 @@ public class AndroidClientThread extends Thread {
             out.flush();
 
             do {
-                final GameState serverGameState = (GameState) in.readObject();
-                int numberOfPlayers = 0;
-                if (serverGameState == GameState.WAITING) {
-                    numberOfPlayers = in.readInt();
-                }
+                gameState = (GameState) in.readObject();
 
                 switch (gameState) {
                     case WAITING:
-                        final int copyForLambda = numberOfPlayers;
                         Gdx.app.postRunnable(() ->
-                                table.getStatusLabel().setText(playersSentence(copyForLambda)));
+                                table.getStatusLabel().setText(WAITING));
                         break;
                     case READY_TO_START:
-                        // get test
-
-//                        GameSettings settings = new GameSettings();
-//                        TestingSessionSettings room = null;
-//
-//                        BlackoutGame.getInstance().getScreenManager().setScreen(new GameScreen(room, server, settings));
-
                         Gdx.app.postRunnable(() ->
                                 table.getStatusLabel().setText(READY_TO_START_MS));
+
+                        final GameSettings settings = new GameSettings();
+                        TestingSessionSettings room = (TestingSessionSettings) in.readObject();
+                        room.character = (Hero.Definition) in.readObject();
+
+                        BlackoutGame.getInstance().getScreenManager().setScreen(new GameScreen(room, server, settings));
                         break;
-                    case IN_PROCESS:
-                        Gdx.app.postRunnable(() ->
-                                table.getStatusLabel().setText(IN_PROCESS));
                     default:
                         break;
                 }
+            } while (gameState == GameState.WAITING && !isInterrupted());
 
-                gameState = serverGameState;
-            } while (gameState != GameState.FINISHED && !isInterrupted());
-
+            while (true) {
+            }
         } catch (UnknownHostException e) {
             Gdx.app.log(TAG, "Don't know about host " + HOST_NAME);
         }
@@ -92,13 +85,5 @@ public class AndroidClientThread extends Thread {
             });
         }
         Gdx.app.log(TAG, "Stopped");
-    }
-
-    private static String playersSentence(int number) {
-        if (number == 1) {
-            return number + " player is waiting";
-        } else {
-            return number + " players are waiting";
-        }
     }
 }
