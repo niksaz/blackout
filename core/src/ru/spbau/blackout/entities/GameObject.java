@@ -139,7 +139,8 @@ public abstract class GameObject implements RenderableProvider, Serializable {
          * supplier will be sent instead.
          */
         private Creator<Shape> shapeCreator;
-        protected final BodyDef bodyDef = new BodyDef();
+        private final Vector2 position = new Vector2();
+
 
         // appearance:
         public String modelPath;
@@ -152,10 +153,7 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         {
             this.modelPath = modelPath;
             this.shapeCreator = shapeCreator;
-
-            // setup body
-            this.bodyDef.position.set(initialX, initialY);
-            this.bodyDef.type = getBodyType();
+            this.position.set(initialX, initialY);
         }
 
         public void setDensity(float density) {
@@ -179,25 +177,28 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         }
 
         public float getHeight() {
-            return height;
+            return this.height;
         }
 
         public Vector2 getPosition() {
-            return bodyDef.position;
+            return this.position;
         }
 
         public void setPosition(float x, float y) {
-            bodyDef.position.set(x, y);
+            this.position.set(x, y);
         }
 
         /**
          * Rotates object to the given direction.
          */
         public void setDirection(Vector2 direction) {
-            rotation = direction.angleRad();
+            this.rotation = direction.angleRad();
         }
 
         public Body addToWorld(World world) {
+            BodyDef bodyDef = new BodyDef();
+            bodyDef.position.set(this.position);
+            bodyDef.type = getBodyType();
             return world.createBody(bodyDef);
         }
 
