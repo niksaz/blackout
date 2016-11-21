@@ -1,6 +1,5 @@
 package ru.spbau.blackout;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -22,9 +21,9 @@ public class GameWorld implements Iterable<GameObject> {
     public static final int POSITION_ITERATIONS = 2;
 
     private final Array<GameObject> gameObjects = new Array<>();
-    private final World world;
-    private float accumulator = 0;
-    private Body ground;
+    transient private final World world;
+    transient private float accumulator = 0;
+    transient private Body ground;
 
     public GameWorld() {
         // without gravity, without sleeping
@@ -49,6 +48,10 @@ public class GameWorld implements Iterable<GameObject> {
 
             shape.dispose();
         }
+    }
+
+    public Array<GameObject> getGameObjects() {
+        return gameObjects;
     }
 
     @Override

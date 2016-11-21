@@ -16,14 +16,14 @@ public abstract class DynamicObject extends GameObject {
     protected final Vector2 velocity = new Vector2();
 
     // Appearance:
-    protected final AnimationController animation;
+    transient protected final AnimationController animation;
+    protected float animationSpeed = 1f;
 
     protected DynamicObject(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
         animation = new AnimationController(this.model);
         animation.setAnimation(Animations.DEFAULT, -1);
     }
-    protected float animationSpeed = 1f;
 
     @Override
     public void updateState(float delta) {

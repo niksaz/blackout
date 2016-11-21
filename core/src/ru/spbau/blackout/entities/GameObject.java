@@ -17,16 +17,18 @@ import com.badlogic.gdx.utils.Pool;
 
 import ru.spbau.blackout.GameWorld;
 
+import java.io.Serializable;
+
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
-public abstract class GameObject implements RenderableProvider {
+public abstract class GameObject implements RenderableProvider, Serializable {
     // physics:
-    protected Body body;
+    transient protected Body body;
     float height;
 
     // appearance:
-    protected ModelInstance model;
+    transient protected ModelInstance model;
 
     protected GameObject(Definition def, Model model, GameWorld gameWorld) {
         this.model = new ModelInstance(model);

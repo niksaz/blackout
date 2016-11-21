@@ -8,10 +8,12 @@ import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Utils;
 
+import java.io.Serializable;
+
 import static ru.spbau.blackout.utils.Utils.projectVec;
 import static ru.spbau.blackout.utils.Utils.sqr;
 
-public abstract class GameUnit extends DynamicObject {
+public abstract class GameUnit extends DynamicObject implements Serializable {
     public static class Animations extends DynamicObject.Animations {
         public static final String WALK = "Armature|Walk";
         public static final String STAY = "Armature|Stay";
