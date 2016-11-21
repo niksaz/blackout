@@ -139,7 +139,6 @@ public abstract class GameObject implements RenderableProvider, Serializable {
          * supplier will be sent instead.
          */
         private Creator<Shape> shapeCreator;
-
         protected final BodyDef bodyDef = new BodyDef();
 
         // appearance:
