@@ -13,7 +13,7 @@ import java.io.Serializable;
 import static ru.spbau.blackout.utils.Utils.projectVec;
 import static ru.spbau.blackout.utils.Utils.sqr;
 
-public abstract class GameUnit extends DynamicObject implements Serializable {
+public abstract class GameUnit extends DynamicObject {
     public static class Animations extends DynamicObject.Animations {
         public static final String WALK = "Armature|Walk";
         public static final String STAY = "Armature|Stay";

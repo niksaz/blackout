@@ -116,7 +116,7 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         return height;
     }
 
-    public static abstract class Definition {
+    public static abstract class Definition implements Serializable {
         public static final float DEFAULT_HEIGHT = 0;
         public static final float DEFAULT_ROTATION = 0;
 

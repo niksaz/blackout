@@ -13,6 +13,8 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import java.util.List;
+
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameObject;
@@ -136,7 +138,7 @@ public class GameScreen extends BlackoutScreen {
     }
 
     private class LoadingScreen extends BlackoutScreen {
-        final Array<GameObject.Definition> objectDefs;
+        final List<GameObject.Definition> objectDefs;
         final Hero.Definition characterDef;
         final String mapPath;
 
