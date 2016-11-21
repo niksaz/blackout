@@ -54,26 +54,36 @@ public class BlackoutGame extends Game {
 
 	// FIXME:  just for test
     public void testGameScreen() {
-/*        TestingSessionSettings room = new TestingSessionSettings();
+        TestingSessionSettings room = new TestingSessionSettings();
         room.map =  "maps/duel/duel.g3db";
 
-        Shape heroShape = new CircleShape();
-        heroShape.setRadius(0.7f);
-        Hero.Definition hero = new Hero.Definition("models/wizard/wizard.g3db", heroShape, 0, 0);
+        Hero.Definition hero = new Hero.Definition(
+                "models/wizard/wizard.g3db",
+                () -> {
+                    Shape shape = new CircleShape();
+                    shape.setRadius(0.7f);
+                    return shape;
+                },
+                0, 0
+        );
 
         room.objectDefs.add(hero);
         room.character = hero;
 
-        Shape stoneShape = new CircleShape();
-        heroShape.setRadius(1.5f);
         GameObject.Definition stone = new Decoration.Definition(
-                "models/stone/stone.g3db", stoneShape, 0, -20
+                "models/stone/stone.g3db",
+                () -> {
+                    Shape shape = new CircleShape();
+                    shape.setRadius(1.5f);
+                    return shape;
+                },
+                0, -20
         );
         room.objectDefs.add(stone);
 
         GameSettings settings = new GameSettings();  // just default settings
 
-        screenManager.setScreen(new GameScreen(room, new FakeServer(), settings));*/
+        screenManager.setScreen(new GameScreen(room, new FakeServer(), settings));
 	}
 
     public void initializePlayServices(PlayServices playServices) {
