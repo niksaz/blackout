@@ -6,8 +6,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
+import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
+import ru.spbau.blackout.rooms.TestingSessionSettings;
 
 /**
  * A thread allocated for each client connected to the server. Initially it is waiting to be matched
@@ -20,8 +22,10 @@ class ClientThread extends Thread {
     private final RoomServer server;
     private final Socket socket;
     private String name = UNKNOWN;
-    private Game game;
+    private AtomicReference<Game> game = new AtomicReference<>();
     private AtomicReference<GameState> clientGameState = new AtomicReference<>(GameState.WAITING);
+    private TestingSessionSettings sessionSettings;
+    private Hero.Definition clientCharacter;
 
     ClientThread(RoomServer server, Socket socket) {
         this.server = server;
@@ -38,43 +42,48 @@ class ClientThread extends Thread {
             name = in.readUTF();
             server.log(name + " connected.");
 
-            state_updating_loop:
-            do {
-                GameState currentState = clientGameState.get();
-                if (currentState == GameState.WAITING) {
-                    final Game currentGame;
-                    synchronized (this) {
-                        currentGame = game;
-                    }
+            synchronized (this) {
+                do {
+                    final Game currentGame = game.get();
                     if (currentGame != null) {
-                        clientGameState.set(game.getGameState());
+                        clientGameState.set(currentGame.getGameState());
                         //noinspection SynchronizationOnLocalVariableOrMethodParameter
                         synchronized (currentGame) {
                             currentGame.notify();
                         }
                     }
-                } else {
-                    clientGameState.set(game.getGameState());
+
+                    final GameState currentState = clientGameState.get();
+                    out.writeObject(currentState);
+                    if (currentState == GameState.FINISHED) {
+                        break;
+                    }
+                    out.flush();
+
+                    try {
+                        sleep(Network.STATE_UPDATE_CYCLE_MS);
+                    } catch (InterruptedException ignored) {
+                    }
+                } while (clientGameState.get() == GameState.WAITING);
+
+                if (clientGameState.get() == GameState.FINISHED) {
+                    return;
                 }
 
-                currentState = clientGameState.get();
-                out.writeObject(currentState);
-                switch (currentState) {
-                    case WAITING:
-                        out.writeInt(server.getPlayersNumber());
-                        break;
-                    case FINISHED:
-                        break state_updating_loop;
-                    default:
-                        break;
+                // waiting for game to set room to send
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                out.writeObject(sessionSettings);
+                out.writeObject(clientCharacter);
                 out.flush();
 
-                try {
-                    sleep(Network.STATE_UPDATE_CYCLE_MS);
-                } catch (InterruptedException ignored) {
+
+                while (true) {
                 }
-            } while (true);
+            }
         } catch (IOException ignored) {
         } finally {
             if (clientGameState.get() == GameState.WAITING) {
@@ -88,8 +97,14 @@ class ClientThread extends Thread {
         return name;
     }
 
-    synchronized void setGame(Game game) {
-        this.game = game;
+    void setGame(Game game) {
+        this.game.set(game);
+    }
+
+    synchronized void setSessionSettings(TestingSessionSettings testingSessionSettings, Hero.Definition character) {
+        sessionSettings = testingSessionSettings;
+        clientCharacter = character;
+        notify();
     }
 
     GameState getClientGameState() {

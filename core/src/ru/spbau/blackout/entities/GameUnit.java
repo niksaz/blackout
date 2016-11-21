@@ -34,7 +34,9 @@ public abstract class GameUnit extends DynamicObject implements Serializable {
     protected GameUnit(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
         selfVelocityScale = def.selfVelocityScale;
-        animation.setAnimation(Animations.STAY, -1);
+        if (animation != null) {
+            animation.setAnimation(Animations.STAY, -1);
+        }
 
         frictionJoint = gameWorld.addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
     }

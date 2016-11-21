@@ -2,6 +2,8 @@ package ru.spbau.blackout.rooms;
 
 import com.badlogic.gdx.utils.Array;
 
+import java.io.Serializable;
+
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 

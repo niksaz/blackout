@@ -64,39 +64,34 @@ class Game extends Thread {
 
         // !!!!!!
 
-//        TestingSessionSettings room = new TestingSessionSettings();
-//        room.map =  "maps/duel/duel.g3db";
-//
-//        Shape heroShape = new CircleShape();
-//        heroShape.setRadius(0.7f);
-//        Hero.Definition hero = new Hero.Definition("models/wizard/wizard.g3db", heroShape, 0, 0);
-//
-//        Shape heroShape2 = new CircleShape();
-//        heroShape.setRadius(0.7f);
-//        Hero.Definition hero2 = new Hero.Definition("models/wizard/wizard.g3db", heroShape, 50, 50);
-//
-//        room.objectDefs.add(hero);
-//
-//        room.objectDefs.add(hero2);
-//
-//        Shape stoneShape = new CircleShape();
-//        heroShape.setRadius(1.5f);
-//        GameObject.Definition stone = new Decoration.Definition(
-//                "models/stone/stone.g3db", stoneShape, 0, -20
-//        );
-//        room.objectDefs.add(stone);
-//
-//        GameWorld gameWorld = new GameWorld();
-//        for (GameObject.Definition def : room.getObjectDefs()) {
-//            def.makeInstance(null, gameWorld);
-//        }
-//
-//        room.character = hero;
-//        // serialize and send
-//
-//        room.character = hero2;
-//        // serialize and send
+        final TestingSessionSettings room = new TestingSessionSettings();
+        room.map =  "maps/duel/duel.g3db";
 
+        final Shape heroShape = new CircleShape();
+        heroShape.setRadius(0.7f);
+        Hero.Definition hero = new Hero.Definition("models/wizard/wizard.g3db", heroShape, 0, 0);
+
+        final Shape heroShape2 = new CircleShape();
+        heroShape.setRadius(0.7f);
+        Hero.Definition hero2 = new Hero.Definition("models/wizard/wizard.g3db", heroShape2, 50, 50);
+
+        room.objectDefs.add(hero);
+        room.objectDefs.add(hero2);
+
+        final Shape stoneShape = new CircleShape();
+        heroShape.setRadius(1.5f);
+        final GameObject.Definition stone = new Decoration.Definition(
+                "models/stone/stone.g3db", stoneShape, 0, -20
+        );
+        room.objectDefs.add(stone);
+
+        final GameWorld gameWorld = new GameWorld();
+        for (GameObject.Definition def : room.getObjectDefs()) {
+            def.makeInstance(null, gameWorld);
+        }
+
+        clients.get(0).setSessionSettings(room, hero);
+        clients.get(1).setSessionSettings(room, hero2);
 
         // !!!!!!!
 

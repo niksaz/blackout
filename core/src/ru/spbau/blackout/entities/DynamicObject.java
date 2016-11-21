@@ -21,8 +21,12 @@ public abstract class DynamicObject extends GameObject {
 
     protected DynamicObject(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
-        animation = new AnimationController(this.model);
-        animation.setAnimation(Animations.DEFAULT, -1);
+        if (model == null) {
+            animation = null;
+        } else {
+            animation = new AnimationController(this.model);
+            animation.setAnimation(Animations.DEFAULT, -1);
+        }
     }
 
     @Override

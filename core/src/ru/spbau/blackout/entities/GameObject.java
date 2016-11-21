@@ -31,7 +31,7 @@ public abstract class GameObject implements RenderableProvider, Serializable {
     transient protected ModelInstance model;
 
     protected GameObject(Definition def, Model model, GameWorld gameWorld) {
-        this.model = new ModelInstance(model);
+        this.model = model == null ? null : new ModelInstance(model);
 
         body = gameWorld.addObject(this, def);
         body.createFixture(def.fixtureDef);

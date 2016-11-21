@@ -82,8 +82,13 @@ project(":server") {
 
     mainClassName = "ru.spbau.blackout.server.Main"
 
+    configurations { natives }
+
     dependencies {
         compile project(":core")
+        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
     }
 }
 
