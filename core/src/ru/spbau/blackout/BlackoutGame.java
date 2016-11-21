@@ -4,8 +4,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.physics.box2d.Box2D;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
@@ -13,10 +11,11 @@ import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.network.FakeServer;
 import ru.spbau.blackout.play.services.PlayServices;
 import ru.spbau.blackout.play.services.PlayServicesInCore;
-import ru.spbau.blackout.rooms.TestingSessionSettings;
+import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
 import ru.spbau.blackout.settings.GameSettings;
+import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.AssetLoader;
 import ru.spbau.blackout.utils.ScreenManager;
 
@@ -59,11 +58,7 @@ public class BlackoutGame extends Game {
 
         Hero.Definition hero = new Hero.Definition(
                 "models/wizard/wizard.g3db",
-                () -> {
-                    Shape shape = new CircleShape();
-                    shape.setRadius(0.7f);
-                    return shape;
-                },
+                new CircleCreator(0.7f),
                 0, 0
         );
 
@@ -72,11 +67,7 @@ public class BlackoutGame extends Game {
 
         GameObject.Definition stone = new Decoration.Definition(
                 "models/stone/stone.g3db",
-                () -> {
-                    Shape shape = new CircleShape();
-                    shape.setRadius(1.5f);
-                    return shape;
-                },
+                new CircleCreator(1.5f),
                 0, -20
         );
         room.objectDefs.add(stone);

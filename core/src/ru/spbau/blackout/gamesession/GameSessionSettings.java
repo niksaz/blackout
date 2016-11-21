@@ -1,9 +1,7 @@
-package ru.spbau.blackout.rooms;
+package ru.spbau.blackout.gamesession;
 
 import java.io.Serializable;
 import java.util.List;
-
-import java.io.Serializable;
 
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;

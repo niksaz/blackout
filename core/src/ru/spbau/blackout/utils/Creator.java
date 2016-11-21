@@ -7,6 +7,7 @@ import java.io.Serializable;
  * Useful for either objects which are not Serializable or very big
  * objects which can be easily created locally.
  */
+@FunctionalInterface
 public interface Creator<T> extends Serializable {
     T create();
 }

@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.Hero;
-import ru.spbau.blackout.rooms.TestingSessionSettings;
+import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.MultiplayerTable;

@@ -1,18 +1,10 @@
 package ru.spbau.blackout.server;
 
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Shape;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import ru.spbau.blackout.GameWorld;
-import ru.spbau.blackout.entities.Decoration;
-import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.network.GameState;
-import ru.spbau.blackout.rooms.TestingSessionSettings;
 
 /**
  * Multiplayer game representation. Used for synchronizing game's state and watching for game flow,

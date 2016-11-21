@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
-import ru.spbau.blackout.rooms.TestingSessionSettings;
+import ru.spbau.blackout.gamesession.TestingSessionSettings;
 
 /**
  * A thread allocated for each client connected to the server. Initially it is waiting to be matched
