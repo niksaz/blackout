@@ -18,6 +18,7 @@ import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
+import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.rooms.GameSessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 
@@ -43,8 +44,10 @@ public class GameScreen extends BlackoutScreen {
     private final IngameUI ui;
 
     private final GameWorld gameWorld = new GameWorld();
+    private final AbstractServer server;
 
-    public GameScreen(GameSessionSettings room, GameSettings settings) {
+    public GameScreen(GameSessionSettings room, AbstractServer server, GameSettings settings) {
+        this.server = server;
         loadingScreen = new LoadingScreen(room);
         ui = new IngameUI(this, settings.ui);
 
@@ -58,6 +61,10 @@ public class GameScreen extends BlackoutScreen {
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 100f));
         environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.2f, 0f, 0.2f, -1f));
+    }
+
+    public AbstractServer getServer() {
+        return server;
     }
 
     @Override

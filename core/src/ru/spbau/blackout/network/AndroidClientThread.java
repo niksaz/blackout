@@ -26,6 +26,7 @@ public class AndroidClientThread extends Thread {
 
     private final MultiplayerTable table;
     private GameState gameState = GameState.WAITING;
+    private final AbstractServer server = new RealServer();
 
     public AndroidClientThread(MultiplayerTable table) {
         this.table = table;
@@ -61,7 +62,8 @@ public class AndroidClientThread extends Thread {
 
                         GameSettings settings = new GameSettings();
                         TestingSessionSettings room = null;
-                        BlackoutGame.getInstance().getScreenManager().setScreen(new GameScreen(room, settings));
+
+                        BlackoutGame.getInstance().getScreenManager().setScreen(new GameScreen(room, server, settings));
 
                         Gdx.app.postRunnable(() ->
                                 table.getStatusLabel().setText(READY_TO_START_MS));
