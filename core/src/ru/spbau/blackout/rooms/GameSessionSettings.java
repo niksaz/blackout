@@ -8,7 +8,7 @@ import ru.spbau.blackout.entities.Hero;
 /**
  * Contains settings for particular game session.
  */
-public interface  GameRoom {
+public interface GameSessionSettings {
     String getMap();
     Array<GameObject.Definition> getObjectDefs();
     Hero.Definition getCharacter();

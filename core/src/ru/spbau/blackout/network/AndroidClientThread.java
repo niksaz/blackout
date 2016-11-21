@@ -9,9 +9,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.rooms.TestingSessionSettings;
+import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.MultiplayerTable;
 import ru.spbau.blackout.screens.PlayScreenTable;
+import ru.spbau.blackout.settings.GameSettings;
 
 import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
 import static ru.spbau.blackout.BlackoutGame.PORT_NUMBER;
@@ -54,6 +57,12 @@ public class AndroidClientThread extends Thread {
                                 table.getStatusLabel().setText(playersSentence(copyForLambda)));
                         break;
                     case READY_TO_START:
+                        // get test
+
+                        GameSettings settings = new GameSettings();
+                        TestingSessionSettings room = null;
+                        BlackoutGame.getInstance().getScreenManager().setScreen(new GameScreen(room, settings));
+
                         Gdx.app.postRunnable(() ->
                                 table.getStatusLabel().setText(READY_TO_START_MS));
                         break;

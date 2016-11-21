@@ -18,7 +18,7 @@ import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
-import ru.spbau.blackout.rooms.GameRoom;
+import ru.spbau.blackout.rooms.GameSessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
@@ -44,7 +44,7 @@ public class GameScreen extends BlackoutScreen {
 
     private final GameWorld gameWorld = new GameWorld();
 
-    public GameScreen(GameRoom room, GameSettings settings) {
+    public GameScreen(GameSessionSettings room, GameSettings settings) {
         loadingScreen = new LoadingScreen(room);
         ui = new IngameUI(this, settings.ui);
 
@@ -131,7 +131,7 @@ public class GameScreen extends BlackoutScreen {
         final Hero.Definition characterDef;
         final String mapPath;
 
-        LoadingScreen(GameRoom room) {
+        LoadingScreen(GameSessionSettings room) {
             // getting information from room
             objectDefs = room.getObjectDefs();
             characterDef = room.getCharacter();

@@ -12,7 +12,7 @@ import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.play.services.PlayServices;
 import ru.spbau.blackout.play.services.PlayServicesInCore;
-import ru.spbau.blackout.rooms.TestingRoom;
+import ru.spbau.blackout.rooms.TestingSessionSettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
 import ru.spbau.blackout.settings.GameSettings;
@@ -53,12 +53,13 @@ public class BlackoutGame extends Game {
 
 	// FIXME:  just for test
     public void testGameScreen() {
-        TestingRoom room = new TestingRoom();
+        TestingSessionSettings room = new TestingSessionSettings();
         room.map =  "maps/duel/duel.g3db";
 
         Shape heroShape = new CircleShape();
         heroShape.setRadius(0.7f);
         Hero.Definition hero = new Hero.Definition("models/wizard/wizard.g3db", heroShape, 0, 0);
+
         room.objectDefs.add(hero);
         room.character = hero;
 

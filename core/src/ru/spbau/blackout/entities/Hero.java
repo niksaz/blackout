@@ -8,7 +8,6 @@ import ru.spbau.blackout.GameWorld;
 public class Hero extends GameUnit {
     protected Hero(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
-        velocity.set(0, 15);
      }
 
     public static class Definition extends GameUnit.Definition {
