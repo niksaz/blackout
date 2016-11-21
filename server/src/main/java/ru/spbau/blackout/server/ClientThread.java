@@ -9,6 +9,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 
+/**
+ * A thread allocated for each client connected to the server. Initially it is waiting to be matched
+ * and later acting as the representative of the client in the game.
+ */
 class ClientThread extends Thread {
 
     private static final String UNKNOWN = "UNKNOWN";
@@ -44,6 +48,10 @@ class ClientThread extends Thread {
                     }
                     if (currentGame != null) {
                         clientGameState.set(game.getGameState());
+                        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                        synchronized (currentGame) {
+                            currentGame.notify();
+                        }
                     }
                 } else {
                     clientGameState.set(game.getGameState());

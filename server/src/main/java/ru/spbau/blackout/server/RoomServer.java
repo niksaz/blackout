@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Accepts incoming connections, creates a thread for each accepted connection (ClientThread),
+ * stored them and match them to create Games.
+ */
 class RoomServer {
 
     private static final int PLAYERS_NUMBER = 2;

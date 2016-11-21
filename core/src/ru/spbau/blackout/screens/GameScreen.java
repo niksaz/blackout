@@ -117,7 +117,9 @@ public class GameScreen extends BlackoutScreen {
      * Updates game world on every frame.
      */
     private void update(final float delta) {
-        gameWorld.update(delta);
+        //synchronized (gameWorld) {
+            gameWorld.update(delta);
+        //}
 
         // Must go after gameWorld.update to be synced.
         Vector2 charPos = character.getPosition();

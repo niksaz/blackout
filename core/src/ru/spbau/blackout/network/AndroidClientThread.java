@@ -23,6 +23,7 @@ public class AndroidClientThread extends Thread {
 
     private static final String TAG = "AndroidClientThread";
     private static final String READY_TO_START_MS = "Starting a game. Prepare yourself.";
+    private static final String IN_PROCESS = "In process.";
 
     private final MultiplayerTable table;
     private GameState gameState = GameState.WAITING;
@@ -60,17 +61,17 @@ public class AndroidClientThread extends Thread {
                     case READY_TO_START:
                         // get test
 
-                        GameSettings settings = new GameSettings();
-                        TestingSessionSettings room = null;
-
-                        BlackoutGame.getInstance().getScreenManager().setScreen(new GameScreen(room, server, settings));
+//                        GameSettings settings = new GameSettings();
+//                        TestingSessionSettings room = null;
+//
+//                        BlackoutGame.getInstance().getScreenManager().setScreen(new GameScreen(room, server, settings));
 
                         Gdx.app.postRunnable(() ->
                                 table.getStatusLabel().setText(READY_TO_START_MS));
                         break;
                     case IN_PROCESS:
                         Gdx.app.postRunnable(() ->
-                                table.getStatusLabel().setText("In process."));
+                                table.getStatusLabel().setText(IN_PROCESS));
                     default:
                         break;
                 }
