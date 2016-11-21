@@ -64,7 +64,7 @@ class Game extends Thread {
 
         // !!!!!!
 
-        final TestingSessionSettings room = new TestingSessionSettings();
+/*        final TestingSessionSettings room = new TestingSessionSettings();
         room.map =  "maps/duel/duel.g3db";
 
         final Shape heroShape = new CircleShape();
@@ -90,8 +90,8 @@ class Game extends Thread {
             def.makeInstance(null, gameWorld);
         }
 
-        clients.get(0).setSessionSettings(room, hero);
-        clients.get(1).setSessionSettings(room, hero2);
+        clients.create(0).setSessionSettings(room, hero);
+        clients.create(1).setSessionSettings(room, hero2);*/
 
         // !!!!!!!
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.utils.Creator;
 
 public class ShellObject extends DynamicObject {
     protected ShellObject(Definition def, Model model, GameWorld gameWorld) {
@@ -17,8 +18,10 @@ public class ShellObject extends DynamicObject {
     }
 
     public static class Definition extends DynamicObject.Definition {
-        public Definition(String modelPath, Shape shape, float initialX, float initialY) {
-            super(modelPath, shape, initialX, initialY);
+        public Definition(String modelPath, Creator<Shape> shapeCreator,
+                          float initialX, float initialY)
+        {
+            super(modelPath, shapeCreator, initialX, initialY);
         }
 
         @Override

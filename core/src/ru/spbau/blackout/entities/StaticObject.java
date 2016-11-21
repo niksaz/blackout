@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.utils.Creator;
 
 public abstract class StaticObject extends GameObject {
     protected StaticObject(Definition def, Model model, GameWorld gameWorld) {
@@ -12,9 +13,10 @@ public abstract class StaticObject extends GameObject {
     }
 
     public static abstract class Definition extends GameObject.Definition {
-        public Definition(String modelPath, Shape shape, float initialX, float initialY) {
-            super(modelPath, shape, initialX, initialY);
-            setFriction(0f);
+        public Definition(String modelPath, Creator<Shape> shapeCreator,
+                          float initialX, float initialY)
+        {
+            super(modelPath, shapeCreator, initialX, initialY);
         }
 
         @Override

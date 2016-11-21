@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.utils.Creator;
 
 public class Decoration extends StaticObject {
     protected Decoration(Definition def, Model model, GameWorld gameWorld) {
@@ -11,8 +12,10 @@ public class Decoration extends StaticObject {
     }
 
     public static class Definition extends StaticObject.Definition {
-        public Definition(String modelPath, Shape shape, float initialX, float initialY) {
-            super(modelPath, shape, initialX, initialY);
+        public Definition(String modelPath, Creator<Shape> shapeCreator,
+                          float initialX, float initialY)
+        {
+            super(modelPath, shapeCreator, initialX, initialY);
         }
 
         @Override

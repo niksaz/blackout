@@ -54,7 +54,7 @@ public class BlackoutGame extends Game {
 
 	// FIXME:  just for test
     public void testGameScreen() {
-        TestingSessionSettings room = new TestingSessionSettings();
+/*        TestingSessionSettings room = new TestingSessionSettings();
         room.map =  "maps/duel/duel.g3db";
 
         Shape heroShape = new CircleShape();
@@ -73,7 +73,7 @@ public class BlackoutGame extends Game {
 
         GameSettings settings = new GameSettings();  // just default settings
 
-        screenManager.setScreen(new GameScreen(room, new FakeServer(), settings));
+        screenManager.setScreen(new GameScreen(room, new FakeServer(), settings));*/
 	}
 
     public void initializePlayServices(PlayServices playServices) {

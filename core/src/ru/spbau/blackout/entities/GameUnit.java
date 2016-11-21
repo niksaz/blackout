@@ -6,9 +6,8 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 
 import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Utils;
-
-import java.io.Serializable;
 
 import static ru.spbau.blackout.utils.Utils.projectVec;
 import static ru.spbau.blackout.utils.Utils.sqr;
@@ -95,8 +94,10 @@ public abstract class GameUnit extends DynamicObject {
 
         public float selfVelocityScale = DEFAULT_SELF_VELOCITY_SCALE;
 
-        public Definition(String modelPath, Shape shape, float initialX, float initialY) {
-            super(modelPath, shape, initialX, initialY);
+        public Definition(String modelPath, Creator<Shape> shapeCreator,
+                          float initialX, float initialY)
+        {
+            super(modelPath, shapeCreator, initialX, initialY);
         }
     }
 }

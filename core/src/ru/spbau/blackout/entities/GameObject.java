@@ -1,6 +1,5 @@
 package ru.spbau.blackout.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
@@ -16,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
 import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.utils.Creator;
 
 import java.io.Serializable;
 
@@ -34,7 +34,14 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         this.model = model == null ? null : new ModelInstance(model);
 
         body = gameWorld.addObject(this, def);
-        body.createFixture(def.fixtureDef);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = def.getShapeCreator().create();
+        fixtureDef.density = def.getDensity();
+        fixtureDef.friction = 0;
+        fixtureDef.restitution = 0;
+        body.createFixture(fixtureDef);
+        fixtureDef.shape.dispose();
 
         setPosition(def.getPosition().x, def.getPosition().y);
     }
@@ -125,40 +132,47 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         // physics
         public float rotation = DEFAULT_ROTATION;
         public float height = DEFAULT_HEIGHT;
-        private final FixtureDef fixtureDef = new FixtureDef();
+
+        private float density = DEFAULT_DENSITY;
+        /**
+         * As far as Shape itself isn't serializable,
+         * supplier will be sent instead.
+         */
+        private Creator<Shape> shapeCreator;
+
         protected final BodyDef bodyDef = new BodyDef();
 
         // appearance:
         public String modelPath;
 
-        public Definition(String modelPath, Shape shape, float initialX, float initialY) {
+        /**
+         * ShapeCreator must be serializable.
+         */
+        public Definition(String modelPath, Creator<Shape> shapeCreator,
+                          float initialX, float initialY)
+        {
             this.modelPath = modelPath;
-
-            // setup fixture
-            fixtureDef.shape = shape;
-            fixtureDef.density = DEFAULT_DENSITY;
-            fixtureDef.friction = 0;
-            fixtureDef.restitution = 0;
+            this.shapeCreator = shapeCreator;
 
             // setup body
-            bodyDef.position.set(initialX, initialY);
-            bodyDef.type = getBodyType();
+            this.bodyDef.position.set(initialX, initialY);
+            this.bodyDef.type = getBodyType();
         }
 
         public void setDensity(float density) {
-            fixtureDef.density = density;
+            this.density = density;
         }
 
-        public void setFriction(float friction) {
-            fixtureDef.friction = friction;
+        public void setShapeCreator(Creator<Shape> shapeCreator) {
+            this.shapeCreator = shapeCreator;
         }
 
         public float getDensity() {
-            return fixtureDef.density;
+            return this.density;
         }
 
-        public float getFriction() {
-            return fixtureDef.friction;
+        public Creator<Shape> getShapeCreator() {
+            return this.shapeCreator;
         }
 
         public void setHeight(float height) {
@@ -182,10 +196,6 @@ public abstract class GameObject implements RenderableProvider, Serializable {
          */
         public void setDirection(Vector2 direction) {
             rotation = direction.angleRad();
-        }
-
-        public void dispose() {
-            fixtureDef.shape.dispose();
         }
 
         public Body addToWorld(World world) {
