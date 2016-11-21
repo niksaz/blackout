@@ -1,10 +1,19 @@
 package ru.spbau.blackout.server;
 
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Shape;
+
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.entities.Decoration;
+import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
+import ru.spbau.blackout.shapescreators.CircleCreator;
 
 /**
  * Multiplayer game representation. Used for synchronizing game's state and watching for game flow,
@@ -56,24 +65,28 @@ class Game extends Thread {
 
         // !!!!!!
 
-/*        final TestingSessionSettings room = new TestingSessionSettings();
+        final TestingSessionSettings room = new TestingSessionSettings();
         room.map =  "maps/duel/duel.g3db";
 
-        final Shape heroShape = new CircleShape();
-        heroShape.setRadius(0.7f);
-        Hero.Definition hero = new Hero.Definition("models/wizard/wizard.g3db", heroShape, 0, 0);
+        Hero.Definition hero = new Hero.Definition(
+                "models/wizard/wizard.g3db",
+                new CircleCreator(0.7f),
+                0, 0
+        );
 
-        final Shape heroShape2 = new CircleShape();
-        heroShape.setRadius(0.7f);
-        Hero.Definition hero2 = new Hero.Definition("models/wizard/wizard.g3db", heroShape2, 50, 50);
+        Hero.Definition hero2 = new Hero.Definition(
+                "models/wizard/wizard.g3db",
+                new CircleCreator(0.7f),
+                10, 10
+        );
 
         room.objectDefs.add(hero);
         room.objectDefs.add(hero2);
 
-        final Shape stoneShape = new CircleShape();
-        heroShape.setRadius(1.5f);
-        final GameObject.Definition stone = new Decoration.Definition(
-                "models/stone/stone.g3db", stoneShape, 0, -20
+        GameObject.Definition stone = new Decoration.Definition(
+                "models/stone/stone.g3db",
+                new CircleCreator(1.5f),
+                0, -20
         );
         room.objectDefs.add(stone);
 
@@ -82,8 +95,8 @@ class Game extends Thread {
             def.makeInstance(null, gameWorld);
         }
 
-        clients.create(0).setSessionSettings(room, hero);
-        clients.create(1).setSessionSettings(room, hero2);*/
+        clients.get(0).setSessionSettings(room, hero);
+        clients.get(1).setSessionSettings(room, hero2);
 
         // !!!!!!!
 
