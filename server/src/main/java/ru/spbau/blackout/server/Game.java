@@ -26,7 +26,10 @@ class Game extends Thread {
     private final int gameId;
     private final RoomServer server;
     private final List<ClientThread> clients;
-    private AtomicReference<GameState> gameState = new AtomicReference<>(GameState.READY_TO_START);
+    private final AtomicReference<GameState> gameState = new AtomicReference<>(GameState.READY_TO_START);
+    private TestingSessionSettings room;
+    private Hero.Definition firstHero;
+    private Hero.Definition secondHero;
 
     Game(RoomServer server, List<ClientThread> clients) {
         gameId = gamesCreated.getAndAdd(1);
@@ -100,19 +103,22 @@ class Game extends Thread {
 
         // !!!!!!!
 
-        gameState.set(GameState.IN_PROCESS);
+        while (true) {
+        }
 
-        do {
-            for (ClientThread thread : clients) {
-                GameState currentClientGameState = thread.getClientGameState();
-                if (currentClientGameState == GameState.FINISHED) {
-                    server.log(thread.getClientName() +
-                               " disconnected. Game with id #" + gameId + " will be finished.");
-                    gameState.set(GameState.FINISHED);
-                    break;
-                }
-            }
-        } while (gameState.get() != GameState.FINISHED);
+//        gameState.set(GameState.IN_PROCESS);
+//
+//        do {
+//            for (ClientThread thread : clients) {
+//                GameState currentClientGameState = thread.getClientGameState();
+//                if (currentClientGameState == GameState.FINISHED) {
+//                    server.log(thread.getClientName() +
+//                               " disconnected. Game with id #" + gameId + " will be finished.");
+//                    gameState.set(GameState.FINISHED);
+//                    break;
+//                }
+//            }
+//        } while (gameState.get() != GameState.FINISHED);
     }
 
     GameState getGameState() {

@@ -82,13 +82,19 @@ class ClientThread extends Thread {
                 out.writeObject(clientCharacter);
                 out.flush();
 
+                new Thread(() -> {
+                    do {
+                        try {
+                            final Vector2 velocity = (Vector2) in.readObject();
+                        } catch (ClassNotFoundException | IOException e) {
+                            e.printStackTrace();
+                            break;
+                        }
+                    } while (clientGameState.get() != GameState.FINISHED);
+                }).start();
+
                 while (true) {
-                    try {
-                        final Vector2 velocity = (Vector2) in.readObject();
-                        server.log("Client " + name + " " + velocity.toString());
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    // sleep and after getting GameWorld periodically sending it to the client
                 }
             }
         } catch (IOException ignored) {
