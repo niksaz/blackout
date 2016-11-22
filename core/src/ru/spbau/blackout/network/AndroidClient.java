@@ -76,23 +76,25 @@ public class AndroidClient implements Runnable, AbstractServer {
             } while (gameState == GameState.WAITING && !isInterrupted.get());
 
             new Thread(() -> {
-                final Vector2 velocityToSend = this.velocityToSend.getAndSet(null);
-                if (velocityToSend != null) {
+                while (true) {
+                    final Vector2 velocityToSend = this.velocityToSend.getAndSet(null);
                     try {
                         out.writeObject(velocityToSend);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-                try {
-                    // sleeping to not send position too often
-                    sleep(POSITION_SENDING_SLEEP_MS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    try {
+                        // sleeping to not send position too often.
+                        // performing around 30 sends per sec
+                        sleep(POSITION_SENDING_SLEEP_MS);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }).start();
 
             while (true) {
+                // should read game world here from inputStream
             }
         } catch (UnknownHostException e) {
             Gdx.app.log(TAG, "Don't know about host " + HOST_NAME);

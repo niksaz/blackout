@@ -61,7 +61,6 @@ public class GameWorld implements Iterable<GameObject> {
     }
 
     public void update(float delta) {
-        Gdx.app.log("GameWorld", delta + "");
         accumulator += delta;
 
         for (GameObject object : gameObjects) {
