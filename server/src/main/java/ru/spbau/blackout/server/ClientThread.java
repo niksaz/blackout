@@ -1,5 +1,7 @@
 package ru.spbau.blackout.server;
 
+import com.badlogic.gdx.math.Vector2;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -80,8 +82,13 @@ class ClientThread extends Thread {
                 out.writeObject(clientCharacter);
                 out.flush();
 
-
                 while (true) {
+                    try {
+                        final Vector2 velocity = (Vector2) in.readObject();
+                        server.log("Client " + name + " " + velocity.toString());
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (IOException ignored) {

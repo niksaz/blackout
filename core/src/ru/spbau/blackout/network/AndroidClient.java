@@ -1,6 +1,7 @@
 package ru.spbau.blackout.network;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.Hero;
@@ -18,18 +20,20 @@ import ru.spbau.blackout.screens.MultiplayerTable;
 import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
 
+import static java.lang.Thread.sleep;
 import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
 import static ru.spbau.blackout.BlackoutGame.PORT_NUMBER;
+import static ru.spbau.blackout.network.Network.POSITION_SENDING_SLEEP_MS;
 
-public class AndroidClient implements Runnable {
+public class AndroidClient implements Runnable, AbstractServer {
 
     private static final String TAG = "AndroidClient";
     private static final String WAITING = "Waiting for a game.";
     private static final String READY_TO_START_MS = "Starting a game. Prepare yourself.";
 
     private final MultiplayerTable table;
-    private final AbstractServer server = new RealServer();
     private final AtomicBoolean isInterrupted = new AtomicBoolean();
+    private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>();
 
     public AndroidClient(MultiplayerTable table) {
         this.table = table;
@@ -64,12 +68,29 @@ public class AndroidClient implements Runnable {
                         TestingSessionSettings room = (TestingSessionSettings) in.readObject();
                         room.character = (Hero.Definition) in.readObject();
 
-                        BlackoutGame.getInstance().getScreenManager().setScreen(new GameScreen(room, server, settings));
+                        BlackoutGame.getInstance().getScreenManager().setScreen(new GameScreen(room, this, settings));
                         break;
                     default:
                         break;
                 }
             } while (gameState == GameState.WAITING && !isInterrupted.get());
+
+            new Thread(() -> {
+                final Vector2 velocityToSend = this.velocityToSend.getAndSet(null);
+                if (velocityToSend != null) {
+                    try {
+                        out.writeObject(velocityToSend);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    // sleeping to not send position too often
+                    sleep(POSITION_SENDING_SLEEP_MS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
 
             while (true) {
             }
@@ -90,5 +111,10 @@ public class AndroidClient implements Runnable {
 
     public void interrupt() {
         isInterrupted.set(true);
+    }
+
+    @Override
+    public void sendSelfVelocity(Vector2 velocity) {
+        velocityToSend.set(velocity);
     }
 }

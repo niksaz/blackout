@@ -1,5 +1,6 @@
 package ru.spbau.blackout;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -60,6 +61,7 @@ public class GameWorld implements Iterable<GameObject> {
     }
 
     public void update(float delta) {
+        Gdx.app.log("GameWorld", delta + "");
         accumulator += delta;
 
         for (GameObject object : gameObjects) {
