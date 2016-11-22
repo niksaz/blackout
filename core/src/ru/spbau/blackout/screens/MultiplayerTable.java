@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-import ru.spbau.blackout.network.AndroidClientThread;
+import ru.spbau.blackout.network.AndroidClient;
 import ru.spbau.blackout.utils.AssetLoader;
 
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
@@ -21,7 +21,7 @@ public class MultiplayerTable {
     private final Table middleTable;
     private final Label status;
     private final MenuScreen screen;
-    private final AndroidClientThread thread;
+    private final AndroidClient task;
 
     private MultiplayerTable(MenuScreen screen) {
         this.screen = screen;
@@ -32,7 +32,7 @@ public class MultiplayerTable {
         status = new Label("Connecting to the server...", style);
         middleTable.add(status).row();
 
-        thread = new AndroidClientThread(this);
+        task = new AndroidClient(this);
     }
 
     static Table getTable(final MenuScreen screen) {
@@ -46,11 +46,11 @@ public class MultiplayerTable {
         addButton(result.middleTable, BACK_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                result.thread.interrupt();
+                result.task.interrupt();
             }
         });
 
-        result.thread.start();
+        (new Thread(result.task)).start();
         result.middleTable.setFillParent(true);
         return result.middleTable;
     }
