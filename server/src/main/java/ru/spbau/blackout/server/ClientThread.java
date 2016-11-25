@@ -26,6 +26,7 @@ class ClientThread extends Thread {
     private final RoomServer server;
     private final Socket socket;
     private String name = UNKNOWN;
+    private int numberInGame;
     private AtomicReference<Game> game = new AtomicReference<>();
     private AtomicReference<GameState> clientGameState = new AtomicReference<>(GameState.WAITING);
     private TestingSessionSettings sessionSettings;
@@ -88,6 +89,7 @@ class ClientThread extends Thread {
                     do {
                         try {
                             final Vector2 velocity = (Vector2) in.readObject();
+                            game.get().setVelocityFor(numberInGame, velocity);
                         } catch (ClassNotFoundException | IOException e) {
                             e.printStackTrace();
                             break;
@@ -118,8 +120,9 @@ class ClientThread extends Thread {
         return name;
     }
 
-    void setGame(Game game) {
+    void setGame(Game game, int numberInGame) {
         this.game.set(game);
+        this.numberInGame = numberInGame;
     }
 
     synchronized void setSessionSettings(TestingSessionSettings testingSessionSettings, Hero.Definition character) {
