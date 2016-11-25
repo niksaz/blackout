@@ -110,10 +110,8 @@ public class GameScreen extends BlackoutScreen {
         super.dispose();
     }
 
-    public void resetGameWorld(GameWorld nextGameWorld) {
-        synchronized (gameWorld) {
-            gameWorld.reset(nextGameWorld);
-        }
+    public GameWorld getGameWorld() {
+        return gameWorld;
     }
 
     public Hero getCharacter() {

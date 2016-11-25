@@ -155,8 +155,6 @@ class Game extends Thread {
 
     public GameWorld getGameWorld() {
         //noinspection SynchronizeOnNonFinalField
-        synchronized (gameWorld) {
-            return gameWorld;
-        }
+        return gameWorld;
     }
 }

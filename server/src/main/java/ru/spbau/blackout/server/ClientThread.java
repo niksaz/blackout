@@ -8,10 +8,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
+import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
+import ru.spbau.blackout.utils.InplaceSerializable;
 
 import static ru.spbau.blackout.network.Network.FRAMES_60_SLEEP_MS;
 
@@ -106,7 +108,11 @@ class ClientThread extends Thread {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    out.writeObject(game.get().getGameWorld());
+                    final GameWorld gameWorld = game.get().getGameWorld();
+                    //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                    synchronized (gameWorld) {
+                        InplaceSerializable.inplaceSerialize(gameWorld, out);
+                    }
                 }
             }
         } catch (IOException ignored) {

@@ -20,6 +20,7 @@ import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.MultiplayerTable;
 import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
+import ru.spbau.blackout.utils.InplaceSerializable;
 
 import static java.lang.Thread.sleep;
 import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
@@ -98,9 +99,13 @@ public class AndroidClient implements Runnable, AbstractServer {
 
             while (true) {
                 // should read game world here from inputStream
-                final GameWorld gameWorld = (GameWorld) in.readObject();
+
+                final GameWorld currentWorld = gameScreen.getGameWorld();
+                //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                synchronized (currentWorld) {
+                    InplaceSerializable.inplaceDeserialize(currentWorld, in);
+                }
                 Gdx.app.log("Blackout.BeforeReset", "HEY");
-                gameScreen.resetGameWorld(gameWorld);
             }
         } catch (UnknownHostException e) {
             Gdx.app.log(TAG, "Don't know about host " + HOST_NAME);

@@ -1,6 +1,5 @@
 package ru.spbau.blackout.utils;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -8,9 +7,7 @@ public interface InplaceSerializable {
     /**
      * Ignores inplaceDeserializeImpl return value.
      */
-    static void inplaceDeserialize(InplaceSerializable dest, ObjectInputStream in)
-        throws IOException, ClassNotFoundException
-    {
+    static void inplaceDeserialize(InplaceSerializable dest, ObjectInputStream in) {
         dest.inplaceDeserializeImpl(in);
     }
 
@@ -18,16 +15,14 @@ public interface InplaceSerializable {
      * Same as <code>source.inplaceSerializeImpl()</code>, but highly preferred
      * because it looks similar to <code>inplaceDeserialize(dest, in)</code>.
      */
-    static void inplaceSerialize(InplaceSerializable source, ObjectOutputStream out)
-            throws IOException, ClassNotFoundException
-    {
+    static void inplaceSerialize(InplaceSerializable source, ObjectOutputStream out) {
         source.inpaceSerializeImpl(out);
     }
 
     /**
      * Opposite to <code>inplaceDeserializeImpl</code>
      */
-    void inpaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException;
+    void inpaceSerializeImpl(ObjectOutputStream out);
 
     /**
      * Opposite to <code>inplaceSerializeImpl</code>
@@ -35,5 +30,5 @@ public interface InplaceSerializable {
      * Returns any data which is necessary for deserialization of derived classes.
      * (look at <code>GameObject</code> deserialization, to see when the return value is necessary)
      */
-    Object inplaceDeserializeImpl(ObjectInputStream in) throws IOException, ClassNotFoundException;
+    Object inplaceDeserializeImpl(ObjectInputStream in);
 }
