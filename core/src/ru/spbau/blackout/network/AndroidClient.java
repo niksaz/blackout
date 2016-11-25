@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.screens.GameScreen;
@@ -34,6 +35,7 @@ public class AndroidClient implements Runnable, AbstractServer {
     private final MultiplayerTable table;
     private final AtomicBoolean isInterrupted = new AtomicBoolean();
     private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>();
+    private GameScreen gameScreen;
 
     public AndroidClient(MultiplayerTable table) {
         this.table = table;
@@ -68,7 +70,8 @@ public class AndroidClient implements Runnable, AbstractServer {
                         TestingSessionSettings room = (TestingSessionSettings) in.readObject();
                         room.character = (Hero.Definition) in.readObject();
 
-                        BlackoutGame.getInstance().getScreenManager().setScreen(new GameScreen(room, this, settings));
+                        gameScreen = new GameScreen(room, this, settings);
+                        BlackoutGame.getInstance().getScreenManager().setScreen(gameScreen);
                         break;
                     default:
                         break;
@@ -95,6 +98,8 @@ public class AndroidClient implements Runnable, AbstractServer {
 
             while (true) {
                 // should read game world here from inputStream
+                final GameWorld gameWorld = (GameWorld) in.readObject();
+                gameScreen.setGameWorld(gameWorld);
             }
         } catch (UnknownHostException e) {
             Gdx.app.log(TAG, "Don't know about host " + HOST_NAME);

@@ -123,6 +123,9 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         return height;
     }
 
+    // TODO: make abstract
+    public abstract void reset(GameObject otherObject);
+
     public static abstract class Definition implements Serializable {
         public static final float DEFAULT_HEIGHT = 0;
         public static final float DEFAULT_ROTATION = 0;

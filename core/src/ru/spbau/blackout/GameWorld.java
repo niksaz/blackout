@@ -1,6 +1,5 @@
 package ru.spbau.blackout;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -10,18 +9,20 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
-import com.badlogic.gdx.utils.Array;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import ru.spbau.blackout.entities.GameObject;
 
-public class GameWorld implements Iterable<GameObject> {
+public class GameWorld implements Iterable<GameObject>, Serializable {
     public static final float WORLD_STEP = 1 / 58f;
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
-    private final Array<GameObject> gameObjects = new Array<>();
+    private final List<GameObject> gameObjects = new ArrayList<>();
     transient private final World world;
     transient private float accumulator = 0;
     transient private Body ground;
@@ -51,13 +52,23 @@ public class GameWorld implements Iterable<GameObject> {
         }
     }
 
-    public Array<GameObject> getGameObjects() {
+    public List<GameObject> getGameObjects() {
         return gameObjects;
     }
 
     @Override
     public Iterator<GameObject> iterator() {
         return gameObjects.iterator();
+    }
+
+    public void reset(GameWorld gameWorld) {
+        final Iterator<GameObject> thisWorldIt = iterator();
+        final Iterator<GameObject> otherWorldIt = iterator();
+        while (thisWorldIt.hasNext() && otherWorldIt.hasNext()) {
+            final GameObject thisObject = thisWorldIt.next();
+            final GameObject otherObject = otherWorldIt.next();
+            thisObject.reset(otherObject);
+        }
     }
 
     public void update(float delta) {
@@ -108,14 +119,11 @@ public class GameWorld implements Iterable<GameObject> {
     }
 
     private void step() {
-        for (GameObject object : gameObjects) {
-            object.updateForFirstStep();
-        }
+        gameObjects.forEach(GameObject::updateForFirstStep);
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-        for (GameObject object : gameObjects) {
-            object.updateForSecondStep();
-        }
+        gameObjects.forEach(GameObject::updateForSecondStep);
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }
+
 }

@@ -110,6 +110,12 @@ public class GameScreen extends BlackoutScreen {
         super.dispose();
     }
 
+    public void setGameWorld(GameWorld nextGameWorld) {
+        synchronized (gameWorld) {
+            gameWorld.reset(nextGameWorld);
+        }
+    }
+
     public Hero getCharacter() {
         return character;
     }
@@ -118,9 +124,9 @@ public class GameScreen extends BlackoutScreen {
      * Updates game world on every frame.
      */
     private void update(final float delta) {
-        //synchronized (gameWorld) {
+        synchronized (gameWorld) {
             gameWorld.update(delta);
-        //}
+        }
 
         // Must go after gameWorld.update to be synced.
         Vector2 charPos = character.getPosition();
