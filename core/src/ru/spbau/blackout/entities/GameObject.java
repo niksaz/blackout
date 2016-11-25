@@ -4,26 +4,31 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
+import com.badlogic.gdx.graphics.g3d.utils.BaseAnimationController;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.Transform;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Creator;
+import ru.spbau.blackout.utils.InplaceSerializable;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
-public abstract class GameObject implements RenderableProvider, Serializable {
+public abstract class GameObject implements RenderableProvider, InplaceSerializable {
     // physics:
     transient protected Body body;
     private float height;
@@ -57,8 +62,10 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         out.writeFloat(this.getRotation());
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
+    @Override
+    public void inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        GameObject other = (GameObject) in.readObject();
+        this.reset(other);
         Vector2 position = (Vector2) in.readObject();
         float rotation = in.readFloat();
         this.setTransform(position, rotation);
@@ -96,7 +103,6 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         fixTop(model);
         Vector2 pos = body.getPosition();
         model.transform.setTranslation(pos.x, pos.y, height);
-//        model.calculateTransforms();
     }
 
     // Rotation
