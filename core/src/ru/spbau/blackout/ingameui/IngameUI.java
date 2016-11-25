@@ -20,7 +20,7 @@ public class IngameUI {
     public IngameUI(GameScreen screen, Settings settings) {
         this.screen = screen;
         camera = new OrthographicCamera();
-        stage = new Stage(new ScreenViewport(camera), BlackoutGame.getInstance().spriteBatch);
+        stage = new Stage(new ScreenViewport(camera), BlackoutGame.getInstance().getSpriteBatch());
         Gdx.input.setInputProcessor(stage);
 
         stick = new Stick(screen.getServer(), settings.stickSettings);

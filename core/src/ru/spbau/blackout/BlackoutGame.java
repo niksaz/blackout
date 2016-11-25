@@ -32,6 +32,20 @@ public class BlackoutGame extends Game {
     private ScreenManager screenManager;
     private PlayServicesInCore playServicesInCore;
 
+    // not supposed to be changed, but can't be initialized in constructor
+    // due to libgdx limitations
+    private ModelBatch modelBatch;
+    private SpriteBatch spriteBatch;
+
+
+    public ModelBatch getModelBatch() {
+        return modelBatch;
+    }
+
+    public SpriteBatch getSpriteBatch() {
+        return spriteBatch;
+    }
+
     public static BlackoutGame getInstance() {
         return INSTANCE;
     }
@@ -47,9 +61,6 @@ public class BlackoutGame extends Game {
     public PlayServicesInCore getPlayServicesInCore() {
         return playServicesInCore;
     }
-
-    public ModelBatch modelBatch;
-    public SpriteBatch spriteBatch;
 
 	// FIXME:  just for test
     public void testGameScreen() {
@@ -84,9 +95,10 @@ public class BlackoutGame extends Game {
 
 	@Override
 	public void create() {
-		modelBatch = new ModelBatch();
-		spriteBatch = new SpriteBatch();
-        Box2D.init();
+	    Box2D.init();
+        // can't be created in constructor due to libgdx limitations
+        modelBatch = new ModelBatch();
+        spriteBatch = new SpriteBatch();
 
 		AssetLoader.getInstance().loadFonts();
         screenManager.setScreen(new LoadScreen());

@@ -28,7 +28,7 @@ public abstract class GameUnit extends DynamicObject {
     // Movement:
     final private Vector2 selfVelocity = new Vector2();
     private float selfVelocityScale;
-    private final FrictionJoint frictionJoint;
+    transient private final FrictionJoint frictionJoint;
 
     protected GameUnit(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
@@ -67,6 +67,13 @@ public abstract class GameUnit extends DynamicObject {
 
     public final Vector2 getSelfVelocity() {
         return selfVelocity;
+    }
+
+    @Override
+    public void reset(GameObject other) {
+        final GameUnit other1 = (GameUnit) other;
+        this.selfVelocity.set(other1.selfVelocity);
+        this.selfVelocityScale = other1.selfVelocityScale;
     }
 
     public void setSelfVelocity(final Vector2 vel) {

@@ -48,6 +48,14 @@ public abstract class DynamicObject extends GameObject {
         velocity.set(body.getLinearVelocity());
     }
 
+    @Override
+    public void reset(GameObject other) {
+        super.reset(other);
+        DynamicObject other1 = (DynamicObject) other;
+        this.velocity.set(other1.velocity);
+        this.animationSpeed = other1.animationSpeed;  // FIXME: probably should be removed
+    }
+
     public static abstract class Definition extends GameObject.Definition {
         public Definition(String modelPath, Creator<Shape> shapeCreator,
                           float initialX, float initialY)

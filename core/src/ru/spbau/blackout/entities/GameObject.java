@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Pool;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
@@ -25,7 +26,7 @@ import static ru.spbau.blackout.utils.Utils.fixTop;
 public abstract class GameObject implements RenderableProvider, Serializable {
     // physics:
     transient protected Body body;
-    float height;
+    private float height;
 
     // appearance:
     transient protected ModelInstance model;
@@ -46,6 +47,22 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         setPosition(def.getPosition().x, def.getPosition().y);
     }
 
+    /**
+     * Serialization overriding. We have to handle that Body isn't serializable
+     * (we need its position and rotation)
+     */
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        out.writeObject(this.getPosition());
+        out.writeFloat(this.getRotation());
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        Vector2 position = (Vector2) in.readObject();
+        float rotation = in.readFloat();
+    }
+
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
         updateTransform();
@@ -64,6 +81,10 @@ public abstract class GameObject implements RenderableProvider, Serializable {
 
     public void setTransform(float x, float y, float angle) {
         body.setTransform(x, y, angle);
+    }
+
+    public void setTransform(Vector2 position, float angle) {
+        body.setTransform(position, angle);
     }
 
     /**
@@ -104,6 +125,9 @@ public abstract class GameObject implements RenderableProvider, Serializable {
 
     // Position:
 
+    /**
+     *
+     */
     public Vector2 getPosition() {
         return body.getPosition();
     }
@@ -111,7 +135,6 @@ public abstract class GameObject implements RenderableProvider, Serializable {
     public void setPosition(float x, float y) {
         setTransform(x, y, getRotation());
     }
-
 
     // Height:
 
@@ -123,8 +146,11 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         return height;
     }
 
-    // TODO: make abstract
-    public abstract void reset(GameObject otherObject);
+    public void reset(GameObject other) {
+        this.height = other.height;
+    }
+
+
 
     public static abstract class Definition implements Serializable {
         public static final float DEFAULT_HEIGHT = 0;

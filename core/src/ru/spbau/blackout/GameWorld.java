@@ -119,11 +119,16 @@ public class GameWorld implements Iterable<GameObject>, Serializable {
     }
 
     private void step() {
-        gameObjects.forEach(GameObject::updateForFirstStep);
+//        TODO: gameObjects.forEach(GameObject::updateForFirstStep);
+        for (GameObject object : this) {
+            object.updateForFirstStep();
+        }
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-        gameObjects.forEach(GameObject::updateForSecondStep);
+//        TODO: gameObjects.forEach(GameObject::updateForSecondStep);
+        for (GameObject object : this) {
+            object.updateForSecondStep();
+        }
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }
-
 }
