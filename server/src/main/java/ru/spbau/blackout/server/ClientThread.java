@@ -114,6 +114,7 @@ class ClientThread extends Thread {
                             //InplaceSerializable.inplaceSerialize(gameWorld, out);
                             gameWorld.inplaceSerialize(out);
                             out.flush();
+                            server.log("Sent to " + numberInGame);
                             // FIXME
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();

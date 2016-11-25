@@ -97,6 +97,8 @@ public class AndroidClient implements Runnable, AbstractServer {
                 }
             }).start();
 
+            while (!gameScreen.isDoneLoading()) { }
+
             while (true) {
                 // should read game world here from inputStream
 

@@ -46,6 +46,11 @@ public class GameScreen extends BlackoutScreen {
 
     private final GameWorld gameWorld = new GameWorld();
     private final AbstractServer server;
+    private volatile boolean doneLoading;
+
+    public boolean isDoneLoading() {
+        return doneLoading;
+    }
 
     public GameScreen(GameSessionSettings room, AbstractServer server, GameSettings settings) {
         this.server = server;
@@ -216,6 +221,8 @@ public class GameScreen extends BlackoutScreen {
             GameScreen.this.doneLoading();
 
             BlackoutGame.getInstance().getScreenManager().disposeScreen();
+
+            doneLoading = true;
         }
     }
 }

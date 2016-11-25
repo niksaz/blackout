@@ -80,7 +80,7 @@ class Game extends Thread {
         Hero.Definition hero2 = new Hero.Definition(
                 "models/wizard/wizard.g3db",
                 new CircleCreator(0.7f),
-                10, 10
+                5, 5
         );
 
         room.objectDefs.add(hero);
