@@ -1,6 +1,7 @@
 package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.model.Animation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
@@ -18,6 +19,8 @@ public abstract class GameUnit extends DynamicObject {
         public static final String STAY = "Armature|Stay";
 
         public static final float WALK_SPEED_FACTOR = 3f;
+
+        protected Animations() {}
     }
 
     public static final float SLOW_DOWN_FACTOR = 0.02f;

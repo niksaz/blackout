@@ -1,6 +1,7 @@
 package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -10,22 +11,49 @@ import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 
 public abstract class DynamicObject extends GameObject {
+    protected static final class NullableAnimationController {
+        private final AnimationController animation;
+
+        public NullableAnimationController(ModelInstance model) {
+            if (model == null) {
+                this.animation = null;
+            } else {
+                this.animation = new AnimationController(model);
+            }
+        }
+
+        public void update(float deltaTime) {
+            if (animation != null) {
+                animation.update(deltaTime);
+            }
+        }
+
+        public void setAnimation(String id, int loopCount) {
+            if (animation != null) {
+                animation.setAnimation(id, loopCount);
+            }
+        }
+    }
+
     public static class Animations {
         public static final String DEFAULT = "Armature|Stay";
+
+        protected Animations() {};
     }
 
     protected final Vector2 velocity = new Vector2();
 
     // Appearance:
-    transient protected final AnimationController animation;
+    transient protected final NullableAnimationController animation;
     protected float animationSpeed = 1f;
 
     protected DynamicObject(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
+
         if (model == null) {
             animation = null;
         } else {
-            animation = new AnimationController(this.model);
+            animation = new NullableAnimationController(this.model);
             animation.setAnimation(Animations.DEFAULT, -1);
         }
     }
