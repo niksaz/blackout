@@ -1,5 +1,6 @@
 package ru.spbau.blackout;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -61,12 +62,13 @@ public class GameWorld implements Iterable<GameObject>, Serializable {
         return gameObjects.iterator();
     }
 
-    public void reset(GameWorld gameWorld) {
+    public void reset(GameWorld otherWorld) {
         final Iterator<GameObject> thisWorldIt = iterator();
-        final Iterator<GameObject> otherWorldIt = iterator();
+        final Iterator<GameObject> otherWorldIt = otherWorld.iterator();
         while (thisWorldIt.hasNext() && otherWorldIt.hasNext()) {
             final GameObject thisObject = thisWorldIt.next();
             final GameObject otherObject = otherWorldIt.next();
+            Gdx.app.log("Blackout.GameWorld.Reset", "" + otherObject.getPosition());
             thisObject.reset(otherObject);
         }
     }
