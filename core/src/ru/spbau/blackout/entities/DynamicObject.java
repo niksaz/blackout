@@ -7,6 +7,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 
@@ -73,11 +76,11 @@ public abstract class DynamicObject extends GameObject {
     }
 
     @Override
-    public void reset(GameObject other) {
-        super.reset(other);
-        DynamicObject other1 = (DynamicObject) other;
-        this.velocity.set(other1.velocity);
-        this.animationSpeed = other1.animationSpeed;  // FIXME: probably should be removed
+    public Object inplaceDeserializeImpl(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        DynamicObject other = (DynamicObject) super.inplaceDeserializeImpl(in);
+        this.velocity.set(other.velocity);
+        this.animationSpeed = other.animationSpeed;  // FIXME: probably should be removed
+        return other;
     }
 
     public static abstract class Definition extends GameObject.Definition {

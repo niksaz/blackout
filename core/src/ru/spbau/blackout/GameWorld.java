@@ -11,14 +11,17 @@ import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 
-import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.utils.InplaceSerializable;
 
-public class GameWorld implements Iterable<GameObject>, Serializable {
+public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     public static final float WORLD_STEP = 1 / 58f;
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
@@ -62,15 +65,27 @@ public class GameWorld implements Iterable<GameObject>, Serializable {
         return gameObjects.iterator();
     }
 
-    public void reset(GameWorld otherWorld) {
-        final Iterator<GameObject> thisWorldIt = iterator();
-        final Iterator<GameObject> otherWorldIt = otherWorld.iterator();
-        while (thisWorldIt.hasNext() && otherWorldIt.hasNext()) {
-            final GameObject thisObject = thisWorldIt.next();
-            final GameObject otherObject = otherWorldIt.next();
-            Gdx.app.log("Blackout.GameWorld.Reset", "" + otherObject.getPosition());
-            thisObject.reset(otherObject);
+    @Override
+    public void inpaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        out.writeInt(gameObjects.size());
+        for (GameObject object : gameObjects) {
+            InplaceSerializable.inplaceSerialize(object, out);
         }
+    }
+
+    @Override
+    public Object inplaceDeserializeImpl(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.readInt();  // size // FIXME
+
+        for (GameObject object : this.gameObjects) {
+            InplaceSerializable.inplaceDeserialize(object, in);
+        }
+
+        return null;
+    }
+
+    public void reset(GameWorld otherWorld) {
+
     }
 
     public void update(float delta) {

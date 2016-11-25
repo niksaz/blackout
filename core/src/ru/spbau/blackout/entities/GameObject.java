@@ -4,15 +4,12 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
-import com.badlogic.gdx.graphics.g3d.utils.BaseAnimationController;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
-import com.badlogic.gdx.physics.box2d.Transform;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
@@ -20,15 +17,17 @@ import com.badlogic.gdx.utils.Pool;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.InplaceSerializable;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
-public abstract class GameObject implements RenderableProvider, InplaceSerializable {
+public abstract class GameObject implements RenderableProvider, InplaceSerializable, Serializable {
     // physics:
     transient protected Body body;
     private float height;
@@ -52,23 +51,21 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         setPosition(def.getPosition().x, def.getPosition().y);
     }
 
-    /**
-     * Serialization overriding. We have to handle that Body isn't serializable
-     * (we need its position and rotation)
-     */
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
+    @Override
+    public void inpaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        out.writeObject(this);
         out.writeObject(this.getPosition());
         out.writeFloat(this.getRotation());
     }
 
     @Override
-    public void inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public Object inplaceDeserializeImpl(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameObject other = (GameObject) in.readObject();
-        this.reset(other);
+        this.height = other.height;
         Vector2 position = (Vector2) in.readObject();
         float rotation = in.readFloat();
         this.setTransform(position, rotation);
+        return other;
     }
 
     @Override
@@ -151,10 +148,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
     public final float getHeight() {
         return height;
-    }
-
-    public void reset(GameObject other) {
-        this.height = other.height;
     }
 
 
