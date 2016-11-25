@@ -74,6 +74,7 @@ public abstract class GameUnit extends DynamicObject {
 
     @Override
     public void reset(GameObject other) {
+        super.reset(other);
         final GameUnit other1 = (GameUnit) other;
         this.selfVelocity.set(other1.selfVelocity);
         this.selfVelocityScale = other1.selfVelocityScale;

@@ -61,6 +61,7 @@ public abstract class GameObject implements RenderableProvider, Serializable {
         in.defaultReadObject();
         Vector2 position = (Vector2) in.readObject();
         float rotation = in.readFloat();
+        this.setTransform(position, rotation);
     }
 
     @Override
