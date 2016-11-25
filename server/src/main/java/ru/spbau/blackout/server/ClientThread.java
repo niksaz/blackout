@@ -113,6 +113,7 @@ class ClientThread extends Thread {
                         try {
                             //InplaceSerializable.inplaceSerialize(gameWorld, out);
                             gameWorld.inplaceSerialize(out);
+                            out.flush();
                             // FIXME
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
