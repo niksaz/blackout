@@ -50,12 +50,8 @@ public abstract class DynamicObject extends GameObject {
     protected DynamicObject(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
 
-        if (model == null) {
-            animation = null;
-        } else {
-            animation = new NullableAnimationController(this.model);
-            animation.setAnimation(Animations.DEFAULT, -1);
-        }
+        animation = new NullableAnimationController(this.model);
+        animation.setAnimation(Animations.DEFAULT, -1);
     }
 
     @Override
