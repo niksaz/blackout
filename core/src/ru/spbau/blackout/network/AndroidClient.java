@@ -20,7 +20,6 @@ import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.MultiplayerTable;
 import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
-import ru.spbau.blackout.utils.InplaceSerializable;
 
 import static java.lang.Thread.sleep;
 import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
@@ -103,7 +102,7 @@ public class AndroidClient implements Runnable, AbstractServer {
                 final GameWorld currentWorld = gameScreen.getGameWorld();
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (currentWorld) {
-                    currentWorld.inplaceDeserializeImpl(in);
+                    currentWorld.inplaceDeserialize(in);
                 }
                 Gdx.app.log("Blackout.BeforeReset", "HEY");
             }

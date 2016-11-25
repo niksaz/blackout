@@ -1,6 +1,5 @@
 package ru.spbau.blackout;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -66,19 +65,19 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     @Override
-    public void inplaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeInt(gameObjects.size());
         for (GameObject object : gameObjects) {
-            InplaceSerializable.inplaceSerialize(object, out);
+            object.inplaceSerialize(out);
         }
     }
 
     @Override
-    public Object inplaceDeserializeImpl(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.readInt();  // size // FIXME
 
         for (GameObject object : this.gameObjects) {
-            InplaceSerializable.inplaceDeserialize(object, in);
+            object.inplaceDeserialize(in);
         }
 
         return null;

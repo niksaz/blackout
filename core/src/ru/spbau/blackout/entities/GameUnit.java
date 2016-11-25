@@ -1,7 +1,6 @@
 package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.model.Animation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
@@ -76,8 +75,8 @@ public abstract class GameUnit extends DynamicObject {
     }
 
     @Override
-    public Object inplaceDeserializeImpl(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        GameUnit other = (GameUnit) super.inplaceDeserializeImpl(in);
+    public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        GameUnit other = (GameUnit) super.inplaceDeserialize(in);
         final GameUnit other1 = (GameUnit) other;
         this.selfVelocity.set(other1.selfVelocity);
         this.selfVelocityScale = other1.selfVelocityScale;

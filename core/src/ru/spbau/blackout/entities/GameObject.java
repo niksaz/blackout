@@ -51,14 +51,14 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     }
 
     @Override
-    public void inplaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeObject(this);
         out.writeObject(this.getPosition());
         out.writeFloat(this.getRotation());
     }
 
     @Override
-    public Object inplaceDeserializeImpl(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameObject other = (GameObject) in.readObject();
         this.height = other.height;
         Vector2 position = (Vector2) in.readObject();

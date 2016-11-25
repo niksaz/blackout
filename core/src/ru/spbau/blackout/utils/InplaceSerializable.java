@@ -6,32 +6,15 @@ import java.io.ObjectOutputStream;
 
 public interface InplaceSerializable {
     /**
-     * Ignores inplaceDeserializeImpl return value.
+     * Opposite to <code>inplaceDeserialize</code>
      */
-    static void inplaceDeserialize(InplaceSerializable dest, ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
-        dest.inplaceDeserializeImpl(in);
-    }
+    void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException;
 
     /**
-     * Same as <code>source.inplaceSerializeImpl()</code>, but highly preferred
-     * because it looks similar to <code>inplaceDeserialize(dest, in)</code>.
-     */
-    static void inplaceSerialize(InplaceSerializable source, ObjectOutputStream out)
-            throws IOException, ClassNotFoundException {
-        source.inplaceSerializeImpl(out);
-    }
-
-    /**
-     * Opposite to <code>inplaceDeserializeImpl</code>
-     */
-    void inplaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException;
-
-    /**
-     * Opposite to <code>inplaceSerializeImpl</code>
+     * Opposite to <code>inplaceSerialize</code>
      * Used to do inplace deserialization.
      * Returns any data which is necessary for deserialization of derived classes.
      * (look at <code>GameObject</code> deserialization, to see when the return value is necessary)
      */
-    Object inplaceDeserializeImpl(ObjectInputStream in) throws IOException, ClassNotFoundException;
+    Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException;
 }

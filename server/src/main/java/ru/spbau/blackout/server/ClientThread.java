@@ -13,7 +13,6 @@ import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
-import ru.spbau.blackout.utils.InplaceSerializable;
 
 import static ru.spbau.blackout.network.Network.FRAMES_60_SLEEP_MS;
 
@@ -113,7 +112,7 @@ class ClientThread extends Thread {
                     synchronized (gameWorld) {
                         try {
                             //InplaceSerializable.inplaceSerialize(gameWorld, out);
-                            gameWorld.inplaceSerializeImpl(out);
+                            gameWorld.inplaceSerialize(out);
                             // FIXME
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
