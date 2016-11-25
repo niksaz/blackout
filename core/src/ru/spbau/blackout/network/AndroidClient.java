@@ -100,7 +100,7 @@ public class AndroidClient implements Runnable, AbstractServer {
                 // should read game world here from inputStream
                 final GameWorld gameWorld = (GameWorld) in.readObject();
                 Gdx.app.log("Blackout.BeforeReset", "HEY");
-                gameScreen.setGameWorld(gameWorld);
+                gameScreen.resetGameWorld(gameWorld);
             }
         } catch (UnknownHostException e) {
             Gdx.app.log(TAG, "Don't know about host " + HOST_NAME);

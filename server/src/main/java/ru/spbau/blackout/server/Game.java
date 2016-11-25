@@ -14,6 +14,7 @@ import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
+import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
 /**
@@ -102,19 +103,27 @@ class Game extends Thread {
 
         // !!!!!!!
 
-        //noinspection InfiniteLoopStatement
         long lastTime = System.currentTimeMillis();
+        int cnt = 0;
         while (true) {
             long currentTime;
             //noinspection SynchronizeOnNonFinalField
             synchronized (gameWorld) {
                 currentTime = System.currentTimeMillis();
                 gameWorld.update(currentTime - lastTime);
+                cnt++;
+                server.log("Updating gameWorld: " + Long.valueOf(currentTime - lastTime).toString());
             }
             lastTime = currentTime;
+            try {
+                sleep(Network.FRAMES_60_SLEEP_MS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             //float currentTime = Gdx.graphics.getDeltaTime();
             //server.log("Time past: " + currentTime);
         }
+
 
 //        gameState.set(GameState.IN_PROCESS);
 //
@@ -134,6 +143,7 @@ class Game extends Thread {
     public void setVelocityFor(int numberInArray, Vector2 newVelocity) {
         //noinspection SynchronizeOnNonFinalField
         synchronized (gameWorld) {
+            server.log("Setting velocity for " + numberInArray + " " + newVelocity);
             GameUnit object = (GameUnit) gameWorld.getGameObjects().get(numberInArray);
             object.setSelfVelocity(newVelocity);
         }

@@ -89,7 +89,9 @@ class ClientThread extends Thread {
                     do {
                         try {
                             final Vector2 velocity = (Vector2) in.readObject();
-                            game.get().setVelocityFor(numberInGame, velocity);
+                            if (velocity != null) {
+                                game.get().setVelocityFor(numberInGame, velocity);
+                            }
                         } catch (ClassNotFoundException | IOException e) {
                             e.printStackTrace();
                             break;
