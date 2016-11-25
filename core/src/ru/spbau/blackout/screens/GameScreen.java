@@ -110,7 +110,7 @@ public class GameScreen extends BlackoutScreen {
         super.dispose();
     }
 
-    public void setGameWorld(GameWorld nextGameWorld) {
+    public void resetGameWorld(GameWorld nextGameWorld) {
         synchronized (gameWorld) {
             gameWorld.reset(nextGameWorld);
         }
