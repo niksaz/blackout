@@ -103,7 +103,7 @@ public class AndroidClient implements Runnable, AbstractServer {
                 final GameWorld currentWorld = gameScreen.getGameWorld();
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (currentWorld) {
-                    InplaceSerializable.inplaceDeserialize(currentWorld, in);
+                    currentWorld.inplaceDeserializeImpl(in);
                 }
                 Gdx.app.log("Blackout.BeforeReset", "HEY");
             }

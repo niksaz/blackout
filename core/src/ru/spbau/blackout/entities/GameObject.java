@@ -17,7 +17,6 @@ import com.badlogic.gdx.utils.Pool;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.InplaceSerializable;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -52,7 +51,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     }
 
     @Override
-    public void inpaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void inplaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeObject(this);
         out.writeObject(this.getPosition());
         out.writeFloat(this.getRotation());

@@ -19,13 +19,13 @@ public interface InplaceSerializable {
      */
     static void inplaceSerialize(InplaceSerializable source, ObjectOutputStream out)
             throws IOException, ClassNotFoundException {
-        source.inpaceSerializeImpl(out);
+        source.inplaceSerializeImpl(out);
     }
 
     /**
      * Opposite to <code>inplaceDeserializeImpl</code>
      */
-    void inpaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException;
+    void inplaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException;
 
     /**
      * Opposite to <code>inplaceSerializeImpl</code>

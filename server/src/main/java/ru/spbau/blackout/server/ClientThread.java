@@ -111,7 +111,14 @@ class ClientThread extends Thread {
                     final GameWorld gameWorld = game.get().getGameWorld();
                     //noinspection SynchronizationOnLocalVariableOrMethodParameter
                     synchronized (gameWorld) {
-                        InplaceSerializable.inplaceSerialize(gameWorld, out);
+                        try {
+                            //InplaceSerializable.inplaceSerialize(gameWorld, out);
+                            gameWorld.inplaceSerializeImpl(out);
+                            // FIXME
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException ignored) {
+                        }
                     }
                 }
             }

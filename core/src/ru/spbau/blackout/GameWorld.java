@@ -66,7 +66,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     @Override
-    public void inpaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void inplaceSerializeImpl(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeInt(gameObjects.size());
         for (GameObject object : gameObjects) {
             InplaceSerializable.inplaceSerialize(object, out);
