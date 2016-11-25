@@ -67,18 +67,18 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     @Override
     public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeInt(gameObjects.size());
-        for (GameObject object : gameObjects) {
-            object.inplaceSerialize(out);
-        }
+//        for (GameObject object : gameObjects) {
+//            object.inplaceSerialize(out);
+//        }
     }
 
     @Override
     public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.readInt();  // size // FIXME
 
-        for (GameObject object : this.gameObjects) {
-            object.inplaceDeserialize(in);
-        }
+//        for (GameObject object : this.gameObjects) {
+//            object.inplaceDeserialize(in);
+//        }
 
         return null;
     }

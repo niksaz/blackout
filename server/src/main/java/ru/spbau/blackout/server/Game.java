@@ -104,14 +104,12 @@ class Game extends Thread {
         // !!!!!!!
 
         long lastTime = System.currentTimeMillis();
-        int cnt = 0;
         while (true) {
             long currentTime;
             //noinspection SynchronizeOnNonFinalField
             synchronized (gameWorld) {
                 currentTime = System.currentTimeMillis();
                 gameWorld.update(currentTime - lastTime);
-                cnt++;
                 server.log("Updating gameWorld: " + Long.valueOf(currentTime - lastTime).toString());
             }
             lastTime = currentTime;

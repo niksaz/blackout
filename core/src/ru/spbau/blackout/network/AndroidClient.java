@@ -83,6 +83,7 @@ public class AndroidClient implements Runnable, AbstractServer {
                     final Vector2 velocityToSend = this.velocityToSend.getAndSet(null);
                     try {
                         out.writeObject(velocityToSend);
+                        out.flush();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
