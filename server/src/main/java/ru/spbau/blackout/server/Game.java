@@ -1,5 +1,8 @@
 package ru.spbau.blackout.server;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
+
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -7,6 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
@@ -24,7 +28,7 @@ class Game extends Thread {
     private final RoomServer server;
     private final List<ClientThread> clients;
     private final AtomicReference<GameState> gameState = new AtomicReference<>(GameState.READY_TO_START);
-    private volatile GameWorld gameWorld;
+    private GameWorld gameWorld;
 
     Game(RoomServer server, List<ClientThread> clients) {
         gameId = gamesCreated.getAndAdd(1);
@@ -34,8 +38,8 @@ class Game extends Thread {
 
     public void run() {
         server.log("New game with id #" + gameId + " has just started!");
-        for (ClientThread thread : clients) {
-            thread.setGame(this);
+        for (int i = 0; i < clients.size(); i++) {
+            clients.get(i).setGame(this, i);
         }
         synchronized (this) {
             boolean everyoneIsReady;
@@ -99,7 +103,17 @@ class Game extends Thread {
         // !!!!!!!
 
         //noinspection InfiniteLoopStatement
+        long lastTime = System.currentTimeMillis();
         while (true) {
+            long currentTime;
+            //noinspection SynchronizeOnNonFinalField
+            synchronized (gameWorld) {
+                currentTime = System.currentTimeMillis();
+                gameWorld.update(currentTime - lastTime);
+            }
+            lastTime = currentTime;
+            //float currentTime = Gdx.graphics.getDeltaTime();
+            //server.log("Time past: " + currentTime);
         }
 
 //        gameState.set(GameState.IN_PROCESS);
@@ -117,11 +131,22 @@ class Game extends Thread {
 //        } while (gameState.get() != GameState.FINISHED);
     }
 
+    public void setVelocityFor(int numberInArray, Vector2 newVelocity) {
+        //noinspection SynchronizeOnNonFinalField
+        synchronized (gameWorld) {
+            GameUnit object = (GameUnit) gameWorld.getGameObjects().get(numberInArray);
+            object.setSelfVelocity(newVelocity);
+        }
+    }
+
     GameState getGameState() {
         return gameState.get();
     }
 
     public GameWorld getGameWorld() {
-        return gameWorld;
+        //noinspection SynchronizeOnNonFinalField
+        synchronized (gameWorld) {
+            return gameWorld;
+        }
     }
 }
