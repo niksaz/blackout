@@ -1,8 +1,5 @@
 package ru.spbau.blackout.server;
 
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Shape;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,9 +24,7 @@ class Game extends Thread {
     private final RoomServer server;
     private final List<ClientThread> clients;
     private final AtomicReference<GameState> gameState = new AtomicReference<>(GameState.READY_TO_START);
-    private TestingSessionSettings room;
-    private Hero.Definition firstHero;
-    private Hero.Definition secondHero;
+    private volatile GameWorld gameWorld;
 
     Game(RoomServer server, List<ClientThread> clients) {
         gameId = gamesCreated.getAndAdd(1);
@@ -93,7 +88,7 @@ class Game extends Thread {
         );
         room.objectDefs.add(stone);
 
-        final GameWorld gameWorld = new GameWorld();
+        gameWorld = new GameWorld();
         for (GameObject.Definition def : room.getObjectDefs()) {
             def.makeInstance(null, gameWorld);
         }
@@ -103,6 +98,7 @@ class Game extends Thread {
 
         // !!!!!!!
 
+        //noinspection InfiniteLoopStatement
         while (true) {
         }
 
@@ -123,5 +119,9 @@ class Game extends Thread {
 
     GameState getGameState() {
         return gameState.get();
+    }
+
+    public GameWorld getGameWorld() {
+        return gameWorld;
     }
 }

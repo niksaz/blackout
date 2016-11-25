@@ -13,6 +13,8 @@ import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
 
+import static ru.spbau.blackout.network.Network.FRAMES_60_SLEEP_MS;
+
 /**
  * A thread allocated for each client connected to the server. Initially it is waiting to be matched
  * and later acting as the representative of the client in the game.
@@ -95,6 +97,12 @@ class ClientThread extends Thread {
 
                 while (true) {
                     // sleep and after getting GameWorld periodically sending it to the client
+                    try {
+                        sleep(FRAMES_60_SLEEP_MS);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    out.writeObject(game.get().getGameWorld());
                 }
             }
         } catch (IOException ignored) {

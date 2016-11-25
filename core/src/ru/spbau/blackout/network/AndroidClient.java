@@ -23,7 +23,7 @@ import ru.spbau.blackout.settings.GameSettings;
 import static java.lang.Thread.sleep;
 import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
 import static ru.spbau.blackout.BlackoutGame.PORT_NUMBER;
-import static ru.spbau.blackout.network.Network.POSITION_SENDING_SLEEP_MS;
+import static ru.spbau.blackout.network.Network.FRAMES_60_SLEEP_MS;
 
 public class AndroidClient implements Runnable, AbstractServer {
 
@@ -86,7 +86,7 @@ public class AndroidClient implements Runnable, AbstractServer {
                     try {
                         // sleeping to not send position too often.
                         // performing around 30 sends per sec
-                        sleep(POSITION_SENDING_SLEEP_MS);
+                        sleep(FRAMES_60_SLEEP_MS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
