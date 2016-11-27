@@ -6,13 +6,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
-import ru.spbau.blackout.gamesession.TestingSessionSettings;
 
 /**
  * A thread allocated for each client connected to the server. Initially it is waiting to be matched
@@ -29,8 +28,7 @@ class ClientThread extends Thread {
     private volatile TestingSessionSettings session;
     private volatile Hero.Definition hero;
     private volatile Game game;
-    //private AtomicReference<Game> game = new AtomicReference<>();
-    private AtomicReference<GameState> clientGameState = new AtomicReference<>(GameState.WAITING);
+    private volatile GameState clientGameState = GameState.WAITING;
 
     ClientThread(RoomServer server, Socket socket) {
         this.server = server;
@@ -50,10 +48,10 @@ class ClientThread extends Thread {
             do {
                 final Game game = this.game;
                 if (game != null) {
-                    clientGameState.set(game.getGameState());
+                    clientGameState = game.getGameState();
                 }
 
-                final GameState currentState = clientGameState.get();
+                final GameState currentState = clientGameState;
                 out.writeObject(currentState);
                 if (currentState == GameState.READY_TO_START) {
                     out.writeObject(session);
@@ -65,7 +63,7 @@ class ClientThread extends Thread {
                     // get boolean from the client when he will load the game components
                     boolean success = in.readBoolean();
                     if (!success) {
-                        clientGameState.set(GameState.FINISHED);
+                        clientGameState = GameState.FINISHED;
                     }
                     assert game != null;
                     //noinspection SynchronizationOnLocalVariableOrMethodParameter
@@ -77,13 +75,13 @@ class ClientThread extends Thread {
                     out.flush();
                 }
 
-                if (clientGameState.get() == GameState.WAITING) {
+                if (clientGameState == GameState.WAITING) {
                     try {
                         sleep(Network.STATE_UPDATE_CYCLE_MS);
                     } catch (InterruptedException ignored) {
                     }
                 }
-            } while (clientGameState.get() == GameState.WAITING);
+            } while (clientGameState == GameState.WAITING);
 
             final Thread clientInputThread = new Thread(() -> {
                 do {
@@ -96,11 +94,11 @@ class ClientThread extends Thread {
                         e.printStackTrace();
                         break;
                     }
-                } while (clientGameState.get() != GameState.FINISHED);
+                } while (clientGameState != GameState.FINISHED);
             });
             clientInputThread.start();
 
-            while (clientGameState.get() != GameState.FINISHED) {
+            while (clientGameState != GameState.FINISHED) {
                 final GameWorld gameWorld = game.getGameWorld();
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (gameWorld) {
@@ -122,10 +120,10 @@ class ClientThread extends Thread {
             }
         } catch (IOException ignored) {
         } finally {
-            if (clientGameState.get() == GameState.WAITING) {
+            if (clientGameState == GameState.WAITING) {
                 server.discard(this);
             }
-            clientGameState.set(GameState.FINISHED);
+            clientGameState = GameState.FINISHED;
         }
     }
 
@@ -141,6 +139,6 @@ class ClientThread extends Thread {
     }
 
     GameState getClientGameState() {
-        return clientGameState.get();
+        return clientGameState;
     }
 }
