@@ -23,7 +23,7 @@ public class BlackoutGame extends Game {
 
     private static final BlackoutGame INSTANCE = new BlackoutGame(new ScreenManager());
 
-    public static final String HOST_NAME = "192.168.1.38";
+    public static final String HOST_NAME = "192.168.1.34";
     public static final int PORT_NUMBER = 48800;
 
     public static final int VIRTUAL_WORLD_WIDTH = 1280;

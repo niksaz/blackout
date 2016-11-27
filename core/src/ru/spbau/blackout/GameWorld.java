@@ -1,6 +1,7 @@
 package ru.spbau.blackout;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -66,12 +67,23 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     @Override
-    public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public synchronized void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeInt(gameObjects.size());
 
-
+        //System.out.println("world ser");
         for (GameObject object : this) {
-            object.inplaceSerialize(out);
+            //System.out.println("some object des");
+            //object.inplaceSerialize(out);
+
+            //long curTime = System.currentTimeMillis();
+            //out.writeLong(curTime);
+
+            Vector2 ob = object.getPosition();
+            out.writeObject(ob);
+            System.out.println("sent time " + ob);
+            //Vector2 v2 = ;//new Vector2(System.currentTimeMillis() % 1000, System.currentTimeMillis() % 1000);
+
+            //out.writeObject(v2);
         }
     }
 
@@ -80,7 +92,12 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         in.readInt(); // size // FIXME
 
         for (GameObject object : this) {
-            object.inplaceDeserialize(in);
+            //object.inplaceDeserialize(in);
+
+            //long l = in.readLong();
+
+            Vector2 pos = (Vector2) in.readObject();
+            Gdx.app.log("ANDROID", "got time " + pos);
         }
 
         return null;
@@ -91,6 +108,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     public void update(float delta) {
+        System.out.println(delta);
         accumulator += delta;
 
         for (GameObject object : gameObjects) {
@@ -149,5 +167,9 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
             object.updateForSecondStep();
         }
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+
+        //for (GameObject object : this) {
+        //    System.out.println("Object position: " + object.getPosition());
+        //}
     }
 }

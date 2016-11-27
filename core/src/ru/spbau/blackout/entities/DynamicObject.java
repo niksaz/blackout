@@ -78,8 +78,8 @@ public abstract class DynamicObject extends GameObject {
     @Override
     public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         DynamicObject other = (DynamicObject) super.inplaceDeserialize(in);
-        this.velocity.set(other.velocity);
-        this.animationSpeed = other.animationSpeed;  // FIXME: probably should be removed
+        //this.velocity.set(other.velocity);
+        //this.animationSpeed = other.animationSpeed;  // FIXME: probably should be removed
         return other;
     }
 

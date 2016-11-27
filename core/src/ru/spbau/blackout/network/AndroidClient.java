@@ -107,7 +107,6 @@ public class AndroidClient implements Runnable, AbstractServer {
                 synchronized (currentWorld) {
                     currentWorld.inplaceDeserialize(in);
                 }
-                Gdx.app.log("Blackout.BeforeReset", "HEY");
             }
         } catch (UnknownHostException e) {
             Gdx.app.log(TAG, "Don't know about host " + HOST_NAME);

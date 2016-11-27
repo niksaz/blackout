@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,6 +24,7 @@ import ru.spbau.blackout.shapescreators.CircleCreator;
  */
 class Game extends Thread {
 
+    private static final float MILLIS_IN_SECOND = 1000f;
     private static AtomicInteger gamesCreated = new AtomicInteger();
 
     private final int gameId;
@@ -99,7 +101,7 @@ class Game extends Thread {
         }
 
         clients.get(0).setSessionSettings(room, hero);
-        clients.get(1).setSessionSettings(room, hero2);
+        //clients.get(1).setSessionSettings(room, hero2);
 
         // !!!!!!!
 
@@ -109,7 +111,7 @@ class Game extends Thread {
             //noinspection SynchronizeOnNonFinalField
             synchronized (gameWorld) {
                 currentTime = System.currentTimeMillis();
-                gameWorld.update(currentTime - lastTime);
+                gameWorld.update((currentTime - lastTime) / MILLIS_IN_SECOND);
                 server.log("Updating gameWorld: " + Long.valueOf(currentTime - lastTime).toString());
             }
             lastTime = currentTime;
@@ -139,9 +141,9 @@ class Game extends Thread {
     }
 
     public void setVelocityFor(int numberInArray, Vector2 newVelocity) {
+        server.log("Setting velocity for " + numberInArray + " " + newVelocity);
         //noinspection SynchronizeOnNonFinalField
         synchronized (gameWorld) {
-            server.log("Setting velocity for " + numberInArray + " " + newVelocity);
             GameUnit object = (GameUnit) gameWorld.getGameObjects().get(numberInArray);
             object.setSelfVelocity(newVelocity);
         }

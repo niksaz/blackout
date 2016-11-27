@@ -1,5 +1,6 @@
 package ru.spbau.blackout.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -31,7 +32,7 @@ public abstract class GameUnit extends DynamicObject {
     public static final float DEFAULT_ANGULAR_FRICTION = 5f;
 
     // Movement:
-    final private Vector2 selfVelocity = new Vector2();
+    private Vector2 selfVelocity = new Vector2();
     private float selfVelocityScale;
     transient private final FrictionJoint frictionJoint;
 
@@ -77,9 +78,10 @@ public abstract class GameUnit extends DynamicObject {
     @Override
     public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameUnit other = (GameUnit) super.inplaceDeserialize(in);
-        final GameUnit other1 = (GameUnit) other;
-        this.selfVelocity.set(other1.selfVelocity);
-        this.selfVelocityScale = other1.selfVelocityScale;
+        //this.selfVelocity.set(other.selfVelocity);
+        Gdx.app.log("Blackout", "SELF VEL GOT" + other.selfVelocity);
+
+//        this.selfVelocityScale = other.selfVelocityScale;
         return other;
     }
 
@@ -101,6 +103,7 @@ public abstract class GameUnit extends DynamicObject {
         }
 
         selfVelocity.set(vel.x * selfVelocityScale, vel.y * selfVelocityScale);
+        System.out.println(this.selfVelocity);
     }
 
     public static abstract class Definition extends DynamicObject.Definition {
