@@ -25,8 +25,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
-import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte1.other;
-
 
 public abstract class GameObject implements RenderableProvider, InplaceSerializable, Serializable {
     // physics:
@@ -55,19 +53,19 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     @Override
     public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeObject(this);
-        //out.writeObject(this.getPosition());
-        //out.writeFloat(this.getRotation());
-        //System.out.println("pos in ser: " + this.getPosition());
+        out.writeObject(this.getPosition());
+        out.writeFloat(this.getRotation());
+        System.out.println("pos in ser: " + this.getPosition());
     }
 
     @Override
     public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameObject other = (GameObject) in.readObject();
-        //this.height = other.height;
-        //Vector2 position = (Vector2) in.readObject();
-        //Gdx.app.log("Blackout", "got position: " + position);
-        //float rotation = in.readFloat();
-        //this.setTransform(position, rotation);
+        this.height = other.height;
+        Vector2 position = (Vector2) in.readObject();
+        Gdx.app.log("Blackout", "got position: " + position);
+        float rotation = in.readFloat();
+        this.setTransform(position, rotation);
         return other;
     }
 

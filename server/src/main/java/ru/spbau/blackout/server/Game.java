@@ -1,10 +1,9 @@
 package ru.spbau.blackout.server;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -31,19 +30,48 @@ class Game extends Thread {
     private final RoomServer server;
     private final List<ClientThread> clients;
     private final AtomicReference<GameState> gameState = new AtomicReference<>(GameState.READY_TO_START);
-    private GameWorld gameWorld;
+    private final GameWorld gameWorld = new GameWorld();
 
     Game(RoomServer server, List<ClientThread> clients) {
-        gameId = gamesCreated.getAndAdd(1);
+        this.gameId = gamesCreated.getAndAdd(1);
         this.server = server;
         this.clients = clients;
     }
 
     public void run() {
-        server.log("New game with id #" + gameId + " has just started!");
-        for (int i = 0; i < clients.size(); i++) {
-            clients.get(i).setGame(this, i);
+        server.log("New game with id #" + gameId + " is going to start!");
+
+        final TestingSessionSettings room = new TestingSessionSettings();
+        room.map =  "maps/duel/duel.g3db";
+
+        final List<Hero.Definition> heroes = new ArrayList<>();
+        heroes.add(
+                new Hero.Definition(
+                "models/wizard/wizard.g3db",
+                new CircleCreator(0.7f),
+                0, 0));
+        heroes.add(
+                new Hero.Definition(
+                "models/wizard/wizard.g3db",
+                new CircleCreator(0.7f),
+                5, 5));
+        room.objectDefs.addAll(heroes);
+
+        GameObject.Definition stone = new Decoration.Definition(
+                "models/stone/stone.g3db",
+                new CircleCreator(1.5f),
+                0, -20
+        );
+        room.objectDefs.add(stone);
+
+        for (GameObject.Definition def : room.getObjectDefs()) {
+            def.makeInstance(null, gameWorld);
         }
+
+        for (int i = 0; i < clients.size(); i++) {
+            clients.get(i).setGame(this, i, room, heroes.get(i));
+        }
+
         synchronized (this) {
             boolean everyoneIsReady;
             do {
@@ -67,46 +95,10 @@ class Game extends Thread {
         if (gameState.get() == GameState.FINISHED) {
             return;
         }
-
-        // !!!!!!
-
-        final TestingSessionSettings room = new TestingSessionSettings();
-        room.map =  "maps/duel/duel.g3db";
-
-        Hero.Definition hero = new Hero.Definition(
-                "models/wizard/wizard.g3db",
-                new CircleCreator(0.7f),
-                0, 0
-        );
-
-        Hero.Definition hero2 = new Hero.Definition(
-                "models/wizard/wizard.g3db",
-                new CircleCreator(0.7f),
-                5, 5
-        );
-
-        room.objectDefs.add(hero);
-        room.objectDefs.add(hero2);
-
-        GameObject.Definition stone = new Decoration.Definition(
-                "models/stone/stone.g3db",
-                new CircleCreator(1.5f),
-                0, -20
-        );
-        room.objectDefs.add(stone);
-
-        gameWorld = new GameWorld();
-        for (GameObject.Definition def : room.getObjectDefs()) {
-            def.makeInstance(null, gameWorld);
-        }
-
-        clients.get(0).setSessionSettings(room, hero);
-        //clients.get(1).setSessionSettings(room, hero2);
-
-        // !!!!!!!
+        gameState.set(GameState.IN_PROCESS);
 
         long lastTime = System.currentTimeMillis();
-        while (true) {
+        while (gameState.get() != GameState.FINISHED) {
             long currentTime;
             //noinspection SynchronizeOnNonFinalField
             synchronized (gameWorld) {
@@ -120,13 +112,8 @@ class Game extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            //float currentTime = Gdx.graphics.getDeltaTime();
-            //server.log("Time past: " + currentTime);
         }
 
-
-//        gameState.set(GameState.IN_PROCESS);
-//
 //        do {
 //            for (ClientThread thread : clients) {
 //                GameState currentClientGameState = thread.getClientGameState();

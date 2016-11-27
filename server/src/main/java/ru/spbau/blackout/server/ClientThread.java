@@ -26,12 +26,12 @@ class ClientThread extends Thread {
 
     private final RoomServer server;
     private final Socket socket;
-    private String name = UNKNOWN;
+    private volatile String name = UNKNOWN;
     private volatile int numberInGame;
+    private volatile TestingSessionSettings session;
+    private volatile Hero.Definition hero;
     private AtomicReference<Game> game = new AtomicReference<>();
     private AtomicReference<GameState> clientGameState = new AtomicReference<>(GameState.WAITING);
-    private TestingSessionSettings sessionSettings;
-    private Hero.Definition clientCharacter;
 
     ClientThread(RoomServer server, Socket socket) {
         this.server = server;
@@ -48,79 +48,77 @@ class ClientThread extends Thread {
             name = in.readUTF();
             server.log(name + " connected.");
 
-            synchronized (this) {
-                do {
-                    final Game currentGame = game.get();
-                    if (currentGame != null) {
-                        clientGameState.set(currentGame.getGameState());
-                        //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                        synchronized (currentGame) {
-                            currentGame.notify();
-                        }
-                    }
+            do {
+                final Game game = this.game.get();
+                if (game != null) {
+                    clientGameState.set(game.getGameState());
+                }
 
-                    final GameState currentState = clientGameState.get();
-                    out.writeObject(currentState);
-                    if (currentState == GameState.FINISHED) {
-                        break;
-                    }
+                final GameState currentState = clientGameState.get();
+                out.writeObject(currentState);
+                if (currentState == GameState.READY_TO_START) {
+                    out.writeObject(session);
+                    out.writeObject(hero);
                     out.flush();
 
+                    // loading may take a long time
+                    socket.setSoTimeout(0);
+                    // get boolean from the client when he will load the game components
+                    boolean success = in.readBoolean();
+                    if (!success) {
+                        clientGameState.set(GameState.FINISHED);
+                    }
+                    assert game != null;
+                    //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                    synchronized (game) {
+                        game.notify();
+                    }
+                    socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
+                } else {
+                    out.flush();
+                }
+
+                if (clientGameState.get() == GameState.WAITING) {
                     try {
                         sleep(Network.STATE_UPDATE_CYCLE_MS);
                     } catch (InterruptedException ignored) {
                     }
-                } while (clientGameState.get() == GameState.WAITING);
+                }
+            } while (clientGameState.get() == GameState.WAITING);
 
-                if (clientGameState.get() == GameState.FINISHED) {
-                    return;
+            final Thread clientInputThread = new Thread(() -> {
+                do {
+                    try {
+                        final Vector2 velocity = (Vector2) in.readObject();
+                        if (velocity != null) {
+                            game.get().setVelocityFor(numberInGame, velocity);
+                        }
+                    } catch (ClassNotFoundException | IOException e) {
+                        e.printStackTrace();
+                        break;
+                    }
+                } while (clientGameState.get() != GameState.FINISHED);
+            });
+            clientInputThread.start();
+
+            while (clientGameState.get() != GameState.FINISHED) {
+                final GameWorld gameWorld = game.get().getGameWorld();
+                //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                synchronized (gameWorld) {
+                    try {
+                        gameWorld.inplaceSerialize(out);
+                        out.flush();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException ignored) {
+                    }
                 }
 
-                // waiting for game to set room to send
+                // sleep and after getting GameWorld periodically sending it to the client
                 try {
-                    wait();
+                    sleep(FRAMES_60_SLEEP_MS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
-                out.writeObject(sessionSettings);
-                out.writeObject(clientCharacter);
-                out.flush();
-
-                new Thread(() -> {
-                    do {
-                        try {
-                            final Vector2 velocity = (Vector2) in.readObject();
-                            if (velocity != null) {
-                                game.get().setVelocityFor(numberInGame, velocity);
-                            }
-                        } catch (ClassNotFoundException | IOException e) {
-                            e.printStackTrace();
-                            break;
-                        }
-                    } while (clientGameState.get() != GameState.FINISHED);
-                }).start();
-
-                while (true) {
-                    // sleep and after getting GameWorld periodically sending it to the client
-                    try {
-                        sleep(FRAMES_60_SLEEP_MS);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    final GameWorld gameWorld = game.get().getGameWorld();
-                    //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                    synchronized (gameWorld) {
-                        try {
-                            //InplaceSerializable.inplaceSerialize(gameWorld, out);
-                            gameWorld.inplaceSerialize(out);
-                            out.flush();
-                            server.log("Sent to " + numberInGame);
-                            // FIXME
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException ignored) {
-                        }
-                    }
                 }
             }
         } catch (IOException ignored) {
@@ -136,15 +134,11 @@ class ClientThread extends Thread {
         return name;
     }
 
-    void setGame(Game game, int numberInGame) {
-        this.game.set(game);
+    void setGame(Game game, int numberInGame, TestingSessionSettings session, Hero.Definition hero) {
         this.numberInGame = numberInGame;
-    }
-
-    synchronized void setSessionSettings(TestingSessionSettings testingSessionSettings, Hero.Definition character) {
-        sessionSettings = testingSessionSettings;
-        clientCharacter = character;
-        notify();
+        this.session = session;
+        this.hero = hero;
+        this.game.set(game);
     }
 
     GameState getClientGameState() {

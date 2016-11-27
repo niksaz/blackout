@@ -127,9 +127,7 @@ public class GameScreen extends BlackoutScreen {
      * Updates game world on every frame.
      */
     private void update(final float delta) {
-        synchronized (gameWorld) {
-            gameWorld.update(delta);
-        }
+        gameWorld.update(delta);
 
         // Must go after gameWorld.update to be synced.
         Vector2 charPos = character.getPosition();
@@ -203,8 +201,6 @@ public class GameScreen extends BlackoutScreen {
         }
 
         private void doneLoading() {
-            Gdx.app.log("blackout:GameScreen", "done loading");
-
             for (GameObject.Definition def : objectDefs) {
                 GameObject obj = def.makeInstance(assets.get(def.modelPath, Model.class), gameWorld);
                 if (def == characterDef) {
@@ -222,7 +218,10 @@ public class GameScreen extends BlackoutScreen {
 
             BlackoutGame.getInstance().getScreenManager().disposeScreen();
 
-            doneLoading = true;
+            // notifying server that loading is done
+            synchronized (server) {
+                server.notify();
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
+import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.units.Rpx;
@@ -56,10 +57,12 @@ public class Stick extends DragListener {
     private Image touchImage;
     private final Settings settings;
     private final AbstractServer server;
+    private final GameWorld gameWorld;
 
-    public Stick(AbstractServer server, Settings settings) {
+    public Stick(AbstractServer server, Settings settings, GameWorld gameWorld) {
         this.settings = settings;
         this.server = server;
+        this.gameWorld = gameWorld;
     }
 
     @Override
@@ -115,7 +118,9 @@ public class Stick extends DragListener {
             velocity.y /= len;
         }
 
-        object.setSelfVelocity(velocity);
+        //synchronized (gameWorld) {
+            object.setSelfVelocity(velocity); //FIXME
+        //}
         updateTouchPosition();
         server.sendSelfVelocity(velocity);
     }

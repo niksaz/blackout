@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 class RoomServer {
 
-    private static final int PLAYERS_NUMBER = 1;
+    private static final int PLAYERS_NUMBER = 2;
 
     private final int port;
     private final Deque<ClientThread> clientThreads = new ConcurrentLinkedDeque<>();

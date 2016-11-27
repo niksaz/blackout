@@ -9,7 +9,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameWorld;
@@ -34,7 +33,7 @@ public class AndroidClient implements Runnable, AbstractServer {
 
     private final MultiplayerTable table;
     private final AtomicBoolean isInterrupted = new AtomicBoolean();
-    private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>();
+    private volatile Vector2 velocityToSend = new Vector2();
     private GameScreen gameScreen;
 
     public AndroidClient(MultiplayerTable table) {
@@ -70,8 +69,19 @@ public class AndroidClient implements Runnable, AbstractServer {
                         TestingSessionSettings room = (TestingSessionSettings) in.readObject();
                         room.character = (Hero.Definition) in.readObject();
 
-                        gameScreen = new GameScreen(room, this, settings);
-                        BlackoutGame.getInstance().getScreenManager().setScreen(gameScreen);
+                        // using the fact that AndroidClient is AbstractServer itself.
+                        // so synchronizing on server on loading
+                        synchronized (this) {
+                            gameScreen = new GameScreen(room, this, settings);
+                            BlackoutGame.getInstance().getScreenManager().setScreen(gameScreen);
+                            try {
+                                wait();
+                            } catch (InterruptedException ignored) {
+                                isInterrupted.set(true);
+                            }
+                        }
+                        out.writeBoolean(!isInterrupted.get());
+                        out.flush();
                         break;
                     default:
                         break;
@@ -80,9 +90,10 @@ public class AndroidClient implements Runnable, AbstractServer {
 
             new Thread(() -> {
                 while (true) {
-                    final Vector2 velocityToSend = this.velocityToSend.getAndSet(null);
                     try {
-                        out.writeObject(velocityToSend);
+                        Vector2 sending = new Vector2(velocityToSend);
+                        Gdx.app.log("ANDROID", "sending " + sending);
+                        out.writeObject(sending);
                         out.flush();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -97,16 +108,19 @@ public class AndroidClient implements Runnable, AbstractServer {
                 }
             }).start();
 
-            while (!gameScreen.isDoneLoading()) { }
-
+            // waiting for the first world to arrive
+            socket.setSoTimeout(0);
             while (true) {
                 // should read game world here from inputStream
-
                 final GameWorld currentWorld = gameScreen.getGameWorld();
+
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (currentWorld) {
                     currentWorld.inplaceDeserialize(in);
                 }
+
+                // should get worlds regularly
+                socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             }
         } catch (UnknownHostException e) {
             Gdx.app.log(TAG, "Don't know about host " + HOST_NAME);
@@ -129,6 +143,6 @@ public class AndroidClient implements Runnable, AbstractServer {
 
     @Override
     public void sendSelfVelocity(Vector2 velocity) {
-        velocityToSend.set(velocity);
+        velocityToSend = velocity;
     }
 }

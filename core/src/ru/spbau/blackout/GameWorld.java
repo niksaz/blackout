@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.utils.InplaceSerializable;
 
 public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
@@ -75,12 +76,23 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
             //System.out.println("some object des");
             //object.inplaceSerialize(out);
 
+            Vector2 sending = object.getPosition();
+            //Vector2 sending = new Vector2(v2.x, v2.y);
+            out.writeFloat(sending.x);
+            out.writeFloat(sending.y);
+            if (object instanceof GameUnit) {
+                GameUnit unit = (GameUnit) object;
+                sending = unit.getSelfVelocity();
+                out.writeFloat(sending.x);
+                out.writeFloat(sending.y);
+            }
             //long curTime = System.currentTimeMillis();
             //out.writeLong(curTime);
 
-            Vector2 ob = object.getPosition();
-            out.writeObject(ob);
-            System.out.println("sent time " + ob);
+//            Vector2 ob = object.getPosition();
+//            Vector2 c = new Vector2(ob.x, ob.y);
+//            out.writeObject(c);
+//            System.out.println("sent time " + c);
             //Vector2 v2 = ;//new Vector2(System.currentTimeMillis() % 1000, System.currentTimeMillis() % 1000);
 
             //out.writeObject(v2);
@@ -88,16 +100,29 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     @Override
-    public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public synchronized Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.readInt(); // size // FIXME
 
         for (GameObject object : this) {
             //object.inplaceDeserialize(in);
 
+            float x = in.readFloat();
+            float y = in.readFloat();
+            object.setPosition(x, y);
+            if (object instanceof GameUnit) {
+                GameUnit unit = (GameUnit) object;
+                x = in.readFloat();
+                y = in.readFloat();
+                unit.setSelfVelocity(new Vector2(x, y));
+            }
+
+            //Vector2 v2 = (Vector2) in.readObject();
+            //Gdx.app.log("ANDROID", "got position: " + x + " " + y);
+
             //long l = in.readLong();
 
-            Vector2 pos = (Vector2) in.readObject();
-            Gdx.app.log("ANDROID", "got time " + pos);
+            //Vector2 pos = (Vector2) in.readObject();
+            //Gdx.app.log("ANDROID", "got time " + pos);
         }
 
         return null;
@@ -107,7 +132,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
 
     }
 
-    public void update(float delta) {
+    public synchronized void update(float delta) {
         System.out.println(delta);
         accumulator += delta;
 
@@ -124,12 +149,12 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         // It would be very hard and takes many resources.
     }
 
-    public Body addObject(GameObject object, GameObject.Definition def) {
+    public synchronized Body addObject(GameObject object, GameObject.Definition def) {
         gameObjects.add(object);
         return def.addToWorld(world);
     }
 
-    public FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {
+    public synchronized FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {
         FrictionJointDef frictionDef = new FrictionJointDef();
 
         frictionDef.maxForce = linearFriction;
@@ -140,7 +165,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         return (FrictionJoint) world.createJoint(frictionDef);
     }
 
-    public Body addController(Body body) {
+    public synchronized Body addController(Body body) {
         // Create a controller's body
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -155,7 +180,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         return controller;
     }
 
-    private void step() {
+    private synchronized void step() {
 //        TODO: gameObjects.forEach(GameObject::updateForFirstStep);
         for (GameObject object : this) {
             object.updateForFirstStep();
