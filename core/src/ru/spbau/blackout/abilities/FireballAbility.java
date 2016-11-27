@@ -3,13 +3,18 @@ package ru.spbau.blackout.abilities;
 import ru.spbau.blackout.entities.Hero;
 
 public class FireballAbility extends InstantAbility {
-    @Override
-    public void castBy(Hero hero) {
-        // create new shell object
+
+    public FireballAbility(Hero hero, int level) {
+        super(hero, level);
     }
 
     @Override
-    public String getIconPath() {
+    public void cast() {
+        // TODO: create shell object
+    }
+
+    @Override
+    public String iconPath() {
         return "icons/abilities/fireball.png";
     }
 }
