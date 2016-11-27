@@ -22,6 +22,16 @@ import java.util.List;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.utils.InplaceSerializable;
 
+
+/**
+ * Main class for all in-game computation including physics.
+ * Isn't connected with any graphics or audio in order to be able to be run on server.
+ * Also used to send information about the game state from the server to clients.
+ *
+ * <p>Physics system:
+ * <br>Due to box2d limitations there is a complex system around it based on two steps.
+ * TODO: describe two physics steps.
+ */
 public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     public static final float WORLD_STEP = 1 / 58f;
     public static final int VELOCITY_ITERATIONS = 1;

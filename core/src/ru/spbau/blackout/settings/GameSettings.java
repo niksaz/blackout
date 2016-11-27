@@ -1,7 +1,8 @@
 package ru.spbau.blackout.settings;
 
 import ru.spbau.blackout.ingameui.IngameUI;
+import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 
 public class GameSettings {
-    public IngameUI.IngameUISettings ui = new IngameUI.IngameUISettings();
+    public IngameUISettings ui = new IngameUISettings();
 }
