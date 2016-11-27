@@ -14,10 +14,16 @@ public abstract class InstantAbility extends Ability {
         this.setIconInputListener(this.new Listener());
     }
 
-    public abstract void cast();  // duration is always 0
+    /**
+     * Ability::cast with zero duration.
+     */
+    public abstract void cast();
     @Override
-    public void cast(float duration) { this.cast(); }
+    public void cast(float duration) { this.cast(); }  // This type of abilities doesn't handle duration.
 
+    /**
+     * IconInputListener which handles only <code>touchDown</code> events and casts the ability.
+     */
     private class Listener extends InputListener {
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {

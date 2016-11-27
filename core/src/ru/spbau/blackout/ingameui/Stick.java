@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.ingameui.settings.StickSettings;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.units.Rpx;
 
@@ -75,11 +76,11 @@ public class Stick extends DragListener {
     /** the controlled unit */
     private GameUnit unit;
     private Image touchImage;
-    private final Settings settings;
+    private final StickSettings settings;
     /** server to send UI events */
     private final AbstractServer server;
 
-    public Stick(AbstractServer server, Settings settings) {
+    public Stick(AbstractServer server, StickSettings settings) {
         this.settings = settings;
         this.server = server;
     }
@@ -151,27 +152,5 @@ public class Stick extends DragListener {
                         - TouchImg.Y.CENTER                 // move pivot to the center of image
                         + velocity.y * MainImg.Y.MAX_AT
         );
-    }
-
-
-    /**
-     * Contains some settings for displaying of this UI unit.
-     * All getters and setters work with RPX.
-     */
-    public static class Settings {
-        public static class Defaults {
-            private Defaults() {}
-            public static final float START_X = 0.6f;
-            public static final float START_Y = 0.6f;
-        }
-
-        private int startX = Rpx.X.fromCm(Defaults.START_X);
-        public void setStartX(int startX) { this.startX = startX; }
-        public int getStartX() { return startX; }
-
-
-        private int startY = Rpx.Y.fromCm(Defaults.START_Y);
-        public void setStartY(int startY) { this.startY = startY; }
-        public int getStartY() { return startY; }
     }
 }

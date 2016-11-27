@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.screens.GameScreen;
 
 
@@ -17,7 +18,7 @@ public class IngameUI {
     OrthographicCamera camera;
     Stick stick;
 
-    public IngameUI(GameScreen screen, Settings settings) {
+    public IngameUI(GameScreen screen, IngameUISettings settings) {
         this.screen = screen;
         camera = new OrthographicCamera();
         stage = new Stage(new ScreenViewport(camera), BlackoutGame.getInstance().getSpriteBatch());
@@ -40,9 +41,5 @@ public class IngameUI {
 
     public void draw() {
         stage.draw();
-    }
-
-    public static class Settings {
-        public Stick.Settings stickSettings = new Stick.Settings();
     }
 }
