@@ -12,19 +12,30 @@ import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.units.Rpx;
 
+/**
+ * Class for stick which used to set character walking direction and speed.
+ */
 public class Stick extends DragListener {
+    /**
+     * Some constants for main image (the font of the stick)
+     */
     public static final class MainImg {
+        private MainImg() {}
+
         public static final class InCentimeters {
+            private InCentimeters() {}
             private static final float SIZE = 1.5f;
         }
 
         public static final class X {
+            private X() {}
             public static final int SIZE = Rpx.X.fromCm(InCentimeters.SIZE);
             public static final float MAX_AT = (SIZE - TouchImg.X.SIZE) / 2;
             public static final float CENTER = SIZE / 2;
         }
 
         public static final class Y {
+            private Y() {}
             public static final int SIZE = Rpx.Y.fromCm(InCentimeters.SIZE);
             public static final float MAX_AT = (SIZE - TouchImg.Y.SIZE) / 2;
             public static final float CENTER = SIZE / 2;
@@ -33,17 +44,25 @@ public class Stick extends DragListener {
         public static final String IMAGE_PATH = "images/ingame_ui/stick_main.png";
     }
 
+    /**
+     * Some constants for touch image.
+     */
     public static final class TouchImg {
+        private TouchImg() {}
+
         public static final class InCentimeters {
+            private InCentimeters() {}
             private static final float SIZE = 0.3f;
         }
 
         public static final class X {
+            private X() {}
             private static final float SIZE = Rpx.X.fromCm(InCentimeters.SIZE);
             private static final float CENTER = Rpx.X.fromCm(InCentimeters.SIZE / 2);
         }
 
         public static final class Y {
+            private Y() {}
             private static final float SIZE = Rpx.Y.fromCm(InCentimeters.SIZE);
             private static final float CENTER = Rpx.Y.fromCm(InCentimeters.SIZE / 2);
         }
@@ -51,10 +70,13 @@ public class Stick extends DragListener {
         public static final String IMAGE_PATH = "images/ingame_ui/stick_touch.png";
     }
 
+    /** current stick position (it is velocity for the unit) */
     private Vector2 velocity = new Vector2(0, 0);
-    private GameUnit object;
+    /** the controlled unit */
+    private GameUnit unit;
     private Image touchImage;
     private final Settings settings;
+    /** server to send UI events */
     private final AbstractServer server;
 
     public Stick(AbstractServer server, Settings settings) {
@@ -86,7 +108,7 @@ public class Stick extends DragListener {
     }
 
     public void doneLoading(AssetManager assets, Stage stage, GameUnit object) {
-        this.object = object;
+        this.unit = object;
 
         // touch image initialization
         touchImage = new Image(assets.get(TouchImg.IMAGE_PATH, Texture.class));
@@ -98,7 +120,7 @@ public class Stick extends DragListener {
         // must go after touch image initialization to be in the foreground
         Image mainImg = new Image(assets.get(MainImg.IMAGE_PATH, Texture.class));
         mainImg.setSize(MainImg.X.SIZE, MainImg.Y.SIZE);
-        mainImg.setPosition(settings.startX, settings.startY);
+        mainImg.setPosition(settings.getStartX(), settings.getStartY());
         mainImg.addListener(this);
         stage.addActor(mainImg);
     }
@@ -115,29 +137,41 @@ public class Stick extends DragListener {
             velocity.y /= len;
         }
 
-        object.setSelfVelocity(velocity);
+        unit.setSelfVelocity(velocity);
         updateTouchPosition();
         server.sendSelfVelocity(velocity);
     }
 
     private void updateTouchPosition() {
         touchImage.setPosition(
-                settings.startX + MainImg.X.CENTER  // move (0,0) to the center of mainImg
+                settings.getStartX() + MainImg.X.CENTER  // move (0,0) to the center of mainImg
                         - TouchImg.X.CENTER                 // move pivot to the center of image
                         + velocity.x * MainImg.X.MAX_AT,
-                settings.startY + MainImg.Y.CENTER  // move (0,0) to the center of mainImg
+                settings.getStartY() + MainImg.Y.CENTER  // move (0,0) to the center of mainImg
                         - TouchImg.Y.CENTER                 // move pivot to the center of image
                         + velocity.y * MainImg.Y.MAX_AT
         );
     }
 
+
+    /**
+     * Contains some settings for displaying of this UI unit.
+     * All getters and setters work with RPX.
+     */
     public static class Settings {
         public static class Defaults {
+            private Defaults() {}
             public static final float START_X = 0.6f;
             public static final float START_Y = 0.6f;
         }
 
-        public int startX = Rpx.X.fromCm(Defaults.START_X);
-        public int startY = Rpx.Y.fromCm(Defaults.START_Y);
+        private int startX = Rpx.X.fromCm(Defaults.START_X);
+        public void setStartX(int startX) { this.startX = startX; }
+        public int getStartX() { return startX; }
+
+
+        private int startY = Rpx.Y.fromCm(Defaults.START_Y);
+        public void setStartY(int startY) { this.startY = startY; }
+        public int getStartY() { return startY; }
     }
 }
