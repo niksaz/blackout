@@ -72,9 +72,15 @@ public class BlackoutGame extends Game {
                 new CircleCreator(0.7f),
                 0, 0
         );
-
         room.objectDefs.add(hero);
         room.character = hero;
+
+        Hero.Definition enemy = new Hero.Definition(
+                "models/wizard/wizard.g3db",
+                new CircleCreator(0.7f),
+                5, 0
+        );
+        room.objectDefs.add(enemy);
 
         GameObject.Definition stone = new Decoration.Definition(
                 "models/stone/stone.g3db",
