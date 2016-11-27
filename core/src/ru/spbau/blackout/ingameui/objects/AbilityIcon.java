@@ -1,7 +1,8 @@
-package ru.spbau.blackout.ingameui;
+package ru.spbau.blackout.ingameui.objects;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -10,6 +11,7 @@ import com.sun.javafx.print.Units;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.network.AbstractServer;
 
@@ -47,10 +49,9 @@ public class AbilityIcon extends IngameUIObject {
 
     @Override
     public void update(float deltaTime) {
-//        if (this.isPressed) {
-//            this.getAbilityInst().
-//        }
-        // TODO
+        if (this.isPressed) {
+            this.getAbility().inCast(unit, deltaTime);
+        }
     }
 
 
@@ -58,6 +59,20 @@ public class AbilityIcon extends IngameUIObject {
 
 
     private class Listener extends InputListener {
+        @Override
+        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            getAbility().onCastStart(unit);
+            isPressed = true;
 
+            // It means that I want it to receive all touchDragged and touchUp events,
+            // even those not over this actor, until touchUp is received.
+            return true;
+        }
+
+        @Override
+        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+            isPressed = false;
+            getAbility().onCastEnd(unit);
+        }
     }
 }

@@ -1,4 +1,4 @@
-package ru.spbau.blackout.ingameui;
+package ru.spbau.blackout.ingameui.objects;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.ingameui.settings.StickSettings;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.units.Rpx;

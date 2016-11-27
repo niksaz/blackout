@@ -25,9 +25,9 @@ public class IngameUI {
 
         Gdx.input.setInputProcessor(this.stage);
 
-        this.uiObjects.add(new Stick(screen.getServer(), settings.stickSettings));
+        this.uiObjects.add(new ru.spbau.blackout.ingameui.objects.Stick(screen.getServer(), settings.stickSettings));
         for (AbilityIconSettings iconSettings : settings.abilities) {
-            this.uiObjects.add(new AbilityIcon(screen.getServer(), iconSettings));
+            this.uiObjects.add(new ru.spbau.blackout.ingameui.objects.AbilityIcon(screen.getServer(), iconSettings));
         }
     }
 
