@@ -100,7 +100,6 @@ class Game extends Thread {
         long lastTime = System.currentTimeMillis();
         while (gameState.get() != GameState.FINISHED) {
             long currentTime;
-            //noinspection SynchronizeOnNonFinalField
             synchronized (gameWorld) {
                 currentTime = System.currentTimeMillis();
                 gameWorld.update((currentTime - lastTime) / MILLIS_IN_SECOND);
@@ -108,7 +107,7 @@ class Game extends Thread {
             }
             lastTime = currentTime;
             try {
-                sleep(Network.FRAMES_60_SLEEP_MS);
+                sleep(Network.SLEEPING_TIME_TO_ACHIEVE_FRAME_RATE);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -127,9 +126,8 @@ class Game extends Thread {
 //        } while (gameState.get() != GameState.FINISHED);
     }
 
-    public void setVelocityFor(int numberInArray, Vector2 newVelocity) {
+    void setVelocityFor(int numberInArray, Vector2 newVelocity) {
         server.log("Setting velocity for " + numberInArray + " " + newVelocity);
-        //noinspection SynchronizeOnNonFinalField
         synchronized (gameWorld) {
             GameUnit object = (GameUnit) gameWorld.getGameObjects().get(numberInArray);
             object.setSelfVelocity(newVelocity);
@@ -140,8 +138,7 @@ class Game extends Thread {
         return gameState.get();
     }
 
-    public GameWorld getGameWorld() {
-        //noinspection SynchronizeOnNonFinalField
+    GameWorld getGameWorld() {
         return gameWorld;
     }
 }

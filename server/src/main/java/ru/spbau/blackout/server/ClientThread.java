@@ -14,8 +14,6 @@ import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
 
-import static ru.spbau.blackout.network.Network.FRAMES_60_SLEEP_MS;
-
 /**
  * A thread allocated for each client connected to the server. Initially it is waiting to be matched
  * and later acting as the representative of the client in the game.
@@ -30,7 +28,8 @@ class ClientThread extends Thread {
     private volatile int numberInGame;
     private volatile TestingSessionSettings session;
     private volatile Hero.Definition hero;
-    private AtomicReference<Game> game = new AtomicReference<>();
+    private volatile Game game;
+    //private AtomicReference<Game> game = new AtomicReference<>();
     private AtomicReference<GameState> clientGameState = new AtomicReference<>(GameState.WAITING);
 
     ClientThread(RoomServer server, Socket socket) {
@@ -49,7 +48,7 @@ class ClientThread extends Thread {
             server.log(name + " connected.");
 
             do {
-                final Game game = this.game.get();
+                final Game game = this.game;
                 if (game != null) {
                     clientGameState.set(game.getGameState());
                 }
@@ -91,7 +90,7 @@ class ClientThread extends Thread {
                     try {
                         final Vector2 velocity = (Vector2) in.readObject();
                         if (velocity != null) {
-                            game.get().setVelocityFor(numberInGame, velocity);
+                            game.setVelocityFor(numberInGame, velocity);
                         }
                     } catch (ClassNotFoundException | IOException e) {
                         e.printStackTrace();
@@ -102,7 +101,7 @@ class ClientThread extends Thread {
             clientInputThread.start();
 
             while (clientGameState.get() != GameState.FINISHED) {
-                final GameWorld gameWorld = game.get().getGameWorld();
+                final GameWorld gameWorld = game.getGameWorld();
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (gameWorld) {
                     try {
@@ -116,7 +115,7 @@ class ClientThread extends Thread {
 
                 // sleep and after getting GameWorld periodically sending it to the client
                 try {
-                    sleep(FRAMES_60_SLEEP_MS);
+                    sleep(Network.SLEEPING_TIME_TO_ACHIEVE_FRAME_RATE);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -138,7 +137,7 @@ class ClientThread extends Thread {
         this.numberInGame = numberInGame;
         this.session = session;
         this.hero = hero;
-        this.game.set(game);
+        this.game = game;
     }
 
     GameState getClientGameState() {

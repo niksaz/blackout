@@ -8,7 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameWorld;
@@ -23,7 +22,6 @@ import ru.spbau.blackout.settings.GameSettings;
 import static java.lang.Thread.sleep;
 import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
 import static ru.spbau.blackout.BlackoutGame.PORT_NUMBER;
-import static ru.spbau.blackout.network.Network.FRAMES_60_SLEEP_MS;
 
 public class AndroidClient implements Runnable, AbstractServer {
 
@@ -32,7 +30,7 @@ public class AndroidClient implements Runnable, AbstractServer {
     private static final String READY_TO_START_MS = "Starting a game. Prepare yourself.";
 
     private final MultiplayerTable table;
-    private final AtomicBoolean isInterrupted = new AtomicBoolean();
+    private volatile boolean isInterrupted = false;
     private volatile Vector2 velocityToSend = new Vector2();
     private GameScreen gameScreen;
 
@@ -42,7 +40,6 @@ public class AndroidClient implements Runnable, AbstractServer {
 
     @Override
     public void run() {
-        Gdx.app.log(TAG, "Started");
         try (
             Socket socket = new Socket(HOST_NAME, PORT_NUMBER);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
@@ -77,40 +74,41 @@ public class AndroidClient implements Runnable, AbstractServer {
                             try {
                                 wait();
                             } catch (InterruptedException ignored) {
-                                isInterrupted.set(true);
+                                isInterrupted = true;
                             }
                         }
-                        out.writeBoolean(!isInterrupted.get());
+                        out.writeBoolean(!isInterrupted);
                         out.flush();
                         break;
                     default:
                         break;
                 }
-            } while (gameState == GameState.WAITING && !isInterrupted.get());
+            } while (gameState == GameState.WAITING && !isInterrupted);
 
-            new Thread(() -> {
-                while (true) {
+            final Thread outputToServerThread = new Thread(() -> {
+                while (!isInterrupted) {
                     try {
                         Vector2 sending = new Vector2(velocityToSend);
-                        Gdx.app.log("ANDROID", "sending " + sending);
                         out.writeObject(sending);
                         out.flush();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        isInterrupted = true;
                     }
+                    // sleeping to not send position too often.
                     try {
-                        // sleeping to not send position too often.
-                        // performing around 30 sends per sec
-                        sleep(FRAMES_60_SLEEP_MS);
+                        sleep(Network.SLEEPING_TIME_TO_ACHIEVE_FRAME_RATE);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                        isInterrupted = true;
                     }
                 }
-            }).start();
+            });
+            outputToServerThread.start();
 
             // waiting for the first world to arrive
             socket.setSoTimeout(0);
-            while (true) {
+            while (!isInterrupted) {
                 // should read game world here from inputStream
                 final GameWorld currentWorld = gameScreen.getGameWorld();
 
@@ -119,26 +117,25 @@ public class AndroidClient implements Runnable, AbstractServer {
                     currentWorld.inplaceDeserialize(in);
                 }
 
-                // should get worlds regularly
+                // should get worlds regularly after the first one
                 socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             }
         } catch (UnknownHostException e) {
             Gdx.app.log(TAG, "Don't know about host " + HOST_NAME);
-        }
-        catch (ClassNotFoundException | IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
+            isInterrupted = true;
             Gdx.app.postRunnable(() -> {
                 final MenuScreen menuScreen = table.getMenuScreen();
                 menuScreen.changeMiddleTable(PlayScreenTable.getTable(menuScreen));
+                BlackoutGame.getInstance().getScreenManager().setScreen(menuScreen);
             });
         }
-        Gdx.app.log(TAG, "Stopped");
     }
 
     public void interrupt() {
-        isInterrupted.set(true);
+        isInterrupted = true;
     }
 
     @Override
