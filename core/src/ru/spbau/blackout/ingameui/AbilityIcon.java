@@ -9,28 +9,43 @@ import com.sun.javafx.print.Units;
 
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.network.AbstractServer;
 
-public class AbilityIcon extends InputListener {
+public class AbilityIcon extends IngameUIObject {
     // fields marked as /*final*/ must be assigned only once inside doneLoading method.
 
     private final AbilityIconSettings settings;
-    private final AbstractServer server;
     private /*final*/ Image icon;
     private /*final*/ GameUnit unit;
     private /*final*/ Ability ability;
     private boolean isPressed = false;
 
+
     // I have to get unitDef here in order to get its abilityIcons
     public AbilityIcon(AbstractServer server, AbilityIconSettings settings) {
-        this.server = server;
+        super(server);
         this.settings = settings;
     }
 
-    // TODO: make abstract class IngameUIElement
-    public void load(AssetManager assets) {}
 
+    @Override
+    public void load(AssetManager assets) { /*nothing*/ }
+
+    @Override
+    public void doneLoading(AssetManager assets, Stage stage, Hero hero) {
+        this.ability = hero.getAbility(this.settings.getAbilityNum());
+
+        // icon initialization
+        this.icon = new Image(assets.get(this.getAbility().iconPath(), Texture.class));
+        this.icon.setSize(this.settings.getSizeX(), this.settings.getSizeY());
+        this.icon.setPosition(settings.getStartX(), settings.getStartY());
+        stage.addActor(this.icon);
+        this.icon.addListener(this.new Listener());
+    }
+
+    @Override
     public void update(float deltaTime) {
 //        if (this.isPressed) {
 //            this.getAbilityInst().
@@ -38,18 +53,11 @@ public class AbilityIcon extends InputListener {
         // TODO
     }
 
-    public void doneLoading(AssetManager assets, Stage stage, GameUnit unit) {
-        this.ability = unit.getAbility(this.settings.getAbilityNum());
 
-        // icon initialization
-        this.icon = new Image(assets.get(this.getAbility().iconPath(), Texture.class));
-        this.icon.setSize(this.settings.getSizeX(), this.settings.getSizeY());
-        this.icon.setPosition(settings.getStartX(), settings.getStartY());
-        stage.addActor(this.icon);
-        this.icon.addListener(this);
-    }
+    public Ability getAbility() { return this.ability; }
 
-    public Ability getAbility() {
-        return this.ability;
+
+    private class Listener extends InputListener {
+
     }
 }

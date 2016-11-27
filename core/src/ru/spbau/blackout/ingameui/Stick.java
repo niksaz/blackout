@@ -4,11 +4,13 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.settings.StickSettings;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.units.Rpx;
@@ -17,46 +19,30 @@ import ru.spbau.blackout.units.Rpx;
 /**
  * Class for stick which used to set character walking direction and speed.
  */
-public class Stick extends DragListener {
+public class Stick extends IngameUIObject {
     /** current stick position (it is velocity for the unit) */
     private Vector2 velocity = new Vector2(0, 0);
     /** the controlled unit */
     private GameUnit unit;
     private Image touchImage;
     private final StickSettings settings;
-    /** server to send UI events */
-    private final AbstractServer server;
+
 
     public Stick(AbstractServer server, StickSettings settings) {
+        super(server);
         this.settings = settings;
-        this.server = server;
     }
+
 
     @Override
-    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-        touchMovedTo(x, y);
-        return super.touchDown(event, x, y, pointer, button);
-    }
-
-    @Override
-    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-        super.touchUp(event, x, y, pointer, button);
-        touchMovedTo(MainImg.X.CENTER, MainImg.Y.CENTER);
-    }
-
-    @Override
-    public void drag(InputEvent event, float x, float y, int pointer) {
-        super.drag(event, x, y, pointer);
-        touchMovedTo(x, y);
-    }
-
     public void load(AssetManager assets) {
         assets.load(TouchImg.IMAGE_PATH, Texture.class);
         assets.load(MainImg.IMAGE_PATH, Texture.class);
     }
 
-    public void doneLoading(AssetManager assets, Stage stage, GameUnit object) {
-        this.unit = object;
+    @Override
+    public void doneLoading(AssetManager assets, Stage stage, Hero hero) {
+        this.unit = hero;
 
         // touch image initialization
         touchImage = new Image(assets.get(TouchImg.IMAGE_PATH, Texture.class));
@@ -69,26 +55,13 @@ public class Stick extends DragListener {
         Image mainImg = new Image(assets.get(MainImg.IMAGE_PATH, Texture.class));
         mainImg.setSize(MainImg.X.SIZE, MainImg.Y.SIZE);
         mainImg.setPosition(settings.getStartX(), settings.getStartY());
-        mainImg.addListener(this);
+        mainImg.addListener(this.new Listener());
         stage.addActor(mainImg);
     }
 
-    private void touchMovedTo(float x, float y) {
-        velocity.set(
-                (x - MainImg.X.CENTER) / MainImg.X.MAX_AT,
-                (y - MainImg.Y.CENTER) / MainImg.Y.MAX_AT
-        );
+    @Override
+    public void update(float deltaTime) { /*nothing*/ }
 
-        float len = velocity.len();
-        if (len > 1) {
-            velocity.x /= len;
-            velocity.y /= len;
-        }
-
-        unit.setSelfVelocity(velocity);
-        updateTouchPosition();
-        server.sendSelfVelocity(velocity);
-    }
 
     private void updateTouchPosition() {
         touchImage.setPosition(
@@ -99,6 +72,44 @@ public class Stick extends DragListener {
                         - TouchImg.Y.CENTER                 // move pivot to the center of image
                         + velocity.y * MainImg.Y.MAX_AT
         );
+    }
+
+
+    private class Listener extends DragListener {
+        @Override
+        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            touchMovedTo(x, y);
+            return super.touchDown(event, x, y, pointer, button);
+        }
+
+        @Override
+        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+            super.touchUp(event, x, y, pointer, button);
+            touchMovedTo(MainImg.X.CENTER, MainImg.Y.CENTER);
+        }
+
+        @Override
+        public void drag(InputEvent event, float x, float y, int pointer) {
+            super.drag(event, x, y, pointer);
+            touchMovedTo(x, y);
+        }
+
+        private void touchMovedTo(float x, float y) {
+            velocity.set(
+                    (x - MainImg.X.CENTER) / MainImg.X.MAX_AT,
+                    (y - MainImg.Y.CENTER) / MainImg.Y.MAX_AT
+            );
+
+            float len = velocity.len();
+            if (len > 1) {
+                velocity.x /= len;
+                velocity.y /= len;
+            }
+
+            unit.setSelfVelocity(velocity);
+            updateTouchPosition();
+            server.sendSelfVelocity(velocity);
+        }
     }
 
 

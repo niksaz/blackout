@@ -2,7 +2,6 @@ package ru.spbau.blackout.abilities.fireball;
 
 import com.badlogic.gdx.Gdx;
 
-import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.abilities.InstantAbility;
 import ru.spbau.blackout.entities.GameUnit;
 
