@@ -15,6 +15,8 @@ import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
+import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
+import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.MultiplayerTable;
@@ -66,7 +68,10 @@ public class AndroidClient implements Runnable, AbstractServer {
                         Gdx.app.postRunnable(() ->
                                 table.getStatusLabel().setText(READY_TO_START_MS));
 
-                        final GameSettings settings = new GameSettings();
+                        AbilityIconSettings firstIconSettings = new AbilityIconSettings(0 /*num*/, 200 /*x*/, 100 /*y*/);
+                        IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
+                        GameSettings settings = new GameSettings(uiSettings);  // just default settings
+
                         TestingSessionSettings room = (TestingSessionSettings) in.readObject();
                         room.character = (Hero.Definition) in.readObject();
 

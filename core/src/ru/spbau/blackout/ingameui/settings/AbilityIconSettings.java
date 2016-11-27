@@ -1,6 +1,5 @@
 package ru.spbau.blackout.ingameui.settings;
 
-import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.units.Rpx;
 
 /**
@@ -13,9 +12,10 @@ public class AbilityIconSettings {
         public static final float SIZE_CM = 1f;
     }
 
-    private Ability ability;
-    public Ability getAbility() { return this.ability; }
-    public void setAbility(Ability ability) { this.ability = ability; }
+
+    private int abilityNum;
+    public int getAbilityNum() { return this.abilityNum; }
+    public void setAbilityNum(int abilityNum) { this.abilityNum = abilityNum; }
 
     private int sizeX = Rpx.X.fromCm(Defaults.SIZE_CM);
     public int getSizeX() { return this.sizeX; }
@@ -32,4 +32,11 @@ public class AbilityIconSettings {
     private int startY;
     public int getStartY() { return this.startY; }
     public void setStartY(int startY) { this.startY = startY; }
+
+
+    public AbilityIconSettings(int abilityNum, int startX, int startY) {
+        this.abilityNum = abilityNum;
+        this.startX = startX;
+        this.startY = startY;
+    }
 }

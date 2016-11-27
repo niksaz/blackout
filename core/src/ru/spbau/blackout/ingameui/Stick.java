@@ -13,64 +13,11 @@ import ru.spbau.blackout.ingameui.settings.StickSettings;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.units.Rpx;
 
+
 /**
  * Class for stick which used to set character walking direction and speed.
  */
 public class Stick extends DragListener {
-    /**
-     * Some constants for main image (the font of the stick)
-     */
-    public static final class MainImg {
-        private MainImg() {}
-
-        public static final class InCentimeters {
-            private InCentimeters() {}
-            private static final float SIZE = 1.5f;
-        }
-
-        public static final class X {
-            private X() {}
-            public static final int SIZE = Rpx.X.fromCm(InCentimeters.SIZE);
-            public static final float MAX_AT = (SIZE - TouchImg.X.SIZE) / 2;
-            public static final float CENTER = SIZE / 2;
-        }
-
-        public static final class Y {
-            private Y() {}
-            public static final int SIZE = Rpx.Y.fromCm(InCentimeters.SIZE);
-            public static final float MAX_AT = (SIZE - TouchImg.Y.SIZE) / 2;
-            public static final float CENTER = SIZE / 2;
-        }
-
-        public static final String IMAGE_PATH = "images/ingame_ui/stick_main.png";
-    }
-
-    /**
-     * Some constants for touch image.
-     */
-    public static final class TouchImg {
-        private TouchImg() {}
-
-        public static final class InCentimeters {
-            private InCentimeters() {}
-            private static final float SIZE = 0.3f;
-        }
-
-        public static final class X {
-            private X() {}
-            private static final float SIZE = Rpx.X.fromCm(InCentimeters.SIZE);
-            private static final float CENTER = Rpx.X.fromCm(InCentimeters.SIZE / 2);
-        }
-
-        public static final class Y {
-            private Y() {}
-            private static final float SIZE = Rpx.Y.fromCm(InCentimeters.SIZE);
-            private static final float CENTER = Rpx.Y.fromCm(InCentimeters.SIZE / 2);
-        }
-
-        public static final String IMAGE_PATH = "images/ingame_ui/stick_touch.png";
-    }
-
     /** current stick position (it is velocity for the unit) */
     private Vector2 velocity = new Vector2(0, 0);
     /** the controlled unit */
@@ -87,20 +34,20 @@ public class Stick extends DragListener {
 
     @Override
     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-        movedTo(x, y);
+        touchMovedTo(x, y);
         return super.touchDown(event, x, y, pointer, button);
     }
 
     @Override
     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
         super.touchUp(event, x, y, pointer, button);
-        movedTo(MainImg.X.CENTER, MainImg.Y.CENTER);
+        touchMovedTo(MainImg.X.CENTER, MainImg.Y.CENTER);
     }
 
     @Override
     public void drag(InputEvent event, float x, float y, int pointer) {
         super.drag(event, x, y, pointer);
-        movedTo(x, y);
+        touchMovedTo(x, y);
     }
 
     public void load(AssetManager assets) {
@@ -126,7 +73,7 @@ public class Stick extends DragListener {
         stage.addActor(mainImg);
     }
 
-    private void movedTo(float x, float y) {
+    private void touchMovedTo(float x, float y) {
         velocity.set(
                 (x - MainImg.X.CENTER) / MainImg.X.MAX_AT,
                 (y - MainImg.Y.CENTER) / MainImg.Y.MAX_AT
@@ -152,5 +99,57 @@ public class Stick extends DragListener {
                         - TouchImg.Y.CENTER                 // move pivot to the center of image
                         + velocity.y * MainImg.Y.MAX_AT
         );
+    }
+
+
+    /** Some constants for main image (the font of the stick) */
+    public static final class MainImg {
+        private MainImg() {}
+
+        public static final class InCentimeters {
+            private InCentimeters() {}
+            private static final float SIZE = 1.5f;
+        }
+
+        public static final class X {
+            private X() {}
+            public static final int SIZE = Rpx.X.fromCm(InCentimeters.SIZE);
+            public static final float MAX_AT = (SIZE - TouchImg.X.SIZE) / 2;
+            public static final float CENTER = SIZE / 2;
+        }
+
+        public static final class Y {
+            private Y() {}
+            public static final int SIZE = Rpx.Y.fromCm(InCentimeters.SIZE);
+            public static final float MAX_AT = (SIZE - TouchImg.Y.SIZE) / 2;
+            public static final float CENTER = SIZE / 2;
+        }
+
+        public static final String IMAGE_PATH = "images/ingame_ui/stick_main.png";
+    }
+
+
+    /** Some constants for touch image. */
+    public static final class TouchImg {
+        private TouchImg() {}
+
+        public static final class InCentimeters {
+            private InCentimeters() {}
+            private static final float SIZE = 0.3f;
+        }
+
+        public static final class X {
+            private X() {}
+            private static final float SIZE = Rpx.X.fromCm(InCentimeters.SIZE);
+            private static final float CENTER = Rpx.X.fromCm(InCentimeters.SIZE / 2);
+        }
+
+        public static final class Y {
+            private Y() {}
+            private static final float SIZE = Rpx.Y.fromCm(InCentimeters.SIZE);
+            private static final float CENTER = Rpx.Y.fromCm(InCentimeters.SIZE / 2);
+        }
+
+        public static final String IMAGE_PATH = "images/ingame_ui/stick_touch.png";
     }
 }

@@ -80,9 +80,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     public synchronized void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeInt(gameObjects.size());
 
-        //System.out.println("world ser");
         for (GameObject object : this) {
-            //System.out.println("some object des");
             //object.inplaceSerialize(out);
 
             //long curTime = System.currentTimeMillis();
@@ -90,7 +88,6 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
 
             Vector2 ob = object.getPosition();
             out.writeObject(ob);
-            System.out.println("sent time " + ob);
             //Vector2 v2 = ;//new Vector2(System.currentTimeMillis() % 1000, System.currentTimeMillis() % 1000);
 
             //out.writeObject(v2);
@@ -107,7 +104,6 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
             //long l = in.readLong();
 
             Vector2 pos = (Vector2) in.readObject();
-            Gdx.app.log("ANDROID", "got time " + pos);
         }
 
         return null;
@@ -118,7 +114,6 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     public void update(float delta) {
-        System.out.println(delta);
         accumulator += delta;
 
         for (GameObject object : gameObjects) {
@@ -177,9 +172,5 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
             object.updateForSecondStep();
         }
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-
-        //for (GameObject object : this) {
-        //    System.out.println("Object position: " + object.getPosition());
-        //}
     }
 }

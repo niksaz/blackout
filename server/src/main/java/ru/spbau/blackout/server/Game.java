@@ -70,38 +70,15 @@ class Game extends Thread {
 
         // !!!!!!
 
-        final TestingSessionSettings room = new TestingSessionSettings();
-        room.map =  "maps/duel/duel.g3db";
-
-        Hero.Definition hero = new Hero.Definition(
-                "models/wizard/wizard.g3db",
-                new CircleCreator(0.7f),
-                0, 0
-        );
-
-        Hero.Definition hero2 = new Hero.Definition(
-                "models/wizard/wizard.g3db",
-                new CircleCreator(0.7f),
-                5, 5
-        );
-
-        room.objectDefs.add(hero);
-        room.objectDefs.add(hero2);
-
-        GameObject.Definition stone = new Decoration.Definition(
-                "models/stone/stone.g3db",
-                new CircleCreator(1.5f),
-                0, -20
-        );
-        room.objectDefs.add(stone);
+        final TestingSessionSettings room = TestingSessionSettings.getTest();
 
         gameWorld = new GameWorld();
         for (GameObject.Definition def : room.getObjectDefs()) {
             def.makeInstance(null, gameWorld);
         }
 
-        clients.get(0).setSessionSettings(room, hero);
-        //clients.get(1).setSessionSettings(room, hero2);
+        clients.get(0).setSessionSettings(room, (Hero.Definition)room.objectDefs.get(0));
+        clients.get(1).setSessionSettings(room, (Hero.Definition)room.objectDefs.get(1));
 
         // !!!!!!!
 

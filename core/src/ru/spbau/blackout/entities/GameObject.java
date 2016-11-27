@@ -1,6 +1,7 @@
 package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
@@ -42,14 +43,14 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         body = gameWorld.addObject(this, def);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = def.getShapeCreator().create();
-        fixtureDef.density = def.getDensity();
+        fixtureDef.shape = def.shapeCreator.create();
+        fixtureDef.density = def.density;
         fixtureDef.friction = 0;
         fixtureDef.restitution = 0;
         body.createFixture(fixtureDef);
         fixtureDef.shape.dispose();
 
-        setPosition(def.getPosition().x, def.getPosition().y);
+        setPosition(def.position);
     }
 
     @Override
@@ -57,7 +58,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         out.writeObject(this);
         //out.writeObject(this.getPosition());
         //out.writeFloat(this.getRotation());
-        //System.out.println("pos in ser: " + this.getPosition());
     }
 
     @Override
@@ -65,7 +65,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         GameObject other = (GameObject) in.readObject();
         //this.height = other.height;
         //Vector2 position = (Vector2) in.readObject();
-        //Gdx.app.log("Blackout", "got position: " + position);
         //float rotation = in.readFloat();
         //this.setTransform(position, rotation);
         return other;
@@ -76,6 +75,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         updateTransform();
         model.getRenderables(renderables, pool);
     }
+
 
     /**
      * Update things not connected with physics.
@@ -139,6 +139,10 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         return body.getPosition();
     }
 
+    public void setPosition(Vector2 position) {
+        setTransform(position, getRotation());
+    }
+
     public void setPosition(float x, float y) {
         setTransform(x, y, getRotation());
     }
@@ -154,7 +158,9 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     }
 
 
-
+    /**
+     * TODO
+     */
     public static abstract class Definition implements Serializable {
         public static final float DEFAULT_HEIGHT = 0;
         public static final float DEFAULT_ROTATION = 0;
@@ -165,13 +171,13 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public float rotation = DEFAULT_ROTATION;
         public float height = DEFAULT_HEIGHT;
 
-        private float density = DEFAULT_DENSITY;
+        public float density = DEFAULT_DENSITY;
         /**
          * As far as Shape itself isn't serializable,
          * supplier will be sent instead.
          */
-        private Creator<Shape> shapeCreator;
-        private final Vector2 position = new Vector2();
+        public Creator<Shape> shapeCreator;
+        public final Vector2 position = new Vector2();
 
 
         // appearance:
@@ -188,41 +194,11 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
             this.position.set(initialX, initialY);
         }
 
-        public void setDensity(float density) {
-            this.density = density;
+        public void load(AssetManager assets) {
+            assets.load(this.modelPath, Model.class);
         }
 
-        public void setShapeCreator(Creator<Shape> shapeCreator) {
-            this.shapeCreator = shapeCreator;
-        }
-
-        public float getDensity() {
-            return this.density;
-        }
-
-        public Creator<Shape> getShapeCreator() {
-            return this.shapeCreator;
-        }
-
-        public void setHeight(float height) {
-            this.height = height;
-        }
-
-        public float getHeight() {
-            return this.height;
-        }
-
-        public Vector2 getPosition() {
-            return this.position;
-        }
-
-        public void setPosition(float x, float y) {
-            this.position.set(x, y);
-        }
-
-        /**
-         * Rotates object to the given direction.
-         */
+        /** Rotates object to the given direction. */
         public void setDirection(Vector2 direction) {
             this.rotation = direction.angleRad();
         }
@@ -234,9 +210,8 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
             return world.createBody(bodyDef);
         }
 
+
         public abstract GameObject makeInstance(Model model, GameWorld gameWorld);
         public abstract BodyDef.BodyType getBodyType();
-//        public abstract float getDensity();
-//        public abstract float getFriction();i
     }
 }

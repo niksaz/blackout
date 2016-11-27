@@ -17,7 +17,6 @@ public class StickSettings {
     public void setStartX(int startX) { this.startX = startX; }
     public int getStartX() { return startX; }
 
-
     private int startY = Rpx.Y.fromCm(Defaults.START_Y);
     public void setStartY(int startY) { this.startY = startY; }
     public int getStartY() { return startY; }

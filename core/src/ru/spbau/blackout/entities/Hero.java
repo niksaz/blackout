@@ -6,18 +6,18 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import java.io.Serializable;
 
 import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
 
 public class Hero extends GameUnit {
     protected Hero(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
-     }
+    }
 
     public static class Definition extends GameUnit.Definition implements Serializable {
-        public Definition(String modelPath, Creator<Shape> shapeCreator,
-                          float initialX, float initialY)
-        {
-            super(modelPath, shapeCreator, initialX, initialY);
+        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY,
+                          Ability[] abilities) {
+            super(modelPath, shapeCreator, initialX, initialY, abilities);
         }
 
         @Override

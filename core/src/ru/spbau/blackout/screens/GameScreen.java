@@ -52,9 +52,9 @@ public class GameScreen extends BlackoutScreen {
         return doneLoading;
     }
 
-    public GameScreen(GameSessionSettings room, AbstractServer server, GameSettings settings) {
+    public GameScreen(GameSessionSettings sessionSettings, AbstractServer server, GameSettings settings) {
         this.server = server;
-        loadingScreen = new LoadingScreen(room);
+        loadingScreen = new LoadingScreen(sessionSettings);
         ui = new IngameUI(this, settings.ui);
 
         // initialize main camera
@@ -84,8 +84,8 @@ public class GameScreen extends BlackoutScreen {
     }
 
     @Override
-    public void render(float delta) {
-        super.render(delta);
+    public void render(float deltaTime) {
+        super.render(deltaTime);
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -98,7 +98,7 @@ public class GameScreen extends BlackoutScreen {
 
         ui.draw();
 
-        update(delta);
+        update(deltaTime);
     }
 
     @Override
@@ -152,9 +152,9 @@ public class GameScreen extends BlackoutScreen {
 
         LoadingScreen(GameSessionSettings room) {
             // getting information from room
-            objectDefs = room.getObjectDefs();
-            characterDef = room.getCharacter();
-            mapPath = room.getMap();
+            this.objectDefs = room.getObjectDefs();
+            this.characterDef = room.getCharacter();
+            this.mapPath = room.getMap();
         }
 
         @Override
@@ -164,7 +164,7 @@ public class GameScreen extends BlackoutScreen {
             // start loading
             ui.load(assets);
             for (GameObject.Definition def : objectDefs) {
-                assets.load(def.modelPath, Model.class);
+                def.load(assets);
             }
             assets.load(mapPath, Model.class);
         }
@@ -203,16 +203,13 @@ public class GameScreen extends BlackoutScreen {
         }
 
         private void doneLoading() {
-            Gdx.app.log("blackout:GameScreen", "done loading");
-
             for (GameObject.Definition def : objectDefs) {
                 GameObject obj = def.makeInstance(assets.get(def.modelPath, Model.class), gameWorld);
                 if (def == characterDef) {
-                    // FIXME: assert that obj instanceof Hero
                     character = (Hero)obj;
                 }
             }
-            // FIXME: assert that character != null
+            // TODO: assert that character != null
 
             map = new ModelInstance(assets.get(mapPath, Model.class));
             fixTop(map);

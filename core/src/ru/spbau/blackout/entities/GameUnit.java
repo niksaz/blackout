@@ -1,6 +1,8 @@
 package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -10,12 +12,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Utils;
 
 import static ru.spbau.blackout.utils.Utils.projectVec;
 import static ru.spbau.blackout.utils.Utils.sqr;
 
+
+/**
+ * Unit is a dynamic object which can move by itself and cast abilities.
+ */
 public abstract class GameUnit extends DynamicObject {
     public static class Animations extends DynamicObject.Animations {
         public static final String WALK = "Armature|Walk";
@@ -33,19 +40,26 @@ public abstract class GameUnit extends DynamicObject {
 
     // Movement:
     private Vector2 selfVelocity = new Vector2();
-    private float selfVelocityScale;
+    private float speed;
     transient private final FrictionJoint frictionJoint;
+    transient private final Ability[] abilities;
+
 
     protected GameUnit(Definition def, Model model, GameWorld gameWorld) {
         super(def, model, gameWorld);
-        selfVelocityScale = def.selfVelocityScale;
-        if (animation != null) {
-            animation.setAnimation(Animations.STAY, -1);
-        }
+        this.speed = def.speed;
+        this.animation.setAnimation(Animations.STAY, -1);
+        this.abilities = def.abilities;
 
-        frictionJoint = gameWorld.addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
+        this.frictionJoint = gameWorld.addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
     }
 
+
+    public final Ability getAbility(int num) {
+        return this.abilities[num];
+    }
+
+    /** See <code>GameWorld</code> documentation */
     @Override
     public void updateForSecondStep() {
         super.updateForSecondStep();
@@ -79,9 +93,8 @@ public abstract class GameUnit extends DynamicObject {
     public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameUnit other = (GameUnit) super.inplaceDeserialize(in);
         //this.selfVelocity.set(other.selfVelocity);
-        Gdx.app.log("Blackout", "SELF VEL GOT" + other.selfVelocity);
 
-//        this.selfVelocityScale = other.selfVelocityScale;
+//        this.speed = other.speed;
         return other;
     }
 
@@ -102,19 +115,27 @@ public abstract class GameUnit extends DynamicObject {
             setDirection(vel);
         }
 
-        selfVelocity.set(vel.x * selfVelocityScale, vel.y * selfVelocityScale);
-        System.out.println(this.selfVelocity);
+        selfVelocity.set(vel.x * speed, vel.y * speed);
     }
 
     public static abstract class Definition extends DynamicObject.Definition {
-        public static final float DEFAULT_SELF_VELOCITY_SCALE = 7f;
+        public static final float DEFAULT_SPEED = 7f;
 
-        public float selfVelocityScale = DEFAULT_SELF_VELOCITY_SCALE;
+        public float speed = DEFAULT_SPEED;
+        public Ability[] abilities;
 
-        public Definition(String modelPath, Creator<Shape> shapeCreator,
-                          float initialX, float initialY)
-        {
+        @Override
+        public void load(AssetManager assets) {
+            super.load(assets);
+            for (Ability ability : abilities) {
+                assets.load(ability.iconPath(), Texture.class);
+            }
+        }
+
+        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY,
+                          Ability[] abilities) {
             super(modelPath, shapeCreator, initialX, initialY);
+            this.abilities = abilities;
         }
     }
 }
