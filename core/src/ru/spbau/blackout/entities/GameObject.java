@@ -26,7 +26,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
-import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte1.other;
 
 
 public abstract class GameObject implements RenderableProvider, InplaceSerializable, Serializable {
@@ -36,6 +35,10 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
     // appearance:
     transient protected ModelInstance model;
+
+    protected GameObject(Model model, GameWorld gameWorld, Creator<Shape> shapeCreator, float density) {
+
+    }
 
     protected GameObject(Definition def, Model model, GameWorld gameWorld) {
         this.model = model == null ? null : new ModelInstance(model);
@@ -52,6 +55,9 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
         setPosition(def.position);
     }
+
+    /** When assets are loaded. */
+    public void doneLoading(AssetManager assets) {}
 
     @Override
     public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
@@ -132,9 +138,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
     // Position:
 
-    /**
-     *
-     */
     public Vector2 getPosition() {
         return body.getPosition();
     }
@@ -194,9 +197,14 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
             this.position.set(initialX, initialY);
         }
 
+        /** Load necessary assets. */
         public void load(AssetManager assets) {
             assets.load(this.modelPath, Model.class);
         }
+
+        /*public GameObject doneLoading(AssetManager assets) {
+
+        }*/
 
         /** Rotates object to the given direction. */
         public void setDirection(Vector2 direction) {

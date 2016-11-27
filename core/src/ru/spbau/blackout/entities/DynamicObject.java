@@ -41,7 +41,7 @@ public abstract class DynamicObject extends GameObject {
     public static class Animations {
         public static final String DEFAULT = "Armature|Stay";
 
-        protected Animations() {};
+        protected Animations() {}
     }
 
     protected final Vector2 velocity = new Vector2();

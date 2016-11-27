@@ -54,6 +54,13 @@ public abstract class GameUnit extends DynamicObject {
         this.frictionJoint = gameWorld.addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
     }
 
+    @Override
+    public void doneLoading(AssetManager assets) {
+        super.doneLoading(assets);
+        for (Ability ability : abilities) {
+            ability.doneLoading(assets, this);
+        }
+    }
 
     public final Ability getAbility(int num) {
         return this.abilities[num];
@@ -128,7 +135,7 @@ public abstract class GameUnit extends DynamicObject {
         public void load(AssetManager assets) {
             super.load(assets);
             for (Ability ability : abilities) {
-                assets.load(ability.iconPath(), Texture.class);
+                ability.load(assets);
             }
         }
 

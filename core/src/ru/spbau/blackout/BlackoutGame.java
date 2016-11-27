@@ -19,9 +19,6 @@ import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
 import ru.spbau.blackout.settings.GameSettings;
-import ru.spbau.blackout.shapescreators.CircleCreator;
-import ru.spbau.blackout.units.Rpx;
-import ru.spbau.blackout.units.Vpx;
 import ru.spbau.blackout.utils.AssetLoader;
 import ru.spbau.blackout.utils.ScreenManager;
 
@@ -71,7 +68,7 @@ public class BlackoutGame extends Game {
 
 	// FIXME:  just for test
     public void testGameScreen() {
-        AbilityIconSettings firstIconSettings = new AbilityIconSettings(0 /*num*/, 500 /*x*/, 100 /*y*/);
+        AbilityIconSettings firstIconSettings = new AbilityIconSettings(0 /*num*/, 1200 /*x*/, 400 /*y*/);
         IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
         GameSettings settings = new GameSettings(uiSettings);  // just default settings
 

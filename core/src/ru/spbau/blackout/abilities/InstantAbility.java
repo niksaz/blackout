@@ -11,14 +11,14 @@ public abstract class InstantAbility extends Ability {
         super(level);
     }
 
-    public abstract void castBy(GameUnit unit);
+    public abstract void cast();
 
     @Override
-    public final void onCastStart(GameUnit unit) {
-        this.castBy(unit);
+    public final void onCastStart() {
+        this.cast();
     }
     @Override
-    public final void inCast(GameUnit unit, float deltaTime) { /*nothing*/ }
+    public final void inCast(float deltaTime) { /*nothing*/ }
     @Override
-    public final void onCastEnd(GameUnit unit) { /*nothing*/ }
+    public final void onCastEnd() { /*nothing*/ }
 }

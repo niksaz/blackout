@@ -1,12 +1,11 @@
-package ru.spbau.blackout.entities.shells;
+package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameWorld;
-import ru.spbau.blackout.entities.DynamicObject;
-import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.utils.Creator;
+
 
 public class ShellObject extends DynamicObject {
     protected ShellObject(Definition def, Model model, GameWorld gameWorld) {

@@ -30,7 +30,7 @@ import ru.spbau.blackout.utils.InplaceSerializable;
  *
  * <p>Physics system:
  * <br>Due to box2d limitations there is a complex system around it based on two steps.
- * TODO: describe two physics steps.
+ * TODO: describe two(three) physics steps.
  */
 public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     public static final float WORLD_STEP = 1 / 58f;
