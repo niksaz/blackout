@@ -4,41 +4,38 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 
 // I know that libgdx has its own API for progress bars, but this one is much better in some cases.
+// Also it's adapted for the project (project-specific methods like load and doneLoading).
 /**
  * Provides easy and powerful API for creating progress bars.
  */
 public class SimpleProgressBar extends Actor {
-    private final String fullTexturePath;
-    private final String emptyTexturePath;
+    private String fullTexturePath;
+    private String emptyTexturePath;
 
     private TextureRegionDrawable full;
     private TextureRegionDrawable empty;
 
-    public final Vector2 position = new Vector2();
-    public final Vector2 size = new Vector2();
-
     private /*final*/ int fullWidth;
     private float minValue;
     private float maxValue;
-    private float value;
+    private float normalizedValue;
 
 
-    public SimpleProgressBar(String fullTexturePath, String emptyTexturePath, float minValue, float maxValue) {
+    public SimpleProgressBar(String emptyTexturePath, String fullTexturePath, float minValue, float maxValue) {
         this.fullTexturePath = fullTexturePath;
         this.emptyTexturePath = emptyTexturePath;
         this.minValue = minValue;
         this.maxValue = maxValue;
-        this.value = minValue;
+        this.normalizedValue = minValue;
     }
 
-    public SimpleProgressBar(String fullTexturePath, String emptyTexturePath) {
-        this(fullTexturePath, emptyTexturePath, 0, 1);
+    public SimpleProgressBar(String emptyTexturePath, String fullTexturePath) {
+        this(emptyTexturePath, fullTexturePath, 0, 1);
     }
 
 
@@ -52,22 +49,26 @@ public class SimpleProgressBar extends Actor {
         this.fullWidth = fullTexture.getWidth();
         this.full = new TextureRegionDrawable(new TextureRegion(fullTexture));
         this.empty = new TextureRegionDrawable(new TextureRegion(assets.get(this.emptyTexturePath, Texture.class)));
-        this.setValue(minValue);
+        this.setNormalizedValue(minValue);
+
+        this.fullTexturePath = null;
+        this.emptyTexturePath = null;
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
-        float normalized = (this.value - this.minValue) / this.maxValue;  // from 0 to 1
-        this.full.getRegion().setRegionWidth((int) Math.floor(normalized * this.fullWidth));
+        this.full.getRegion().setRegionWidth((int) Math.floor(normalizedValue * this.fullWidth));
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        full.draw(batch, position.x, position.y, size.x, size.y);
-        empty.draw(batch, position.x, position.y, size.x, size.y);
+        empty.draw(batch, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        full.draw(batch, this.getX(), this.getY(), normalizedValue * this.getWidth(), this.getHeight());
     }
 
-    public void setValue(float value) { this.value = value; }
+    public void setNormalizedValue(float normalizedValue) {
+        this.normalizedValue = (normalizedValue - this.minValue) / this.maxValue;  // from 0 to 1
+    }
 }
