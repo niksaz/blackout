@@ -74,7 +74,6 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
             //object.inplaceSerialize(out);
 
             Vector2 sending = object.getPosition();
-            //Vector2 sending = new Vector2(v2.x, v2.y);
             out.writeFloat(sending.x);
             out.writeFloat(sending.y);
             if (object instanceof GameUnit) {
@@ -83,12 +82,21 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
                 out.writeFloat(sending.x);
                 out.writeFloat(sending.y);
             }
+
+            // ???? do not work
+            // Vector2 ob = object.getPosition();
+            // out.writeObject(ob);
+
+            // ++++ correct
+            // Vector2 ob = object.getPosition();
+            // Vector2 c = new Vector2(ob.x, ob.y);
+            // out.writeObject(c);
+
+
             //long curTime = System.currentTimeMillis();
             //out.writeLong(curTime);
 
-//            Vector2 ob = object.getPosition();
-//            Vector2 c = new Vector2(ob.x, ob.y);
-//            out.writeObject(c);
+
 //            System.out.println("sent time " + c);
             //Vector2 v2 = ;//new Vector2(System.currentTimeMillis() % 1000, System.currentTimeMillis() % 1000);
 
@@ -123,10 +131,6 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         }
 
         return null;
-    }
-
-    public void reset(GameWorld otherWorld) {
-
     }
 
     public synchronized void update(float delta) {
