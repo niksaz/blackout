@@ -23,6 +23,10 @@ import static java.lang.Thread.sleep;
 import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
 import static ru.spbau.blackout.BlackoutGame.PORT_NUMBER;
 
+/**
+ * Task with the purpose of talking to a server: waiting in a queue, getting a game from a server,
+ * synchronizing state of a game, passing user inputs to a server (AbstractServer)
+ */
 public class AndroidClient implements Runnable, AbstractServer {
 
     private static final String TAG = "AndroidClient";

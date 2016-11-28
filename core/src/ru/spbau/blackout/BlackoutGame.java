@@ -19,6 +19,9 @@ import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.AssetLoader;
 import ru.spbau.blackout.utils.ScreenManager;
 
+/**
+ * Singleton game class which is called by libGdx when it starts a game on a platform.
+ */
 public class BlackoutGame extends Game {
 
     private static final BlackoutGame INSTANCE = new BlackoutGame(new ScreenManager());

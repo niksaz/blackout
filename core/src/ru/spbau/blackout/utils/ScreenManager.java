@@ -5,6 +5,9 @@ import com.badlogic.gdx.utils.Array;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.screens.BlackoutScreen;
 
+/**
+ * Used to put a new screen instead of last one but also saves references to screens for reusing.
+ */
 public class ScreenManager {
 
     private final Array<BlackoutScreen> screens = new Array<>();
@@ -27,5 +30,4 @@ public class ScreenManager {
         }
         BlackoutGame.getInstance().setScreen(screens.peek());
     }
-
 }

@@ -112,18 +112,6 @@ class Game extends Thread {
                 e.printStackTrace();
             }
         }
-
-//        do {
-//            for (ClientThread thread : clients) {
-//                GameState currentClientGameState = thread.getClientGameState();
-//                if (currentClientGameState == GameState.FINISHED) {
-//                    server.log(thread.getClientName() +
-//                               " disconnected. Game with id #" + gameId + " will be finished.");
-//                    gameState.set(GameState.FINISHED);
-//                    break;
-//                }
-//            }
-//        } while (gameState.get() != GameState.FINISHED);
     }
 
     void setVelocityFor(int numberInArray, Vector2 newVelocity) {
