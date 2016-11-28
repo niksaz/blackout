@@ -28,16 +28,28 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  * Isn't connected with any graphics or audio in order to be able to be run on server.
  * Also used to send information about the game state from the server to clients.
  *
+ *
  * <p>Physics system:
  * <br>Due to box2d limitations there is a complex system around it based on two steps.
- * TODO: describe two(three) physics steps.
+ *
+ * <br>Physic driver used with the fixed step (see WORLD_STEP static field) and without interpolation.
+ *
+ * <br>The first step is when external velocity is processed. In <code>updateForFirstStep</code> method
+ * each object must set its external velocity as its body's velocity.
+ *
+ * <br>In <code>updateForSecondStep</code> method each object must get its new external velocity from
+ * its body's velocity and then it must put its own velocity (just like <code>selfVelocity</code> of GameUnit) instead.
+ * The resulting velocity of the second step isn't important.
+ *
+ * <br>There is one more method called <code>updateState</code>. It must update things which are not connected
+ * with physic driver. This method called one time per frame (i.e. without fixed step).
  */
 public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
+    /** The fixed physic driver's step. */
     public static final float WORLD_STEP = 1 / 58f;
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
-    // TODO: UID
     private final List<GameObject> gameObjects = new LinkedList<>();
     transient private final World world;
     transient private float accumulator = 0;

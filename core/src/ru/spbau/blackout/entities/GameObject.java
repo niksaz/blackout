@@ -87,14 +87,20 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
 
     /**
-     * Update things not connected with physics.
+     * Update things not connected with physics. See <code>GameWorld</code> documentation.
      */
     public void updateState(float deltaTime) {}
-
+    /** See <code>GameWorld</code> documentation. */
     public void updateForFirstStep() {}
+    /** See <code>GameWorld</code> documentation. */
     public void updateForSecondStep() {}
 
 
+    /**
+     * Sets mass of the object. It mainly works just like expected:
+     * the mass is higher, the harder to move object by applying external force.
+     * One thing which can be unexpected is that velocity itself isn't connected with mass.
+     */
     public void setMass(float newMass) {
         MassData massData = body.getMassData();
 
@@ -105,9 +111,15 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         body.setMassData(massData);
     }
 
+    /**
+     * Kill the unit. It will be removed from the <code>GameWorld</code> and from the map
+     * after paying death animation.
+     */
     public void kill() {
         // TODO: override
-        this.dead = true;   // it will be handled in GameWorld update
+        // It will be handled in GameWorld::update. It's a bad idea to try to remove body
+        // from GameWorld right here because this method can be called in process of updating physics.
+        this.dead = true;
         this.model = Optional.empty();  // FIXME: play death animation
     }
 

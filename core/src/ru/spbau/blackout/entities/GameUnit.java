@@ -85,7 +85,7 @@ public abstract class GameUnit extends DynamicObject {
         );
     }
 
-    public final Vector2 getSelfVelocity() {
+    public final synchronized Vector2 getSelfVelocity() {
         return selfVelocity;
     }
 
