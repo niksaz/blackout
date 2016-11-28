@@ -287,7 +287,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private static final String PATH_FULL = "images/progress_bar/full.png";
         // current progress bar isn't scalable.
         private static final float WIDTH = Rpx.X.fromCm(6f);
-        private static final float HEIGHT = Rpx.Y.fromCm(1f);
-        private static final float START_Y = Rpx.Y.fromVpx(VIRTUAL_WORLD_HEIGHT / 10);
+        private static final float HEIGHT = Rpx.Y.fromCm(0.8f);
+        private static final float START_Y = Rpx.Y.fromVpx(VIRTUAL_WORLD_HEIGHT / 5);
     }
 }

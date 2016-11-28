@@ -46,11 +46,15 @@ public class SimpleProgressBar extends Actor {
 
     public void doneLoading(AssetManager assets) {
         Texture fullTexture = assets.get(this.fullTexturePath, Texture.class);
+        Utils.addAntiAliassing(fullTexture);
         this.fullWidth = fullTexture.getWidth();
         this.full = new TextureRegionDrawable(new TextureRegion(fullTexture));
-        this.empty = new TextureRegionDrawable(new TextureRegion(assets.get(this.emptyTexturePath, Texture.class)));
-        this.setNormalizedValue(minValue);
 
+        Texture emptyTexture = assets.get(this.emptyTexturePath, Texture.class);
+        Utils.addAntiAliassing(emptyTexture);
+        this.empty = new TextureRegionDrawable(new TextureRegion(emptyTexture));
+
+        this.setNormalizedValue(minValue);
         this.fullTexturePath = null;
         this.emptyTexturePath = null;
     }
