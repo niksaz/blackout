@@ -17,9 +17,11 @@ public class Hero extends GameUnit {
 
 
     public static class Definition extends GameUnit.Definition implements Serializable {
-        public Definition(String modelPath, Creator<Shape> shapeCreator, Ability[] abilities) {
-            super(modelPath, shapeCreator, abilities);
+        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY,
+                          Ability[] abilities) {
+            super(modelPath, shapeCreator, initialX, initialY, abilities);
         }
+
 
         @Override
         public GameObject makeInstance(float x, float y) {

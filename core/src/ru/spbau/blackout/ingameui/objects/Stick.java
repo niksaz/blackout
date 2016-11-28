@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUIObject;
@@ -36,20 +37,22 @@ public class Stick extends IngameUIObject {
 
 
     @Override
-    public void load(AssetManager assets) {
+    public void load(GameContext context) {
+        AssetManager assets = context.assets().get();
         assets.load(TouchImg.IMAGE_PATH, Texture.class);
         assets.load(MainImg.IMAGE_PATH, Texture.class);
     }
 
     @Override
-    public void doneLoading(AssetManager assets, Stage stage, Hero hero) {
+    public void doneLoading(GameContext context, Stage stage, Hero hero) {
         this.unit = hero;
+        AssetManager assets = context.assets().get();
 
         // touch image initialization
-        touchImage = new Image(assets.get(TouchImg.IMAGE_PATH, Texture.class));
-        touchImage.setSize(TouchImg.X.SIZE, TouchImg.Y.SIZE);
+        this.touchImage = new Image(assets.get(TouchImg.IMAGE_PATH, Texture.class));
+        this.touchImage.setSize(TouchImg.X.SIZE, TouchImg.Y.SIZE);
         updateTouchPosition();
-        stage.addActor(touchImage);
+        stage.addActor(this.touchImage);
 
         // main image initialization
         // must go after touch image initialization to be in the foreground

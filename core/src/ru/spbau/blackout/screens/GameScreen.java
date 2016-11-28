@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.List;
-import java.util.Optional;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
@@ -21,6 +20,7 @@ import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
+import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.gamesession.GameSessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
@@ -53,23 +53,20 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
     public GameScreen(GameSessionSettings sessionSettings, AbstractServer server, GameSettings settings) {
         this.server = server;
-        loadingScreen = new LoadingScreen(sessionSettings);
-        ui = new IngameUI(this, settings.ui);
+        this.loadingScreen = new LoadingScreen(sessionSettings);
+        this.ui = new IngameUI(this.getServer(), settings.ui);
 
         // initialize main camera
-        camera = new PerspectiveCamera();
-        camera.fieldOfView = 67;
-        camera.near = 1f;
-        camera.far = 30000f;
+        this.camera = new PerspectiveCamera();
+        this.camera.fieldOfView = 67;
+        this.camera.near = 1f;
+        this.camera.far = 30000f;
 
         // initialize environment
-        environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 100f));
-        environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.2f, 0f, 0.2f, -1f));
+        this.environment = new Environment();
+        this.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 100f));
+        this.environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.2f, 0f, 0.2f, -1f));
     }
-
-
-    public boolean isDoneLoading() { return doneLoading; }
 
 
     // instance of GameContext
@@ -79,15 +76,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     @Override
-    public Optional<Hero> character() {
-        return null;
-    }
-
-    @Override
     public GameWorld gameWorld() { return gameWorld; }
-
-    @Override
-    public AbstractServer server() { return server; }
 
 
     // instance of Screen
@@ -132,6 +121,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     public void dispose() {
         super.dispose();
     }
+
+
+    public AbstractServer getServer() { return server; }
+    public Hero getCharacter() { return character; }
+    public boolean isDoneLoading() { return doneLoading; }
 
 
     /**
@@ -215,17 +209,20 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         private void doneLoading() {
             for (GameObject.Definition def : objectDefs) {
-                GameObject obj = def.makeInstance(assets.get(def.modelPath, Model.class), gameWorld);
+                def.doneLoading(GameScreen.this);
+                GameObject obj = def.makeInstance();
                 if (def == characterDef) {
-                    character = (Hero)obj;
+                    character = (Hero) obj;
                 }
             }
-            // TODO: assert that character != null
+            if (character == null) {
+                throw new AssertionError("Player without character");
+            }
 
             map = new ModelInstance(assets.get(mapPath, Model.class));
             fixTop(map);
 
-            ui.doneLoading(assets, character);
+            ui.doneLoading(GameScreen.this, character);
             GameScreen.this.doneLoading();
 
             BlackoutGame.get().screenManager().disposeScreen();

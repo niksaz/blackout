@@ -9,9 +9,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
+import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.screens.GameScreen;
 
 
@@ -25,29 +27,29 @@ public class IngameUI {
     /**
      * Creates all UI elements and sets itself as input processor.
      */
-    public IngameUI(GameScreen screen, IngameUISettings settings) {
+    public IngameUI(AbstractServer server, IngameUISettings settings) {
         Camera camera = new OrthographicCamera();
         this.stage = new Stage(new ScreenViewport(camera), BlackoutGame.get().spriteBatch());
 
         Gdx.input.setInputProcessor(this.stage);
 
-        this.uiObjects.add(new ru.spbau.blackout.ingameui.objects.Stick(screen.getServer(), settings.stickSettings));
+        this.uiObjects.add(new ru.spbau.blackout.ingameui.objects.Stick(server, settings.stickSettings));
         for (AbilityIconSettings iconSettings : settings.abilities) {
-            this.uiObjects.add(new ru.spbau.blackout.ingameui.objects.AbilityIcon(screen.getServer(), iconSettings));
+            this.uiObjects.add(new ru.spbau.blackout.ingameui.objects.AbilityIcon(server, iconSettings));
         }
     }
 
     /** Load necessary assets. */
-    public void load(AssetManager assets) {
+    public void load(GameContext context) {
         for (IngameUIObject object : uiObjects) {
-            object.load(assets);
+            object.load(context);
         }
     }
 
     /** When assets are loaded. */
-    public void doneLoading(AssetManager assets, Hero character) {
+    public void doneLoading(GameContext context, Hero character) {
         for (IngameUIObject object : uiObjects) {
-            object.doneLoading(assets, stage, character);
+            object.doneLoading(context, stage, character);
         }
     }
 

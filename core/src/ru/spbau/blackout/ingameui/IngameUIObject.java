@@ -22,7 +22,7 @@ public abstract class IngameUIObject {
     /** Load assets. */
     public abstract void load(GameContext context);
     /** When assets are loaded. */
-    public abstract void doneLoading(GameContext context, Stage stage);
+    public abstract void doneLoading(GameContext context, Stage stage, Hero hero);
     /** Update for each frame. */
     public abstract void update(float deltaTime);
 }

@@ -2,10 +2,7 @@ package ru.spbau.blackout;
 
 import com.badlogic.gdx.assets.AssetManager;
 
-import java.util.Optional;
-
-import ru.spbau.blackout.entities.Hero;
-import ru.spbau.blackout.network.AbstractServer;
+import ru.spbau.blackout.java8features.Optional;
 
 
 /**
@@ -16,6 +13,4 @@ import ru.spbau.blackout.network.AbstractServer;
 public interface GameContext {
     Optional<AssetManager> assets();
     GameWorld gameWorld();
-    AbstractServer server();
-    Optional<Hero> character();
 }

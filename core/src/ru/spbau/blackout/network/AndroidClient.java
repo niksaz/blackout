@@ -107,7 +107,7 @@ public class AndroidClient implements Runnable, AbstractServer {
             while (true) {
                 // should read game world here from inputStream
 
-                final GameWorld currentWorld = gameScreen.getGameWorld();
+                final GameWorld currentWorld = gameScreen.gameWorld();
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (currentWorld) {
                     currentWorld.inplaceDeserialize(in);

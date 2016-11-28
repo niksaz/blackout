@@ -36,7 +36,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
 
     protected GameObject(Definition def, float x, float y) {
-        this.model = model == null ? null : new ModelInstance(model);
+        this.model = new ModelInstance(def.model);
 
         body = def.registerObject(this);
 

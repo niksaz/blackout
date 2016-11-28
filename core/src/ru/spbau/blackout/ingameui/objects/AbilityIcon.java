@@ -41,7 +41,7 @@ public class AbilityIcon extends IngameUIObject {
         this.ability = hero.getAbility(this.settings.getAbilityNum());
 
         // icon initialization
-        assert context.assets()ss
+        // TODO: assert context.assets().isPresent()
         this.icon = new Image(context.assets().get().get(this.getAbility().iconPath(), Texture.class));
         this.icon.setSize(this.settings.getSizeX(), this.settings.getSizeY());
         this.icon.setPosition(settings.getStartX(), settings.getStartY());
