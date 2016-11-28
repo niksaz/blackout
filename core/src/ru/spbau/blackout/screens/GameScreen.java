@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -14,6 +16,8 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.List;
@@ -30,8 +34,10 @@ import ru.spbau.blackout.gamesession.GameSessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.units.Rpx;
 import ru.spbau.blackout.utils.SimpleProgressBar;
+import ru.spbau.blackout.utils.Utils;
 
 import static ru.spbau.blackout.BlackoutGame.VIRTUAL_WORLD_HEIGHT;
+import static ru.spbau.blackout.BlackoutGame.VIRTUAL_WORLD_WIDTH;
 import static ru.spbau.blackout.java8features.Functional.foreach;
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
@@ -174,12 +180,16 @@ public class GameScreen extends BlackoutScreen implements GameContext {
      * Screen with progress bar which is showed during loading assets.
      */
     private class LoadingScreen extends BlackoutScreen {
+        public static final String BACKGROUND_IMAGE = "images/loading_screen.png";
+
+
         private final List<GameObject.Definition> objectDefs;
         private final Character.Definition characterDef;
         private final String mapPath;
         private final Stage stage;
         private final SimpleProgressBar progressBar =
                 new SimpleProgressBar(ProgressBarConst.PATH_EMPTY, ProgressBarConst.PATH_FULL);
+        private Image background;
         private boolean loadingScreenLoaded = false;
 
 
@@ -203,6 +213,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             super.show();
             // first of all, it loads its own resources.
             this.progressBar.load(assets);
+            assets.load(BACKGROUND_IMAGE, Texture.class);
         }
 
         @Override
@@ -221,7 +232,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                     // end loading
                     this.doneLoading();
                 } else {
-                    // show progress bar
+                    // show loading screen
                     float progress = assets.getProgress();
                     System.out.println(progress);
                     this.progressBar.setNormalizedValue(progress);
@@ -229,9 +240,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                     this.stage.draw();
                 }
             } else if (loaded) {
-                // initialize progress bar, start loading real resources
-                progressBar.doneLoading(assets);
-                this.stage.addActor(progressBar);
+                // initialize loading screen, start loading real resources
+                this.initializeLoadingScreen();
                 this.loadRealResources();
                 loadingScreenLoaded = true;
             }
@@ -248,6 +258,18 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             // TODO: dispose progress bar's resources
         }
 
+        private void initializeLoadingScreen() {
+            Texture backgroundTexture = assets.get(BACKGROUND_IMAGE, Texture.class);
+            Utils.addAntiAliassing(backgroundTexture);
+            this.background = new Image(backgroundTexture);
+            this.background.setPosition(0, 0);
+            this.background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            this.stage.addActor(this.background);
+
+            this.progressBar.doneLoading(assets);
+            this.progressBar.toFront();
+            this.stage.addActor(progressBar);
+        }
 
         private void loadRealResources() {
             ui.load(GameScreen.this);
@@ -286,8 +308,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private static final String PATH_EMPTY = "images/progress_bar/empty.png";
         private static final String PATH_FULL = "images/progress_bar/full.png";
         // current progress bar isn't scalable.
-        private static final float WIDTH = Rpx.X.fromCm(6f);
-        private static final float HEIGHT = Rpx.Y.fromCm(0.8f);
+        private static final float WIDTH = Math.min(Rpx.X.fromCm(10f), Rpx.X.fromVpx(VIRTUAL_WORLD_WIDTH / 2));
+        private static final float HEIGHT = Math.min(Rpx.Y.fromCm(1.3f), Rpx.Y.fromVpx(VIRTUAL_WORLD_HEIGHT / 8));
         private static final float START_Y = Rpx.Y.fromVpx(VIRTUAL_WORLD_HEIGHT / 5);
     }
 }
