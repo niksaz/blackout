@@ -10,9 +10,10 @@ import ru.spbau.blackout.utils.Creator;
 public class FireballObject extends AbilityObject {
     private float timeRest;
 
-    public FireballObject(AbilityObject.Definition def, float x, float y, float time) {
+
+    protected FireballObject(FireballObject.Definition def, float x, float y) {
         super(def, x, y);
-        this.timeRest = time;
+        this.timeRest = def.timeToLive;
     }
 
 
@@ -25,6 +26,10 @@ public class FireballObject extends AbilityObject {
         }
     }
 
+
+    /**
+     * Additionally defines timeToLive for an object.
+     */
     public static class Definition extends AbilityObject.Definition {
         public float timeToLive;
 
@@ -33,10 +38,9 @@ public class FireballObject extends AbilityObject {
             this.timeToLive = timeToLive;
         }
 
-
         @Override
         public GameObject makeInstance(float x, float y) {
-            return new FireballObject(this, x, y, timeToLive);
+            return new FireballObject(this, x, y);
         }
     }
 }

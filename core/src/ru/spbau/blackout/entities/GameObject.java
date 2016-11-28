@@ -41,6 +41,9 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     private boolean dead = false;
 
 
+    /**
+     * Constructs defined object at the given position.
+     */
     protected GameObject(Definition def, float x, float y) {
         this.model = def.model.map(ModelInstance::new);
 
@@ -82,7 +85,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
             updateTransform();
             model.getRenderables(renderables, pool);
         });
-
     }
 
 
@@ -91,9 +93,9 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
      */
     public void updateState(float deltaTime) {}
     /** See <code>GameWorld</code> documentation. */
-    public void updateForFirstStep() {}
+    public abstract void updateForFirstStep();
     /** See <code>GameWorld</code> documentation. */
-    public void updateForSecondStep() {}
+    public abstract void updateForSecondStep();
 
 
     /**
@@ -112,8 +114,8 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     }
 
     /**
-     * Kill the unit. It will be removed from the <code>GameWorld</code> and from the map
-     * after paying death animation.
+     * Kill the unit. It will be removed from the <code>GameWorld</code>
+     * and from the map after paying death animation.
      */
     public void kill() {
         // TODO: override

@@ -10,6 +10,11 @@ public abstract class StaticObject extends GameObject {
         super(def, x, y);
     }
 
+    // We don't need to update velocity for static objects
+    @Override
+    public void updateForSecondStep() {}
+    @Override
+    public void updateForFirstStep() {}
 
     /** Definition for objects which have Static body type. */
     public static abstract class Definition extends GameObject.Definition {

@@ -30,10 +30,6 @@ public final class Utils {
         model.transform.rotateRad(Vector3.X, PI / 2f);
     }
 
-    public static float projectVec(Vector2 vec, Vector2 base) {
-        return vec.len() * MathUtils.cos(vec.angleRad(base));
-    }
-
     public static float sqr(float x) {
         return x * x;
     }

@@ -11,22 +11,18 @@ import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Utils;
 
-import static ru.spbau.blackout.utils.Utils.projectVec;
-import static ru.spbau.blackout.utils.Utils.sqr;
-
 
 /**
  * Unit is a dynamic object which can move by itself and cast abilities.
  * Also it has friction.
  */
 public abstract class GameUnit extends DynamicObject {
+    /** Constant holder class to provide names for animations. */
     public static class Animations extends DynamicObject.Animations {
+        protected Animations() {}
         public static final String WALK = "Armature|Walk";
         public static final String STAY = "Armature|Stay";
-
         public static final float WALK_SPEED_FACTOR = 3f;
-
-        protected Animations() {}
     }
 
     public static final float SLOW_DOWN_FACTOR = 0.02f;
@@ -35,7 +31,7 @@ public abstract class GameUnit extends DynamicObject {
     public static final float DEFAULT_ANGULAR_FRICTION = 5f;
 
     // Movement:
-    private Vector2 selfVelocity = new Vector2();
+    private final Vector2 selfVelocity = new Vector2();
     private float speed;
     transient private final Ability[] abilities;
 
@@ -64,19 +60,17 @@ public abstract class GameUnit extends DynamicObject {
     public void updateForSecondStep() {
         super.updateForSecondStep();
 
-        float projection = projectVec(selfVelocity, velocity);
-        if (projection < 0) {
-            float slowDown = -projection * SLOW_DOWN_FACTOR;
-
-//             decrease velocity
-            if (velocity.len2() <= sqr(slowDown)) {
-                velocity.set(0, 0);
-            } else {
-                velocity.set(
-                        velocity.x - Math.signum(velocity.x) * slowDown,
-                        velocity.y - Math.signum(velocity.y) * slowDown
-                );
-            }
+        // Resistance to external velocity by unit (selfVelocity)
+        if (!Utils.isZeroVec(velocity)) {
+            // some inefficient, but clear pseudocode in comments:
+            // float proj = |projection of selfVelocity on velocity|
+            // float k = proj / |velocity| * SLOW_DOWN_FACTOR
+            float k = this.selfVelocity.dot(velocity) / this.velocity.len2() * SLOW_DOWN_FACTOR;
+            // don't increase velocity
+            if (k > 0) { k = 0; }
+            // don't accelerate to the opposite direction
+            if (k < -1) { k = -1; }
+            this.velocity.mulAdd(this.velocity, k);
         }
 
         body.setLinearVelocity(
@@ -86,7 +80,8 @@ public abstract class GameUnit extends DynamicObject {
     }
 
     public final synchronized Vector2 getSelfVelocity() {
-        return selfVelocity;
+        // to ensure that nobody will change it outside avoiding setSelfVelocity method.
+        return new Vector2(selfVelocity);
     }
 
     @Override
@@ -98,25 +93,28 @@ public abstract class GameUnit extends DynamicObject {
         return other;
     }
 
-    public void setSelfVelocity(final Vector2 vel) {
-        if (Utils.isZeroVec(vel)) {
+
+    public void setSelfVelocity(Vector2 newVelocity) {
+        if (Utils.isZeroVec(newVelocity)) {
             // on stop walking
-            if (!Utils.isZeroVec(selfVelocity.x, selfVelocity.y)) {
-                animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
-                animationSpeed = 1f;
+            if (!Utils.isZeroVec(this.selfVelocity)) {
+                this.animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
+                this.animationSpeed = 1f;
             }
         } else {
             // on start walking
-            if (Utils.isZeroVec(selfVelocity.x, selfVelocity.y)) {
-                animation.ifPresent(controller -> controller.setAnimation(Animations.WALK, -1));
+            if (Utils.isZeroVec(this.selfVelocity)) {
+                this.animation.ifPresent(controller -> controller.setAnimation(Animations.WALK, -1));
             }
 
-            animationSpeed = vel.len() * Animations.WALK_SPEED_FACTOR;
-            setDirection(vel);
+            this.animationSpeed = newVelocity.len() * Animations.WALK_SPEED_FACTOR;
+            this.setDirection(newVelocity);
         }
 
-        selfVelocity.set(vel.x * speed, vel.y * speed);
+        this.selfVelocity.set(newVelocity.x * speed, newVelocity.y * speed);
     }
+
+    public void setSelfVelocity(float x, float y) { setSelfVelocity(new Vector2(x, y)); }
 
 
     /** Definition for units. Loads abilities. */
