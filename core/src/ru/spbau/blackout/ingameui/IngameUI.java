@@ -51,6 +51,7 @@ public class IngameUI {
 
     /** Update for each frame. */
     public void update(float deltaTime) {
+        this.stage.act(deltaTime);
         foreach(uiObjects, object -> object.update(deltaTime));
     }
 

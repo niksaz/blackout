@@ -2,8 +2,12 @@ package ru.spbau.blackout.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -11,6 +15,10 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.List;
 
@@ -77,7 +85,9 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     @Override
-    public GameWorld gameWorld() { return gameWorld; }
+    public GameWorld gameWorld() {
+        return gameWorld;
+    }
 
 
     // instance of Screen
@@ -104,9 +114,10 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         modelBatch.render(map, environment);
         modelBatch.end();
 
+        ui.update(deltaTime);  // FIXME: should be in common update method
         ui.draw();
 
-        update(deltaTime);
+        update(deltaTime);  // FIXME: why it is in the end of render. It doesn't look logical.
     }
 
     @Override
@@ -124,17 +135,25 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
 
-    public AbstractServer getServer() { return server; }
-    public Character getCharacter() { return character; }
-    public boolean isDoneLoading() { return doneLoading; }
+    public AbstractServer getServer() {
+        return server;
+    }
+
+    public Character getCharacter() {
+        return character;
+    }
+
+    public boolean isDoneLoading() {
+        return doneLoading;
+    }
 
 
     /**
      * Updates game world on every frame.
      */
-    private void update(final float delta) {
+    private void update(final float deltaTime) {  // FIXME: m.b. this method is redundant
         synchronized (gameWorld) {
-            gameWorld.update(delta);
+            gameWorld.update(deltaTime);
         }
 
         // Must go after gameWorld.update to be synced.
@@ -151,43 +170,69 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         loadingScreen = null;
     }
 
-    private class LoadingScreen extends BlackoutScreen {
-        final List<GameObject.Definition> objectDefs;
-        final Character.Definition characterDef;
-        final String mapPath;
 
-        LoadingScreen(GameSessionSettings room) {
+    /**
+     * Screen with progress bar which is showed during loading assets.
+     */
+    private class LoadingScreen extends BlackoutScreen {
+        private static final String KNOB_BEFORE = "images/ui/progress_bar/knob_before.png";
+        private static final String KNOB = "images/ui/progress_bar/knob.png";
+        private static final String KNOB_AFTER = "images/ui/progress_bar/knob_after.png";
+        private static final String BACKGROUND = "images/ui/progress_bar/background.png";
+
+
+        private final List<GameObject.Definition> objectDefs;
+        private final Character.Definition characterDef;
+        private final String mapPath;
+        private final Stage stage;
+        private ProgressBar progressBar;
+        private boolean loadingScreenLoaded = false;
+
+
+        public LoadingScreen(GameSessionSettings room) {
             // getting information from room
             this.objectDefs = room.getObjectDefs();
             this.characterDef = room.getCharacter();
             this.mapPath = room.getMap();
+
+            Camera camera = new OrthographicCamera();
+            this.stage = new Stage(new ScreenViewport(camera), BlackoutGame.get().spriteBatch());
         }
+
 
         @Override
         public void show() {
             super.show();
-
-            // start loading
-            ui.load(GameScreen.this);
-            foreach(objectDefs, def -> def.load(GameScreen.this));
-            assets.load(mapPath, Model.class);
+            // first of all, it loads its own resources.
+            this.loadSelfResources();
         }
 
         @Override
         public void render(float delta) {
             super.render(delta);
 
+            // fill screen by gray color
             Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-            doLoading();
+            // do loading
+            boolean loaded = assets.update();
 
-            float progress = assets.getProgress();
-            // TODO: show progress
-
-            // TODO: beautiful loading screen
-            /*if(assets.isLoaded(LOADING_SCREEN)) {
-            }*/
+            if (loadingScreenLoaded) {
+                if (loaded) {
+                    this.doneLoading();
+                } else {
+                    float progress = assets.getProgress();
+                    System.out.println(progress);
+                    this.progressBar.setValue(progress);
+                    this.stage.act();
+                    this.stage.draw();
+                }
+            } else if (loaded) {
+                loadingScreenLoaded = true;
+                this.loadRealResources();
+                this.initializeProgressBar();
+            }
         }
 
         @Override
@@ -198,12 +243,43 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         @Override
         public void dispose() {
             super.dispose();
+            // TODO: dispose progress bar's resources
         }
 
-        private void doLoading() {
-            if (assets.update()) {
-                doneLoading();
-            }
+
+        /** Starts loading of resources which are necessary to show <code>LoadingScreen</code> itself. */
+        private void loadSelfResources() {
+            assets.load(KNOB_BEFORE, Texture.class);
+            assets.load(KNOB, Texture.class);
+            assets.load(KNOB_AFTER, Texture.class);
+            assets.load(BACKGROUND, Texture.class);
+        }
+
+        private void loadRealResources() {
+            ui.load(GameScreen.this);
+            foreach(this.objectDefs, def -> def.load(GameScreen.this));
+            assets.load(this.mapPath, Model.class);
+        }
+
+        private void initializeProgressBar() {
+            TextureRegionDrawable knobBefore = this.getTextureRegion(KNOB_BEFORE);
+            TextureRegionDrawable knob = this.getTextureRegion(KNOB);
+            TextureRegionDrawable knobAfter = this.getTextureRegion(KNOB_AFTER);
+            TextureRegionDrawable background = this.getTextureRegion(BACKGROUND);
+
+            ProgressBar.ProgressBarStyle barStyle = new ProgressBar.ProgressBarStyle();
+            barStyle.knobBefore = knobBefore;
+            barStyle.knob = knob;
+            barStyle.knobAfter = knobAfter;
+            barStyle.background = background;
+
+            this.progressBar = new ProgressBar(0, 1, 0.01f, false, barStyle);
+            this.progressBar.setPosition(10, 10);
+
+            this.progressBar.setSize(1000, this.progressBar.getPrefHeight());
+            this.progressBar.setAnimateDuration(2);
+
+            this.stage.addActor(this.progressBar);
         }
 
         private void doneLoading() {
@@ -227,6 +303,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             BlackoutGame.get().screenManager().disposeScreen();
 
             doneLoading = true;
+        }
+
+        /** Returns drawable object for the texture. */
+        private TextureRegionDrawable getTextureRegion(String path) {
+            return new TextureRegionDrawable(new TextureRegion(assets.get(path, Texture.class)));
         }
     }
 }

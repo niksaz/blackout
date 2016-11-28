@@ -22,12 +22,12 @@ public abstract class GameUnit extends DynamicObject {
         protected Animations() {}
         public static final String WALK = "Armature|Walk";
         public static final String STAY = "Armature|Stay";
-        public static final float WALK_SPEED_FACTOR = 3f;
+        public static final float WALK_ANIM_SPEED_FACTOR = 3f;
     }
 
     public static final float SLOW_DOWN_FACTOR = 0.02f;
 
-    public static final float DEFAULT_LINEAR_FRICTION = 5f;
+    public static final float DEFAULT_LINEAR_FRICTION = 20f;
     public static final float DEFAULT_ANGULAR_FRICTION = 5f;
 
     // Movement:
@@ -61,11 +61,11 @@ public abstract class GameUnit extends DynamicObject {
         super.updateForSecondStep();
 
         // Resistance to external velocity by unit (selfVelocity)
-        if (!Utils.isZeroVec(velocity)) {
+        if (!Utils.isZeroVec(this.velocity)) {
             // some inefficient, but clear pseudocode in comments:
             // float proj = |projection of selfVelocity on velocity|
             // float k = proj / |velocity| * SLOW_DOWN_FACTOR
-            float k = this.selfVelocity.dot(velocity) / this.velocity.len2() * SLOW_DOWN_FACTOR;
+            float k = this.selfVelocity.dot(this.velocity) / this.velocity.len2() * SLOW_DOWN_FACTOR;
             // don't increase velocity
             if (k > 0) { k = 0; }
             // don't accelerate to the opposite direction
@@ -73,10 +73,7 @@ public abstract class GameUnit extends DynamicObject {
             this.velocity.mulAdd(this.velocity, k);
         }
 
-        body.setLinearVelocity(
-                selfVelocity.x,
-                selfVelocity.y
-        );
+        this.body.setLinearVelocity(selfVelocity);
     }
 
     public final synchronized Vector2 getSelfVelocity() {
@@ -107,7 +104,7 @@ public abstract class GameUnit extends DynamicObject {
                 this.animation.ifPresent(controller -> controller.setAnimation(Animations.WALK, -1));
             }
 
-            this.animationSpeed = newVelocity.len() * Animations.WALK_SPEED_FACTOR;
+            this.animationSpeed = newVelocity.len() * Animations.WALK_ANIM_SPEED_FACTOR;
             this.setDirection(newVelocity);
         }
 

@@ -1,6 +1,5 @@
 package ru.spbau.blackout.entities;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import java.io.Serializable;
@@ -8,6 +7,7 @@ import java.io.Serializable;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
+
 
 public class Character extends GameUnit {
     public Character(GameUnit.Definition def, float x, float y, GameContext context) {
