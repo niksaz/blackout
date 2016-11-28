@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Arrays;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.GameWorld;
@@ -17,6 +18,7 @@ import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Utils;
 
+import static ru.spbau.blackout.java8features.Functional.foreach;
 import static ru.spbau.blackout.utils.Utils.projectVec;
 import static ru.spbau.blackout.utils.Utils.sqr;
 

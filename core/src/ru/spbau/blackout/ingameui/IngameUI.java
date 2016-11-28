@@ -16,6 +16,8 @@ import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.screens.GameScreen;
 
+import static ru.spbau.blackout.java8features.Functional.foreach;
+
 
 /**
  * Main class for in-game user interface.
@@ -41,23 +43,17 @@ public class IngameUI {
 
     /** Load necessary assets. */
     public void load(GameContext context) {
-        for (IngameUIObject object : uiObjects) {
-            object.load(context);
-        }
+        foreach(uiObjects, object -> object.load(context));
     }
 
     /** When assets are loaded. */
     public void doneLoading(GameContext context, Hero character) {
-        for (IngameUIObject object : uiObjects) {
-            object.doneLoading(context, stage, character);
-        }
+        foreach(uiObjects, object -> object.doneLoading(context, stage, character));
     }
 
     /** Update for each frame. */
     public void update(float deltaTime) {
-        for (IngameUIObject object : uiObjects) {
-            object.update(deltaTime);
-        }
+        foreach(uiObjects, object -> object.update(deltaTime));
     }
 
     /** On window resize */

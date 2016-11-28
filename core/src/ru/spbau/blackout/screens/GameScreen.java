@@ -25,6 +25,7 @@ import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.gamesession.GameSessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 
+import static ru.spbau.blackout.java8features.Functional.foreach;
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 public class GameScreen extends BlackoutScreen implements GameContext {
@@ -168,9 +169,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
             // start loading
             ui.load(GameScreen.this);
-            for (GameObject.Definition def : objectDefs) {
-                def.load(GameScreen.this);
-            }
+            foreach(objectDefs, def -> def.load(GameScreen.this));
             assets.load(mapPath, Model.class);
         }
 

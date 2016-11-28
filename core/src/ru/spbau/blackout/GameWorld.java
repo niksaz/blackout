@@ -1,7 +1,6 @@
 package ru.spbau.blackout;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -21,6 +20,8 @@ import java.util.List;
 
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.utils.InplaceSerializable;
+
+import static ru.spbau.blackout.java8features.Functional.foreach;
 
 
 /**
@@ -116,9 +117,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     public void update(float delta) {
         accumulator += delta;
 
-        for (GameObject object : gameObjects) {
-            object.updateState(delta);
-        }
+        foreach(gameObjects, object -> object.updateState(delta));
 
         while (accumulator >= WORLD_STEP) {
             step();
@@ -161,16 +160,10 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     private void step() {
-//        TODO: gameObjects.forEach(GameObject::updateForFirstStep);
-        for (GameObject object : this) {
-            object.updateForFirstStep();
-        }
+        foreach(this, GameObject::updateForFirstStep);
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-//        TODO: gameObjects.forEach(GameObject::updateForSecondStep);
-        for (GameObject object : this) {
-            object.updateForSecondStep();
-        }
+        foreach(this, GameObject::updateForSecondStep);
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }
 }
