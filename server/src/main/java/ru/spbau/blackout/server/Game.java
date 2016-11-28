@@ -1,22 +1,15 @@
 package ru.spbau.blackout.server;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.GameWorld;
-import ru.spbau.blackout.entities.Decoration;
-import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.entities.Hero;
-import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
-import ru.spbau.blackout.shapescreators.CircleCreator;
 
 /**
  * Multiplayer game representation. Used for synchronizing game's state and watching for game flow,
@@ -79,8 +72,8 @@ class Game extends Thread {
 //            def.makeInstance(null, gameWorld);
 //        }
 //
-//        clients.get(0).setSessionSettings(room, (Hero.Definition)room.objectDefs.get(0));
-//        clients.get(1).setSessionSettings(room, (Hero.Definition)room.objectDefs.get(1));
+//        clients.get(0).setSessionSettings(room, (Character.Definition)room.objectDefs.get(0));
+//        clients.get(1).setSessionSettings(room, (Character.Definition)room.objectDefs.get(1));
 
         // !!!!!!!
 

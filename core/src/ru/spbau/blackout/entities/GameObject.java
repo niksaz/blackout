@@ -10,11 +10,15 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.java8features.Function;
+import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.InplaceSerializable;
 
@@ -32,23 +36,26 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     private float height;
 
     // appearance:
-    transient protected ModelInstance model;
+    transient protected Optional<ModelInstance> model;
+
+    private boolean dead = false;
 
 
     protected GameObject(Definition def, float x, float y) {
-        this.model = new ModelInstance(def.model);
+        this.model = def.model.map(ModelInstance::new);
 
         body = def.registerObject(this);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = def.shapeCreator.create();
-        fixtureDef.density = def.density;
+        fixtureDef.density = 1;
         fixtureDef.friction = 0;
         fixtureDef.restitution = 0;
         body.createFixture(fixtureDef);
         fixtureDef.shape.dispose();
 
-        setPosition(x, y);
+        this.setPosition(x, y);
+        this.setMass(def.mass);
     }
 
 
@@ -71,18 +78,49 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
-        updateTransform();
-        model.getRenderables(renderables, pool);
+        model.ifPresent(model -> {
+            updateTransform();
+            model.getRenderables(renderables, pool);
+        });
+
     }
 
 
     /**
      * Update things not connected with physics.
      */
-    public void updateState(float delta) {}
+    public void updateState(float deltaTime) {}
 
     public void updateForFirstStep() {}
     public void updateForSecondStep() {}
+
+
+    public void setMass(float newMass) {
+        MassData massData = body.getMassData();
+
+        float scaleFactor = newMass / massData.mass;
+        massData.mass *= scaleFactor;
+        massData.I *= scaleFactor;
+
+        body.setMassData(massData);
+    }
+
+    public void kill() {
+        // TODO: override
+        this.dead = true;   // it will be handled in GameWorld update
+        this.model = Optional.empty();  // FIXME: play death animation
+    }
+
+    public boolean isDead() { return this.dead; }
+
+    /**
+     * This function is necessary for better encapsulation.
+     * I don't want anyone to access object's <code>Body</code> directly as well as I don't want anyone
+     * to access <code>World</code> (which is a part of <code>GameWorld</code> class) directly.
+     */
+    public void destroyBody(World world) {
+        world.destroyBody(this.body);
+    }
 
     // Transform:
 
@@ -95,10 +133,12 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     }
 
     protected void updateTransform() {
-        model.transform.setToRotationRad(Vector3.Z, body.getAngle());
-        fixTop(model);
-        Vector2 pos = body.getPosition();
-        model.transform.setTranslation(pos.x, pos.y, height);
+        model.ifPresent(model -> {
+            model.transform.setToRotationRad(Vector3.Z, body.getAngle());
+            fixTop(model);
+            Vector2 pos = body.getPosition();
+            model.transform.setTranslation(pos.x, pos.y, height);
+        });
     }
 
     // Rotation
@@ -153,14 +193,15 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public static final float DEFAULT_HEIGHT = 0;
         public static final float DEFAULT_ROTATION = 0;
 
-        public static final float DEFAULT_DENSITY = 1f;
+        public static final float DEFAULT_MASS = 5f;
 
 
         // physics
         public float rotation = DEFAULT_ROTATION;
         public float height = DEFAULT_HEIGHT;
 
-        public float density = DEFAULT_DENSITY;
+        /** Mass of an object in kg */
+        public float mass = 70;
         /**
          * As far as Shape itself isn't serializable,
          * supplier will be sent instead.
@@ -169,7 +210,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public final Vector2 position = new Vector2();
 
         /** The loaded model object. Initialized by <code>doneLoading</code> method. */
-        private transient Model model;
+        private transient Optional<Model> model;
         /** Saving context is necessary in order to be able to make instances. */
         private transient GameContext context;
 
@@ -196,9 +237,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         /** When assets are loaded. */
         public void doneLoading(GameContext context) {
             this.context = context;
-            context.assets().ifPresent(assets ->
-                this.model = assets.get(this.modelPath, Model.class)
-            );
+            this.model = context.assets().map(assets -> assets.get(this.modelPath, Model.class));
         }
 
         public abstract GameObject makeInstance(float x, float y);

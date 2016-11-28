@@ -1,7 +1,6 @@
 package ru.spbau.blackout.ingameui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -10,11 +9,10 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.network.AbstractServer;
-import ru.spbau.blackout.screens.GameScreen;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
@@ -47,7 +45,7 @@ public class IngameUI {
     }
 
     /** When assets are loaded. */
-    public void doneLoading(GameContext context, Hero character) {
+    public void doneLoading(GameContext context, Character character) {
         foreach(uiObjects, object -> object.doneLoading(context, stage, character));
     }
 

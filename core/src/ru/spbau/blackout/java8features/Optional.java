@@ -1,11 +1,11 @@
 package ru.spbau.blackout.java8features;
 
 public class Optional<T> {
-    T t;
+    T value;
 
 
-    private Optional(T t) {
-        this.t = t;
+    private Optional(T value) {
+        this.value = value;
     }
 
     public static <T> Optional<T> of(T t) {
@@ -19,21 +19,33 @@ public class Optional<T> {
         return new Optional<>(null);
     }
 
+    public static <T> Optional<T> ofNullable(T value) {
+        return new Optional<>(value);
+    }
+
+
+    public boolean isPresent() {
+        return value != null;
+    }
 
     public T get() {
-        if (t == null) {
+        if (!this.isPresent()) {
             throw new IllegalStateException("emptyOptional.get()");
         }
-        return t;
+        return value;
     }
 
     public void ifPresent(Consumer<? super T> consumer) {
-        if (t != null) {
-            consumer.accept(t);
+        if (this.isPresent()) {
+            consumer.accept(value);
         }
     }
 
-    public boolean isPresent() {
-        return t != null;
+    public <U> Optional<U> map(Function<? super T,? extends U> mapper) {
+        if (this.isPresent()) {
+            return Optional.of(mapper.apply(this.value));
+        } else {
+            return Optional.empty();
+        }
     }
 }

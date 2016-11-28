@@ -1,9 +1,11 @@
 package ru.spbau.blackout.abilities.fireball;
 
+import com.badlogic.gdx.math.Vector2;
+
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.InstantAbility;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.entities.ShellObject;
+import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
 
@@ -11,19 +13,30 @@ public class FireballAbility extends InstantAbility {
     public static final String ICON_PATH = "abilities/fireball/icon.png";
     public static final String MODEL_PATH = "abilities/fireball/fireball.g3db";
 
+    public static final float SHELL_START_SPEED = 20f;
+    public static final float CAST_DISTANCE = 1f;
+    public static final float SHELL_MASS = 5f;
+    /** The estimated distance of the ability in case of no external force. */
+    public static final float DISTANCE = 8f;
+    public static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;
 
-    private final ShellObject.Definition shellDef;
+
+    private final AbilityObject.Definition shellDef;
 
 
     public FireballAbility(int level) {
         super(level);
-        this.shellDef = new ShellObject.Definition(MODEL_PATH, new CircleCreator(1));
+        this.shellDef = new FireballObject.Definition(MODEL_PATH, new CircleCreator(1), SHELL_MASS, TIME_TO_LIVE);
     }
 
 
     @Override
     public void cast() {
-//        ShellObject shell = (ShellObject) shellDef.makeInstance(getUnit().getPosition().add(0, 2));
+        Vector2 direction = new Vector2(1, 0).rotateRad(getUnit().getRotation());
+        AbilityObject shell = (AbilityObject) shellDef.makeInstance(
+                getUnit().getPosition().mulAdd(direction, CAST_DISTANCE)
+        );
+        shell.velocity.mulAdd(direction, SHELL_START_SPEED);
     }
 
 

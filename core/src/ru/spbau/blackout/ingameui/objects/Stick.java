@@ -4,14 +4,13 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.ingameui.settings.StickSettings;
 import ru.spbau.blackout.network.AbstractServer;
@@ -44,8 +43,8 @@ public class Stick extends IngameUIObject {
     }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage, Hero hero) {
-        this.unit = hero;
+    public void doneLoading(GameContext context, Stage stage, Character character) {
+        this.unit = character;
         AssetManager assets = context.assets().get();
 
         // touch image initialization

@@ -11,42 +11,38 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 
 public abstract class DynamicObject extends GameObject {
     public static class Animations {
-        public static final String DEFAULT = "Armature|Stay";
-
         protected Animations() {}
+        public static final String DEFAULT = "Armature|Stay";
     }
 
 
-    protected final Vector2 velocity = new Vector2();
+    public final Vector2 velocity = new Vector2();
 
 
     // Appearance:
-    transient protected final NullableAnimationController animation;
-    protected float animationSpeed = 1f;
+    /** It is empty on server */
+    transient protected final Optional<AnimationController> animation;
+    transient protected float animationSpeed = 1f;
 
 
     /** Construct DynamicObject at the giving position. */
     protected DynamicObject(Definition def, float x, float y) {
         super(def, x, y);
 
-        animation = new NullableAnimationController(this.model);
-        animation.setAnimation(Animations.DEFAULT, -1);
-    }
-
-
-    public void addVelocity() {
-          // FIXME
+        animation = this.model.map(AnimationController::new);
+        animation.ifPresent(controller -> controller.setAnimation(Animations.DEFAULT, -1));
     }
 
 
     @Override
-    public void updateState(float delta) {
-        super.updateState(delta);
-        animation.update(delta * animationSpeed);
+    public void updateState(float deltaTime) {
+        super.updateState(deltaTime);
+        animation.ifPresent(controller -> controller.update(deltaTime * animationSpeed));
     }
 
     @Override
@@ -79,31 +75,6 @@ public abstract class DynamicObject extends GameObject {
         @Override
         public BodyDef.BodyType getBodyType() {
             return BodyDef.BodyType.DynamicBody;
-        }
-    }
-
-
-    protected static final class NullableAnimationController {
-        private final AnimationController animation;
-
-        public NullableAnimationController(ModelInstance model) {
-            if (model == null) {
-                this.animation = null;
-            } else {
-                this.animation = new AnimationController(model);
-            }
-        }
-
-        public void update(float deltaTime) {
-            if (animation != null) {
-                animation.update(deltaTime);
-            }
-        }
-
-        public void setAnimation(String id, int loopCount) {
-            if (animation != null) {
-                animation.setAnimation(id, loopCount);
-            }
         }
     }
 }

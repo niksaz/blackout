@@ -1,0 +1,42 @@
+package ru.spbau.blackout.abilities.fireball;
+
+import com.badlogic.gdx.physics.box2d.Shape;
+
+import ru.spbau.blackout.entities.AbilityObject;
+import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.utils.Creator;
+
+
+public class FireballObject extends AbilityObject {
+    private float timeRest;
+
+    public FireballObject(AbilityObject.Definition def, float x, float y, float time) {
+        super(def, x, y);
+        this.timeRest = time;
+    }
+
+
+    @Override
+    public void updateState(float deltaTime) {
+        super.updateState(deltaTime);
+        timeRest -= deltaTime;
+        if (timeRest <= 0) {
+            this.kill();
+        }
+    }
+
+    public static class Definition extends AbilityObject.Definition {
+        public float timeToLive;
+
+        public Definition(String modelPath, Creator<Shape> shapeCreator, float mass, float timeToLive) {
+            super(modelPath, shapeCreator, mass);
+            this.timeToLive = timeToLive;
+        }
+
+
+        @Override
+        public GameObject makeInstance(float x, float y) {
+            return new FireballObject(this, x, y, timeToLive);
+        }
+    }
+}

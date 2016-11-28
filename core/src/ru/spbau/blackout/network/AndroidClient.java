@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameWorld;
-import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
@@ -73,7 +73,7 @@ public class AndroidClient implements Runnable, AbstractServer {
                         GameSettings settings = new GameSettings(uiSettings);  // just default settings
 
                         TestingSessionSettings room = (TestingSessionSettings) in.readObject();
-                        room.character = (Hero.Definition) in.readObject();
+                        room.character = (Character.Definition) in.readObject();
 
                         gameScreen = new GameScreen(room, this, settings);
                         BlackoutGame.get().screenManager().setScreen(gameScreen);

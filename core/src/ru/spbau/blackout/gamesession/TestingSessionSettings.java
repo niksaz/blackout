@@ -7,13 +7,13 @@ import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.abilities.fireball.FireballAbility;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
 public class TestingSessionSettings implements GameSessionSettings {
     public String map;
     public List<GameObject.Definition> objectDefs = new ArrayList<>();
-    public Hero.Definition character;
+    public Character.Definition character;
 
     //@Override
     public String getMap() {
@@ -26,7 +26,7 @@ public class TestingSessionSettings implements GameSessionSettings {
     }
 
     //@Override
-    public Hero.Definition getCharacter() {
+    public Character.Definition getCharacter() {
         return character;
     }
 
@@ -34,7 +34,7 @@ public class TestingSessionSettings implements GameSessionSettings {
         TestingSessionSettings session = new TestingSessionSettings();
         session.map =  "maps/duel/duel.g3db";
 
-        Hero.Definition hero = new Hero.Definition(
+        Character.Definition hero = new Character.Definition(
                 "models/wizard/wizard.g3db",
                 new CircleCreator(0.6f),
                 0, 0,
@@ -43,7 +43,7 @@ public class TestingSessionSettings implements GameSessionSettings {
         session.objectDefs.add(hero);
         session.character = hero;
 
-        Hero.Definition enemy = new Hero.Definition(
+        Character.Definition enemy = new Character.Definition(
                 "models/wizard/wizard.g3db",
                 new CircleCreator(0.6f),
                 5, 0,

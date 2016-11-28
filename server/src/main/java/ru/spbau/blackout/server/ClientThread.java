@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.GameWorld;
-import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
@@ -31,7 +31,7 @@ class ClientThread extends Thread {
     private AtomicReference<Game> game = new AtomicReference<>();
     private AtomicReference<GameState> clientGameState = new AtomicReference<>(GameState.WAITING);
     private TestingSessionSettings sessionSettings;
-    private Hero.Definition clientCharacter;
+    private Character.Definition clientCharacter;
 
     ClientThread(RoomServer server, Socket socket) {
         this.server = server;
@@ -141,7 +141,7 @@ class ClientThread extends Thread {
         this.numberInGame = numberInGame;
     }
 
-    synchronized void setSessionSettings(TestingSessionSettings testingSessionSettings, Hero.Definition character) {
+    synchronized void setSessionSettings(TestingSessionSettings testingSessionSettings, Character.Definition character) {
         sessionSettings = testingSessionSettings;
         clientCharacter = character;
         notify();

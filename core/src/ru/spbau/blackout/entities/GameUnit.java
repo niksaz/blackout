@@ -1,24 +1,16 @@
 package ru.spbau.blackout.entities;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
-import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Arrays;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Utils;
 
-import static ru.spbau.blackout.java8features.Functional.foreach;
 import static ru.spbau.blackout.utils.Utils.projectVec;
 import static ru.spbau.blackout.utils.Utils.sqr;
 
@@ -51,7 +43,7 @@ public abstract class GameUnit extends DynamicObject {
     protected GameUnit(Definition def, float x, float y, GameContext context) {
         super(def, x, y);
         this.speed = def.speed;
-        this.animation.setAnimation(Animations.STAY, -1);
+        this.animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
         this.abilities = def.abilities;
 
         // add friction for the unit
@@ -110,13 +102,13 @@ public abstract class GameUnit extends DynamicObject {
         if (Utils.isZeroVec(vel)) {
             // on stop walking
             if (!Utils.isZeroVec(selfVelocity.x, selfVelocity.y)) {
-                animation.setAnimation(Animations.STAY, -1);
+                animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
                 animationSpeed = 1f;
             }
         } else {
             // on start walking
             if (Utils.isZeroVec(selfVelocity.x, selfVelocity.y)) {
-                animation.setAnimation(Animations.WALK, -1);
+                animation.ifPresent(controller -> controller.setAnimation(Animations.WALK, -1));
             }
 
             animationSpeed = vel.len() * Animations.WALK_SPEED_FACTOR;

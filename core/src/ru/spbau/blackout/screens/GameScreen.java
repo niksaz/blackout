@@ -18,7 +18,7 @@ import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AbstractServer;
@@ -44,7 +44,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private PerspectiveCamera camera;
     public Environment environment;
 
-    private Hero character;
+    private Character character;
     private final IngameUI ui;
 
     private final GameWorld gameWorld = new GameWorld();
@@ -125,7 +125,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
 
     public AbstractServer getServer() { return server; }
-    public Hero getCharacter() { return character; }
+    public Character getCharacter() { return character; }
     public boolean isDoneLoading() { return doneLoading; }
 
 
@@ -153,7 +153,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
     private class LoadingScreen extends BlackoutScreen {
         final List<GameObject.Definition> objectDefs;
-        final Hero.Definition characterDef;
+        final Character.Definition characterDef;
         final String mapPath;
 
         LoadingScreen(GameSessionSettings room) {
@@ -211,7 +211,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                 def.doneLoading(GameScreen.this);
                 GameObject obj = def.makeInstance();
                 if (def == characterDef) {
-                    character = (Hero) obj;
+                    character = (Character) obj;
                 }
             }
             if (character == null) {

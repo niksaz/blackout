@@ -1,17 +1,15 @@
 package ru.spbau.blackout.ingameui.objects;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.sun.javafx.print.Units;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.entities.Hero;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.network.AbstractServer;
@@ -37,8 +35,8 @@ public class AbilityIcon extends IngameUIObject {
     public void load(GameContext context) { /*nothing*/ }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage, Hero hero) {
-        this.ability = hero.getAbility(this.settings.getAbilityNum());
+    public void doneLoading(GameContext context, Stage stage, Character character) {
+        this.ability = character.getAbility(this.settings.getAbilityNum());
 
         // icon initialization
         // TODO: assert context.assets().isPresent()

@@ -9,13 +9,12 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
-import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import ru.spbau.blackout.entities.GameObject;
@@ -38,7 +37,8 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
-    private final List<GameObject> gameObjects = new ArrayList<>();
+    // TODO: UID
+    private final List<GameObject> gameObjects = new LinkedList<>();
     transient private final World world;
     transient private float accumulator = 0;
     transient private Body ground;
@@ -112,6 +112,14 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
 
     public void update(float delta) {
         this.accumulator += delta;
+
+        for (Iterator<GameObject> it = this.iterator(); it.hasNext();) {
+            GameObject object = it.next();
+            if (object.isDead()) {
+                object.destroyBody(world);
+                it.remove();
+            }
+        }
 
         foreach(this, object -> object.updateState(delta));
 

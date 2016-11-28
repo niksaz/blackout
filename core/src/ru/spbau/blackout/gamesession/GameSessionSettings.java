@@ -3,8 +3,8 @@ package ru.spbau.blackout.gamesession;
 import java.io.Serializable;
 import java.util.List;
 
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.entities.Hero;
 
 /**
  * Contains settings for particular game session.
@@ -26,5 +26,5 @@ public interface GameSessionSettings extends Serializable {
      * Returns a definition of current player's character.
      * Note that it also must be represented in the common list of GameObjects
      */
-    Hero.Definition getCharacter();
+    Character.Definition getCharacter();
 }
