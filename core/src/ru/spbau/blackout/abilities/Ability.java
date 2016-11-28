@@ -3,6 +3,7 @@ package ru.spbau.blackout.abilities;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
 
 
@@ -23,14 +24,16 @@ public abstract class Ability {
      * Load necessary assets.
      * Must be called once from <code>GameUnit.Definition::update</code>
      */
-    public void load(AssetManager assets) {
-        assets.load(this.iconPath(), Texture.class);
+    public void load(GameContext context) {
+        context.assets().ifPresent(assets ->
+            assets.load(this.iconPath(), Texture.class)
+        );
     }
     /**
      * When assets are loaded.
      * Must be called once from <code>GameUnit::update</code>.
      */
-    public void doneLoading(AssetManager assets, GameUnit unit) {
+    public void doneLoading(GameContext context, GameUnit unit) {
         this.unit = unit;
     }
 

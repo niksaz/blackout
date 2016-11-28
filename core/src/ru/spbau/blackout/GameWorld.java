@@ -129,9 +129,9 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         // It would be very hard and takes many resources.
     }
 
-    public Body addObject(GameObject object, GameObject.Definition def) {
+    public Body addObject(GameObject object, BodyDef bodyDef) {
         gameObjects.add(object);
-        return def.addToWorld(world);
+        return world.createBody(bodyDef);
     }
 
     public FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {

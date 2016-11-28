@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
@@ -22,6 +23,7 @@ import static ru.spbau.blackout.utils.Utils.sqr;
 
 /**
  * Unit is a dynamic object which can move by itself and cast abilities.
+ * Also it has friction.
  */
 public abstract class GameUnit extends DynamicObject {
     public static class Animations extends DynamicObject.Animations {
@@ -41,26 +43,23 @@ public abstract class GameUnit extends DynamicObject {
     // Movement:
     private Vector2 selfVelocity = new Vector2();
     private float speed;
-    transient private final FrictionJoint frictionJoint;
     transient private final Ability[] abilities;
 
 
-    protected GameUnit(Definition def, Model model, GameWorld gameWorld) {
-        super(def, model, gameWorld);
+    protected GameUnit(Definition def, float x, float y, GameContext context) {
+        super(def, x, y);
         this.speed = def.speed;
         this.animation.setAnimation(Animations.STAY, -1);
         this.abilities = def.abilities;
 
-        this.frictionJoint = gameWorld.addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
-    }
+        // add friction for the unit
+        context.gameWorld().addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
 
-    @Override
-    public void doneLoading(AssetManager assets) {
-        super.doneLoading(assets);
         for (Ability ability : abilities) {
-            ability.doneLoading(assets, this);
+            ability.doneLoading(context, this);
         }
     }
+
 
     public final Ability getAbility(int num) {
         return this.abilities[num];
@@ -125,24 +124,27 @@ public abstract class GameUnit extends DynamicObject {
         selfVelocity.set(vel.x * speed, vel.y * speed);
     }
 
+
+    /** Definition for units. Loads abilities. */
     public static abstract class Definition extends DynamicObject.Definition {
         public static final float DEFAULT_SPEED = 7f;
 
         public float speed = DEFAULT_SPEED;
         public Ability[] abilities;
 
-        @Override
-        public void load(AssetManager assets) {
-            super.load(assets);
-            for (Ability ability : abilities) {
-                ability.load(assets);
-            }
-        }
-
         public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY,
                           Ability[] abilities) {
             super(modelPath, shapeCreator, initialX, initialY);
             this.abilities = abilities;
+        }
+
+
+        @Override
+        public void load(GameContext context) {
+            super.load(context);
+            for (Ability ability : abilities) {
+                ability.load(context);
+            }
         }
     }
 }

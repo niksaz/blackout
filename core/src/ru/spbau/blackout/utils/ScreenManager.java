@@ -11,7 +11,7 @@ public class ScreenManager {
 
     public void setScreen(BlackoutScreen screen) {
         screens.add(screen);
-        BlackoutGame.getInstance().setScreen(screen);
+        BlackoutGame.get().setScreen(screen);
     }
 
     public void disposeScreen() {
@@ -25,7 +25,7 @@ public class ScreenManager {
             }
             screens.pop().dispose();
         }
-        BlackoutGame.getInstance().setScreen(screens.peek());
+        BlackoutGame.get().setScreen(screens.peek());
     }
 
 }

@@ -13,8 +13,10 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.List;
+import java.util.Optional;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
@@ -25,7 +27,7 @@ import ru.spbau.blackout.settings.GameSettings;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
-public class GameScreen extends BlackoutScreen {
+public class GameScreen extends BlackoutScreen implements GameContext {
     public static final float DEFAULT_CAMERA_X_OFFSET = 0;
     public static final float DEFAULT_CAMERA_Y_OFFSET = -1;
     public static final float DEFAULT_CAMERA_HEIGHT = 12;
@@ -48,9 +50,6 @@ public class GameScreen extends BlackoutScreen {
     private final AbstractServer server;
     private volatile boolean doneLoading;
 
-    public boolean isDoneLoading() {
-        return doneLoading;
-    }
 
     public GameScreen(GameSessionSettings sessionSettings, AbstractServer server, GameSettings settings) {
         this.server = server;
@@ -69,17 +68,36 @@ public class GameScreen extends BlackoutScreen {
         environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.2f, 0f, 0.2f, -1f));
     }
 
-    public AbstractServer getServer() {
-        return server;
+
+    public boolean isDoneLoading() { return doneLoading; }
+
+
+    // instance of GameContext
+    @Override
+    public Optional<AssetManager> assets() {
+        return Optional.of(assets);
     }
 
+    @Override
+    public Optional<Hero> character() {
+        return null;
+    }
+
+    @Override
+    public GameWorld gameWorld() { return gameWorld; }
+
+    @Override
+    public AbstractServer server() { return server; }
+
+
+    // instance of Screen
     @Override
     public void show() {
         super.show();
 
         // if not loaded yet
         if (loadingScreen != null) {
-            BlackoutGame.getInstance().getScreenManager().setScreen(loadingScreen);
+            BlackoutGame.get().screenManager().setScreen(loadingScreen);
         }
     }
 
@@ -90,7 +108,7 @@ public class GameScreen extends BlackoutScreen {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        ModelBatch modelBatch = BlackoutGame.getInstance().getModelBatch();
+        ModelBatch modelBatch = BlackoutGame.get().modelBatch();
         modelBatch.begin(camera);
         modelBatch.render(gameWorld, environment);
         modelBatch.render(map, environment);
@@ -115,13 +133,6 @@ public class GameScreen extends BlackoutScreen {
         super.dispose();
     }
 
-    public GameWorld getGameWorld() {
-        return gameWorld;
-    }
-
-    public Hero getCharacter() {
-        return character;
-    }
 
     /**
      * Updates game world on every frame.
@@ -162,9 +173,9 @@ public class GameScreen extends BlackoutScreen {
             super.show();
 
             // start loading
-            ui.load(assets);
+            ui.load(GameScreen.this);
             for (GameObject.Definition def : objectDefs) {
-                def.load(assets);
+                def.load(GameScreen.this);
             }
             assets.load(mapPath, Model.class);
         }
@@ -217,7 +228,7 @@ public class GameScreen extends BlackoutScreen {
             ui.doneLoading(assets, character);
             GameScreen.this.doneLoading();
 
-            BlackoutGame.getInstance().getScreenManager().disposeScreen();
+            BlackoutGame.get().screenManager().disposeScreen();
 
             doneLoading = true;
         }

@@ -27,7 +27,7 @@ public class IngameUI {
      */
     public IngameUI(GameScreen screen, IngameUISettings settings) {
         Camera camera = new OrthographicCamera();
-        this.stage = new Stage(new ScreenViewport(camera), BlackoutGame.getInstance().getSpriteBatch());
+        this.stage = new Stage(new ScreenViewport(camera), BlackoutGame.get().spriteBatch());
 
         Gdx.input.setInputProcessor(this.stage);
 

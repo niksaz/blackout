@@ -1,6 +1,5 @@
 package ru.spbau.blackout.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
@@ -12,11 +11,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Shape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
-import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.InplaceSerializable;
 
@@ -36,14 +34,11 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     // appearance:
     transient protected ModelInstance model;
 
-    protected GameObject(Model model, GameWorld gameWorld, Creator<Shape> shapeCreator, float density) {
 
-    }
-
-    protected GameObject(Definition def, Model model, GameWorld gameWorld) {
+    protected GameObject(Definition def, float x, float y) {
         this.model = model == null ? null : new ModelInstance(model);
 
-        body = gameWorld.addObject(this, def);
+        body = def.registerObject(this);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = def.shapeCreator.create();
@@ -53,11 +48,9 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         body.createFixture(fixtureDef);
         fixtureDef.shape.dispose();
 
-        setPosition(def.position);
+        setPosition(x, y);
     }
 
-    /** When assets are loaded. */
-    public void doneLoading(AssetManager assets) {}
 
     @Override
     public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
@@ -101,9 +94,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         body.setTransform(position, angle);
     }
 
-    /**
-     * Model instance model to the physic body.
-     */
     protected void updateTransform() {
         model.transform.setToRotationRad(Vector3.Z, body.getAngle());
         fixTop(model);
@@ -113,26 +103,20 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
     // Rotation
 
-    /**
-     * Set rotation in radians.
-     */
+    /** Set rotation in radians. */
     public void setRotation(float angle) {
         Vector2 pos = getPosition();
         setTransform(pos.x, pos.y, angle);
     }
 
-    /**
-     * Rotates object to the given direction.
-     */
-    public void setDirection(Vector2 direction) {
-        setRotation(direction.angleRad());
-    }
-
-    /**
-     *  The current rotation in radians.
-     */
+    /** Returns the current rotation in radians. */
     public float getRotation() {
         return body.getAngle();
+    }
+
+    /** Rotates object to the given direction. */
+    public void setDirection(Vector2 direction) {
+        setRotation(direction.angleRad());
     }
 
 
@@ -150,25 +134,27 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         setTransform(x, y, getRotation());
     }
 
-    // Height:
 
-    public void setHeight(float height) {
-        this.height = height;
-    }
-
-    public final float getHeight() {
-        return height;
-    }
+    public void setHeight(float height) { this.height = height; }
+    public final float getHeight() { return height; }
 
 
     /**
-     * TODO
+     * Used to send via network a definition of an object to create.
+     * Each kind of objects must have its own <code>Definition</code> subclass.
+     *
+     * <p>Life cycle:
+     * <br>constructor (once)
+     * <br>load (once)
+     * <br>doneLoading (once)
+     * <br>makeInstance (Any number of calls)
      */
     public static abstract class Definition implements Serializable {
         public static final float DEFAULT_HEIGHT = 0;
         public static final float DEFAULT_ROTATION = 0;
 
         public static final float DEFAULT_DENSITY = 1f;
+
 
         // physics
         public float rotation = DEFAULT_ROTATION;
@@ -182,44 +168,67 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public Creator<Shape> shapeCreator;
         public final Vector2 position = new Vector2();
 
+        /** The loaded model object. Initialized by <code>doneLoading</code> method. */
+        private transient Model model;
+        /** Saving context is necessary in order to be able to make instances. */
+        private transient GameContext context;
 
         // appearance:
         public String modelPath;
 
+
         /**
-         * ShapeCreator must be serializable.
+         * Warning: ShapeCreator must be serializable.
          */
-        public Definition(String modelPath, Creator<Shape> shapeCreator,
-                          float initialX, float initialY)
-        {
+        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
             this.modelPath = modelPath;
             this.shapeCreator = shapeCreator;
             this.position.set(initialX, initialY);
         }
 
         /** Load necessary assets. */
-        public void load(AssetManager assets) {
-            assets.load(this.modelPath, Model.class);
+        public void load(GameContext context) {
+            context.assets().ifPresent(assets ->
+                assets.load(this.modelPath, Model.class)
+            );
         }
 
-        /*public GameObject doneLoading(AssetManager assets) {
+        /** When assets are loaded. */
+        public void doneLoading(GameContext context) {
+            this.context = context;
+            context.assets().ifPresent(assets ->
+                this.model = assets.get(this.modelPath, Model.class)
+            );
+        }
 
-        }*/
+        public abstract GameObject makeInstance(float x, float y);
+        public GameObject makeInstance(Vector2 position) {
+            return this.makeInstance(position.x, position.y);
+        }
+        public GameObject makeInstance() {
+            return this.makeInstance(this.position);
+        }
 
         /** Rotates object to the given direction. */
         public void setDirection(Vector2 direction) {
             this.rotation = direction.angleRad();
         }
 
-        public Body addToWorld(World world) {
+        protected GameContext getContext() { return context; }
+
+
+        /**
+         * Must be called from <code>GameObject</code> constructor to add this
+         * <code>GameObject</code> to the world and make <code>Body</code> for it.
+         */
+        private Body registerObject(GameObject object) {
             BodyDef bodyDef = new BodyDef();
             bodyDef.position.set(this.position);
             bodyDef.type = getBodyType();
-            return world.createBody(bodyDef);
+
+            return context.gameWorld().addObject(object, bodyDef);
         }
 
-
-        public abstract GameObject makeInstance(Model model, GameWorld gameWorld);
         public abstract BodyDef.BodyType getBodyType();
     }
 }

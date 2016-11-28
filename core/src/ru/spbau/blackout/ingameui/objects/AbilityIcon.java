@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.sun.javafx.print.Units;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.Hero;
@@ -33,14 +34,15 @@ public class AbilityIcon extends IngameUIObject {
 
 
     @Override
-    public void load(AssetManager assets) { /*nothing*/ }
+    public void load(GameContext context) { /*nothing*/ }
 
     @Override
-    public void doneLoading(AssetManager assets, Stage stage, Hero hero) {
+    public void doneLoading(GameContext context, Stage stage, Hero hero) {
         this.ability = hero.getAbility(this.settings.getAbilityNum());
 
         // icon initialization
-        this.icon = new Image(assets.get(this.getAbility().iconPath(), Texture.class));
+        assert context.assets()ss
+        this.icon = new Image(context.assets().get().get(this.getAbility().iconPath(), Texture.class));
         this.icon.setSize(this.settings.getSizeX(), this.settings.getSizeY());
         this.icon.setPosition(settings.getStartX(), settings.getStartY());
         stage.addActor(this.icon);
@@ -50,7 +52,7 @@ public class AbilityIcon extends IngameUIObject {
     @Override
     public void update(float deltaTime) {
         if (this.isPressed) {
-            this.getAbility().inCast(unit, deltaTime);
+            this.getAbility().inCast(deltaTime);
         }
     }
 
@@ -61,7 +63,7 @@ public class AbilityIcon extends IngameUIObject {
     private class Listener extends InputListener {
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-            getAbility().onCastStart(unit);
+            getAbility().onCastStart();
             isPressed = true;
 
             // It means that I want it to receive all touchDragged and touchUp events,
@@ -72,7 +74,7 @@ public class AbilityIcon extends IngameUIObject {
         @Override
         public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
             isPressed = false;
-            getAbility().onCastEnd(unit);
+            getAbility().onCastEnd();
         }
     }
 }

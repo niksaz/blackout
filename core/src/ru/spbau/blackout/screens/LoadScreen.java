@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.play.services.CorePlayServicesListener;
-import ru.spbau.blackout.utils.AssetLoader;
 
 public class LoadScreen extends StageScreen implements CorePlayServicesListener {
 
@@ -30,30 +29,30 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
     public void show() {
         super.show();
 
-        BlackoutGame.getInstance().getPlayServicesInCore().addListener(this);
+        BlackoutGame.get().playServicesInCore().addListener(this);
 
         middleTable = new Table();
         middleTable.setFillParent(true);
         stage.addActor(middleTable);
 
         addLabel(STARTED_LOG_IN);
-        BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().signIn();
+        BlackoutGame.get().playServicesInCore().getPlayServices().signIn();
     }
 
     @Override
     public void onSignInSucceeded() {
         Gdx.app.postRunnable(() -> addLabel(STARTED_LOADING));
-        BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().startLoadingSnapshot();
+        BlackoutGame.get().playServicesInCore().getPlayServices().startLoadingSnapshot();
     }
 
     @Override
     public void finishedLoadingSnapshot() {
-        BlackoutGame.getInstance().getPlayServicesInCore().removeListener(this);
+        BlackoutGame.get().playServicesInCore().removeListener(this);
         middleTable.remove();
         middleTable = null;
 
         Gdx.app.postRunnable(() ->
-                BlackoutGame.getInstance().getScreenManager().setScreen(new MenuScreen()));
+                BlackoutGame.get().screenManager().setScreen(new MenuScreen()));
     }
 
     @Override
@@ -66,7 +65,7 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
     }
 
     private Label addLabel(CharSequence text) {
-        final Label.LabelStyle style = new Label.LabelStyle(AssetLoader.getInstance().getFont(), LABEL_COLOR);
+        final Label.LabelStyle style = new Label.LabelStyle(BlackoutGame.get().assets().getFont(), LABEL_COLOR);
         final Label label = new Label(text , style);
 
         middleTable.add(label).pad(LABEL_BOTTOM_PADDING).row();

@@ -52,7 +52,7 @@ public class AndroidClient implements Runnable, AbstractServer {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
-            out.writeUTF(BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().getPlayerName());
+            out.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
             out.flush();
 
             GameState gameState;
@@ -76,7 +76,7 @@ public class AndroidClient implements Runnable, AbstractServer {
                         room.character = (Hero.Definition) in.readObject();
 
                         gameScreen = new GameScreen(room, this, settings);
-                        BlackoutGame.getInstance().getScreenManager().setScreen(gameScreen);
+                        BlackoutGame.get().screenManager().setScreen(gameScreen);
                         break;
                     default:
                         break;

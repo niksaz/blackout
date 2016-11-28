@@ -3,10 +3,9 @@ package ru.spbau.blackout.abilities.fireball;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.InstantAbility;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.entities.ShellObject;
-import ru.spbau.blackout.shapescreators.CircleCreator;
 
 
 public class FireballAbility extends InstantAbility {
@@ -17,6 +16,7 @@ public class FireballAbility extends InstantAbility {
         super(level);
     }
 
+
     @Override
     public void cast() {
         Gdx.app.log("Blackout", "fireball cast");
@@ -26,15 +26,17 @@ public class FireballAbility extends InstantAbility {
 //
     }
 
+
     @Override
-    public void load(AssetManager assets) {
-        super.load(assets);
+    public void load(GameContext context) {
+        super.load(context);
         // TODO: load fireball model
     }
 
     @Override
-    public void doneLoading(AssetManager assets, GameUnit unit) {
+    public void doneLoading(GameContext assets, GameUnit unit) {
         super.doneLoading(assets, unit);
+        // TODO: ???
     }
 
     @Override

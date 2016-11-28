@@ -50,12 +50,15 @@ public abstract class DynamicObject extends GameObject {
     transient protected final NullableAnimationController animation;
     protected float animationSpeed = 1f;
 
-    protected DynamicObject(Definition def, Model model, GameWorld gameWorld) {
-        super(def, model, gameWorld);
+
+    /** Construct DynamicObject at the giving position. */
+    protected DynamicObject(Definition def, float x, float y) {
+        super(def, x, y);
 
         animation = new NullableAnimationController(this.model);
         animation.setAnimation(Animations.DEFAULT, -1);
     }
+
 
     @Override
     public void updateState(float delta) {
@@ -83,10 +86,10 @@ public abstract class DynamicObject extends GameObject {
         return other;
     }
 
+
+    /** Definition for objects which have Dynamic body type. */
     public static abstract class Definition extends GameObject.Definition {
-        public Definition(String modelPath, Creator<Shape> shapeCreator,
-                          float initialX, float initialY)
-        {
+        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
             super(modelPath, shapeCreator, initialX, initialY);
         }
 

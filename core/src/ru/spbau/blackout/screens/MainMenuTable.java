@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.utils.AssetLoader;
+import ru.spbau.blackout.utils.BlackoutAssets;
 
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
@@ -46,19 +46,19 @@ class MainMenuTable {
         addButton(middleTable, BUTTON_SHOP_TEXT, upImage, downImage, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                BlackoutGame.getInstance().getPlayServicesInCore().getSnapshot().changeGold(10);
+                BlackoutGame.get().playServicesInCore().getSnapshot().changeGold(10);
             }
         });
         addButton(middleTable, BUTTON_ACHIEVEMENTS_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().showAchievements();
+                BlackoutGame.get().playServicesInCore().getPlayServices().showAchievements();
             }
         });
         addButton(middleTable, BUTTON_LEADERBOARD_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().showLeaderboards();
+                BlackoutGame.get().playServicesInCore().getPlayServices().showLeaderboards();
             }
         });
 
@@ -67,7 +67,8 @@ class MainMenuTable {
     }
 
     private static Label addBlackoutLabel(Table table) {
-        final LabelStyle style = new LabelStyle(AssetLoader.getInstance().getFontBlackoutLabel(), BLACKOUT_LABEL_COLOR);
+        final LabelStyle style = new LabelStyle(BlackoutGame.get().assets().getFontBlackoutLabel(),
+                                                BLACKOUT_LABEL_COLOR);
         final Label label = new Label(BLACKOUT_TEXT, style);
 
         table.add(label).pad(BLACKOUT_LABEL_BOTTOM_PADDING).row();

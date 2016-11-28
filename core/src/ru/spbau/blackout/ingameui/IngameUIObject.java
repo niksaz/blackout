@@ -3,6 +3,7 @@ package ru.spbau.blackout.ingameui;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.network.AbstractServer;
 
@@ -19,9 +20,9 @@ public abstract class IngameUIObject {
     }
 
     /** Load assets. */
-    public abstract void load(AssetManager assets);
+    public abstract void load(GameContext context);
     /** When assets are loaded. */
-    public abstract void doneLoading(AssetManager assets, Stage stage, Hero hero);
+    public abstract void doneLoading(GameContext context, Stage stage);
     /** Update for each frame. */
     public abstract void update(float deltaTime);
 }
