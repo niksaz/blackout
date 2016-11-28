@@ -34,13 +34,11 @@ public class TestingSessionSettings implements GameSessionSettings {
         TestingSessionSettings session = new TestingSessionSettings();
         session.map =  "maps/duel/duel.g3db";
 
-        Ability fireball = new FireballAbility(2);
-
         Hero.Definition hero = new Hero.Definition(
                 "models/wizard/wizard.g3db",
                 new CircleCreator(0.6f),
                 0, 0,
-                new Ability[] { fireball }
+                new Ability[] { new FireballAbility(7) }
         );
         session.objectDefs.add(hero);
         session.character = hero;
@@ -49,7 +47,7 @@ public class TestingSessionSettings implements GameSessionSettings {
                 "models/wizard/wizard.g3db",
                 new CircleCreator(0.6f),
                 5, 0,
-                new Ability[] { fireball }
+                new Ability[] { new FireballAbility(2) }
         );
         session.objectDefs.add(enemy);
 

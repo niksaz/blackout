@@ -14,37 +14,15 @@ import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 
 public abstract class DynamicObject extends GameObject {
-    protected static final class NullableAnimationController {
-        private final AnimationController animation;
-
-        public NullableAnimationController(ModelInstance model) {
-            if (model == null) {
-                this.animation = null;
-            } else {
-                this.animation = new AnimationController(model);
-            }
-        }
-
-        public void update(float deltaTime) {
-            if (animation != null) {
-                animation.update(deltaTime);
-            }
-        }
-
-        public void setAnimation(String id, int loopCount) {
-            if (animation != null) {
-                animation.setAnimation(id, loopCount);
-            }
-        }
-    }
-
     public static class Animations {
         public static final String DEFAULT = "Armature|Stay";
 
         protected Animations() {}
     }
 
+
     protected final Vector2 velocity = new Vector2();
+
 
     // Appearance:
     transient protected final NullableAnimationController animation;
@@ -57,6 +35,11 @@ public abstract class DynamicObject extends GameObject {
 
         animation = new NullableAnimationController(this.model);
         animation.setAnimation(Animations.DEFAULT, -1);
+    }
+
+
+    public void addVelocity() {
+          // FIXME
     }
 
 
@@ -96,6 +79,31 @@ public abstract class DynamicObject extends GameObject {
         @Override
         public BodyDef.BodyType getBodyType() {
             return BodyDef.BodyType.DynamicBody;
+        }
+    }
+
+
+    protected static final class NullableAnimationController {
+        private final AnimationController animation;
+
+        public NullableAnimationController(ModelInstance model) {
+            if (model == null) {
+                this.animation = null;
+            } else {
+                this.animation = new AnimationController(model);
+            }
+        }
+
+        public void update(float deltaTime) {
+            if (animation != null) {
+                animation.update(deltaTime);
+            }
+        }
+
+        public void setAnimation(String id, int loopCount) {
+            if (animation != null) {
+                animation.setAnimation(id, loopCount);
+            }
         }
     }
 }

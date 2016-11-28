@@ -1,42 +1,42 @@
 package ru.spbau.blackout.abilities.fireball;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
-
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.InstantAbility;
 import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.entities.ShellObject;
+import ru.spbau.blackout.shapescreators.CircleCreator;
 
 
 public class FireballAbility extends InstantAbility {
     public static final String ICON_PATH = "abilities/fireball/icon.png";
     public static final String MODEL_PATH = "abilities/fireball/fireball.g3db";
 
+
+    private final ShellObject.Definition shellDef;
+
+
     public FireballAbility(int level) {
         super(level);
+        this.shellDef = new ShellObject.Definition(MODEL_PATH, new CircleCreator(1));
     }
 
 
     @Override
     public void cast() {
-        Gdx.app.log("Blackout", "fireball cast");
-//         TODO: throw shell
-//        ShellObject.Definition def = new ShellObject.Definition(MODEL_PATH, new CircleCreator(0.5f),
-//                                            this.getUnit().getPosition().x, this.getUnit().getPosition().y + 2);
-//
+//        ShellObject shell = (ShellObject) shellDef.makeInstance(getUnit().getPosition().add(0, 2));
     }
 
 
     @Override
     public void load(GameContext context) {
         super.load(context);
-        // TODO: load fireball model
+        shellDef.load(context);
     }
 
     @Override
-    public void doneLoading(GameContext assets, GameUnit unit) {
-        super.doneLoading(assets, unit);
-        // TODO: ???
+    public void doneLoading(GameContext context, GameUnit unit) {
+        super.doneLoading(context, unit);
+        shellDef.doneLoading(context);
     }
 
     @Override

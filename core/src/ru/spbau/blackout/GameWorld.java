@@ -110,18 +110,14 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         return null;
     }
 
-    public void reset(GameWorld otherWorld) {
-
-    }
-
     public void update(float delta) {
-        accumulator += delta;
+        this.accumulator += delta;
 
-        foreach(gameObjects, object -> object.updateState(delta));
+        foreach(this, object -> object.updateState(delta));
 
-        while (accumulator >= WORLD_STEP) {
-            step();
-            accumulator -= WORLD_STEP;
+        while (this.accumulator >= WORLD_STEP) {
+            this.step();
+            this.accumulator -= WORLD_STEP;
         }
 
         // I don't think that interpolation is necessary.
@@ -129,8 +125,8 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     public Body addObject(GameObject object, BodyDef bodyDef) {
-        gameObjects.add(object);
-        return world.createBody(bodyDef);
+        this.gameObjects.add(object);
+        return this.world.createBody(bodyDef);
     }
 
     public FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {
@@ -141,29 +137,15 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
 
         frictionDef.initialize(body, ground, Vector2.Zero);
 
-        return (FrictionJoint) world.createJoint(frictionDef);
+        return (FrictionJoint) this.world.createJoint(frictionDef);
     }
 
-    public Body addController(Body body) {
-        // Create a controller's body
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(body.getPosition().x, body.getPosition().y);
-        Body controller = world.createBody(bodyDef);
-
-        // Glue it with the target body
-        WeldJointDef jointDef = new WeldJointDef();
-        jointDef.initialize(body, controller, Vector2.Zero);
-        world.createJoint(jointDef);
-
-        return controller;
-    }
 
     private void step() {
         foreach(this, GameObject::updateForFirstStep);
-        world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+        this.world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
         foreach(this, GameObject::updateForSecondStep);
-        world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+        this.world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }
 }

@@ -20,10 +20,6 @@ public class ShellObject extends DynamicObject {
 
 
     public static class Definition extends DynamicObject.Definition {
-        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
-            super(modelPath, shapeCreator, initialX, initialY);
-        }
-        /** Same as <code> Definition(String modelPath, Creator<Shape> shapeCreator, 0, 0)</code> */
         public Definition(String modelPath, Creator<Shape> shapeCreator) {
             super(modelPath, shapeCreator, 0, 0);
         }
