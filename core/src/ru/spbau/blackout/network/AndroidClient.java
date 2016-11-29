@@ -68,7 +68,7 @@ public class AndroidClient implements Runnable, AbstractServer {
                         Gdx.app.postRunnable(() ->
                                 table.getStatusLabel().setText(READY_TO_START_MS));
 
-                        AbilityIconSettings firstIconSettings = new AbilityIconSettings(0 /*num*/, 200 /*x*/, 100 /*y*/);
+                        AbilityIconSettings firstIconSettings = new AbilityIconSettings(0);
                         IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
                         GameSettings settings = new GameSettings(uiSettings);  // just default settings
 

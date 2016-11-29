@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
@@ -13,7 +15,10 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.network.AbstractServer;
+import ru.spbau.blackout.units.Vpx;
 
+import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
+import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
 
@@ -28,8 +33,9 @@ public class IngameUI {
      * Creates all UI elements and sets itself as input processor.
      */
     public IngameUI(AbstractServer server, IngameUISettings settings) {
-        Camera camera = new OrthographicCamera();
-        this.stage = new Stage(new ScreenViewport(camera), BlackoutGame.get().spriteBatch());
+        Camera camera = new OrthographicCamera(getWorldWidth(), getWorldHeight());
+        Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), camera);
+        this.stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
 
         Gdx.input.setInputProcessor(this.stage);
 
@@ -53,12 +59,6 @@ public class IngameUI {
     public void update(float deltaTime) {
         this.stage.act(deltaTime);
         foreach(uiObjects, object -> object.update(deltaTime));
-    }
-
-    /** On window resize */
-    public void resize(int width, int height) {
-        // TODO: resize each UI object
-        stage.getViewport().update(width, height);
     }
 
     /** Called from GameScreen::draw() */

@@ -1,5 +1,7 @@
 package ru.spbau.blackout.ingameui.settings;
 
+import com.badlogic.gdx.math.Vector2;
+
 import ru.spbau.blackout.units.Rpx;
 
 /**
@@ -7,17 +9,7 @@ import ru.spbau.blackout.units.Rpx;
  * All getters and setters work with RPX.
  */
 public class StickSettings {
-    public static class Defaults {
-        private Defaults() {}
-        public static final float START_X = 0.6f;
-        public static final float START_Y = 0.6f;
-    }
-
-    private int startX = Rpx.X.fromCm(Defaults.START_X);
-    public void setStartX(int startX) { this.startX = startX; }
-    public int getStartX() { return startX; }
-
-    private int startY = Rpx.Y.fromCm(Defaults.START_Y);
-    public void setStartY(int startY) { this.startY = startY; }
-    public int getStartY() { return startY; }
+    private Vector2 start = new Vector2(100, 100);  // FIXME
+    public void setStart(Vector2 start) { this.start = start; }
+    public Vector2 getStart() { return start; }
 }

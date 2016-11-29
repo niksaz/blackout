@@ -1,5 +1,7 @@
 package ru.spbau.blackout.ingameui.settings;
 
+import com.badlogic.gdx.math.Vector2;
+
 import ru.spbau.blackout.units.Rpx;
 
 /**
@@ -7,36 +9,19 @@ import ru.spbau.blackout.units.Rpx;
  * All getters and setters work with RPX.
  */
 public class AbilityIconSettings {
-    public static class Defaults {
-        private Defaults() {}
-        public static final float SIZE_CM = 1f;
-    }
-
-
     private int abilityNum;
     public int getAbilityNum() { return this.abilityNum; }
     public void setAbilityNum(int abilityNum) { this.abilityNum = abilityNum; }
 
-    private int sizeX = Rpx.X.fromCm(Defaults.SIZE_CM);
-    public int getSizeX() { return this.sizeX; }
-    public void setSizeX(int sizeX) { this.sizeX = sizeX; }
+    public Vector2 size = new Vector2(100, 100);  // FIXME
+    public void setSize(Vector2 sizeX) { this.size = sizeX; }
+    public Vector2 getSize() { return this.size; }
 
-    private int sizeY = Rpx.Y.fromCm(Defaults.SIZE_CM);
-    public int getSizeY() { return this.sizeY; }
-    public void setSizeY(int sizeY) { this.sizeY = sizeY; }
+    public Vector2 start = new Vector2(1100, 400);  // FIXME
+    public void setStart(Vector2 start) { this.start = start; }
+    public Vector2 getStart() { return this.start; }
 
-    private int startX;
-    public int getStartX() { return this.startX; }
-    public void setStartX(int startX) { this.startX = startX; }
-
-    private int startY;
-    public int getStartY() { return this.startY; }
-    public void setStartY(int startY) { this.startY = startY; }
-
-
-    public AbilityIconSettings(int abilityNum, int startX, int startY) {
+    public AbilityIconSettings(int abilityNum) {
         this.abilityNum = abilityNum;
-        this.startX = startX;
-        this.startY = startY;
     }
 }

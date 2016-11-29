@@ -15,6 +15,9 @@ import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.ingameui.settings.StickSettings;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.units.Rpx;
+import ru.spbau.blackout.units.Vpx;
+
+import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 
 
 /**
@@ -49,15 +52,15 @@ public class Stick extends IngameUIObject {
 
         // touch image initialization
         this.touchImage = new Image(assets.get(TouchImg.IMAGE_PATH, Texture.class));
-        this.touchImage.setSize(TouchImg.X.SIZE, TouchImg.Y.SIZE);
+        this.touchImage.setSize(TouchImg.SIZE, TouchImg.SIZE);
         updateTouchPosition();
         stage.addActor(this.touchImage);
 
         // main image initialization
         // must go after touch image initialization to be in the foreground
         Image mainImg = new Image(assets.get(MainImg.IMAGE_PATH, Texture.class));
-        mainImg.setSize(MainImg.X.SIZE, MainImg.Y.SIZE);
-        mainImg.setPosition(settings.getStartX(), settings.getStartY());
+        mainImg.setSize(MainImg.SIZE, MainImg.SIZE);
+        mainImg.setPosition(settings.getStart().x, settings.getStart().y);
         mainImg.addListener(this.new Listener());
         stage.addActor(mainImg);
     }
@@ -67,14 +70,10 @@ public class Stick extends IngameUIObject {
 
 
     private void updateTouchPosition() {
-        touchImage.setPosition(
-                settings.getStartX() + MainImg.X.CENTER  // move (0,0) to the center of mainImg
-                        - TouchImg.X.CENTER                 // move pivot to the center of image
-                        + velocity.x * MainImg.X.MAX_AT,
-                settings.getStartY() + MainImg.Y.CENTER  // move (0,0) to the center of mainImg
-                        - TouchImg.Y.CENTER                 // move pivot to the center of image
-                        + velocity.y * MainImg.Y.MAX_AT
-        );
+        Vector2 position = new Vector2(settings.getStart());
+        position.add(MainImg.CENTER - TouchImg.CENTER, MainImg.CENTER - TouchImg.CENTER)
+                .mulAdd(velocity, MainImg.MAX_AT);
+        touchImage.setPosition(position.x, position.y);
     }
 
 
@@ -88,7 +87,7 @@ public class Stick extends IngameUIObject {
         @Override
         public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
             super.touchUp(event, x, y, pointer, button);
-            touchMovedTo(MainImg.X.CENTER, MainImg.Y.CENTER);
+            touchMovedTo(MainImg.CENTER, MainImg.CENTER);
         }
 
         @Override
@@ -97,11 +96,9 @@ public class Stick extends IngameUIObject {
             touchMovedTo(x, y);
         }
 
+
         private void touchMovedTo(float x, float y) {
-            velocity.set(
-                    (x - MainImg.X.CENTER) / MainImg.X.MAX_AT,
-                    (y - MainImg.Y.CENTER) / MainImg.Y.MAX_AT
-            );
+            velocity.set((x - MainImg.CENTER) / MainImg.MAX_AT, (y - MainImg.CENTER) / MainImg.MAX_AT);
 
             float len = velocity.len();
             if (len > 1) {
@@ -120,24 +117,9 @@ public class Stick extends IngameUIObject {
     public static final class MainImg {
         private MainImg() {}
 
-        public static final class InCentimeters {
-            private InCentimeters() {}
-            private static final float SIZE = 1.5f;
-        }
-
-        public static final class X {
-            private X() {}
-            public static final int SIZE = Rpx.X.fromCm(InCentimeters.SIZE);
-            public static final float MAX_AT = (SIZE - TouchImg.X.SIZE) / 2;
-            public static final float CENTER = SIZE / 2;
-        }
-
-        public static final class Y {
-            private Y() {}
-            public static final int SIZE = Rpx.Y.fromCm(InCentimeters.SIZE);
-            public static final float MAX_AT = (SIZE - TouchImg.Y.SIZE) / 2;
-            public static final float CENTER = SIZE / 2;
-        }
+        public static final float SIZE = Math.min(Vpx.fromCm(3f), getWorldWidth() / 7);
+        public static final float CENTER = SIZE / 2;  // because it is related to position
+        public static final float MAX_AT = (SIZE - TouchImg.SIZE) / 2;
 
         public static final String IMAGE_PATH = "images/ingame_ui/stick_main.png";
     }
@@ -147,22 +129,8 @@ public class Stick extends IngameUIObject {
     public static final class TouchImg {
         private TouchImg() {}
 
-        public static final class InCentimeters {
-            private InCentimeters() {}
-            private static final float SIZE = 0.3f;
-        }
-
-        public static final class X {
-            private X() {}
-            private static final float SIZE = Rpx.X.fromCm(InCentimeters.SIZE);
-            private static final float CENTER = Rpx.X.fromCm(InCentimeters.SIZE / 2);
-        }
-
-        public static final class Y {
-            private Y() {}
-            private static final float SIZE = Rpx.Y.fromCm(InCentimeters.SIZE);
-            private static final float CENTER = Rpx.Y.fromCm(InCentimeters.SIZE / 2);
-        }
+        private static final float SIZE = MainImg.SIZE / 5;
+        private static final float CENTER = SIZE / 2;
 
         public static final String IMAGE_PATH = "images/ingame_ui/stick_touch.png";
     }

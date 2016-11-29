@@ -1,9 +1,11 @@
 package ru.spbau.blackout;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.physics.box2d.Box2D;
+import com.sun.deploy.uitoolkit.impl.fx.Utils;
 
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
@@ -26,8 +28,19 @@ public class BlackoutGame extends Game {
     public static final String HOST_NAME = "192.168.1.34";
     public static final int PORT_NUMBER = 48800;
 
-    public static final int VIRTUAL_WORLD_WIDTH = 1280;
-    public static final int VIRTUAL_WORLD_HEIGHT = 768;
+
+    /** For lazy initialization (NullPointerException otherwise) */
+    private static final class ScreenSizeHolder {
+        public static final float ASPECT_RATION = (float)Gdx.graphics.getWidth() / (float)Gdx.graphics.getHeight();
+        public static final int VIRTUAL_WORLD_WIDTH  = 1280;
+        public static final int VIRTUAL_WORLD_HEIGHT = Math.round(VIRTUAL_WORLD_WIDTH / ASPECT_RATION);
+    }
+
+    // Functions instead of constants because window can be resized.
+    public static float getAspectRation() { return ScreenSizeHolder.ASPECT_RATION; }
+    public static int getWorldWidth() { return ScreenSizeHolder.VIRTUAL_WORLD_WIDTH; }
+    public static int getWorldHeight() { return ScreenSizeHolder.VIRTUAL_WORLD_HEIGHT; }
+
 
     // fields marked as /*final*/ must be assigned only once, but can't be assigned in constructor
 
@@ -53,7 +66,7 @@ public class BlackoutGame extends Game {
 
 	// FIXME:  just for test
     public void testGameScreen() {
-        AbilityIconSettings firstIconSettings = new AbilityIconSettings(0 /*num*/, 1100 /*x*/, 400 /*y*/);
+        AbilityIconSettings firstIconSettings = new AbilityIconSettings(0);
         IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
         GameSettings settings = new GameSettings(uiSettings);  // just default settings
 

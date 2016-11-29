@@ -19,7 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.List;
 
@@ -33,13 +34,12 @@ import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.gamesession.GameSessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
-import ru.spbau.blackout.units.Rpx;
+import ru.spbau.blackout.units.Vpx;
 import ru.spbau.blackout.utils.SimpleProgressBar;
 import ru.spbau.blackout.utils.Utils;
 
-import static com.badlogic.gdx.graphics.Color.BROWN;
-import static ru.spbau.blackout.BlackoutGame.VIRTUAL_WORLD_HEIGHT;
-import static ru.spbau.blackout.BlackoutGame.VIRTUAL_WORLD_WIDTH;
+import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
+import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 import static ru.spbau.blackout.java8features.Functional.foreach;
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
@@ -88,12 +88,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     // instance of GameContext
     @Override
     public Optional<AssetManager> assets() {
-        return Optional.of(assets);
+        return Optional.of(this.assets);
     }
 
     @Override
     public GameWorld gameWorld() {
-        return gameWorld;
+        return this.gameWorld;
     }
 
 
@@ -103,8 +103,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         super.show();
 
         // if not loaded yet
-        if (loadingScreen != null) {
-            BlackoutGame.get().screenManager().setScreen(loadingScreen);
+        if (this.loadingScreen != null) {
+            BlackoutGame.get().screenManager().setScreen(this.loadingScreen);
         }
     }
 
@@ -116,15 +116,16 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         ModelBatch modelBatch = BlackoutGame.get().modelBatch();
-        modelBatch.begin(camera);
-        modelBatch.render(gameWorld, environment);
-        modelBatch.render(map, environment);
+        modelBatch.begin(this.camera);
+        modelBatch.render(this.gameWorld, this.environment);
+        modelBatch.render(this.map, this.environment);
         modelBatch.end();
 
-        ui.update(deltaTime);  // FIXME: should be in common update method
-        ui.draw();
+        this.ui.update(deltaTime);
+        this.ui.draw();
 
-        update(deltaTime);  // FIXME: why it is in the end of render. It doesn't look logical.
+        this.gameWorld.update(deltaTime);
+        this.updateCamera();
     }
 
     @Override
@@ -133,7 +134,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         camera.viewportWidth = width;
         camera.viewportHeight = height;
         camera.update();
-        ui.resize(width, height);
     }
 
     @Override
@@ -155,14 +155,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
 
-    /**
-     * Updates game world on every frame.
-     */
-    private void update(final float deltaTime) {  // FIXME: m.b. this method is redundant
-        synchronized (gameWorld) {
-            gameWorld.update(deltaTime);
-        }
-
+    private void updateCamera() {
         // Must go after gameWorld.update to be synced.
         Vector2 charPos = character.getPosition();
         camera.position.set(
@@ -201,9 +194,10 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             this.mapPath = room.getMap();
 
             Camera camera = new OrthographicCamera();
-            this.stage = new Stage(new ScreenViewport(camera), BlackoutGame.get().spriteBatch());
+            Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), camera);
+            this.stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
 
-            float startX = (Gdx.graphics.getWidth() - ProgressBarConst.WIDTH) / 2;
+            float startX = (getWorldWidth() - ProgressBarConst.WIDTH) / 2;
             this.progressBar.setPosition(startX, ProgressBarConst.START_Y);
             this.progressBar.setSize(ProgressBarConst.WIDTH, ProgressBarConst.HEIGHT);
         }
@@ -235,7 +229,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                 } else {
                     // show loading screen
                     float progress = assets.getProgress();
-                    System.out.println(progress);
                     this.progressBar.setValue(progress);
                     this.stage.act();
                     this.stage.draw();
@@ -251,6 +244,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         @Override
         public void resize(int width, int height) {
             super.resize(width, height);
+            this.stage.getViewport().update(Vpx.fromRpx(width), Vpx.fromRpx(height));
         }
 
         @Override
@@ -267,7 +261,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             Utils.addAntiAliassing(backgroundTexture);
             Image background = new Image(backgroundTexture);
             background.setPosition(0, 0);
-            background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            background.setSize(getWorldWidth(), getWorldHeight());
             this.stage.addActor(background);
 
             // progress bar
@@ -329,21 +323,20 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private ProgressBarConst() {}
         private static final String PATH_EMPTY = "images/progress_bar/empty.png";
         private static final String PATH_FULL = "images/progress_bar/full.png";
-        // current progress bar isn't scalable.
-        private static final float WIDTH = Math.min(Rpx.X.fromCm(10f), Rpx.X.fromVpx(VIRTUAL_WORLD_WIDTH / 2));
-        private static final float HEIGHT = Math.min(Rpx.Y.fromCm(1.3f), Rpx.Y.fromVpx(VIRTUAL_WORLD_HEIGHT / 8));
-        private static final float START_Y = Rpx.Y.fromVpx(VIRTUAL_WORLD_HEIGHT / 5);
+        private static final float WIDTH = Math.min(Vpx.fromCm(10f), getWorldWidth() / 2);
+        private static final float HEIGHT = Math.min(Vpx.fromCm(1.3f), getWorldHeight() / 8);
+        private static final float START_Y = getWorldHeight() / 5;
     }
 
 
     /** constant holder for label in loading screen */
     private static final class LoadingLabelConst {
         private LoadingLabelConst() {}
-        private static final Color COLOR = BROWN;
+        private static final Color COLOR = new Color(60f / 255f, 10f / 255f, 0, 1);
 
-        private static final float MAX_Y = Rpx.X.fromVpx(VIRTUAL_WORLD_HEIGHT * 4 / 5);
-        private static final float MIN_Y = Rpx.X.fromVpx(VIRTUAL_WORLD_HEIGHT * 2 / 5);
-        private static final float WIDTH = Rpx.X.fromVpx(VIRTUAL_WORLD_WIDTH / 2);
-        private static final float MIN_X = (Gdx.graphics.getWidth() - LoadingLabelConst.WIDTH) / 2;
+        private static final float MAX_Y = getWorldHeight() * 4 / 5;
+        private static final float MIN_Y = getWorldHeight() * 2 / 5;
+        private static final float WIDTH = getWorldWidth() / 2;
+        private static final float MIN_X = (getWorldWidth() - LoadingLabelConst.WIDTH) / 2;
     }
 }

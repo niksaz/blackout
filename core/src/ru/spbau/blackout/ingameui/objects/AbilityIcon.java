@@ -41,8 +41,8 @@ public class AbilityIcon extends IngameUIObject {
         // icon initialization
         // TODO: assert context.assets().isPresent()
         this.icon = new Image(context.assets().get().get(this.getAbility().iconPath(), Texture.class));
-        this.icon.setSize(this.settings.getSizeX(), this.settings.getSizeY());
-        this.icon.setPosition(settings.getStartX(), settings.getStartY());
+        this.icon.setSize(this.settings.getSize().x, this.settings.getSize().y);
+        this.icon.setPosition(settings.getStart().x, settings.getStart().y);
         stage.addActor(this.icon);
         this.icon.addListener(this.new Listener());
     }
@@ -53,7 +53,6 @@ public class AbilityIcon extends IngameUIObject {
             this.getAbility().inCast(deltaTime);
         }
     }
-
 
     public Ability getAbility() { return this.ability; }
 
