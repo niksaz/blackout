@@ -55,7 +55,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         out.writeObject(this);
         out.writeObject(this.getPosition());
         out.writeFloat(this.getRotation());
-        System.out.println("pos in ser: " + this.getPosition());
     }
 
     @Override
@@ -63,7 +62,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         GameObject other = (GameObject) in.readObject();
         this.height = other.height;
         Vector2 position = (Vector2) in.readObject();
-        Gdx.app.log("Blackout", "got position: " + position);
         float rotation = in.readFloat();
         this.setTransform(position, rotation);
         return other;

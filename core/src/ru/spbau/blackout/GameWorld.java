@@ -71,64 +71,16 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         out.writeInt(gameObjects.size());
 
         for (GameObject object : this) {
-            //System.out.println("some object des");
-            //object.inplaceSerialize(out);
-
-            Vector2 sending = object.getPosition();
-            out.writeFloat(sending.x);
-            out.writeFloat(sending.y);
-            if (object instanceof GameUnit) {
-                GameUnit unit = (GameUnit) object;
-                sending = unit.getSelfVelocity();
-                out.writeFloat(sending.x);
-                out.writeFloat(sending.y);
-            }
-
-            // ???? do not work
-            // Vector2 ob = object.getPosition();
-            // out.writeObject(ob);
-
-            // ++++ correct
-            // Vector2 ob = object.getPosition();
-            // Vector2 c = new Vector2(ob.x, ob.y);
-            // out.writeObject(c);
-
-
-            //long curTime = System.currentTimeMillis();
-            //out.writeLong(curTime);
-
-
-//            System.out.println("sent time " + c);
-            //Vector2 v2 = ;//new Vector2(System.currentTimeMillis() % 1000, System.currentTimeMillis() % 1000);
-
-            //out.writeObject(v2);
+            object.inplaceSerialize(out);
         }
     }
 
     @Override
     public synchronized Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.readInt(); // size // FIXME
+        in.readInt();
 
         for (GameObject object : this) {
-            //object.inplaceDeserialize(in);
-
-            float x = in.readFloat();
-            float y = in.readFloat();
-            object.setPosition(x, y);
-            if (object instanceof GameUnit) {
-                GameUnit unit = (GameUnit) object;
-                x = in.readFloat();
-                y = in.readFloat();
-                unit.setSelfVelocity(new Vector2(x, y));
-            }
-
-            //Vector2 v2 = (Vector2) in.readObject();
-            //Gdx.app.log("ANDROID", "got position: " + x + " " + y);
-
-            //long l = in.readLong();
-
-            //Vector2 pos = (Vector2) in.readObject();
-            //Gdx.app.log("ANDROID", "got time " + pos);
+            object.inplaceDeserialize(in);
         }
 
         return null;
@@ -195,9 +147,5 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
             object.updateForSecondStep();
         }
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-
-        //for (GameObject object : this) {
-        //    System.out.println("Object position: " + object.getPosition());
-        //}
     }
 }
