@@ -14,11 +14,11 @@ public class FireballAbility extends InstantAbility {
     public static final String MODEL_PATH = "abilities/fireball/model/fireball.g3db";
     public static final float MAX_CHARGE_TIME = 3f;
 
-    public static final float SHELL_START_SPEED = 20f;
+    public static final float SHELL_START_SPEED = 30f;
     public static final float CAST_DISTANCE = 1f;
     public static final float SHELL_MASS = 5f;
     /** The estimated distance of the ability in case of no external force. */
-    public static final float DISTANCE = 8f;
+    public static final float DISTANCE = 12f;
     public static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;
 
 

@@ -27,7 +27,7 @@ public abstract class GameUnit extends DynamicObject {
 
     public static final float SLOW_DOWN_FACTOR = 0.02f;
 
-    public static final float DEFAULT_LINEAR_FRICTION = 20f;
+    public static final float DEFAULT_LINEAR_FRICTION = 50f;
     public static final float DEFAULT_ANGULAR_FRICTION = 5f;
 
     // Movement:
@@ -116,7 +116,7 @@ public abstract class GameUnit extends DynamicObject {
 
     /** Definition for units. Loads abilities. */
     public static abstract class Definition extends DynamicObject.Definition {
-        public static final float DEFAULT_SPEED = 7f;
+        public static final float DEFAULT_SPEED = 8f;
 
         public float speed = DEFAULT_SPEED;
         public Ability[] abilities;

@@ -45,9 +45,14 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 public class GameScreen extends BlackoutScreen implements GameContext {
-    public static final float DEFAULT_CAMERA_X_OFFSET = 0;
-    public static final float DEFAULT_CAMERA_Y_OFFSET = -1;
-    public static final float DEFAULT_CAMERA_HEIGHT = 12;
+    public static final class CameraDefaults {
+        private CameraDefaults() {}
+        public static final float FIELD_OF_VIEW = 30;
+        public static final float X_OFFSET = 0;
+        public static final float Y_OFFSET = -10;
+        public static final float HEIGHT = 40;
+    }
+
 
     // should be here, not in loading screen because it owns all assets
     private final AssetManager assets = new AssetManager();
@@ -75,9 +80,9 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         // initialize main camera
         this.camera = new PerspectiveCamera();
-        this.camera.fieldOfView = 67;
+        this.camera.fieldOfView = CameraDefaults.FIELD_OF_VIEW;
         this.camera.near = 1f;
-        this.camera.far = 30000f;
+        this.camera.far = 300f;
 
         // initialize environment
         this.environment = new Environment();
@@ -165,9 +170,9 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         // Must go after gameWorld.update to be synced.
         Vector2 charPos = character.getPosition();
         camera.position.set(
-                DEFAULT_CAMERA_X_OFFSET + charPos.x,
-                DEFAULT_CAMERA_Y_OFFSET + charPos.y,
-                DEFAULT_CAMERA_HEIGHT + character.getHeight());
+                CameraDefaults.X_OFFSET + charPos.x,
+                CameraDefaults.Y_OFFSET + charPos.y,
+                CameraDefaults.HEIGHT + character.getHeight());
         camera.lookAt(charPos.x, charPos.y, character.getHeight());
         camera.update();
     }
