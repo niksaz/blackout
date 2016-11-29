@@ -33,9 +33,10 @@ import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.gamesession.GameSessionSettings;
+import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.units.Vpx;
-import ru.spbau.blackout.utils.SimpleProgressBar;
+import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.utils.Utils;
 
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
@@ -96,6 +97,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         return this.gameWorld;
     }
 
+    @Override
+    public void resume() {
+        super.resume();
+        assets.update();
+    }
 
     // instance of Screen
     @Override
@@ -183,7 +189,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private final String mapPath;
         private final Stage stage;
         private final SimpleProgressBar progressBar =
-                new SimpleProgressBar(ProgressBarConst.PATH_EMPTY, ProgressBarConst.PATH_FULL);
+                new HorizontalProgressBar(ProgressBarConst.PATH_EMPTY, ProgressBarConst.PATH_FULL);
         private boolean loadingScreenLoaded = false;
 
 
@@ -267,7 +273,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             // progress bar
             this.progressBar.doneLoading(assets);
             this.progressBar.toFront();
-            this.stage.addActor(progressBar);
+            this.stage.addActor(this.progressBar);
 
             // label
             Label.LabelStyle style = new Label.LabelStyle(
@@ -288,7 +294,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         }
 
         private void loadRealResources() {
-            ui.load(GameScreen.this);
+            ui.load(assets);
             foreach(this.objectDefs, def -> def.load(GameScreen.this));
             assets.load(this.mapPath, Model.class);
         }
@@ -308,7 +314,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             map = new ModelInstance(assets.get(mapPath, Model.class));
             fixTop(map);
 
-            ui.doneLoading(GameScreen.this, character);
+            ui.doneLoading(assets, character);
             GameScreen.this.doneLoading();
 
             BlackoutGame.get().screenManager().disposeScreen();

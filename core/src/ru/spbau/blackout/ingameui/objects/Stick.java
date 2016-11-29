@@ -39,16 +39,14 @@ public class Stick extends IngameUIObject {
 
 
     @Override
-    public void load(GameContext context) {
-        AssetManager assets = context.assets().get();
+    public void load(AssetManager assets) {
         assets.load(TouchImg.IMAGE_PATH, Texture.class);
         assets.load(MainImg.IMAGE_PATH, Texture.class);
     }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage, Character character) {
+    public void doneLoading(AssetManager assets, Stage stage, Character character) {
         this.unit = character;
-        AssetManager assets = context.assets().get();
 
         // touch image initialization
         this.touchImage = new Image(assets.get(TouchImg.IMAGE_PATH, Texture.class));
