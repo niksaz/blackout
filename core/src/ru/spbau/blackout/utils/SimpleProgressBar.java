@@ -14,6 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
  * Provides easy and powerful API for creating progress bars.
  */
 public class SimpleProgressBar extends Actor {
+    private static final float MAX_SPEED = 1f;
+
+
     private String fullTexturePath;
     private String emptyTexturePath;
 
@@ -23,7 +26,11 @@ public class SimpleProgressBar extends Actor {
     private /*final*/ int fullWidth;
     private float minValue;
     private float maxValue;
-    private float normalizedValue;
+    /** Real value from 0 to 1. */
+    private float realValue;
+    /** Value from 0 to 1 after interpolation. */
+    private float valueToShow;
+
 
 
     public SimpleProgressBar(String emptyTexturePath, String fullTexturePath, float minValue, float maxValue) {
@@ -31,7 +38,7 @@ public class SimpleProgressBar extends Actor {
         this.emptyTexturePath = emptyTexturePath;
         this.minValue = minValue;
         this.maxValue = maxValue;
-        this.normalizedValue = minValue;
+        this.realValue = minValue;
     }
 
     public SimpleProgressBar(String emptyTexturePath, String fullTexturePath) {
@@ -54,25 +61,35 @@ public class SimpleProgressBar extends Actor {
         Utils.addAntiAliassing(emptyTexture);
         this.empty = new TextureRegionDrawable(new TextureRegion(emptyTexture));
 
-        this.setNormalizedValue(minValue);
+        this.setValue(minValue);
         this.fullTexturePath = null;
         this.emptyTexturePath = null;
     }
 
     @Override
-    public void act(float delta) {
-        super.act(delta);
-        this.full.getRegion().setRegionWidth((int) Math.floor(normalizedValue * this.fullWidth));
+    public void act(float deltaTime) {
+        super.act(deltaTime);
+//        this.valueToShow =
+
+        float dValue = this.realValue - this.valueToShow;
+        float maxDValue = MAX_SPEED * deltaTime;
+        if (dValue > 0) {
+            this.valueToShow += Math.min(dValue, maxDValue);
+        } else {
+            this.valueToShow -= Math.max(dValue, -maxDValue);
+        }
+
+        this.full.getRegion().setRegionWidth((int) Math.floor(this.valueToShow * this.fullWidth));
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
         empty.draw(batch, this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        full.draw(batch, this.getX(), this.getY(), normalizedValue * this.getWidth(), this.getHeight());
+        full.draw(batch, this.getX(), this.getY(), this.valueToShow * this.getWidth(), this.getHeight());
     }
 
-    public void setNormalizedValue(float normalizedValue) {
-        this.normalizedValue = (normalizedValue - this.minValue) / this.maxValue;  // from 0 to 1
+    public void setValue(float value) {
+        this.realValue = (value - this.minValue) / this.maxValue;  // from 0 to 1
     }
 }

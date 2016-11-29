@@ -16,8 +16,8 @@ public class LoadScreen extends StageScreen implements CorePlayServicesListener 
 
     private static final float LABEL_BOTTOM_PADDING = 25.0f;
 
-    private static final String STARTED_LOG_IN = "Logging in...";
-    private static final String STARTED_LOADING = "Loading your game info...";
+    private static final String STARTED_LOG_IN = "Logging in...";  // FIXME: localization (move to resources)
+    private static final String STARTED_LOADING = "Loading your game info...";  // FIXME: localization
 
     private Table middleTable;
 

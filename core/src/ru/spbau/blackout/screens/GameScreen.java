@@ -3,11 +3,11 @@ package ru.spbau.blackout.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -17,7 +17,8 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.List;
@@ -36,6 +37,7 @@ import ru.spbau.blackout.units.Rpx;
 import ru.spbau.blackout.utils.SimpleProgressBar;
 import ru.spbau.blackout.utils.Utils;
 
+import static com.badlogic.gdx.graphics.Color.BROWN;
 import static ru.spbau.blackout.BlackoutGame.VIRTUAL_WORLD_HEIGHT;
 import static ru.spbau.blackout.BlackoutGame.VIRTUAL_WORLD_WIDTH;
 import static ru.spbau.blackout.java8features.Functional.foreach;
@@ -189,7 +191,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private final Stage stage;
         private final SimpleProgressBar progressBar =
                 new SimpleProgressBar(ProgressBarConst.PATH_EMPTY, ProgressBarConst.PATH_FULL);
-        private Image background;
         private boolean loadingScreenLoaded = false;
 
 
@@ -235,12 +236,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                     // show loading screen
                     float progress = assets.getProgress();
                     System.out.println(progress);
-                    this.progressBar.setNormalizedValue(progress);
+                    this.progressBar.setValue(progress);
                     this.stage.act();
                     this.stage.draw();
                 }
             } else if (loaded) {
-                // initialize loading screen, start loading real resources
+                // initialize loading screen and start loading real resources
                 this.initializeLoadingScreen();
                 this.loadRealResources();
                 loadingScreenLoaded = true;
@@ -255,20 +256,41 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         @Override
         public void dispose() {
             super.dispose();
-            // TODO: dispose progress bar's resources
+            assets.unload(BACKGROUND_IMAGE);
+            assets.unload(ProgressBarConst.PATH_EMPTY);
+            assets.unload(ProgressBarConst.PATH_FULL);
         }
 
         private void initializeLoadingScreen() {
+            // background image
             Texture backgroundTexture = assets.get(BACKGROUND_IMAGE, Texture.class);
             Utils.addAntiAliassing(backgroundTexture);
-            this.background = new Image(backgroundTexture);
-            this.background.setPosition(0, 0);
-            this.background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            this.stage.addActor(this.background);
+            Image background = new Image(backgroundTexture);
+            background.setPosition(0, 0);
+            background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            this.stage.addActor(background);
 
+            // progress bar
             this.progressBar.doneLoading(assets);
             this.progressBar.toFront();
             this.stage.addActor(progressBar);
+
+            // label
+            Label.LabelStyle style = new Label.LabelStyle(
+                    BlackoutGame.get().assets().getFont(),
+                    LoadingLabelConst.COLOR
+            );
+            Label label = new Label(
+                "Test: The pen name, Max Frei, was invented by Martynchik and Steopin for their works on" +
+                    "comic fantasy series Labyrinths of Echo (\"ЛабиринтыEхо\"). The plot follows the eponymous" +
+                    "narrator, sir Max, as he leaves our \"real\" world...",
+                style
+            );
+            label.setPosition(LoadingLabelConst.MIN_X, LoadingLabelConst.MIN_Y);
+            label.setSize(LoadingLabelConst.WIDTH, LoadingLabelConst.MAX_Y - LoadingLabelConst.MIN_Y);
+            label.setAlignment(Align.center);
+            label.setWrap(true);
+            this.stage.addActor(label);
         }
 
         private void loadRealResources() {
@@ -311,5 +333,17 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private static final float WIDTH = Math.min(Rpx.X.fromCm(10f), Rpx.X.fromVpx(VIRTUAL_WORLD_WIDTH / 2));
         private static final float HEIGHT = Math.min(Rpx.Y.fromCm(1.3f), Rpx.Y.fromVpx(VIRTUAL_WORLD_HEIGHT / 8));
         private static final float START_Y = Rpx.Y.fromVpx(VIRTUAL_WORLD_HEIGHT / 5);
+    }
+
+
+    /** constant holder for label in loading screen */
+    private static final class LoadingLabelConst {
+        private LoadingLabelConst() {}
+        private static final Color COLOR = BROWN;
+
+        private static final float MAX_Y = Rpx.X.fromVpx(VIRTUAL_WORLD_HEIGHT * 4 / 5);
+        private static final float MIN_Y = Rpx.X.fromVpx(VIRTUAL_WORLD_HEIGHT * 2 / 5);
+        private static final float WIDTH = Rpx.X.fromVpx(VIRTUAL_WORLD_WIDTH / 2);
+        private static final float MIN_X = (Gdx.graphics.getWidth() - LoadingLabelConst.WIDTH) / 2;
     }
 }
