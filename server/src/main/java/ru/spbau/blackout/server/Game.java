@@ -105,13 +105,13 @@ class Game extends Thread {
         while (gameState != GameState.FINISHED) {
             try (
                 ByteArrayOutputStream serializedVersionOfWorld = new ByteArrayOutputStream();
-                ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld);
+                ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld)
             ) {
                 long currentTime;
                 synchronized (gameWorld) {
                     currentTime = System.currentTimeMillis();
                     gameWorld.update((currentTime - lastTime) / MILLIS_IN_SECOND);
-                    server.log("Updating gameWorld: " + Long.valueOf(currentTime - lastTime).toString());
+                    server.log("Updating gameWorld: " + (currentTime - lastTime) / MILLIS_IN_SECOND);
                     try {
                         gameWorld.inplaceSerialize(objectOutputStreamForWorld);
                         objectOutputStreamForWorld.flush();

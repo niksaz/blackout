@@ -31,9 +31,6 @@ class ClientThread extends Thread {
     private volatile GameState clientGameState = GameState.WAITING;
     private final AtomicReference<byte[]> worldInBytes = new AtomicReference<>();
 
-
-    public volatile ObjectOutputStream outputStream;
-
     ClientThread(RoomServer server, Socket socket) {
         this.server = server;
         this.socket = socket;
@@ -48,8 +45,6 @@ class ClientThread extends Thread {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             name = in.readUTF();
             server.log(name + " connected.");
-
-            outputStream = out;
 
             do {
                 final Game game = this.game;

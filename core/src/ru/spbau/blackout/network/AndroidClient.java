@@ -119,14 +119,10 @@ public class AndroidClient implements Runnable, AbstractServer {
 
                 byte[] serializedWorld = (byte[]) in.readObject();
 
-                Gdx.app.log("ANDROID", "TRYING TO ACQUIRE LOCK");
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (currentWorld) {
-                    Gdx.app.log("ANDROID", "STARTING DESERIALIZATION ON IT");
                     currentWorld.inplaceDeserialize(new ObjectInputStream(new ByteArrayInputStream(serializedWorld)));
-                    Gdx.app.log("ANDROID", "FINISHING DESERIALIZATION ON IT");
                 }
-                Gdx.app.log("ANDROID", "RELEASING TO ACQUIRE LOCK");
 
                 // should get worlds regularly after the first one
                 socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
