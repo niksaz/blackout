@@ -79,7 +79,7 @@ public abstract class GameUnit extends DynamicObject {
     public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameUnit other = (GameUnit) super.inplaceDeserialize(in);
         this.selfVelocity.set(other.selfVelocity);
-        Gdx.app.log("Blackout", "SELF VEL GOT" + other.selfVelocity);
+        //Gdx.app.log("Blackout", "SELF VEL GOT" + other.selfVelocity);
 
         this.selfVelocityScale = other.selfVelocityScale;
         return other;
@@ -103,7 +103,7 @@ public abstract class GameUnit extends DynamicObject {
         }
 
         selfVelocity.set(vel.x * selfVelocityScale, vel.y * selfVelocityScale);
-        System.out.println(this.selfVelocity);
+        //System.out.println(this.selfVelocity);
     }
 
     public static abstract class Definition extends DynamicObject.Definition {

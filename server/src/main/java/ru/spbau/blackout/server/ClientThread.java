@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicReference;
 
-import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
@@ -29,6 +29,10 @@ class ClientThread extends Thread {
     private volatile Hero.Definition hero;
     private volatile Game game;
     private volatile GameState clientGameState = GameState.WAITING;
+    private final AtomicReference<byte[]> worldInBytes = new AtomicReference<>();
+
+
+    public volatile ObjectOutputStream outputStream;
 
     ClientThread(RoomServer server, Socket socket) {
         this.server = server;
@@ -44,6 +48,8 @@ class ClientThread extends Thread {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             name = in.readUTF();
             server.log(name + " connected.");
+
+            outputStream = out;
 
             do {
                 final Game game = this.game;
@@ -99,26 +105,24 @@ class ClientThread extends Thread {
             clientInputThread.start();
 
             while (clientGameState != GameState.FINISHED) {
-                final GameWorld gameWorld = game.getGameWorld();
-                //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                synchronized (gameWorld) {
-                    try {
-                        gameWorld.inplaceSerialize(out);
-                        out.flush();
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException ignored) {
+                if (worldInBytes.get() != null) {
+                    final byte[] worldToSend = worldInBytes.getAndSet(null);
+                    out.writeObject(worldToSend);
+                    out.flush();
+                } else {
+                    synchronized (this) {
+                        if (worldInBytes.get() == null) {
+                            try {
+                                wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
-
-                // sleep and after getting GameWorld periodically sending it to the client
-                try {
-                    sleep(Network.SLEEPING_TIME_TO_ACHIEVE_FRAME_RATE);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             if (clientGameState == GameState.WAITING) {
                 server.discard(this);
@@ -136,6 +140,11 @@ class ClientThread extends Thread {
         this.session = session;
         this.hero = hero;
         this.game = game;
+    }
+
+    synchronized void setWorldToSend(byte[] worldInBytes) {
+        this.worldInBytes.set(worldInBytes);
+        notify();
     }
 
     GameState getClientGameState() {

@@ -2,6 +2,9 @@ package ru.spbau.blackout.server;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,8 +32,8 @@ class Game extends Thread {
     private final int gameId;
     private final RoomServer server;
     private final List<ClientThread> clients;
-    private final AtomicReference<GameState> gameState = new AtomicReference<>(GameState.READY_TO_START);
     private final GameWorld gameWorld = new GameWorld();
+    private volatile GameState gameState = GameState.READY_TO_START;
 
     Game(RoomServer server, List<ClientThread> clients) {
         this.gameId = gamesCreated.getAndAdd(1);
@@ -92,23 +95,51 @@ class Game extends Thread {
             } while (!everyoneIsReady);
         }
 
-        if (gameState.get() == GameState.FINISHED) {
+        if (gameState == GameState.FINISHED) {
             return;
         }
-        gameState.set(GameState.IN_PROCESS);
+        gameState = GameState.IN_PROCESS;
 
+        // creating streams for deserialization of the world for further usage for ClientThreads
         long lastTime = System.currentTimeMillis();
-        while (gameState.get() != GameState.FINISHED) {
-            long currentTime;
-            synchronized (gameWorld) {
-                currentTime = System.currentTimeMillis();
-                gameWorld.update((currentTime - lastTime) / MILLIS_IN_SECOND);
-                server.log("Updating gameWorld: " + Long.valueOf(currentTime - lastTime).toString());
-            }
-            lastTime = currentTime;
-            try {
-                sleep(Network.SLEEPING_TIME_TO_ACHIEVE_FRAME_RATE);
-            } catch (InterruptedException e) {
+        while (gameState != GameState.FINISHED) {
+            try (
+                ByteArrayOutputStream serializedVersionOfWorld = new ByteArrayOutputStream();
+                ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld);
+            ) {
+                long currentTime;
+                synchronized (gameWorld) {
+                    currentTime = System.currentTimeMillis();
+                    gameWorld.update((currentTime - lastTime) / MILLIS_IN_SECOND);
+                    server.log("Updating gameWorld: " + Long.valueOf(currentTime - lastTime).toString());
+                    try {
+                        gameWorld.inplaceSerialize(objectOutputStreamForWorld);
+                        objectOutputStreamForWorld.flush();
+                    } catch (IOException | ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+                lastTime = currentTime;
+
+                final byte[] worldInBytes = serializedVersionOfWorld.toByteArray();
+
+                if (worldInBytes.length != 0) {
+                    for (ClientThread client : clients) {
+                        // watching client's states
+                        if (client.getClientGameState() == GameState.FINISHED) {
+                            gameState = GameState.FINISHED;
+                            break;
+                        }
+                        client.setWorldToSend(worldInBytes);
+                    }
+                }
+
+                try {
+                    sleep(Network.SLEEPING_TIME_TO_ACHIEVE_FRAME_RATE);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -123,7 +154,7 @@ class Game extends Thread {
     }
 
     GameState getGameState() {
-        return gameState.get();
+        return gameState;
     }
 
     GameWorld getGameWorld() {

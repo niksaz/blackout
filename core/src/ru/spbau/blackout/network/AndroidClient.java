@@ -3,6 +3,7 @@ package ru.spbau.blackout.network;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -116,10 +117,16 @@ public class AndroidClient implements Runnable, AbstractServer {
                 // should read game world here from inputStream
                 final GameWorld currentWorld = gameScreen.getGameWorld();
 
+                byte[] serializedWorld = (byte[]) in.readObject();
+
+                Gdx.app.log("ANDROID", "TRYING TO ACQUIRE LOCK");
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (currentWorld) {
-                    currentWorld.inplaceDeserialize(in);
+                    Gdx.app.log("ANDROID", "STARTING DESERIALIZATION ON IT");
+                    currentWorld.inplaceDeserialize(new ObjectInputStream(new ByteArrayInputStream(serializedWorld)));
+                    Gdx.app.log("ANDROID", "FINISHING DESERIALIZATION ON IT");
                 }
+                Gdx.app.log("ANDROID", "RELEASING TO ACQUIRE LOCK");
 
                 // should get worlds regularly after the first one
                 socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
