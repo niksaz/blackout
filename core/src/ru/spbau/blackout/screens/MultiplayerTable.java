@@ -46,11 +46,11 @@ public class MultiplayerTable {
         addButton(result.middleTable, BACK_TEXT, upImage, downImage, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                result.task.interrupt();
+                result.task.stop();
             }
         });
 
-        (new Thread(result.task)).start();
+        new Thread(result.task).start();
         result.middleTable.setFillParent(true);
         return result.middleTable;
     }

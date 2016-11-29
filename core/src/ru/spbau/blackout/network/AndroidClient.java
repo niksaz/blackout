@@ -137,8 +137,9 @@ public class AndroidClient implements Runnable, AbstractServer {
         }
     }
 
-    public void interrupt() {
+    public synchronized void stop() {
         isInterrupted = true;
+        notifyAll();
     }
 
     @Override
