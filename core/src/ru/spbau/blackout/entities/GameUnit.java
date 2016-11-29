@@ -78,8 +78,8 @@ public abstract class GameUnit extends DynamicObject {
     @Override
     public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameUnit other = (GameUnit) super.inplaceDeserialize(in);
-        this.selfVelocity.set(other.selfVelocity);
-        //this.setSelfVelocity(other.selfVelocity);
+        //this.selfVelocity.set(other.selfVelocity);
+        this.setSelfVelocity(other.selfVelocity);
         this.selfVelocityScale = other.selfVelocityScale;
         return other;
     }

@@ -21,8 +21,6 @@ import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
 
 import static java.lang.Thread.sleep;
-import static ru.spbau.blackout.BlackoutGame.HOST_NAME;
-import static ru.spbau.blackout.BlackoutGame.PORT_NUMBER;
 
 /**
  * Task with the purpose of talking to a server: waiting in a queue, getting a game from a server,
@@ -46,7 +44,7 @@ public class AndroidClient implements Runnable, AbstractServer {
     @Override
     public void run() {
         try (
-            Socket socket = new Socket(HOST_NAME, PORT_NUMBER);
+            Socket socket = new Socket(Network.SERVER_IP_ADDRESS, Network.SERVER_PORT_NUMBER);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
@@ -111,24 +109,22 @@ public class AndroidClient implements Runnable, AbstractServer {
             });
             outputToServerThread.start();
 
+            final GameWorld currentWorld = gameScreen.getGameWorld();
             // waiting for the first world to arrive
             socket.setSoTimeout(0);
             while (!isInterrupted) {
                 // should read game world here from inputStream
-                final GameWorld currentWorld = gameScreen.getGameWorld();
 
-                byte[] serializedWorld = (byte[]) in.readObject();
-
-                //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                synchronized (currentWorld) {
-                    currentWorld.inplaceDeserialize(new ObjectInputStream(new ByteArrayInputStream(serializedWorld)));
-                }
+                final byte[] serializedWorld = (byte[]) in.readObject();
+                final ObjectInputStream serverWorldStream =
+                        new ObjectInputStream(new ByteArrayInputStream(serializedWorld));
+                currentWorld.setExternalWorldStream(serverWorldStream);
 
                 // should get worlds regularly after the first one
                 socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             }
         } catch (UnknownHostException e) {
-            Gdx.app.log(TAG, "Don't know about host " + HOST_NAME);
+            Gdx.app.log(TAG, "Don't know about host " + Network.SERVER_IP_ADDRESS);
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         } finally {

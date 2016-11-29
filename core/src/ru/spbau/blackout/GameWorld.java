@@ -1,6 +1,5 @@
 package ru.spbau.blackout;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -17,20 +16,24 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.utils.InplaceSerializable;
 
 public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
+
     public static final float WORLD_STEP = 1 / 58f;
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
     private final List<GameObject> gameObjects = new ArrayList<>();
-    transient private final World world;
-    transient private float accumulator = 0;
-    transient private Body ground;
+
+    private final World world;
+    private float accumulator = 0;
+    private Body ground;
+
+    private final AtomicReference<ObjectInputStream> externalWorldStream = new AtomicReference<>();
 
     public GameWorld() {
         // without gravity, without sleeping
@@ -87,7 +90,14 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     public synchronized void update(float delta) {
-        System.out.println(delta);
+        if (externalWorldStream.get() != null) {
+            try {
+                inplaceDeserialize(externalWorldStream.getAndSet(null));
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
         accumulator += delta;
 
         for (GameObject object : gameObjects) {
@@ -98,7 +108,6 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
             step();
             accumulator -= WORLD_STEP;
         }
-
 
         // I don't think that interpolation is necessary.
         // It would be very hard and takes many resources.
@@ -147,5 +156,9 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
             object.updateForSecondStep();
         }
         world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+    }
+
+    public void setExternalWorldStream(ObjectInputStream externalWorldStream) {
+        this.externalWorldStream.set(externalWorldStream);
     }
 }
