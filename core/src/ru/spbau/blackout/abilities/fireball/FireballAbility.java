@@ -11,7 +11,7 @@ import ru.spbau.blackout.shapescreators.CircleCreator;
 
 public class FireballAbility extends InstantAbility {
     public static final String ICON_PATH = "abilities/fireball/icon.png";
-    public static final String MODEL_PATH = "abilities/fireball/fireball.g3db";
+    public static final String MODEL_PATH = "abilities/fireball/model/fireball.g3db";
     public static final float MAX_CHARGE_TIME = 3f;
 
     public static final float SHELL_START_SPEED = 20f;
@@ -38,7 +38,6 @@ public class FireballAbility extends InstantAbility {
                 getUnit().getPosition().mulAdd(direction, CAST_DISTANCE)
         );
         shell.velocity.mulAdd(direction, SHELL_START_SPEED);
-        this.chargeStart();
     }
 
 

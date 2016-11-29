@@ -16,6 +16,7 @@ public abstract class InstantAbility extends Ability {
     @Override
     public final void onCastStart() {
         this.cast();
+        this.chargeStart();
     }
     @Override
     public final void inCast(float deltaTime) { /*nothing*/ }

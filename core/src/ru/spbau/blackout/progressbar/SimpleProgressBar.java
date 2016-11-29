@@ -68,7 +68,6 @@ public abstract class SimpleProgressBar extends Actor {
         super.act(deltaTime);
 
         float dValue = this.realValue - this.valueToShow;
-        System.out.println("dValue: " + dValue);
         float maxDValue = MAX_SPEED * deltaTime;
         this.valueToShow += Math.min(Math.max(dValue, -maxDValue), maxDValue);
     }

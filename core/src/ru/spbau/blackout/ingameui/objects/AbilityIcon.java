@@ -2,12 +2,10 @@ package ru.spbau.blackout.ingameui.objects;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.entities.GameUnit;
@@ -15,22 +13,20 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.network.AbstractServer;
-import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.progressbar.VerticalProgressBar;
 
+import static ru.spbau.blackout.utils.Utils.EMPTY_TEXTURE_PATH;
 import static ru.spbau.blackout.utils.Utils.floatEq;
 
 public class AbilityIcon extends IngameUIObject {
     // fields marked as /*final*/ must be assigned only once inside doneLoading method.
 
-    public static final String EMPTY_TEXTURE_PATH = "images/ability_cell/empty.png";
     public static final String FULL_TEXTURE_PATH = "images/ability_cell/full.png";
-    public static final String READY_TEXTURE_PATH = "images/ability_cell/ready.png";
+    public static final String CHARGED_TEXTURE_PATH = "images/ability_cell/charged.png";
 
 
     private final AbilityIconSettings settings;
-    private /*final*/ GameUnit unit;
     private /*final*/ Ability ability;
     private boolean isPressed = false;
     private SimpleProgressBar chargingBar = new VerticalProgressBar(EMPTY_TEXTURE_PATH, FULL_TEXTURE_PATH);
@@ -46,7 +42,7 @@ public class AbilityIcon extends IngameUIObject {
     @Override
     public void load(AssetManager assets) {
         this.chargingBar.load(assets);
-        assets.load(READY_TEXTURE_PATH, Texture.class);
+        assets.load(CHARGED_TEXTURE_PATH, Texture.class);
     }
 
     @Override
@@ -54,7 +50,7 @@ public class AbilityIcon extends IngameUIObject {
         this.ability = character.getAbility(this.settings.getAbilityNum());
 
         // Charged cell image
-        Image ready = new Image(assets.get(READY_TEXTURE_PATH, Texture.class));
+        Image ready = new Image(assets.get(CHARGED_TEXTURE_PATH, Texture.class));
         ready.setSize(this.settings.getSize().x, this.settings.getSize().y);
         ready.setPosition(settings.getStart().x, settings.getStart().y);
         ready.setZIndex(0);
@@ -73,7 +69,7 @@ public class AbilityIcon extends IngameUIObject {
         this.chargingBar.setSize(this.settings.getSize().x, this.settings.getSize().y);
         this.chargingBar.setPosition(settings.getStart().x, settings.getStart().y);
         this.chargingBar.setZIndex(2);
-        this.chargingBar.setVisible(false);
+        this.endCharging();
         stage.addActor(this.chargingBar);
     }
 
@@ -87,17 +83,17 @@ public class AbilityIcon extends IngameUIObject {
         if (floatEq(chargeTime, 0)) {
             if (this.isCharging()) {
                 // stop charging
-                this.chargingBar.setVisible(false);
+                this.endCharging();
             }
         } else {
             if (this.isCharging()) {
                 // update charging
-                this.ability.charge(deltaTime);
                 this.chargingBar.setValue(chargeTime / this.ability.getMaxChargeTime());
+                this.ability.charge(deltaTime);
             } else {
                 // start charging
-                this.chargingBar.setVisible(true);
                 this.chargingBar.setValueInstant(chargeTime / this.ability.getMaxChargeTime());
+                this.chargingBar.setVisible(true);
             }
         }
     }
@@ -108,6 +104,12 @@ public class AbilityIcon extends IngameUIObject {
 
     public boolean isCharging() {
         return this.chargingBar.isVisible();
+    }
+
+    private void endCharging() {
+        this.chargingBar.setVisible(false);
+        // FIXME: I can't explain it, but there is a strange unpleasant effect without this line.
+        this.chargingBar.setValueInstant(1);
     }
 
 

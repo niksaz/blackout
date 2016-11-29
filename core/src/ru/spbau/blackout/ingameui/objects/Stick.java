@@ -119,7 +119,7 @@ public class Stick extends IngameUIObject {
         public static final float CENTER = SIZE / 2;  // because it is related to position
         public static final float MAX_AT = (SIZE - TouchImg.SIZE) / 2;
 
-        public static final String IMAGE_PATH = "images/ingame_ui/stick_main.png";
+        public static final String IMAGE_PATH = "images/stick/stick_main.png";
     }
 
 
@@ -130,6 +130,6 @@ public class Stick extends IngameUIObject {
         private static final float SIZE = MainImg.SIZE / 5;
         private static final float CENTER = SIZE / 2;
 
-        public static final String IMAGE_PATH = "images/ingame_ui/stick_touch.png";
+        public static final String IMAGE_PATH = "images/stick/stick_touch.png";
     }
 }

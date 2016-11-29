@@ -11,6 +11,9 @@ import static com.badlogic.gdx.math.MathUtils.PI;
 public final class Utils {
     private Utils() {}
 
+    /** Just a fully transparent texture 64x64. */
+    public static final String EMPTY_TEXTURE_PATH = "empty_texture.png";
+
     public static final double EPSILON = 1e-5f;
 
     public static boolean floatEq(double a, double b) {
