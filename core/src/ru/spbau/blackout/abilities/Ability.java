@@ -26,6 +26,7 @@ public abstract class Ability {
      * Must be called once from <code>GameUnit.Definition::update</code>
      */
     public void load(GameContext context) {
+        // loading of icon has to be here because it isn't accessible from `AbilityIcon` class in the loading stage
         context.assets().ifPresent(assets ->
             assets.load(this.iconPath(), Texture.class)
         );

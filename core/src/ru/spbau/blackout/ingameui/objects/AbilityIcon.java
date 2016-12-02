@@ -8,13 +8,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 import ru.spbau.blackout.abilities.Ability;
-import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.progressbar.VerticalProgressBar;
+import ru.spbau.blackout.utils.Textures;
 
 import static ru.spbau.blackout.utils.Utils.EMPTY_TEXTURE_PATH;
 import static ru.spbau.blackout.utils.Utils.floatEq;
@@ -42,7 +42,7 @@ public class AbilityIcon extends IngameUIObject {
     @Override
     public void load(AssetManager assets) {
         this.chargingBar.load(assets);
-        assets.load(CHARGED_TEXTURE_PATH, Texture.class);
+        Textures.loadMipMapAA(CHARGED_TEXTURE_PATH, assets);
     }
 
     @Override
@@ -51,6 +51,7 @@ public class AbilityIcon extends IngameUIObject {
 
         // Charged cell image
         Image ready = new Image(assets.get(CHARGED_TEXTURE_PATH, Texture.class));
+//        Image ready = new Image(Utils.addAntiAliasing(assets.get(CHARGED_TEXTURE_PATH, Texture.class)));
         ready.setSize(this.settings.getSize().x, this.settings.getSize().y);
         ready.setPosition(settings.getStart().x, settings.getStart().y);
         ready.setZIndex(0);

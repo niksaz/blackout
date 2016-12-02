@@ -1,15 +1,15 @@
 package ru.spbau.blackout.utils;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import static com.badlogic.gdx.math.MathUtils.PI;
 
+
 public final class Utils {
     private Utils() {}
+
 
     /** Just a fully transparent texture 64x64. */
     public static final String EMPTY_TEXTURE_PATH = "empty_texture.png";
@@ -28,13 +28,8 @@ public final class Utils {
         return floatEq(x, 0) && floatEq(y, 0);
     }
 
-    public static void addAntiAliassing(Texture texture) {
-        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-    }
 
-    /**
-     * Makes positive direction of Z axis as top (Y by default)
-     */
+    /** Makes positive direction of Z axis as top (Y by default). */
     public static void fixTop(ModelInstance model) {
         // make Z axis as top (Y by default)
         model.transform.rotateRad(Vector3.X, PI / 2f);

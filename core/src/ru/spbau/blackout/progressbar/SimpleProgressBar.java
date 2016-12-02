@@ -4,11 +4,10 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-import ru.spbau.blackout.utils.Utils;
+import ru.spbau.blackout.utils.Textures;
 
 
 // I know that libgdx has its own API for progress bars, but this one is much better in some cases.
@@ -43,17 +42,16 @@ public abstract class SimpleProgressBar extends Actor {
 
 
     public void load(AssetManager assets) {
-        assets.load(this.fullTexturePath, Texture.class);
-        assets.load(this.emptyTexturePath, Texture.class);
+        Textures.loadMipMapAA(this.fullTexturePath, assets);
+        Textures.loadMipMapAA(this.emptyTexturePath, assets);
     }
+
 
     public void doneLoading(AssetManager assets) {
         Texture fullTexture = assets.get(this.fullTexturePath, Texture.class);
-        Utils.addAntiAliassing(fullTexture);
         this.full = new TextureRegionDrawable(new TextureRegion(fullTexture));
 
         Texture emptyTexture = assets.get(this.emptyTexturePath, Texture.class);
-        Utils.addAntiAliassing(emptyTexture);
         this.empty = new TextureRegionDrawable(new TextureRegion(emptyTexture));
 
         this.setValue(minValue);

@@ -40,7 +40,6 @@ public class FireballAbility extends InstantAbility {
         shell.velocity.mulAdd(direction, SHELL_START_SPEED);
     }
 
-
     @Override
     public void load(GameContext context) {
         super.load(context);

@@ -37,7 +37,7 @@ import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.units.Vpx;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
-import ru.spbau.blackout.utils.Utils;
+import ru.spbau.blackout.utils.Textures;
 
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
@@ -219,7 +219,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             super.show();
             // first of all, it loads its own resources.
             this.progressBar.load(assets);
-            assets.load(BACKGROUND_IMAGE, Texture.class);
+            Textures.loadFast(BACKGROUND_IMAGE, assets);
         }
 
         @Override
@@ -269,7 +269,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private void initializeLoadingScreen() {
             // background image
             Texture backgroundTexture = assets.get(BACKGROUND_IMAGE, Texture.class);
-            Utils.addAntiAliassing(backgroundTexture);
             Image background = new Image(backgroundTexture);
             background.setPosition(0, 0);
             background.setSize(getWorldWidth(), getWorldHeight());
@@ -334,7 +333,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private ProgressBarConst() {}
         private static final String PATH_EMPTY = "images/progress_bar/empty.png";
         private static final String PATH_FULL = "images/progress_bar/full.png";
-        private static final float WIDTH = Math.min(Vpx.fromCm(10f), getWorldWidth() / 2);
+        private static final float WIDTH = Math.min(Vpx.fromCm(8f), getWorldWidth() / 2);
         private static final float HEIGHT = Math.min(Vpx.fromCm(1.3f), getWorldHeight() / 8);
         private static final float START_Y = getWorldHeight() / 5;
     }

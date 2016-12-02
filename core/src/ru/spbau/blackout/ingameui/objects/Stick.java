@@ -8,14 +8,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
-import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.ingameui.settings.StickSettings;
 import ru.spbau.blackout.network.AbstractServer;
-import ru.spbau.blackout.units.Rpx;
 import ru.spbau.blackout.units.Vpx;
+import ru.spbau.blackout.utils.Textures;
 
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 
@@ -24,6 +23,17 @@ import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
  * Class for stick which used to set character walking direction and speed.
  */
 public class Stick extends IngameUIObject {
+    public static final float MAIN_IMAGE_SIZE = Math.min(Vpx.fromCm(3f), getWorldWidth() / 7);
+    public static final float MAIN_IMAGE_CENTER = MAIN_IMAGE_SIZE / 2;  // because it is related to position
+    public static final String MAIN_IMAGE_PATH = "images/stick/stick_main.png";
+
+    public static final float TOUCH_IMAGE_SIZE = MAIN_IMAGE_SIZE / 5;
+    public static final float TOUCH_IMAGE_CENTER = TOUCH_IMAGE_SIZE / 2;
+    public static final String TOUCH_IMAGE_PATH = "images/stick/stick_touch.png";
+
+    public static final float MAX_AT = (MAIN_IMAGE_SIZE - TOUCH_IMAGE_SIZE) / 2;
+
+
     /** current stick position (it is velocity for the unit) */
     private Vector2 velocity = new Vector2(0, 0);
     /** the controlled unit */
@@ -40,27 +50,31 @@ public class Stick extends IngameUIObject {
 
     @Override
     public void load(AssetManager assets) {
-        assets.load(TouchImg.IMAGE_PATH, Texture.class);
-        assets.load(MainImg.IMAGE_PATH, Texture.class);
+        Textures.loadAA(MAIN_IMAGE_PATH, assets);
+        Textures.loadAA(TOUCH_IMAGE_PATH, assets);
     }
 
     @Override
     public void doneLoading(AssetManager assets, Stage stage, Character character) {
         this.unit = character;
 
-        // touch image initialization
-        this.touchImage = new Image(assets.get(TouchImg.IMAGE_PATH, Texture.class));
-        this.touchImage.setSize(TouchImg.SIZE, TouchImg.SIZE);
-        updateTouchPosition();
-        stage.addActor(this.touchImage);
-
         // main image initialization
-        // must go after touch image initialization to be in the foreground
-        Image mainImg = new Image(assets.get(MainImg.IMAGE_PATH, Texture.class));
-        mainImg.setSize(MainImg.SIZE, MainImg.SIZE);
+        Image mainImg = new Image(assets.get(MAIN_IMAGE_PATH, Texture.class));
+        mainImg.setSize(MAIN_IMAGE_SIZE, MAIN_IMAGE_SIZE);
         mainImg.setPosition(settings.getStart().x, settings.getStart().y);
         mainImg.addListener(this.new Listener());
         stage.addActor(mainImg);
+
+        // touch image initialization
+        this.touchImage = new Image(assets.get(TOUCH_IMAGE_PATH, Texture.class));
+        this.touchImage.setSize(TOUCH_IMAGE_SIZE, TOUCH_IMAGE_SIZE);
+        updateTouchPosition();
+
+        stage.addActor(this.touchImage);
+
+        // in order to be able to handle input by main image
+        this.touchImage.toBack();
+        mainImg.toFront();
     }
 
     @Override
@@ -69,8 +83,8 @@ public class Stick extends IngameUIObject {
 
     private void updateTouchPosition() {
         Vector2 position = new Vector2(settings.getStart());
-        position.add(MainImg.CENTER - TouchImg.CENTER, MainImg.CENTER - TouchImg.CENTER)
-                .mulAdd(velocity, MainImg.MAX_AT);
+        position.add(MAIN_IMAGE_CENTER - TOUCH_IMAGE_CENTER, MAIN_IMAGE_CENTER - TOUCH_IMAGE_CENTER)
+                .mulAdd(velocity, MAX_AT);
         touchImage.setPosition(position.x, position.y);
     }
 
@@ -85,7 +99,7 @@ public class Stick extends IngameUIObject {
         @Override
         public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
             super.touchUp(event, x, y, pointer, button);
-            touchMovedTo(MainImg.CENTER, MainImg.CENTER);
+            touchMovedTo(MAIN_IMAGE_CENTER, MAIN_IMAGE_CENTER);
         }
 
         @Override
@@ -96,7 +110,7 @@ public class Stick extends IngameUIObject {
 
 
         private void touchMovedTo(float x, float y) {
-            velocity.set((x - MainImg.CENTER) / MainImg.MAX_AT, (y - MainImg.CENTER) / MainImg.MAX_AT);
+            velocity.set((x - MAIN_IMAGE_CENTER) / MAX_AT, (y - MAIN_IMAGE_CENTER) / MAX_AT);
 
             float len = velocity.len();
             if (len > 1) {
@@ -108,28 +122,5 @@ public class Stick extends IngameUIObject {
             updateTouchPosition();
             server.sendSelfVelocity(velocity);
         }
-    }
-
-
-    /** Some constants for main image (the font of the stick) */
-    public static final class MainImg {
-        private MainImg() {}
-
-        public static final float SIZE = Math.min(Vpx.fromCm(3f), getWorldWidth() / 7);
-        public static final float CENTER = SIZE / 2;  // because it is related to position
-        public static final float MAX_AT = (SIZE - TouchImg.SIZE) / 2;
-
-        public static final String IMAGE_PATH = "images/stick/stick_main.png";
-    }
-
-
-    /** Some constants for touch image. */
-    public static final class TouchImg {
-        private TouchImg() {}
-
-        private static final float SIZE = MainImg.SIZE / 5;
-        private static final float CENTER = SIZE / 2;
-
-        public static final String IMAGE_PATH = "images/stick/stick_touch.png";
     }
 }
