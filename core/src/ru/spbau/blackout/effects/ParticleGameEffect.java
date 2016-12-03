@@ -1,6 +1,5 @@
 package ru.spbau.blackout.effects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -35,7 +34,7 @@ public class ParticleGameEffect extends GameEffect {
             ParticleEffect effect = this.effect.get();
             this.tmpMatrix.idt();
             Vector2 pos = this.object.getPosition();
-            this.tmpMatrix.translate(pos.x, pos.y, this.object.getHeight());
+            this.tmpMatrix.translate(pos.x, pos.y, this.object.getPivotHeight());
             effect.setTransform(this.tmpMatrix);
         }
     }

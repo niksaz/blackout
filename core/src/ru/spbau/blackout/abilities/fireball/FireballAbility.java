@@ -14,7 +14,6 @@ import ru.spbau.blackout.utils.Particles;
 
 public class FireballAbility extends InstantAbility {
     public static final String ICON_PATH = "abilities/fireball/icon.png";
-    public static final String MODEL_PATH = "abilities/fireball/model/fireball.g3db";
     public static final float MAX_CHARGE_TIME = 1f;
 
     public static final float SHELL_START_SPEED = 30f;
@@ -30,7 +29,8 @@ public class FireballAbility extends InstantAbility {
 
     public FireballAbility(int level) {
         super(level);
-        this.shellDef = new FireballObject.Definition(MODEL_PATH, new CircleCreator(1), SHELL_MASS, TIME_TO_LIVE);
+        this.shellDef = new FireballObject.Definition(null, new CircleCreator(1), SHELL_MASS, TIME_TO_LIVE);
+        this.shellDef.pivotHeight = 1.5f;
     }
 
 

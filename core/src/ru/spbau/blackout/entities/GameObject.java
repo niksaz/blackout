@@ -1,6 +1,5 @@
 package ru.spbau.blackout.entities;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
@@ -18,7 +17,6 @@ import com.badlogic.gdx.utils.Pool;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.effects.GameEffect;
-import ru.spbau.blackout.java8features.Function;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.InplaceSerializable;
@@ -40,6 +38,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     transient protected final Array<GameEffect> effects = new Array<>();
 
     private boolean dead = false;
+    private final float pivotHeight;
 
 
     /**
@@ -58,6 +57,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         body.createFixture(fixtureDef);
         fixtureDef.shape.dispose();
 
+        this.pivotHeight = def.pivotHeight;
         this.setPosition(x, y);
         this.setMass(def.mass);
     }
@@ -101,7 +101,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     public abstract void updateForFirstStep();
     /** See <code>GameWorld</code> documentation. */
     public abstract void updateForSecondStep();
-
 
     /**
      * Sets mass of the object. It mainly works just like expected:
@@ -210,6 +209,10 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     public void setHeight(float height) { this.height = height; }
     public final float getHeight() { return height; }
 
+    public float getPivotHeight() {
+        return this.pivotHeight + this.getHeight();
+    }
+
 
     /**
      * Used to send via network a definition of an object to create.
@@ -246,12 +249,14 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         /** Saving context is necessary in order to be able to make instances. */
         private transient GameContext context;
 
-        // appearance:
-        public String modelPath;
+        // Must be final due to possible problems if this variable changed between calls of `load` and `doneLoading`.
+        public final String modelPath;
+        public float pivotHeight = 0;
 
 
         /**
-         * Warning: ShapeCreator must be serializable.
+         * <code>modelPath</code> can be <code>null</code>.
+         * In this case objects created from this definition will not have models.
          */
         public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
             this.modelPath = modelPath;
@@ -261,27 +266,34 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
         /** Load necessary assets. */
         public void load(GameContext context) {
-            context.assets().ifPresent(assets ->
-                assets.load(this.modelPath, Model.class)
-            );
+            if (this.modelPath != null && context.assets().isPresent()) {
+                context.assets().get().load(this.modelPath, Model.class);
+            }
         }
 
         /** When assets are loaded. */
         public void doneLoading(GameContext context) {
             this.context = context;
-            this.model = context.assets().map(assets -> assets.get(this.modelPath, Model.class));
+            if (this.modelPath == null) {
+                this.model = Optional.empty();
+            } else {
+                this.model = context.assets().map(assets -> assets.get(this.modelPath, Model.class));
+            }
         }
 
 
+        /** Create an object at the giving position. */
         public abstract GameObject makeInstance(float x, float y);
+        /** Create an object at the giving position. */
         public GameObject makeInstance(Vector2 position) {
             return this.makeInstance(position.x, position.y);
         }
+        /** Equal to <code>makeInstance(this.position)</code> */
         public GameObject makeInstance() {
             return this.makeInstance(this.position);
         }
 
-        /** Rotates object to the given direction. */
+        /** Rotates to the given direction. */
         public void setDirection(Vector2 direction) {
             this.rotation = direction.angleRad();
         }
