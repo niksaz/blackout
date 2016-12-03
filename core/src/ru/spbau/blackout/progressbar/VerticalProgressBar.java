@@ -26,9 +26,10 @@ public class VerticalProgressBar extends SimpleProgressBar {
     @Override
     public void act(float deltaTime) {
         super.act(deltaTime);
-        int newHeight = Math.round(this.valueToShow * this.fullHeight);
+        int newHeight = (int) (this.valueToShow * this.fullHeight);
         // image coordinates start from left up corner
         this.full.getRegion().setRegionHeight(newHeight);
+        // it's pretty strange, but this +1 is necessary
         this.full.getRegion().setRegionY(this.fullHeight - newHeight);
     }
 

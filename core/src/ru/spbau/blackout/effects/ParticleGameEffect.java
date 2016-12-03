@@ -45,8 +45,8 @@ public class ParticleGameEffect extends GameEffect {
         super.dispose();
         if (this.effect.isPresent()) {
             ParticleEffect effect = this.effect.get();
-            effect.dispose();
             BlackoutGame.get().particleSystem().remove(effect);
+            effect.dispose();
         }
     }
 }

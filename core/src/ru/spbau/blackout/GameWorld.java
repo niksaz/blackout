@@ -51,19 +51,19 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     public static final int POSITION_ITERATIONS = 2;
 
     private final List<GameObject> gameObjects = new LinkedList<>();
-    transient private final World world;
+    transient private final World box2dWorld;
     transient private float accumulator = 0;
     transient private Body ground;
 
     public GameWorld() {
         // without gravity, without sleeping
-        world = new World(Vector2.Zero, false);
+        box2dWorld = new World(Vector2.Zero, false);
 
         {
             BodyDef def = new BodyDef();
             def.type = BodyDef.BodyType.StaticBody;
             def.position.set(0, 0);
-            ground = world.createBody(def);
+            ground = box2dWorld.createBody(def);
         }
 
         {
@@ -128,7 +128,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         for (Iterator<GameObject> it = this.iterator(); it.hasNext();) {
             GameObject object = it.next();
             if (object.isDead()) {
-                object.destroyBody(world);
+                object.destroyBody(box2dWorld);
                 it.remove();
             }
         }
@@ -146,7 +146,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
 
     public Body addObject(GameObject object, BodyDef bodyDef) {
         this.gameObjects.add(object);
-        return this.world.createBody(bodyDef);
+        return this.box2dWorld.createBody(bodyDef);
     }
 
     public FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {
@@ -157,10 +157,11 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
 
         frictionDef.initialize(body, ground, Vector2.Zero);
 
-        return (FrictionJoint) this.world.createJoint(frictionDef);
+        return (FrictionJoint) this.box2dWorld.createJoint(frictionDef);
     }
 
     public void dispose() {
+        box2dWorld.dispose();
         for (GameObject object : this) {
             object.dispose();
         }
@@ -169,9 +170,9 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
 
     private void step() {
         foreach(this, GameObject::updateForFirstStep);
-        this.world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+        this.box2dWorld.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
         foreach(this, GameObject::updateForSecondStep);
-        this.world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+        this.box2dWorld.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }
 }
