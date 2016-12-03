@@ -20,7 +20,7 @@ public class FireballAbility extends InstantAbility {
     /** The estimated distance of the ability in case of no external force. */
     public static final float DISTANCE = 12f;
     public static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;
-    public static final float IMPULSE_FACTOR = 20f;
+    public static final float IMPULSE_FACTOR = 40f;
 
 
     private final AbilityObject.Definition shellDef;

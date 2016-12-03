@@ -25,10 +25,9 @@ public abstract class GameUnit extends DynamicObject {
         public static final float WALK_ANIM_SPEED_FACTOR = 3f;
     }
 
-    public static final float SLOW_DOWN_FACTOR = 0.02f;
+    public static final float SELF_RESISTANCE_FACTOR = 0.02f;
+    public static final float LINEAR_FRICTION = 0.0025f;
 
-    public static final float DEFAULT_LINEAR_FRICTION = 100f;
-    public static final float DEFAULT_ANGULAR_FRICTION = 5f;
 
     // Movement:
     private final Vector2 selfVelocity = new Vector2();
@@ -42,9 +41,6 @@ public abstract class GameUnit extends DynamicObject {
         this.animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
         this.abilities = def.abilities;
 
-        // add friction for the unit
-//        context.gameWorld().addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
-
         for (Ability ability : abilities) {
             ability.doneLoading(context, this);
         }
@@ -53,6 +49,18 @@ public abstract class GameUnit extends DynamicObject {
 
     public final Ability getAbility(int num) {
         return this.abilities[num];
+    }
+
+
+    @Override
+    public void updateForFirstStep() {
+        // apply friction
+        if (!Utils.isZeroVec(this.velocity)){
+            float k = 1f - (this.getMass() * LINEAR_FRICTION) / this.velocity.len();
+            if (k < 0) k = 0;
+            this.velocity.scl(k);
+        }
+        super.updateForFirstStep();
     }
 
     /** See <code>GameWorld</code> documentation */
@@ -65,11 +73,11 @@ public abstract class GameUnit extends DynamicObject {
             // some inefficient, but clear pseudocode in comments:
             // float proj = |projection of selfVelocity on velocity|
             // float k = proj / |velocity| * SLOW_DOWN_FACTOR
-            float k = this.selfVelocity.dot(this.velocity) / this.velocity.len2() * SLOW_DOWN_FACTOR;
+            float k = this.selfVelocity.dot(this.velocity) / this.velocity.len2() * SELF_RESISTANCE_FACTOR;
             // don't increase velocity
-            if (k > 0) { k = 0; }
+            if (k > 0) k = 0;
             // don't accelerate to the opposite direction
-            if (k < -1) { k = -1; }
+            if (k < -1) k = -1;
             this.velocity.mulAdd(this.velocity, k);
         }
 

@@ -209,6 +209,10 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     public void setHeight(float height) { this.height = height; }
     public final float getHeight() { return height; }
 
+    public final float getMass() {
+        return this.body.getMass();
+    }
+
     public float getPivotHeight() {
         return this.pivotHeight + this.getHeight();
     }

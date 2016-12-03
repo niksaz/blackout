@@ -50,7 +50,7 @@ public abstract class DynamicObject extends GameObject {
     public final void setVelocity(Vector2 newVelocity) { this.setVelocity(newVelocity.x, newVelocity.y); }
 
     public void applyImpulse(float x, float y) {
-        float mass = this.body.getMass();
+        float mass = this.getMass();
         this.velocity.add(x / mass, y / mass);
     }
 
