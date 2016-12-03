@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 
 public abstract class DynamicObject extends GameObject {

@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 
-import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 
 public abstract class StaticObject extends GameObject {

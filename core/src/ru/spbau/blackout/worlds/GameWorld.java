@@ -1,4 +1,4 @@
-package ru.spbau.blackout;
+package ru.spbau.blackout.worlds;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -16,24 +16,19 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.utils.InplaceSerializable;
 
-public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
+public abstract class GameWorld implements Iterable<GameObject>, InplaceSerializable {
 
-    public static final float WORLD_STEP = 1 / 58f;
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
-    private final List<GameObject> gameObjects = new ArrayList<>();
+    protected final List<GameObject> gameObjects = new ArrayList<>();
 
-    private final World world;
-    private float accumulator = 0;
+    protected final World world;
     private Body ground;
-
-    private final AtomicReference<ObjectInputStream> externalWorldStream = new AtomicReference<>();
 
     public GameWorld() {
         // without gravity, without sleeping
@@ -89,30 +84,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         return null;
     }
 
-    public void update(float delta) {
-        if (externalWorldStream.get() != null) {
-            try {
-                System.out.println("hello!!!!");
-                inplaceDeserialize(externalWorldStream.getAndSet(null));
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-
-        accumulator += delta;
-
-        for (GameObject object : gameObjects) {
-            object.updateState(delta);
-        }
-
-        while (accumulator >= WORLD_STEP) {
-            step();
-            accumulator -= WORLD_STEP;
-        }
-
-        // I don't think that interpolation is necessary.
-        // It would be very hard and takes many resources.
-    }
+    public abstract void update(float delta);
 
     public Body addObject(GameObject object, GameObject.Definition def) {
         gameObjects.add(object);
@@ -143,23 +115,5 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         world.createJoint(jointDef);
 
         return controller;
-    }
-
-    private void step() {
-//        TODO: gameObjects.forEach(GameObject::updateForFirstStep);
-        for (GameObject object : this) {
-            object.updateForFirstStep();
-        }
-        world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-
-//        TODO: gameObjects.forEach(GameObject::updateForSecondStep);
-        for (GameObject object : this) {
-            object.updateForSecondStep();
-        }
-        world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
-    }
-
-    public void setExternalWorldStream(ObjectInputStream externalWorldStream) {
-        this.externalWorldStream.set(externalWorldStream);
     }
 }

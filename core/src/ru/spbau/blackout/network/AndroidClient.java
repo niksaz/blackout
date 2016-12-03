@@ -11,7 +11,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
@@ -20,6 +19,7 @@ import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.MultiplayerTable;
 import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
+import ru.spbau.blackout.worlds.GameWorldWithExternalSerial;
 
 import static java.lang.Thread.sleep;
 
@@ -73,7 +73,7 @@ public class AndroidClient implements Runnable, AbstractServer {
                         // using the fact that AndroidClient is AbstractServer itself.
                         // so synchronizing on server on loading
                         synchronized (this) {
-                            gameScreen = new GameScreen(room, this, settings);
+                            gameScreen = new GameScreen(room, new GameWorldWithExternalSerial(), this, settings);
                             BlackoutGame.getInstance().getScreenManager().setScreen(gameScreen);
                             try {
                                 wait();
@@ -116,7 +116,7 @@ public class AndroidClient implements Runnable, AbstractServer {
             });
             outputToServerThread.start();
 
-            final GameWorld currentWorld = gameScreen.getGameWorld();
+            final GameWorldWithExternalSerial currentWorld = (GameWorldWithExternalSerial) gameScreen.getGameWorld();
             // waiting for the first world to arrive
             socket.setSoTimeout(0);
             while (!isInterrupted) {

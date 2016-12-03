@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.List;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.ingameui.IngameUI;
@@ -44,16 +44,12 @@ public class GameScreen extends BlackoutScreen {
     private Hero character;
     private final IngameUI ui;
 
-    private final GameWorld gameWorld = new GameWorld();
+    private final GameWorld gameWorld;
     private final AbstractServer server;
-    private volatile boolean doneLoading;
 
-    public boolean isDoneLoading() {
-        return doneLoading;
-    }
-
-    public GameScreen(GameSessionSettings room, AbstractServer server, GameSettings settings) {
+    public GameScreen(GameSessionSettings room, GameWorld gameWorld, AbstractServer server, GameSettings settings) {
         this.server = server;
+        this.gameWorld = gameWorld;
         loadingScreen = new LoadingScreen(room);
         ui = new IngameUI(this, settings.ui);
 

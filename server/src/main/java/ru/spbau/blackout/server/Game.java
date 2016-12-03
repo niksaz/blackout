@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
@@ -19,6 +18,7 @@ import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Utils;
+import ru.spbau.blackout.worlds.GameWorldWithPhysics;
 
 /**
  * Multiplayer game representation. Used for synchronizing game's state and watching for game flow,
@@ -31,7 +31,7 @@ class Game extends Thread {
     private final int gameId;
     private final RoomServer server;
     private final List<ClientThread> clients;
-    private final GameWorld gameWorld = new GameWorld();
+    private final GameWorldWithPhysics gameWorld = new GameWorldWithPhysics();
     private volatile GameState gameState = GameState.READY_TO_START;
 
     Game(RoomServer server, List<ClientThread> clients) {

@@ -5,7 +5,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 
 import java.io.Serializable;
 
-import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 
 public class Hero extends GameUnit {

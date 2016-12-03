@@ -18,6 +18,7 @@ import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.AssetLoader;
 import ru.spbau.blackout.utils.ScreenManager;
+import ru.spbau.blackout.worlds.GameWorldWithPhysics;
 
 /**
  * Singleton game class which is called by libGdx when it starts a game on a platform.
@@ -91,7 +92,7 @@ public class BlackoutGame extends Game {
 
         GameSettings settings = new GameSettings();  // just default settings
 
-        screenManager.setScreen(new GameScreen(room, new SinglePlayerServer(), settings));
+        screenManager.setScreen(new GameScreen(room, new GameWorldWithPhysics(), new SinglePlayerServer(), settings));
 	}
 
     public void initializePlayServices(PlayServices playServices) {

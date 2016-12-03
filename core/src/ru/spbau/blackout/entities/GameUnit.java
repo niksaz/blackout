@@ -1,6 +1,5 @@
 package ru.spbau.blackout.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -9,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Utils;
 
