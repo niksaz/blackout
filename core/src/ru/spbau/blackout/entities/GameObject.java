@@ -31,6 +31,9 @@ import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
 public abstract class GameObject implements RenderableProvider, InplaceSerializable, Serializable {
+    public static final float RESTITUTION = 0.5f;
+
+
     transient protected final Body body;
     private float height;
 
@@ -53,9 +56,9 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = def.shapeCreator.create();
-        fixtureDef.density = 1;
+        fixtureDef.density = 1f;
         fixtureDef.friction = 0;
-        fixtureDef.restitution = 0;
+        fixtureDef.restitution = RESTITUTION;
         fixtureDef.isSensor = def.isSensor;
         body.createFixture(fixtureDef);
         fixtureDef.shape.dispose();

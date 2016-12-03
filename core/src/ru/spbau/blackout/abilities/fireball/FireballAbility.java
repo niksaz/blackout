@@ -40,7 +40,6 @@ public class FireballAbility extends InstantAbility {
         Vector2 position = new Vector2(getUnit().getPosition());
         position.mulAdd(direction, CAST_DISTANCE);
         AbilityObject shell = (AbilityObject) shellDef.makeInstance(position);
-
         shell.velocity.mulAdd(direction, SHELL_START_SPEED);
     }
 

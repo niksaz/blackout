@@ -26,7 +26,7 @@ public abstract class GameUnit extends DynamicObject {
     }
 
     public static final float SELF_RESISTANCE_FACTOR = 0.02f;
-    public static final float LINEAR_FRICTION = 0.0025f;
+    public static final float LINEAR_FRICTION = 0.002f;
 
 
     // Movement:
