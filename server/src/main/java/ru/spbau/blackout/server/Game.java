@@ -18,6 +18,7 @@ import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.shapescreators.CircleCreator;
+import ru.spbau.blackout.utils.Utils;
 
 /**
  * Multiplayer game representation. Used for synchronizing game's state and watching for game flow,
@@ -25,7 +26,6 @@ import ru.spbau.blackout.shapescreators.CircleCreator;
  */
 class Game extends Thread {
 
-    private static final float MILLIS_IN_SECOND = 1000f;
     private static AtomicInteger gamesCreated = new AtomicInteger();
 
     private final int gameId;
@@ -100,7 +100,8 @@ class Game extends Thread {
         gameState = GameState.IN_PROCESS;
 
         // creating streams for deserialization of the world for further usage for ClientThreads
-        long lastTime = System.currentTimeMillis();
+        long timeLastIterationFinished = System.currentTimeMillis();
+        long timeLastWorldUpdate = System.currentTimeMillis();
         while (gameState != GameState.FINISHED) {
             try (
                 ByteArrayOutputStream serializedVersionOfWorld = new ByteArrayOutputStream();
@@ -109,8 +110,8 @@ class Game extends Thread {
                 long currentTime;
                 synchronized (gameWorld) {
                     currentTime = System.currentTimeMillis();
-                    gameWorld.update((currentTime - lastTime) / MILLIS_IN_SECOND);
-                    server.log("Updating gameWorld: " + (currentTime - lastTime) / MILLIS_IN_SECOND);
+                    gameWorld.update((currentTime - timeLastWorldUpdate) / Utils.MILLIS_IN_SECOND);
+                    server.log("Updating gameWorld: " + (currentTime - timeLastWorldUpdate) / Utils.MILLIS_IN_SECOND);
                     try {
                         gameWorld.inplaceSerialize(objectOutputStreamForWorld);
                         objectOutputStreamForWorld.flush();
@@ -118,10 +119,9 @@ class Game extends Thread {
                         e.printStackTrace();
                     }
                 }
-                lastTime = currentTime;
+                timeLastWorldUpdate = currentTime;
 
                 final byte[] worldInBytes = serializedVersionOfWorld.toByteArray();
-
                 if (worldInBytes.length != 0) {
                     for (ClientThread client : clients) {
                         // watching client's states
@@ -133,13 +133,20 @@ class Game extends Thread {
                     }
                 }
 
-                try {
-                    sleep(Network.SLEEPING_TIME_TO_ACHIEVE_FRAME_RATE);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                //making sure that we are sending position with desired rate
+                final long duration = timeLastIterationFinished - System.currentTimeMillis();
+                if (duration < Network.TIME_SHOULD_BE_SPENT_FOR_ITERATION) {
+                    try {
+                        sleep(Network.TIME_SHOULD_BE_SPENT_FOR_ITERATION - duration);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        gameState = GameState.FINISHED;
+                    }
                 }
+                timeLastIterationFinished = System.currentTimeMillis();
             } catch (IOException e) {
                 e.printStackTrace();
+                gameState = GameState.FINISHED;
             }
         }
     }

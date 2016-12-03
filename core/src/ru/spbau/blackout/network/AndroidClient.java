@@ -89,6 +89,7 @@ public class AndroidClient implements Runnable, AbstractServer {
             } while (gameState == GameState.WAITING && !isInterrupted);
 
             final Thread outputToServerThread = new Thread(() -> {
+                long timeLastIterationFinished = System.currentTimeMillis();
                 while (!isInterrupted) {
                     try {
                         Vector2 sending = new Vector2(velocityToSend);
@@ -98,13 +99,18 @@ public class AndroidClient implements Runnable, AbstractServer {
                         e.printStackTrace();
                         isInterrupted = true;
                     }
-                    // sleeping to not send position too often.
-                    try {
-                        sleep(Network.SLEEPING_TIME_TO_ACHIEVE_FRAME_RATE);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        isInterrupted = true;
+
+                    //making sure that we are sending position with desired rate
+                    final long duration = timeLastIterationFinished - System.currentTimeMillis();
+                    if (duration < Network.TIME_SHOULD_BE_SPENT_FOR_ITERATION) {
+                        try {
+                            sleep(Network.TIME_SHOULD_BE_SPENT_FOR_ITERATION - duration);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            isInterrupted = true;
+                        }
                     }
+                    timeLastIterationFinished = System.currentTimeMillis();
                 }
             });
             outputToServerThread.start();

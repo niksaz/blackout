@@ -8,7 +8,9 @@ import com.badlogic.gdx.math.Vector3;
 import static com.badlogic.gdx.math.MathUtils.PI;
 
 public final class Utils {
+
     public static final double EPSILON = 1e-5f;
+    public static final float MILLIS_IN_SECOND = 1000f;
 
     public static boolean floatEq(double a, double b) {
         return Math.abs(a - b) < EPSILON;
