@@ -34,6 +34,6 @@ public final class Particles {
      * Returns a copy of the particle effect. One must dispose it by themselves.
      */
     public static Optional<ParticleEffect> get(String path, GameContext context) {
-        return context.assets().map(assets -> assets.get(path, ParticleEffect.class).copy());
+        return context.assets().map(assets -> assets.get(path, ParticleEffect.class)/*.copy()*/);
     }
 }

@@ -120,7 +120,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
     /**
      * Kills the unit. It will be removed from the <code>GameWorld</code> and from the map after paying death animation.
-     * Also disposes all non-shared resources (like effects).
+     * Also calls <code>this.dispose()</code>.
      */
     public void kill() {
         // TODO: override
@@ -129,13 +129,20 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         this.dead = true;
         // FIXME: play death animation
         this.model = Optional.empty();
-        for (GameEffect effect : this.effects) {
-            effect.dispose();
-        }
+        this.dispose();
     }
 
     public boolean isDead() { return this.dead; }
 
+    /**
+     * Disposes all non-shared resources (like effects).
+     * Shared resources (like models) will be disposed by AssetManager.
+     */
+    public void dispose() {
+        for (GameEffect effect : this.effects) {
+            effect.dispose();
+        }
+    }
 
 
     /**

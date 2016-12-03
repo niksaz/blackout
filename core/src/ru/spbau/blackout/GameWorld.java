@@ -160,6 +160,12 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         return (FrictionJoint) this.world.createJoint(frictionDef);
     }
 
+    public void dispose() {
+        for (GameObject object : this) {
+            object.dispose();
+        }
+    }
+
 
     private void step() {
         foreach(this, GameObject::updateForFirstStep);

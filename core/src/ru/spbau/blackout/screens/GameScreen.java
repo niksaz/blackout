@@ -176,6 +176,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     @Override
     public void dispose() {
         super.dispose();
+        this.assets.dispose();
+        this.gameWorld.dispose();
     }
 
 

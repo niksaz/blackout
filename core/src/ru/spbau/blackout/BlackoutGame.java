@@ -5,9 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
-import com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch;
 import com.badlogic.gdx.physics.box2d.Box2D;
-import com.sun.deploy.uitoolkit.impl.fx.Utils;
 
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
@@ -95,4 +93,12 @@ public class BlackoutGame extends Game {
 
         this.screenManager.setScreen(new LoadScreen());
 	}
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        this.modelBatch.dispose();
+        this.spriteBatch.dispose();
+        this.screenManager.dispose();
+    }
 }

@@ -28,4 +28,7 @@ public class ScreenManager {
         BlackoutGame.get().setScreen(screens.peek());
     }
 
+    public void dispose() {
+        disposeScreens(screens.size);
+    }
 }
