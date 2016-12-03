@@ -71,7 +71,7 @@ class Game extends Thread {
         }
 
         for (int i = 0; i < clients.size(); i++) {
-            clients.get(i).setGame(this, i, room, heroes.get(i));
+            clients.get(i).setGame(this, room, heroes.get(i));
         }
 
         synchronized (this) {
@@ -107,17 +107,22 @@ class Game extends Thread {
                 ByteArrayOutputStream serializedVersionOfWorld = new ByteArrayOutputStream();
                 ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld)
             ) {
-                long currentTime;
-                synchronized (gameWorld) {
-                    currentTime = System.currentTimeMillis();
-                    gameWorld.update((currentTime - timeLastWorldUpdate) / Utils.MILLIS_IN_SECOND);
-                    server.log("Updating gameWorld: " + (currentTime - timeLastWorldUpdate) / Utils.MILLIS_IN_SECOND);
-                    try {
-                        gameWorld.inplaceSerialize(objectOutputStreamForWorld);
-                        objectOutputStreamForWorld.flush();
-                    } catch (IOException | ClassNotFoundException e) {
-                        e.printStackTrace();
+                for (int i = 0; i < clients.size(); i++) {
+                    final Vector2 heroVelocity = clients.get(i).getVelocityFromClient().getAndSet(null);
+                    if (heroVelocity != null) {
+                        ((GameUnit) gameWorld.getGameObjects().get(i)).setSelfVelocity(heroVelocity);
                     }
+                }
+
+                final long currentTime = System.currentTimeMillis();
+                final float worldDeltaInSecs = (currentTime - timeLastWorldUpdate) / Utils.MILLIS_IN_SECOND;
+                gameWorld.update(worldDeltaInSecs);
+                server.log("Updating gameWorld: " + worldDeltaInSecs);
+                try {
+                    gameWorld.inplaceSerialize(objectOutputStreamForWorld);
+                    objectOutputStreamForWorld.flush();
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
                 timeLastWorldUpdate = currentTime;
 
@@ -151,19 +156,7 @@ class Game extends Thread {
         }
     }
 
-    void setVelocityFor(int numberInArray, Vector2 newVelocity) {
-        server.log("Setting velocity for " + numberInArray + " " + newVelocity);
-        synchronized (gameWorld) {
-            GameUnit object = (GameUnit) gameWorld.getGameObjects().get(numberInArray);
-            object.setSelfVelocity(newVelocity);
-        }
-    }
-
     GameState getGameState() {
         return gameState;
-    }
-
-    GameWorld getGameWorld() {
-        return gameWorld;
     }
 }

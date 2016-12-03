@@ -70,7 +70,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     @Override
-    public synchronized void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeInt(gameObjects.size());
 
         for (GameObject object : this) {
@@ -79,7 +79,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     }
 
     @Override
-    public synchronized Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.readInt();
 
         for (GameObject object : this) {
@@ -89,7 +89,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         return null;
     }
 
-    public synchronized void update(float delta) {
+    public void update(float delta) {
         if (externalWorldStream.get() != null) {
             try {
                 inplaceDeserialize(externalWorldStream.getAndSet(null));
@@ -113,12 +113,12 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         // It would be very hard and takes many resources.
     }
 
-    public synchronized Body addObject(GameObject object, GameObject.Definition def) {
+    public Body addObject(GameObject object, GameObject.Definition def) {
         gameObjects.add(object);
         return def.addToWorld(world);
     }
 
-    public synchronized FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {
+    public FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {
         FrictionJointDef frictionDef = new FrictionJointDef();
 
         frictionDef.maxForce = linearFriction;
@@ -129,7 +129,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         return (FrictionJoint) world.createJoint(frictionDef);
     }
 
-    public synchronized Body addController(Body body) {
+    public Body addController(Body body) {
         // Create a controller's body
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -144,7 +144,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         return controller;
     }
 
-    private synchronized void step() {
+    private void step() {
 //        TODO: gameObjects.forEach(GameObject::updateForFirstStep);
         for (GameObject object : this) {
             object.updateForFirstStep();
