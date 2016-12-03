@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.effects.GameEffect;
 import ru.spbau.blackout.java8features.Function;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
@@ -31,12 +32,12 @@ import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
 public abstract class GameObject implements RenderableProvider, InplaceSerializable, Serializable {
-    // physics:
-    transient protected Body body;
+    transient protected final Body body;
     private float height;
 
-    // appearance:
+    /** Equals to Optional.empty() on a server or if the object is dead. */
     transient protected Optional<ModelInstance> model;
+    transient protected final Array<GameEffect> effects = new Array<>();
 
     private boolean dead = false;
 
@@ -82,7 +83,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
         model.ifPresent(model -> {
-            updateTransform();
+            this.updateTransform();
             model.getRenderables(renderables, pool);
         });
     }
@@ -91,7 +92,11 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     /**
      * Update things not connected with physics. See <code>GameWorld</code> documentation.
      */
-    public void updateState(float deltaTime) {}
+    public void updateState(float deltaTime) {
+        for (GameEffect effect : this.effects) {
+            effect.update(deltaTime, this);
+        }
+    }
     /** See <code>GameWorld</code> documentation. */
     public abstract void updateForFirstStep();
     /** See <code>GameWorld</code> documentation. */
@@ -122,10 +127,16 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         // It will be handled in GameWorld::update. It's a bad idea to try to remove body
         // from GameWorld right here because this method can be called in process of updating physics.
         this.dead = true;
-        this.model = Optional.empty();  // FIXME: play death animation
+        // FIXME: play death animation
+        this.model = Optional.empty();
+        for (GameEffect effect : this.effects) {
+            effect.dispose();
+        }
     }
 
     public boolean isDead() { return this.dead; }
+
+
 
     /**
      * This function is necessary for better encapsulation.
