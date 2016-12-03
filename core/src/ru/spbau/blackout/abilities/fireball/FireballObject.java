@@ -7,9 +7,12 @@ import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.effects.ParticleGameEffect;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
+
+import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTOR;
 
 
 public class FireballObject extends AbilityObject {
@@ -24,6 +27,16 @@ public class FireballObject extends AbilityObject {
         this.effects.add(effect);
     }
 
+
+    @Override
+    public void beginContact(GameObject object) {
+        super.beginContact(object);
+        if (object instanceof GameUnit) {
+            GameUnit unit = (GameUnit) object;
+            unit.applyImpulse(this.velocity.x * IMPULSE_FACTOR, this.velocity.y * IMPULSE_FACTOR);
+        }
+        this.kill();
+    }
 
     @Override
     public void updateState(float deltaTime) {

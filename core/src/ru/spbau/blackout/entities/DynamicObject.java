@@ -49,21 +49,32 @@ public abstract class DynamicObject extends GameObject {
     public final void setVelocity(float x, float y) { this.velocity.set(x, y); }
     public final void setVelocity(Vector2 newVelocity) { this.setVelocity(newVelocity.x, newVelocity.y); }
 
+    public void applyImpulse(float x, float y) {
+        float mass = this.body.getMass();
+        this.velocity.add(x / mass, y / mass);
+    }
+
+    public void applyImpulse(Vector2 impulse) {
+        this.applyImpulse(impulse.x, impulse.y);
+    }
+
 
     @Override
     public void updateState(float deltaTime) {
         super.updateState(deltaTime);
-        animation.ifPresent(controller -> controller.update(deltaTime * animationSpeed));
+        this.animation.ifPresent(controller -> controller.update(deltaTime * this.animationSpeed));
     }
 
     @Override
     public void updateForFirstStep() {
-        body.setLinearVelocity(velocity);
+        this.body.setLinearVelocity(this.velocity);
+        // to take into account velocity changes during the step
+        this.velocity.set(0, 0);
     }
 
     @Override
     public void updateForSecondStep() {
-        velocity.set(body.getLinearVelocity());
+        this.velocity.add(this.body.getLinearVelocity());
     }
 
     @Override

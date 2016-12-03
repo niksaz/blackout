@@ -14,6 +14,9 @@ public abstract class AbilityObject extends DynamicObject {
     }
 
 
+    /** Calls when the object contacts with another object. */
+    public void beginContact(GameObject object) {}
+
     @Override
     public void updateForSecondStep() {
         super.updateForSecondStep();

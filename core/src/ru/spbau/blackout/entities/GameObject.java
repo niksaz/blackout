@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -48,12 +49,14 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         this.model = def.model.map(ModelInstance::new);
 
         body = def.registerObject(this);
+        body.setUserData(this);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = def.shapeCreator.create();
         fixtureDef.density = 1;
         fixtureDef.friction = 0;
         fixtureDef.restitution = 0;
+        fixtureDef.isSensor = def.isSensor;
         body.createFixture(fixtureDef);
         fixtureDef.shape.dispose();
 
@@ -191,8 +194,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     }
 
 
-    // Position:
-
     public Vector2 getPosition() {
         return body.getPosition();
     }
@@ -204,7 +205,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     public void setPosition(float x, float y) {
         setTransform(x, y, getRotation());
     }
-
 
     public void setHeight(float height) { this.height = height; }
     public final float getHeight() { return height; }
@@ -249,9 +249,13 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         /** Saving context is necessary in order to be able to make instances. */
         private transient GameContext context;
 
-        // Must be final due to possible problems if this variable changed between calls of `load` and `doneLoading`.
+        /**
+         * Path to the model for game objects. May be null. In this case objects will not have models.
+         * Must be final due to possible problems if this variable changed between calls of `load` and `doneLoading`.
+         */
         public final String modelPath;
         public float pivotHeight = 0;
+        public boolean isSensor = false;
 
 
         /**

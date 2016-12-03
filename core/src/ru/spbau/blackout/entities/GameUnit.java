@@ -27,7 +27,7 @@ public abstract class GameUnit extends DynamicObject {
 
     public static final float SLOW_DOWN_FACTOR = 0.02f;
 
-    public static final float DEFAULT_LINEAR_FRICTION = 50f;
+    public static final float DEFAULT_LINEAR_FRICTION = 100f;
     public static final float DEFAULT_ANGULAR_FRICTION = 5f;
 
     // Movement:
@@ -43,7 +43,7 @@ public abstract class GameUnit extends DynamicObject {
         this.abilities = def.abilities;
 
         // add friction for the unit
-        context.gameWorld().addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
+//        context.gameWorld().addFriction(body, DEFAULT_LINEAR_FRICTION, DEFAULT_ANGULAR_FRICTION);
 
         for (Ability ability : abilities) {
             ability.doneLoading(context, this);
@@ -73,12 +73,12 @@ public abstract class GameUnit extends DynamicObject {
             this.velocity.mulAdd(this.velocity, k);
         }
 
-        this.body.setLinearVelocity(selfVelocity);
+        this.body.setLinearVelocity(this.selfVelocity);
     }
 
     public final synchronized Vector2 getSelfVelocity() {
         // to ensure that nobody will change it outside avoiding setSelfVelocity method.
-        return new Vector2(selfVelocity);
+        return new Vector2(this.selfVelocity);
     }
 
     @Override

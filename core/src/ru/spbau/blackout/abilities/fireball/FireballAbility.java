@@ -1,15 +1,12 @@
 package ru.spbau.blackout.abilities.fireball;
 
-import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.InstantAbility;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.AbilityObject;
-import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.shapescreators.CircleCreator;
-import ru.spbau.blackout.utils.Particles;
 
 
 public class FireballAbility extends InstantAbility {
@@ -17,11 +14,13 @@ public class FireballAbility extends InstantAbility {
     public static final float MAX_CHARGE_TIME = 1f;
 
     public static final float SHELL_START_SPEED = 30f;
-    public static final float CAST_DISTANCE = 1f;
     public static final float SHELL_MASS = 5f;
+    public static final float SHELL_RADIUS = 0.6f;
+    public static final float CAST_DISTANCE = 1.5f;  // FIXME: use unit radius
     /** The estimated distance of the ability in case of no external force. */
     public static final float DISTANCE = 12f;
     public static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;
+    public static final float IMPULSE_FACTOR = 20f;
 
 
     private final AbilityObject.Definition shellDef;
@@ -29,8 +28,9 @@ public class FireballAbility extends InstantAbility {
 
     public FireballAbility(int level) {
         super(level);
-        this.shellDef = new FireballObject.Definition(null, new CircleCreator(1), SHELL_MASS, TIME_TO_LIVE);
+        this.shellDef = new FireballObject.Definition(null, new CircleCreator(SHELL_RADIUS), SHELL_MASS, TIME_TO_LIVE);
         this.shellDef.pivotHeight = 1.5f;
+        this.shellDef.isSensor = true;
     }
 
 

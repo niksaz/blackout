@@ -53,17 +53,16 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     private final List<GameObject> gameObjects = new LinkedList<>();
     transient private final World box2dWorld;
     transient private float accumulator = 0;
-    transient private Body ground;
 
     public GameWorld() {
         // without gravity, without sleeping
-        box2dWorld = new World(Vector2.Zero, false);
+        this.box2dWorld = new World(Vector2.Zero, false);
+        this.box2dWorld.setContactListener(new BlackoutContactListener());
 
         {
             BodyDef def = new BodyDef();
             def.type = BodyDef.BodyType.StaticBody;
             def.position.set(0, 0);
-            ground = box2dWorld.createBody(def);
         }
 
         {
@@ -74,19 +73,17 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
             fixtureDef.shape = shape;
             fixtureDef.isSensor = true; // no collisions with the ground
 
-            ground.createFixture(fixtureDef);
-
             shape.dispose();
         }
     }
 
     public List<GameObject> getGameObjects() {
-        return gameObjects;
+        return this.gameObjects;
     }
 
     @Override
     public Iterator<GameObject> iterator() {
-        return gameObjects.iterator();
+        return this.gameObjects.iterator();
     }
 
     @Override
@@ -149,19 +146,8 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
         return this.box2dWorld.createBody(bodyDef);
     }
 
-    public FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {
-        FrictionJointDef frictionDef = new FrictionJointDef();
-
-        frictionDef.maxForce = linearFriction;
-        frictionDef.maxTorque = angularFriction;
-
-        frictionDef.initialize(body, ground, Vector2.Zero);
-
-        return (FrictionJoint) this.box2dWorld.createJoint(frictionDef);
-    }
-
     public void dispose() {
-        box2dWorld.dispose();
+        this.box2dWorld.dispose();
         for (GameObject object : this) {
             object.dispose();
         }
