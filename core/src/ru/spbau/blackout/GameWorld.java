@@ -92,6 +92,7 @@ public class GameWorld implements Iterable<GameObject>, InplaceSerializable {
     public void update(float delta) {
         if (externalWorldStream.get() != null) {
             try {
+                System.out.println("hello!!!!");
                 inplaceDeserialize(externalWorldStream.getAndSet(null));
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();

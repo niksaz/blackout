@@ -23,7 +23,7 @@ public class IngameUI {
         stage = new Stage(new ScreenViewport(camera), BlackoutGame.getInstance().getSpriteBatch());
         Gdx.input.setInputProcessor(stage);
 
-        stick = new Stick(screen.getServer(), settings.stickSettings, screen.getGameWorld());
+        stick = new Stick(screen.getServer(), settings.stickSettings);
     }
 
     public void load(AssetManager assets) {

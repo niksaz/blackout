@@ -12,6 +12,7 @@ import java.net.UnknownHostException;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameWorld;
+import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.Hero;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
 import ru.spbau.blackout.screens.GameScreen;
@@ -149,7 +150,7 @@ public class AndroidClient implements Runnable, AbstractServer {
     }
 
     @Override
-    public void sendSelfVelocity(Vector2 velocity) {
+    public void sendSelfVelocity(GameUnit unit, Vector2 velocity) {
         velocityToSend = velocity;
     }
 }

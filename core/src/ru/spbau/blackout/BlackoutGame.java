@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Hero;
-import ru.spbau.blackout.network.IdleServer;
+import ru.spbau.blackout.network.SinglePlayerServer;
 import ru.spbau.blackout.play.services.PlayServices;
 import ru.spbau.blackout.play.services.PlayServicesInCore;
 import ru.spbau.blackout.gamesession.TestingSessionSettings;
@@ -91,7 +91,7 @@ public class BlackoutGame extends Game {
 
         GameSettings settings = new GameSettings();  // just default settings
 
-        screenManager.setScreen(new GameScreen(room, new IdleServer(), settings));
+        screenManager.setScreen(new GameScreen(room, new SinglePlayerServer(), settings));
 	}
 
     public void initializePlayServices(PlayServices playServices) {

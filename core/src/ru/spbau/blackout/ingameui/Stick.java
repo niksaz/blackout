@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
-import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.units.Rpx;
@@ -52,17 +51,15 @@ public class Stick extends DragListener {
         public static final String IMAGE_PATH = "images/ingame_ui/stick_touch.png";
     }
 
-    private Vector2 velocity = new Vector2(0, 0);
+    private final Vector2 velocity = new Vector2(0, 0);
     private GameUnit object;
     private Image touchImage;
     private final Settings settings;
     private final AbstractServer server;
-    private final GameWorld gameWorld;
 
-    public Stick(AbstractServer server, Settings settings, GameWorld gameWorld) {
+    public Stick(AbstractServer server, Settings settings) {
         this.settings = settings;
         this.server = server;
-        this.gameWorld = gameWorld;
     }
 
     @Override
@@ -118,11 +115,8 @@ public class Stick extends DragListener {
             velocity.y /= len;
         }
 
-        //synchronized (gameWorld) {
-            object.setSelfVelocity(velocity); //FIXME
-        //}
         updateTouchPosition();
-        server.sendSelfVelocity(velocity);
+        server.sendSelfVelocity(object, velocity);
     }
 
     private void updateTouchPosition() {
