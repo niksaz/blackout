@@ -114,8 +114,8 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     }
 
     /**
-     * Kill the unit. It will be removed from the <code>GameWorld</code>
-     * and from the map after paying death animation.
+     * Kills the unit. It will be removed from the <code>GameWorld</code> and from the map after paying death animation.
+     * Also disposes all non-shared resources (like effects).
      */
     public void kill() {
         // TODO: override
@@ -253,6 +253,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
             this.context = context;
             this.model = context.assets().map(assets -> assets.get(this.modelPath, Model.class));
         }
+
 
         public abstract GameObject makeInstance(float x, float y);
         public GameObject makeInstance(Vector2 position) {

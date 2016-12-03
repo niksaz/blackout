@@ -4,6 +4,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
+import com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.sun.deploy.uitoolkit.impl.fx.Utils;
 
@@ -50,6 +52,7 @@ public class BlackoutGame extends Game {
     private /*final*/ ModelBatch modelBatch;
     private /*final*/ SpriteBatch spriteBatch;
     private /*final*/ BlackoutAssets assets;
+    private /*final*/ ParticleSystem particleSystem;
 
     private BlackoutGame(ScreenManager screenManager) {
         this.screenManager = screenManager;
@@ -62,6 +65,7 @@ public class BlackoutGame extends Game {
     public ScreenManager screenManager() { return this.screenManager; }
     public PlayServicesInCore playServicesInCore() { return this.playServicesInCore; }
     public BlackoutAssets assets() { return this.assets; }
+    public ParticleSystem particleSystem() { return this.particleSystem; }
 
 
 	// FIXME:  just for test
@@ -85,8 +89,10 @@ public class BlackoutGame extends Game {
         this.modelBatch = new ModelBatch();
         this.spriteBatch = new SpriteBatch();
         this.assets = new BlackoutAssets();
+        this.particleSystem = new ParticleSystem();
 
         this.assets.loadFonts();
+
         this.screenManager.setScreen(new LoadScreen());
 	}
 }

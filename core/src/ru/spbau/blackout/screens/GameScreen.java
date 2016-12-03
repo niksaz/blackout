@@ -2,6 +2,7 @@ package ru.spbau.blackout.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -14,6 +15,10 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
+import com.badlogic.gdx.graphics.g3d.particles.ParticleEffectLoader;
+import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
+import com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -88,6 +93,13 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         this.environment = new Environment();
         this.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 100f));
         this.environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.2f, 0f, 0.2f, -1f));
+
+        // initialize particles
+        BillboardParticleBatch particleBatch = new BillboardParticleBatch();
+        particleBatch.setCamera(this.camera);
+        BlackoutGame.get().particleSystem().add(particleBatch);
+        ParticleEffectLoader loader = new ParticleEffectLoader(new InternalFileHandleResolver());
+        this.assets.setLoader(ParticleEffect.class, loader);
     }
 
 
@@ -126,11 +138,25 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        ModelBatch modelBatch = BlackoutGame.get().modelBatch();
-        modelBatch.begin(this.camera);
-        modelBatch.render(this.gameWorld, this.environment);
-        modelBatch.render(this.map, this.environment);
-        modelBatch.end();
+        // model batch rendering
+        {
+            ModelBatch modelBatch = BlackoutGame.get().modelBatch();
+            ParticleSystem particleSystem = BlackoutGame.get().particleSystem();
+
+            modelBatch.begin(this.camera);
+
+            modelBatch.render(this.gameWorld, this.environment);
+            modelBatch.render(this.map, this.environment);
+
+            // render particles
+            particleSystem.update();
+            particleSystem.begin();
+            particleSystem.draw();
+            particleSystem.end();
+            modelBatch.render(particleSystem);
+
+            modelBatch.end();
+        }
 
         this.ui.update(deltaTime);
         this.ui.draw();
