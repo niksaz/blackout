@@ -94,7 +94,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
      */
     public void updateState(float deltaTime) {
         for (GameEffect effect : this.effects) {
-            effect.update(deltaTime, this);
+            effect.update(deltaTime);
         }
     }
     /** See <code>GameWorld</code> documentation. */

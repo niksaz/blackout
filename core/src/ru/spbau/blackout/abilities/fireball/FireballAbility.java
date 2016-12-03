@@ -1,18 +1,21 @@
 package ru.spbau.blackout.abilities.fireball;
 
+import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.InstantAbility;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.AbilityObject;
+import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.shapescreators.CircleCreator;
+import ru.spbau.blackout.utils.Particles;
 
 
 public class FireballAbility extends InstantAbility {
     public static final String ICON_PATH = "abilities/fireball/icon.png";
     public static final String MODEL_PATH = "abilities/fireball/model/fireball.g3db";
-    public static final float MAX_CHARGE_TIME = 3f;
+    public static final float MAX_CHARGE_TIME = 1f;
 
     public static final float SHELL_START_SPEED = 30f;
     public static final float CAST_DISTANCE = 1f;
@@ -34,22 +37,24 @@ public class FireballAbility extends InstantAbility {
     @Override
     public void cast() {
         Vector2 direction = new Vector2(1, 0).rotateRad(getUnit().getRotation());
-        AbilityObject shell = (AbilityObject) shellDef.makeInstance(
-                getUnit().getPosition().mulAdd(direction, CAST_DISTANCE)
-        );
+        Vector2 position = new Vector2(getUnit().getPosition());
+        position.mulAdd(direction, CAST_DISTANCE);
+        AbilityObject shell = (AbilityObject) shellDef.makeInstance(position);
+
         shell.velocity.mulAdd(direction, SHELL_START_SPEED);
     }
 
     @Override
     public void load(GameContext context) {
         super.load(context);
-        shellDef.load(context);
+        this.shellDef.load(context);
+
     }
 
     @Override
     public void doneLoading(GameContext context, GameUnit unit) {
         super.doneLoading(context, unit);
-        shellDef.doneLoading(context);
+        this.shellDef.doneLoading(context);
     }
 
     @Override

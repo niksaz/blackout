@@ -3,8 +3,11 @@ package ru.spbau.blackout.utils;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 
+import javax.swing.text.html.Option;
+
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.java8features.Optional;
 
 import static com.badlogic.gdx.graphics.g3d.particles.ParticleEffectLoader.ParticleEffectLoadParameter;
 
@@ -23,11 +26,14 @@ public final class Particles {
     }
 
 
-    public static void load(String path, AssetManager assets) {
-        assets.load(path, ParticleEffect.class, getParam());
+    public static void load(String path, GameContext context) {
+        context.assets().ifPresent(assets -> assets.load(path, ParticleEffect.class, getParam()));
     }
 
-    public static ParticleEffect get(String path, AssetManager assets) {
-        return assets.get(path, ParticleEffect.class).copy();
+    /**
+     * Returns a copy of the particle effect. One must dispose it by themselves.
+     */
+    public static Optional<ParticleEffect> get(String path, GameContext context) {
+        return context.assets().map(assets -> assets.get(path, ParticleEffect.class).copy());
     }
 }
