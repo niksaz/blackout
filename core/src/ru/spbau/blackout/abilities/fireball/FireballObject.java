@@ -15,7 +15,7 @@ import ru.spbau.blackout.utils.Particles;
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTOR;
 
 
-public class FireballObject extends AbilityObject {
+public final class FireballObject extends AbilityObject {
     private float timeRest;
 
 
@@ -33,7 +33,9 @@ public class FireballObject extends AbilityObject {
         super.beginContact(object);
         if (object instanceof GameUnit) {
             GameUnit unit = (GameUnit) object;
-            unit.applyImpulse(this.velocity.x * IMPULSE_FACTOR, this.velocity.y * IMPULSE_FACTOR);
+            // This object is going to dye. So, we don't care about changes of its velocity.
+            this.velocity.add(this.body.getLinearVelocity()).scl(IMPULSE_FACTOR);
+            unit.applyImpulse(this.velocity);
         }
         this.kill();
     }
@@ -47,6 +49,10 @@ public class FireballObject extends AbilityObject {
         }
     }
 
+    @Override
+    public void updateForSecondStep() {
+        super.updateForSecondStep();
+    }
 
     /**
      * Additionally defines timeToLive for an object.
