@@ -8,6 +8,11 @@ public class HorizontalProgressBar extends SimpleProgressBar {
     private /*final*/ int fullWidth;
 
 
+    protected HorizontalProgressBar(HorizontalProgressBar other) {
+        super(other);
+        this.fullWidth = other.fullWidth;
+    }
+
     public HorizontalProgressBar(String emptyTexturePath, String fullTexturePath, float minValue, float maxValue) {
         super(emptyTexturePath, fullTexturePath, minValue, maxValue);
     }
@@ -23,6 +28,11 @@ public class HorizontalProgressBar extends SimpleProgressBar {
         this.fullWidth = this.full.getRegion().getTexture().getWidth();
     }
 
+
+    @Override
+    public SimpleProgressBar copy() {
+        return new HorizontalProgressBar(this);
+    }
 
     @Override
     public void act(float deltaTime) {

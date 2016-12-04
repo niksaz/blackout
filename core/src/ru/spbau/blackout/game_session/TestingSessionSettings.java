@@ -38,7 +38,8 @@ public class TestingSessionSettings implements GameSessionSettings {
                 "models/wizard/wizard.g3db",
                 new CircleCreator(0.6f),
                 0, 0,
-                new Ability[] { new FireballAbility(7) }
+                new Ability[] { new FireballAbility(7) },
+                200
         );
         session.objectDefs.add(hero);
         session.character = hero;
@@ -47,7 +48,8 @@ public class TestingSessionSettings implements GameSessionSettings {
                 "models/wizard/wizard.g3db",
                 new CircleCreator(0.6f),
                 5, 0,
-                new Ability[] { new FireballAbility(2) }
+                new Ability[] { new FireballAbility(2) },
+                200
         );
         session.objectDefs.add(enemy);
 

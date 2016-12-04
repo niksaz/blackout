@@ -34,6 +34,9 @@ import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.graphic_effects.GraphicEffect;
+import ru.spbau.blackout.graphic_effects.HealthBarEffect;
 import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AbstractServer;
@@ -51,7 +54,9 @@ import static ru.spbau.blackout.utils.Utils.fixTop;
 
 public class GameScreen extends BlackoutScreen implements GameContext {
     public static final class CameraDefaults {
-        private CameraDefaults() {}
+        private CameraDefaults() {
+        }
+
         public static final float FIELD_OF_VIEW = 30;
         public static final float X_OFFSET = 0;
         public static final float Y_OFFSET = -10;
@@ -222,8 +227,10 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private final String mapPath;
         private final Stage stage;
         private final SimpleProgressBar progressBar =
-                new HorizontalProgressBar(ProgressBarConst.PATH_EMPTY, ProgressBarConst.PATH_FULL);
+                new HorizontalProgressBar(LoadingProgressBar.PATH_EMPTY, LoadingProgressBar.PATH_FULL);
         private boolean loadingScreenLoaded = false;
+        private final SimpleProgressBar commonHealthBar =
+                new HorizontalProgressBar(CommonHealthBar.PATH_EMPTY, CommonHealthBar.PATH_FULL);
 
 
         public LoadingScreen(GameSessionSettings room) {
@@ -236,9 +243,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), camera);
             this.stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
 
-            float startX = (getWorldWidth() - ProgressBarConst.WIDTH) / 2;
-            this.progressBar.setPosition(startX, ProgressBarConst.START_Y);
-            this.progressBar.setSize(ProgressBarConst.WIDTH, ProgressBarConst.HEIGHT);
+            float startX = (getWorldWidth() - LoadingProgressBar.WIDTH) / 2;
+            this.progressBar.setPosition(startX, LoadingProgressBar.START_Y);
+            this.progressBar.setSize(LoadingProgressBar.WIDTH, LoadingProgressBar.HEIGHT);
+
+            this.commonHealthBar.setSize(CommonHealthBar.WIDTH, CommonHealthBar.HEIGHT);
         }
 
 
@@ -290,8 +299,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         public void dispose() {
             super.dispose();
             assets.unload(BACKGROUND_IMAGE);
-            assets.unload(ProgressBarConst.PATH_EMPTY);
-            assets.unload(ProgressBarConst.PATH_FULL);
+            assets.unload(LoadingProgressBar.PATH_EMPTY);
+            assets.unload(LoadingProgressBar.PATH_FULL);
         }
 
         private void initializeLoadingScreen() {
@@ -310,16 +319,16 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             // label
             Label.LabelStyle style = new Label.LabelStyle(
                     BlackoutGame.get().assets().getFont(),
-                    LoadingLabelConst.COLOR
+                    LoadingLabel.COLOR
             );
             Label label = new Label(
-                "Test: The pen name, Max Frei, was invented by Martynchik and Steopin for their works on" +
-                    "comic fantasy series Labyrinths of Echo (\"ЛабиринтыEхо\"). The plot follows the eponymous" +
-                    "narrator, sir Max, as he leaves our \"real\" world...",
-                style
+                    "Test: The pen name, Max Frei, was invented by Martynchik and Steopin for their works on" +
+                            "comic fantasy series Labyrinths of Echo (\"ЛабиринтыEхо\"). The plot follows the eponymous" +
+                            "narrator, sir Max, as he leaves our \"real\" world...",
+                    style
             );
-            label.setPosition(LoadingLabelConst.MIN_X, LoadingLabelConst.MIN_Y);
-            label.setSize(LoadingLabelConst.WIDTH, LoadingLabelConst.MAX_Y - LoadingLabelConst.MIN_Y);
+            label.setPosition(LoadingLabel.MIN_X, LoadingLabel.MIN_Y);
+            label.setSize(LoadingLabel.WIDTH, LoadingLabel.MAX_Y - LoadingLabel.MIN_Y);
             label.setAlignment(Align.center);
             label.setWrap(true);
             this.stage.addActor(label);
@@ -329,15 +338,33 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             ui.load(assets);
             foreach(this.objectDefs, def -> def.load(GameScreen.this));
             assets.load(this.mapPath, Model.class);
+            this.commonHealthBar.load(assets);
         }
 
         private void doneLoading() {
+            this.commonHealthBar.doneLoading(assets);
+
             for (GameObject.Definition def : objectDefs) {
                 def.doneLoading(GameScreen.this);
                 GameObject obj = def.makeInstance();
 
                 if (def == characterDef) {
                     character = (Character) obj;
+                    // TODO: add health bar
+                } else if (obj instanceof Character) {
+                    System.out.println("AAAAAAAAAAAAAAAAAAA");
+                    System.out.println("AAAAAAAAAAAAAAAAAAA");
+                    System.out.println("AAAAAAAAAAAAAAAAAAA");
+                    System.out.println("AAAAAAAAAAAAAAAAAAA");
+                    System.out.println("AAAAAAAAAAAAAAAAAAA");
+                    System.out.println("AAAAAAAAAAAAAAAAAAA");
+                    System.out.println("AAAAAAAAAAAAAAAAAAA");
+                    System.out.println("AAAAAAAAAAAAAAAAAAA");
+                    SimpleProgressBar healthBar = commonHealthBar.copy();
+                    healthBar.setPosition(10, 10);
+                    ui.stage.addActor(healthBar);
+                    GraphicEffect healthBarEffect = new HealthBarEffect((GameUnit) obj, healthBar);
+                    obj.graphicEffects.add(healthBarEffect);
                 }
             }
             if (character == null) {
@@ -357,25 +384,41 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
 
-    /** constant holder for progress bar in loading screen */
-    private static final class ProgressBarConst {
-        private ProgressBarConst() {}
-        private static final String PATH_EMPTY = "images/progress_bar/empty.png";
-        private static final String PATH_FULL = "images/progress_bar/full.png";
-        private static final float WIDTH = Math.min(Vpx.fromCm(8f), getWorldWidth() / 2);
-        private static final float HEIGHT = Math.min(Vpx.fromCm(1.3f), getWorldHeight() / 8);
-        private static final float START_Y = getWorldHeight() / 5;
+    /**
+     * constant holder for progress bar in loading screen
+     */
+    private static final class LoadingProgressBar {
+        private LoadingProgressBar() {}
+
+        static final String PATH_EMPTY = "images/progress_bar/empty.png";
+        static final String PATH_FULL = "images/progress_bar/full.png";
+        static final float WIDTH = Math.min(Vpx.fromCm(8f), getWorldWidth() / 2);
+        static final float HEIGHT = Math.min(Vpx.fromCm(1.3f), getWorldHeight() / 8);
+        static final float START_Y = getWorldHeight() / 5;
     }
 
 
-    /** constant holder for label in loading screen */
-    private static final class LoadingLabelConst {
-        private LoadingLabelConst() {}
-        private static final Color COLOR = new Color(60f / 255f, 10f / 255f, 0, 1);
+    /**
+     * constant holder for label in loading screen
+     */
+    private static final class LoadingLabel {
+        private LoadingLabel() {}
 
-        private static final float MAX_Y = getWorldHeight() * 4 / 5;
-        private static final float MIN_Y = getWorldHeight() * 2 / 5;
-        private static final float WIDTH = getWorldWidth() / 2;
-        private static final float MIN_X = (getWorldWidth() - LoadingLabelConst.WIDTH) / 2;
+        static final Color COLOR = new Color(60f / 255f, 10f / 255f, 0, 1);
+
+        static final float MAX_Y = getWorldHeight() * 4 / 5;
+        static final float MIN_Y = getWorldHeight() * 2 / 5;
+        static final float WIDTH = getWorldWidth() / 2;
+        static final float MIN_X = (getWorldWidth() - LoadingLabel.WIDTH) / 2;
+    }
+
+    private static final class CommonHealthBar {
+        CommonHealthBar() {}
+
+        static final String PATH_FULL = "images/common_health_bar/full.png";
+        static final String PATH_EMPTY = "images/common_health_bar/empty.png";
+
+        static final float WIDTH = getWorldWidth() / 10;
+        static final float HEIGHT = getWorldHeight() / 10;
     }
 }

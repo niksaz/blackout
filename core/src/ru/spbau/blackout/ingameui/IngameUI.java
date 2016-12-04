@@ -15,6 +15,7 @@ import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.objects.AbilityIcon;
+import ru.spbau.blackout.ingameui.objects.Stick;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.network.AbstractServer;
@@ -29,7 +30,7 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  * Main class for in-game user interface.
  */
 public class IngameUI {
-    private final Stage stage;
+    public final Stage stage;
     private final Array<IngameUIObject> uiObjects = new Array<>();
 
     /**
@@ -42,9 +43,9 @@ public class IngameUI {
 
         Gdx.input.setInputProcessor(this.stage);
 
-        this.uiObjects.add(new ru.spbau.blackout.ingameui.objects.Stick(server, settings.stickSettings));
+        this.uiObjects.add(new Stick(server, settings.stickSettings));
         for (AbilityIconSettings iconSettings : settings.abilities) {
-            this.uiObjects.add(new ru.spbau.blackout.ingameui.objects.AbilityIcon(server, iconSettings));
+            this.uiObjects.add(new AbilityIcon(server, iconSettings));
         }
     }
 

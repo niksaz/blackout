@@ -7,6 +7,11 @@ public class VerticalProgressBar extends SimpleProgressBar {
     private /*final*/ int fullHeight;
 
 
+    protected VerticalProgressBar(VerticalProgressBar other) {
+        super(other);
+        this.fullHeight = other.fullHeight;
+    }
+
     public VerticalProgressBar(String emptyTexturePath, String fullTexturePath, float minValue, float maxValue) {
         super(emptyTexturePath, fullTexturePath, minValue, maxValue);
     }
@@ -22,6 +27,10 @@ public class VerticalProgressBar extends SimpleProgressBar {
         this.fullHeight = this.full.getRegion().getTexture().getHeight();
     }
 
+    @Override
+    public SimpleProgressBar copy() {
+        return new VerticalProgressBar(this);
+    }
 
     @Override
     public void act(float deltaTime) {

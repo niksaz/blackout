@@ -44,6 +44,9 @@ public abstract class GameUnit extends DynamicObject implements Damageable {
         this.animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
         this.abilities = def.abilities;
 
+        this.maxHealth = def.maxHealth;
+        this.health = this.maxHealth;
+
         for (Ability ability : abilities) {
             ability.initialize(this);
         }
@@ -145,11 +148,14 @@ public abstract class GameUnit extends DynamicObject implements Damageable {
 
         public float speed = DEFAULT_SPEED;
         public Ability[] abilities;
+        public float maxHealth;
+
 
         public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY,
-                          Ability[] abilities) {
+                          Ability[] abilities, float maxHealth) {
             super(modelPath, shapeCreator, initialX, initialY);
             this.abilities = abilities;
+            this.maxHealth = maxHealth;
         }
 
 

@@ -33,6 +33,30 @@ public abstract class SimpleProgressBar extends Actor {
     protected float valueToShow = 0;
 
 
+    protected SimpleProgressBar(SimpleProgressBar other) {
+        this.fullTexturePath = other.fullTexturePath;
+        this.emptyTexturePath = other.emptyTexturePath;
+        if (other.full != null) {
+            this.full = new TextureRegionDrawable(other.full.getRegion());
+        }
+        if (other.empty != null) {
+            this.empty = new TextureRegionDrawable(other.empty.getRegion());
+        }
+        this.minValue = other.minValue;
+        this.maxValue = other.maxValue;
+        this.realValue = other.realValue;
+        this.valueToShow = other.valueToShow;
+
+        this.setSize(other.getWidth(), other.getHeight());
+        this.setPosition(other.getX(), other.getY());
+
+        int zIndex = other.getZIndex();
+        if (zIndex >= 0) {
+            this.setZIndex(zIndex);
+        }
+    }
+
+
     public SimpleProgressBar(String emptyTexturePath, String fullTexturePath, float minValue, float maxValue) {
         this.fullTexturePath = fullTexturePath;
         this.emptyTexturePath = emptyTexturePath;
@@ -63,6 +87,12 @@ public abstract class SimpleProgressBar extends Actor {
         this.fullTexturePath = null;
         this.emptyTexturePath = null;
     }
+
+
+    /**
+     * Warning: some actor parameters may be not copied.
+     */
+    public abstract SimpleProgressBar copy();
 
 
     @Override
