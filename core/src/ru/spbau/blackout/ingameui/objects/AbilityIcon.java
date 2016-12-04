@@ -19,7 +19,7 @@ import ru.spbau.blackout.utils.Textures;
 import static ru.spbau.blackout.utils.Utils.EMPTY_TEXTURE_PATH;
 import static ru.spbau.blackout.utils.Utils.floatEq;
 
-public class AbilityIcon extends IngameUIObject {
+public final class AbilityIcon extends IngameUIObject {
     // fields marked as /*final*/ must be assigned only once inside initialize method.
 
     public static final String FULL_TEXTURE_PATH = "images/ability_cell/full.png";
@@ -30,11 +30,12 @@ public class AbilityIcon extends IngameUIObject {
     private /*final*/ Ability ability;
     private boolean isPressed = false;
     private SimpleProgressBar chargingBar = new VerticalProgressBar(EMPTY_TEXTURE_PATH, FULL_TEXTURE_PATH);
+    private final AbstractServer server;  // TODO: use it
 
 
     // I have to get unitDef here in order to get its abilityIcons
     public AbilityIcon(AbstractServer server, AbilityIconSettings settings) {
-        super(server);
+        this.server = server;
         this.settings = settings;
     }
 

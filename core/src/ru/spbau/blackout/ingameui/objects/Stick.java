@@ -22,7 +22,7 @@ import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 /**
  * Class for stick which used to set character walking direction and speed.
  */
-public class Stick extends IngameUIObject {
+public final class Stick extends IngameUIObject {
     public static final float MAIN_IMAGE_SIZE = Math.min(Vpx.fromCm(3f), getWorldWidth() / 7);
     public static final float MAIN_IMAGE_CENTER = MAIN_IMAGE_SIZE / 2;  // because it is related to position
     public static final String MAIN_IMAGE_PATH = "images/stick/stick_main.png";
@@ -40,10 +40,11 @@ public class Stick extends IngameUIObject {
     private GameUnit unit;
     private Image touchImage;
     private final StickSettings settings;
+    private final AbstractServer server;
 
 
     public Stick(AbstractServer server, StickSettings settings) {
-        super(server);
+        this.server = server;
         this.settings = settings;
     }
 

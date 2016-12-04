@@ -15,6 +15,7 @@ import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.objects.AbilityIcon;
+import ru.spbau.blackout.ingameui.objects.HealthBar;
 import ru.spbau.blackout.ingameui.objects.Stick;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
@@ -44,9 +45,12 @@ public class IngameUI {
         Gdx.input.setInputProcessor(this.stage);
 
         this.uiObjects.add(new Stick(server, settings.stickSettings));
+
         for (AbilityIconSettings iconSettings : settings.abilities) {
             this.uiObjects.add(new AbilityIcon(server, iconSettings));
         }
+
+        this.uiObjects.add(new HealthBar());
     }
 
     /** Load necessary assets. */

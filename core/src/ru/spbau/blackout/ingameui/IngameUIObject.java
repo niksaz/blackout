@@ -12,13 +12,6 @@ import ru.spbau.blackout.network.AbstractServer;
  * Abstract class for all elements of in-game user interface.
  */
 public abstract class IngameUIObject {
-    /** server to send UI events */
-    protected final AbstractServer server;
-
-    public IngameUIObject(AbstractServer server) {
-        this.server = server;
-    }
-
     /** Load assets. */
     public abstract void load(AssetManager assets);
     /** When assets are loaded. */

@@ -229,7 +229,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                 new HorizontalProgressBar(LoadingProgressBar.PATH_EMPTY, LoadingProgressBar.PATH_FULL);
         private boolean loadingScreenLoaded = false;
         private final SimpleProgressBar commonHealthBar =
-                new HorizontalProgressBar(CommonHealthBar.PATH_EMPTY, CommonHealthBar.PATH_FULL);
+                new HorizontalProgressBar(SmallHealthBar.PATH_EMPTY, SmallHealthBar.PATH_FULL);
 
 
         public LoadingScreen(GameSessionSettings room) {
@@ -246,7 +246,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             this.progressBar.setPosition(startX, LoadingProgressBar.START_Y);
             this.progressBar.setSize(LoadingProgressBar.WIDTH, LoadingProgressBar.HEIGHT);
 
-            this.commonHealthBar.setSize(CommonHealthBar.WIDTH, CommonHealthBar.HEIGHT);
+            this.commonHealthBar.setSize(SmallHealthBar.WIDTH, SmallHealthBar.HEIGHT);
             this.commonHealthBar.toBack();
         }
 
@@ -344,10 +344,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
                 if (def == characterDef) {
                     character = (Character) obj;
-                    // TODO: add health bar
                 } else if (obj instanceof Character) {
                     SimpleProgressBar healthBar = commonHealthBar.copy();
-                    healthBar.setPosition(10, 10);
                     ui.stage.addActor(healthBar);
                     GraphicEffect healthBarEffect = new HealthBarEffect((GameUnit) obj, healthBar, camera);
                     obj.graphicEffects.add(healthBarEffect);
@@ -376,11 +374,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private static final class LoadingProgressBar {
         private LoadingProgressBar() {}
 
-        static final String PATH_EMPTY = "images/progress_bar/empty.png";
-        static final String PATH_FULL = "images/progress_bar/full.png";
-        static final float WIDTH = Math.min(Vpx.fromCm(8f), getWorldWidth() / 2);
-        static final float HEIGHT = Math.min(Vpx.fromCm(1.3f), getWorldHeight() / 8);
-        static final float START_Y = getWorldHeight() / 5;
+        public static final String PATH_EMPTY = "images/progress_bar/empty.png";
+        public static final String PATH_FULL = "images/progress_bar/full.png";
+        public static final float WIDTH = Math.min(Vpx.fromCm(8f), getWorldWidth() / 2);
+        public static final float HEIGHT = Math.min(Vpx.fromCm(1.3f), getWorldHeight() / 8);
+        public static final float START_Y = getWorldHeight() / 5;
     }
 
 
@@ -390,21 +388,21 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private static final class LoadingLabel {
         private LoadingLabel() {}
 
-        static final Color COLOR = new Color(60f / 255f, 10f / 255f, 0, 1);
+        public static final Color COLOR = new Color(60f / 255f, 10f / 255f, 0, 1);
 
-        static final float MAX_Y = getWorldHeight() * 4 / 5;
-        static final float MIN_Y = getWorldHeight() * 2 / 5;
-        static final float WIDTH = getWorldWidth() / 2;
-        static final float MIN_X = (getWorldWidth() - LoadingLabel.WIDTH) / 2;
+        public static final float MAX_Y = getWorldHeight() * 4 / 5;
+        public static final float MIN_Y = getWorldHeight() * 2 / 5;
+        public static final float WIDTH = getWorldWidth() / 2;
+        public static final float MIN_X = (getWorldWidth() - LoadingLabel.WIDTH) / 2;
     }
 
-    private static final class CommonHealthBar {
-        CommonHealthBar() {}
+    private static final class SmallHealthBar {
+        SmallHealthBar() {}
 
-        static final String PATH_FULL = "images/common_health_bar/full.png";
-        static final String PATH_EMPTY = "images/common_health_bar/empty.png";
+        public static final String PATH_FULL = "images/health_bar/full.png";
+        public static final String PATH_EMPTY = "images/health_bar/empty.png";
 
-        static final float WIDTH = getWorldWidth() / 17;
-        static final float HEIGHT = getWorldHeight() / 80;
+        public static final float WIDTH = getWorldWidth() * 0.06f;
+        public static final float HEIGHT = getWorldHeight() * 0.013f;
     }
 }
