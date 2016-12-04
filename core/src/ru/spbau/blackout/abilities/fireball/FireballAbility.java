@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.InstantAbility;
-import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
@@ -29,7 +28,7 @@ public class FireballAbility extends InstantAbility {
     public FireballAbility(int level) {
         super(level);
         this.shellDef = new FireballObject.Definition(null, new CircleCreator(SHELL_RADIUS), SHELL_MASS, TIME_TO_LIVE);
-        this.shellDef.pivotHeight = 1.5f;
+        this.shellDef.chestPivotOffset.set(0, 0, 1.5f);
         this.shellDef.isSensor = true;
     }
 

@@ -41,7 +41,8 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     transient public final Array<GraphicEffect> graphicEffects = new Array<>();
 
     private boolean dead = false;
-    private final float pivotHeight;
+    private final Vector3 chestPivotOffset;
+    private final Vector3 underHeadPivotOffset;
 
 
     /**
@@ -62,7 +63,8 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         body.createFixture(fixtureDef);
         fixtureDef.shape.dispose();
 
-        this.pivotHeight = def.pivotHeight;
+        this.chestPivotOffset = def.chestPivotOffset;
+        this.underHeadPivotOffset = def.underHeadPivotOffset;
         this.setPosition(x, y);
         this.setMass(def.mass);
     }
@@ -208,6 +210,14 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         setTransform(x, y, getRotation());
     }
 
+    /**
+     * Returns new Vector3 (so, it's safe to change this vector without changing unit's position).
+     */
+    public Vector3 get3dPosition() {
+        Vector2 pos = this.getPosition();
+        return new Vector3(pos.x, pos.y, this.getHeight());
+    }
+
     public void setHeight(float height) { this.height = height; }
     public final float getHeight() { return height; }
 
@@ -215,8 +225,13 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         return this.body.getMass();
     }
 
-    public float getPivotHeight() {
-        return this.pivotHeight + this.getHeight();
+
+    public Vector3 getChestPivot() {
+        return this.get3dPosition().add(chestPivotOffset);
+    }
+
+    public Vector3 getUnderHeadPivot() {
+        return this.get3dPosition().add(underHeadPivotOffset);
     }
 
 
@@ -260,7 +275,8 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
          * Must be final due to possible problems if this variable changed between calls of `load` and `initialize`.
          */
         public final String modelPath;
-        public float pivotHeight = 0;
+        public final Vector3 chestPivotOffset = new Vector3();
+        public final Vector3 underHeadPivotOffset = new Vector3();
         public boolean isSensor = false;
 
 

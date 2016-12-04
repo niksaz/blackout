@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.java8features.Optional;
 
 
 /**
@@ -34,8 +33,7 @@ public class ParticleGraphicEffect extends GraphicEffect {
 
     public void updatePosition() {
         this.tmpMatrix.idt();
-        Vector2 pos = this.object.getPosition();
-        this.tmpMatrix.translate(pos.x, pos.y, this.object.getPivotHeight());
+        this.tmpMatrix.translate(this.object.getChestPivot());
         this.effect.setTransform(this.tmpMatrix);
     }
 

@@ -163,11 +163,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             modelBatch.end();
         }
 
+        this.updateCamera();
         this.ui.update(deltaTime);
         this.ui.draw();
 
         this.gameWorld.update(deltaTime);
-        this.updateCamera();
     }
 
     @Override
@@ -248,6 +248,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             this.progressBar.setSize(LoadingProgressBar.WIDTH, LoadingProgressBar.HEIGHT);
 
             this.commonHealthBar.setSize(CommonHealthBar.WIDTH, CommonHealthBar.HEIGHT);
+            this.commonHealthBar.toBack();
         }
 
 
@@ -287,12 +288,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                 this.loadRealResources();
                 loadingScreenLoaded = true;
             }
-        }
-
-        @Override
-        public void resize(int width, int height) {
-            super.resize(width, height);
-            this.stage.getViewport().update(Vpx.fromRpx(width), Vpx.fromRpx(height));
         }
 
         @Override
@@ -352,18 +347,10 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                     character = (Character) obj;
                     // TODO: add health bar
                 } else if (obj instanceof Character) {
-                    System.out.println("AAAAAAAAAAAAAAAAAAA");
-                    System.out.println("AAAAAAAAAAAAAAAAAAA");
-                    System.out.println("AAAAAAAAAAAAAAAAAAA");
-                    System.out.println("AAAAAAAAAAAAAAAAAAA");
-                    System.out.println("AAAAAAAAAAAAAAAAAAA");
-                    System.out.println("AAAAAAAAAAAAAAAAAAA");
-                    System.out.println("AAAAAAAAAAAAAAAAAAA");
-                    System.out.println("AAAAAAAAAAAAAAAAAAA");
                     SimpleProgressBar healthBar = commonHealthBar.copy();
                     healthBar.setPosition(10, 10);
                     ui.stage.addActor(healthBar);
-                    GraphicEffect healthBarEffect = new HealthBarEffect((GameUnit) obj, healthBar);
+                    GraphicEffect healthBarEffect = new HealthBarEffect((GameUnit) obj, healthBar, camera);
                     obj.graphicEffects.add(healthBarEffect);
                 }
             }
@@ -418,7 +405,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         static final String PATH_FULL = "images/common_health_bar/full.png";
         static final String PATH_EMPTY = "images/common_health_bar/empty.png";
 
-        static final float WIDTH = getWorldWidth() / 10;
-        static final float HEIGHT = getWorldHeight() / 10;
+        static final float WIDTH = getWorldWidth() / 18;
+        static final float HEIGHT = getWorldHeight() / 50;
     }
 }

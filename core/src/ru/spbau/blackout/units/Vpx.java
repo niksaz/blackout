@@ -17,11 +17,11 @@ public class Vpx {
         return ConstHolder.RPX_PER_VPX;
     }
 
-    public static int fromRpx(int rpx) {
+    public static float fromRpx(float rpx) {
         return Math.round(rpx / getRpxPerVpx());
     }
 
-    public static int fromCm(float cm) {
+    public static float fromCm(float cm) {
         return fromRpx(Rpx.fromCm(cm));
     }
 }

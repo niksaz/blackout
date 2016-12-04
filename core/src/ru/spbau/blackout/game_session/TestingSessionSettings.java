@@ -41,6 +41,7 @@ public class TestingSessionSettings implements GameSessionSettings {
                 new Ability[] { new FireballAbility(7) },
                 200
         );
+        hero.underHeadPivotOffset.set(0, 0, 3.5f);
         session.objectDefs.add(hero);
         session.character = hero;
 
@@ -51,6 +52,7 @@ public class TestingSessionSettings implements GameSessionSettings {
                 new Ability[] { new FireballAbility(2) },
                 200
         );
+        enemy.underHeadPivotOffset.set(0, 0, 3.5f);
         session.objectDefs.add(enemy);
 
         GameObject.Definition stone = new Decoration.Definition(

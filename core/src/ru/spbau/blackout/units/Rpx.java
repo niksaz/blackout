@@ -11,7 +11,7 @@ public final class Rpx {
         return Math.round(cm * Gdx.graphics.getPpcX());
     }
 
-    public static int fromVpx(int vpx) {
+    public static float fromVpx(float vpx) {
         return Math.round(vpx * ru.spbau.blackout.units.Vpx.getRpxPerVpx());
     }
 }
