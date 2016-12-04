@@ -95,7 +95,7 @@ class ClientThread extends Thread {
                         velocityFromClient.set(velocity);
                     } catch (ClassNotFoundException | IOException e) {
                         e.printStackTrace();
-                        break;
+                        clientGameState = GameState.FINISHED;
                     }
                 } while (clientGameState != GameState.FINISHED);
             });
