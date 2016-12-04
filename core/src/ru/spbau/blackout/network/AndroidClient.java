@@ -11,6 +11,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.GameUnit;
@@ -22,8 +23,6 @@ import ru.spbau.blackout.screens.MultiplayerTable;
 import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.GameWorldWithExternalSerial;
-
-import static java.lang.Thread.sleep;
 
 /**
  * Task with the purpose of talking to a server: waiting in a queue, getting a game from a server,
@@ -37,7 +36,7 @@ public class AndroidClient implements Runnable, AbstractServer {
 
     private final MultiplayerTable table;
     private volatile boolean isInterrupted = false;
-    private volatile Vector2 velocityToSend = new Vector2();
+    private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>();
     private GameScreen gameScreen;
 
     public AndroidClient(MultiplayerTable table) {
@@ -98,39 +97,41 @@ public class AndroidClient implements Runnable, AbstractServer {
             }
 
             final Thread outputToServerThread = new Thread(() -> {
-                long timeLastIterationFinished = System.currentTimeMillis();
-                while (!isInterrupted) {
-                    try {
-                        Vector2 sending = new Vector2(velocityToSend);
-                        out.writeObject(sending);
-                        out.flush();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        isInterrupted = true;
-                    }
-
-                    //making sure that we are sending position with desired rate
-                    final long duration = timeLastIterationFinished - System.currentTimeMillis();
-                    if (duration < Network.TIME_SHOULD_BE_SPENT_FOR_ITERATION) {
-                        try {
-                            sleep(Network.TIME_SHOULD_BE_SPENT_FOR_ITERATION - duration);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                            isInterrupted = true;
+                try {
+                    while (!isInterrupted) {
+                        if (velocityToSend.get() != null) {
+                            final Vector2 sending = velocityToSend.getAndSet(null);
+                            out.writeObject(sending);
+                            out.flush();
+                        } else {
+                            synchronized (velocityToSend) {
+                                if (velocityToSend.get() == null) {
+                                    try {
+                                        // setting timeout because if client not responding in SOCKET_IO_TIMEOUT_MS
+                                        // he will be disconnected
+                                        velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 2);
+                                        if (velocityToSend.get() == null) {
+                                            velocityToSend.set(new Vector2());
+                                        }
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
                         }
                     }
-                    timeLastIterationFinished = System.currentTimeMillis();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    isInterrupted = true;
                 }
             });
             outputToServerThread.start();
 
             final GameWorldWithExternalSerial currentWorld = (GameWorldWithExternalSerial) gameScreen.getGameWorld();
-            // waiting for the first world to arrive
-            while (!isInterrupted) {
-                // should read game world here from inputStream
+            final byte[] buffer = new byte[Network.DATAGRAM_WORLD_PACKET_SIZE];
+            final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
 
-                byte[] buffer = new byte[Network.DATAGRAM_PACKET_SIZE];
-                final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
+            while (!isInterrupted) {
                 datagramSocket.receive(receivedPacket);
                 final ObjectInputStream serverWorldStream =
                         new ObjectInputStream(new ByteArrayInputStream(receivedPacket.getData()));
@@ -160,6 +161,9 @@ public class AndroidClient implements Runnable, AbstractServer {
 
     @Override
     public void sendSelfVelocity(GameUnit unit, Vector2 velocity) {
-        velocityToSend = velocity;
+        synchronized (velocityToSend) {
+            velocityToSend.set(new Vector2(velocity));
+            velocityToSend.notify();
+        }
     }
 }
