@@ -16,9 +16,9 @@ import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 public final class HealthBar extends IngameUIObject {
     public static final String PATH_EMPTY = "images/health_bar/empty.png";
     public static final String PATH_FULL = "images/health_bar/full.png";
-    public static final float WIDTH = getWorldWidth() * 0.25f;
-    public static final float HEIGHT = getWorldHeight() * 0.04f;
-    public static final float START_X = getWorldWidth() * 0.03f;
+    public static final float WIDTH = getWorldWidth() * 0.22f;
+    public static final float HEIGHT = getWorldHeight() * 0.045f;
+    public static final float START_X = getWorldWidth() * 0.04f;
     public static final float START_Y = getWorldHeight() * (1 - 0.05f) - HEIGHT;
 
 

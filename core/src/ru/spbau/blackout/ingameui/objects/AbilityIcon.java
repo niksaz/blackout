@@ -16,6 +16,8 @@ import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.progressbar.VerticalProgressBar;
 import ru.spbau.blackout.utils.Textures;
 
+import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
+import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 import static ru.spbau.blackout.utils.Utils.EMPTY_TEXTURE_PATH;
 import static ru.spbau.blackout.utils.Utils.floatEq;
 
@@ -24,6 +26,8 @@ public final class AbilityIcon extends IngameUIObject {
 
     public static final String FULL_TEXTURE_PATH = "images/ability_cell/full.png";
     public static final String CHARGED_TEXTURE_PATH = "images/ability_cell/charged.png";
+    public static final float CELL_SIZE = getWorldHeight() * 0.17f;
+    public static final float ICON_SIZE = 0.8f * CELL_SIZE;
 
 
     private final AbilityIconSettings settings;
@@ -53,22 +57,24 @@ public final class AbilityIcon extends IngameUIObject {
         // Charged cell image
         Image ready = new Image(assets.get(CHARGED_TEXTURE_PATH, Texture.class));
 //        Image ready = new Image(Utils.addAntiAliasing(assets.get(CHARGED_TEXTURE_PATH, Texture.class)));
-        ready.setSize(this.settings.getSize().x, this.settings.getSize().y);
+        ready.setSize(CELL_SIZE, CELL_SIZE);
         ready.setPosition(settings.getStart().x, settings.getStart().y);
         ready.setZIndex(0);
         stage.addActor(ready);
 
         // icon initialization
         Image icon = new Image(assets.get(this.ability.iconPath(), Texture.class));
-        icon.setSize(this.settings.getSize().x, this.settings.getSize().y);
-        icon.setPosition(settings.getStart().x, settings.getStart().y);
+        icon.setSize(ICON_SIZE, ICON_SIZE);
+        float iconOffset = (CELL_SIZE - ICON_SIZE) / 2f;
+        icon.setPosition(settings.getStart().x + iconOffset, settings.getStart().y + iconOffset);
+
         icon.setZIndex(1);
         stage.addActor(icon);
         icon.addListener(this.new Listener());
 
         // chargingBar initialization
         this.chargingBar.doneLoading(assets);
-        this.chargingBar.setSize(this.settings.getSize().x, this.settings.getSize().y);
+        this.chargingBar.setSize(CELL_SIZE, CELL_SIZE);
         this.chargingBar.setPosition(settings.getStart().x, settings.getStart().y);
         this.chargingBar.setZIndex(2);
         this.endCharging();
