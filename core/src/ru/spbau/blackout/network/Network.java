@@ -8,7 +8,8 @@ public class Network {
     public static final long TIME_SHOULD_BE_SPENT_FOR_ITERATION = 17;
 
     public static final String SERVER_IP_ADDRESS = "192.168.1.34";
-    public static final int SERVER_PORT_NUMBER = 48800;
+    public static final int SERVER_TCP_PORT_NUMBER = 48800;
+    public static final int DATAGRAM_PACKET_SIZE = 1024;
 
     private Network() {}
 }

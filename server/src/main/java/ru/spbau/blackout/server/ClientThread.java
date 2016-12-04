@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -39,11 +41,13 @@ class ClientThread extends Thread {
     public void run() {
         try (
             Socket socket = this.socket;
+            DatagramSocket datagramSocket = new DatagramSocket();
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             name = in.readUTF();
+            final int clientDatagramPort = in.readInt();
             server.log(name + " connected.");
 
             do {
@@ -97,11 +101,15 @@ class ClientThread extends Thread {
             });
             clientInputThread.start();
 
+            final DatagramPacket worldDatagramPacket =
+                    new DatagramPacket(new byte[0], 0, socket.getInetAddress(), clientDatagramPort);
+
             while (clientGameState != GameState.FINISHED) {
                 if (worldInBytes.get() != null) {
                     final byte[] worldToSend = worldInBytes.getAndSet(null);
-                    out.writeObject(worldToSend);
-                    out.flush();
+                    worldDatagramPacket.setData(worldToSend);
+                    worldDatagramPacket.setLength(worldToSend.length);
+                    datagramSocket.send(worldDatagramPacket);
                 } else {
                     synchronized (this) {
                         if (worldInBytes.get() == null) {

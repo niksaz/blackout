@@ -7,7 +7,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import ru.spbau.blackout.BlackoutGame;
@@ -45,13 +48,20 @@ public class AndroidClient implements Runnable, AbstractServer {
     @Override
     public void run() {
         try (
-            Socket socket = new Socket(Network.SERVER_IP_ADDRESS, Network.SERVER_PORT_NUMBER);
+            DatagramSocket datagramSocket = new DatagramSocket();
+            Socket socket = new Socket(Network.SERVER_IP_ADDRESS, Network.SERVER_TCP_PORT_NUMBER);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
+            System.out.println("Hello");
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
+            System.out.println("Hello");
             out.writeUTF(BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().getPlayerName());
+            System.out.println("Hello");
+            out.writeInt(datagramSocket.getLocalPort());
+            System.out.println("Hello");
             out.flush();
+            System.out.println("Hello");
 
             GameState gameState;
             do {
@@ -118,17 +128,19 @@ public class AndroidClient implements Runnable, AbstractServer {
 
             final GameWorldWithExternalSerial currentWorld = (GameWorldWithExternalSerial) gameScreen.getGameWorld();
             // waiting for the first world to arrive
-            socket.setSoTimeout(0);
+            //socket.setSoTimeout(0);
             while (!isInterrupted) {
                 // should read game world here from inputStream
 
-                final byte[] serializedWorld = (byte[]) in.readObject();
+                byte[] buffer = new byte[Network.DATAGRAM_PACKET_SIZE];
+                final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
+                datagramSocket.receive(receivedPacket);
                 final ObjectInputStream serverWorldStream =
-                        new ObjectInputStream(new ByteArrayInputStream(serializedWorld));
+                        new ObjectInputStream(new ByteArrayInputStream(receivedPacket.getData()));
                 currentWorld.setExternalWorldStream(serverWorldStream);
 
                 // should get worlds regularly after the first one
-                socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
+                //socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             }
         } catch (UnknownHostException e) {
             Gdx.app.log(TAG, "Don't know about host " + Network.SERVER_IP_ADDRESS);
