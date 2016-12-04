@@ -2,7 +2,6 @@ package ru.spbau.blackout.graphic_effects;
 
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.GameObject;
@@ -38,8 +37,8 @@ public class ParticleGraphicEffect extends GraphicEffect {
     }
 
     @Override
-    public void dispose() {
-        super.dispose();
+    public void remove() {
+        super.remove();
         BlackoutGame.get().particleSystem().remove(this.effect);
         this.effect.dispose();
     }

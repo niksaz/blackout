@@ -163,11 +163,10 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             modelBatch.end();
         }
 
+        this.gameWorld.update(deltaTime);
         this.updateCamera();
         this.ui.update(deltaTime);
         this.ui.draw();
-
-        this.gameWorld.update(deltaTime);
     }
 
     @Override
@@ -405,7 +404,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         static final String PATH_FULL = "images/common_health_bar/full.png";
         static final String PATH_EMPTY = "images/common_health_bar/empty.png";
 
-        static final float WIDTH = getWorldWidth() / 18;
-        static final float HEIGHT = getWorldHeight() / 50;
+        static final float WIDTH = getWorldWidth() / 17;
+        static final float HEIGHT = getWorldHeight() / 80;
     }
 }

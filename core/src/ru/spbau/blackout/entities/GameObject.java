@@ -42,7 +42,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
     private boolean dead = false;
     private final Vector3 chestPivotOffset;
-    private final Vector3 underHeadPivotOffset;
+    private final Vector3 overHeadPivotOffset;
 
 
     /**
@@ -64,7 +64,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         fixtureDef.shape.dispose();
 
         this.chestPivotOffset = def.chestPivotOffset;
-        this.underHeadPivotOffset = def.underHeadPivotOffset;
+        this.overHeadPivotOffset = def.overHeadPivotOffset;
         this.setPosition(x, y);
         this.setMass(def.mass);
     }
@@ -146,7 +146,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
      */
     public void dispose() {
         for (GraphicEffect effect : this.graphicEffects) {
-            effect.dispose();
+            effect.remove();
         }
     }
 
@@ -230,8 +230,8 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         return this.get3dPosition().add(chestPivotOffset);
     }
 
-    public Vector3 getUnderHeadPivot() {
-        return this.get3dPosition().add(underHeadPivotOffset);
+    public Vector3 getOverHeadPivot() {
+        return this.get3dPosition().add(overHeadPivotOffset);
     }
 
 
@@ -249,7 +249,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public static final float DEFAULT_HEIGHT = 0;
         public static final float DEFAULT_ROTATION = 0;
 
-        public static final float DEFAULT_MASS = 5f;
+        public static final float DEFAULT_MASS = 70f;
 
 
         // physics
@@ -257,7 +257,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public float height = DEFAULT_HEIGHT;
 
         /** Mass of an object in kg */
-        public float mass = 70;
+        public float mass = DEFAULT_MASS;
         /**
          * As far as Shape itself isn't serializable,
          * supplier will be sent instead.
@@ -276,7 +276,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
          */
         public final String modelPath;
         public final Vector3 chestPivotOffset = new Vector3();
-        public final Vector3 underHeadPivotOffset = new Vector3();
+        public final Vector3 overHeadPivotOffset = new Vector3();
         public boolean isSensor = false;
 
 

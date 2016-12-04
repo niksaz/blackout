@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.graphic_effects.ParticleGraphicEffect;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
@@ -17,11 +18,13 @@ import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTO
 
 public final class FireballObject extends AbilityObject {
     private float timeRest;
+    private float damage;
 
 
     protected FireballObject(FireballObject.Definition def, float x, float y) {
         super(def, x, y);
         this.timeRest = def.timeToLive;
+        this.damage = def.damage;
 
         def.particleEffect.ifPresent(effect -> {
             this.graphicEffects.add(new ParticleGraphicEffect(this, effect.copy()));
@@ -31,17 +34,19 @@ public final class FireballObject extends AbilityObject {
 
     @Override
     public void beginContact(GameObject object) {
-        if (this.isDead()) {
-            return;
-        }
-
         super.beginContact(object);
+
         if (object instanceof GameUnit) {
             GameUnit unit = (GameUnit) object;
             // This object is going to dye. So, we don't care about changes of its velocity.
             this.velocity.add(this.body.getLinearVelocity()).scl(IMPULSE_FACTOR);
             unit.applyImpulse(this.velocity);
         }
+
+        if (object instanceof Damageable) {
+            ((Damageable) object).damage(this.damage);
+        }
+
         this.kill();
     }
 
@@ -67,12 +72,12 @@ public final class FireballObject extends AbilityObject {
 
 
         public float timeToLive;
+        public float damage;
         private /*final*/ Optional<ParticleEffect> particleEffect;
 
 
-        public Definition(String modelPath, Creator<Shape> shapeCreator, float mass, float timeToLive) {
+        public Definition(String modelPath, Creator<Shape> shapeCreator, float mass) {
             super(modelPath, shapeCreator, mass);
-            this.timeToLive = timeToLive;
         }
 
         @Override

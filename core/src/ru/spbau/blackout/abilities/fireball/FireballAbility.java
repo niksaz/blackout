@@ -22,14 +22,16 @@ public class FireballAbility extends InstantAbility {
     public static final float IMPULSE_FACTOR = 40f;
 
 
-    private final AbilityObject.Definition shellDef;
+    private final FireballObject.Definition shellDef;
 
 
     public FireballAbility(int level) {
         super(level);
-        this.shellDef = new FireballObject.Definition(null, new CircleCreator(SHELL_RADIUS), SHELL_MASS, TIME_TO_LIVE);
+        this.shellDef = new FireballObject.Definition(null, new CircleCreator(SHELL_RADIUS), SHELL_MASS);
         this.shellDef.chestPivotOffset.set(0, 0, 1.5f);
         this.shellDef.isSensor = true;
+        this.shellDef.timeToLive = TIME_TO_LIVE;
+        this.shellDef.damage = 30f;  // FIXME
     }
 
 

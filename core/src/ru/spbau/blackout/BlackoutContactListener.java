@@ -16,6 +16,10 @@ public class BlackoutContactListener implements ContactListener {
         GameObject first = (GameObject) contact.getFixtureA().getBody().getUserData();
         GameObject second = (GameObject) contact.getFixtureB().getBody().getUserData();
 
+        if (first.isDead() || second.isDead()) {
+            return;
+        }
+
         boolean firstAbility = first instanceof AbilityObject;
         boolean secondAbility = second instanceof AbilityObject;
 
