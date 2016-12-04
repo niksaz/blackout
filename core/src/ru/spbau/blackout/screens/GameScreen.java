@@ -3,6 +3,8 @@ package ru.spbau.blackout.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -24,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -52,10 +55,13 @@ import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 import static ru.spbau.blackout.java8features.Functional.foreach;
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
+
 public class GameScreen extends BlackoutScreen implements GameContext {
+    private static final String BATTLE_MUSIC_DIR_PATH = "music/battle";
+    private static final float BATTLE_MUSIC_MAX_VOLUME = 0.5f;
+
     public static final class CameraDefaults {
-        private CameraDefaults() {
-        }
+        private CameraDefaults() {}
 
         public static final float FIELD_OF_VIEW = 30;
         public static final float X_OFFSET = 0;
@@ -81,6 +87,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private final GameWorld gameWorld = new GameWorld();
     private final AbstractServer server;
     private volatile boolean doneLoading;
+    private final Array<Music> music = new Array<>();
+    private Music currentTrack;
 
 
     public GameScreen(GameSessionSettings sessionSettings, AbstractServer server, GameSettings settings) {
@@ -105,8 +113,23 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         BlackoutGame.get().particleSystem().add(particleBatch);
         ParticleEffectLoader loader = new ParticleEffectLoader(new InternalFileHandleResolver());
         this.assets.setLoader(ParticleEffect.class, loader);
+
+        // initialize music
+        FileHandle battleMusicDir = Gdx.files.internal(BATTLE_MUSIC_DIR_PATH);
+        for (FileHandle file : battleMusicDir.list()) {
+            Music track = Gdx.audio.newMusic(file);
+            track.setVolume(settings.battleMusicVolume * BATTLE_MUSIC_MAX_VOLUME);
+            track.setLooping(false);
+            this.music.add(track);
+        }
+        this.nextTrack();
     }
 
+
+    public void nextTrack() {
+        this.currentTrack = this.music.random();
+        this.currentTrack.play();
+    }
 
     // instance of GameContext
     @Override
@@ -163,6 +186,10 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             modelBatch.end();
         }
 
+        if (!this.currentTrack.isPlaying()) {
+            this.nextTrack();
+        }
+
         this.gameWorld.update(deltaTime);
         this.updateCamera();
         this.ui.update(deltaTime);
@@ -182,6 +209,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         super.dispose();
         this.assets.dispose();
         this.gameWorld.dispose();
+        foreach(this.music, Music::dispose);
     }
 
 
