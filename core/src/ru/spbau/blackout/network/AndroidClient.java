@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -52,9 +53,12 @@ public class AndroidClient implements Runnable, AbstractServer {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
+            datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             out.writeUTF(BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().getPlayerName());
             out.writeInt(datagramSocket.getLocalPort());
             out.flush();
+
+            final int serverDatagramPort = in.readInt();
 
             GameState gameState;
             do {
@@ -97,32 +101,42 @@ public class AndroidClient implements Runnable, AbstractServer {
             }
 
             final Thread outputToServerThread = new Thread(() -> {
-                try {
-                    while (!isInterrupted) {
-                        if (velocityToSend.get() != null) {
-                            final Vector2 sending = velocityToSend.getAndSet(null);
-                            out.writeObject(sending);
-                            out.flush();
-                        } else {
-                            synchronized (velocityToSend) {
-                                if (velocityToSend.get() == null) {
-                                    try {
-                                        // setting timeout because if client not responding in SOCKET_IO_TIMEOUT_MS
-                                        // he will be disconnected
-                                        velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 2);
-                                        if (velocityToSend.get() == null) {
-                                            velocityToSend.set(new Vector2());
-                                        }
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
+                final DatagramPacket velocityDatagram =
+                        new DatagramPacket(new byte[0], 0, socket.getInetAddress(), serverDatagramPort);
+
+                while (!isInterrupted) {
+                    if (velocityToSend.get() != null) {
+                        try (
+                            ByteArrayOutputStream velocityByteStream =
+                                    new ByteArrayOutputStream(Network.DATAGRAM_VELOCITY_PACKET_SIZE);
+                            ObjectOutputStream velocityObjectStream = new ObjectOutputStream(velocityByteStream)
+                        ) {
+                            velocityObjectStream.writeObject(velocityToSend.getAndSet(null));
+                            velocityObjectStream.flush();
+                            final byte[] byteArray = velocityByteStream.toByteArray();
+                            velocityDatagram.setData(byteArray);
+                            velocityDatagram.setLength(byteArray.length);
+                            datagramSocket.send(velocityDatagram);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            isInterrupted = true;
+                        }
+                    } else {
+                        synchronized (velocityToSend) {
+                            if (velocityToSend.get() == null) {
+                                try {
+                                    // setting timeout because if client not responding in SOCKET_IO_TIMEOUT_MS
+                                    // he will be disconnected
+                                    velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 2);
+                                    if (velocityToSend.get() == null) {
+                                        velocityToSend.set(new Vector2());
                                     }
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
                                 }
                             }
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    isInterrupted = true;
                 }
             });
             outputToServerThread.start();
@@ -136,9 +150,6 @@ public class AndroidClient implements Runnable, AbstractServer {
                 final ObjectInputStream serverWorldStream =
                         new ObjectInputStream(new ByteArrayInputStream(receivedPacket.getData()));
                 currentWorld.setExternalWorldStream(serverWorldStream);
-
-                // should get worlds regularly after the first one
-                datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             }
         } catch (UnknownHostException e) {
             Gdx.app.log(TAG, "Don't know about host " + Network.SERVER_IP_ADDRESS);

@@ -2,6 +2,7 @@ package ru.spbau.blackout.server;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -46,9 +47,13 @@ class ClientThread extends Thread {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
+            datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             name = in.readUTF();
             final int clientDatagramPort = in.readInt();
             server.log(name + " connected.");
+
+            out.writeInt(datagramSocket.getLocalPort());
+            out.flush();
 
             do {
                 final Game game = this.game;
@@ -89,15 +94,20 @@ class ClientThread extends Thread {
             } while (clientGameState == GameState.WAITING);
 
             final Thread clientInputThread = new Thread(() -> {
-                do {
-                    try {
-                        final Vector2 velocity = (Vector2) in.readObject();
+                final byte[] buffer = new byte[Network.DATAGRAM_VELOCITY_PACKET_SIZE];
+                final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
+                try {
+                    while (clientGameState != GameState.FINISHED) {
+                        datagramSocket.receive(receivedPacket);
+                        final ObjectInputStream clientsVelocityStream =
+                                new ObjectInputStream(new ByteArrayInputStream(receivedPacket.getData()));
+                        final Vector2 velocity = (Vector2) clientsVelocityStream.readObject();
                         velocityFromClient.set(velocity);
-                    } catch (ClassNotFoundException | IOException e) {
-                        e.printStackTrace();
-                        clientGameState = GameState.FINISHED;
                     }
-                } while (clientGameState != GameState.FINISHED);
+                } catch (ClassNotFoundException | IOException e) {
+                    e.printStackTrace();
+                    clientGameState = GameState.FINISHED;
+                }
             });
             clientInputThread.start();
 
