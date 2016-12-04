@@ -1,4 +1,4 @@
-package ru.spbau.blackout.gamesession;
+package ru.spbau.blackout.game_session;
 
 import java.util.ArrayList;
 import java.util.List;

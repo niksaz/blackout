@@ -12,7 +12,7 @@ import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
-import ru.spbau.blackout.gamesession.TestingSessionSettings;
+import ru.spbau.blackout.game_session.TestingSessionSettings;
 
 import static ru.spbau.blackout.network.Network.FRAMES_60_SLEEP_MS;
 

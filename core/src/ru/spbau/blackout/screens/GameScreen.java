@@ -37,7 +37,7 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AbstractServer;
-import ru.spbau.blackout.gamesession.GameSessionSettings;
+import ru.spbau.blackout.game_session.GameSessionSettings;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.units.Vpx;
@@ -335,6 +335,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             for (GameObject.Definition def : objectDefs) {
                 def.doneLoading(GameScreen.this);
                 GameObject obj = def.makeInstance();
+
                 if (def == characterDef) {
                     character = (Character) obj;
                 }

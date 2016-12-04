@@ -15,7 +15,7 @@ public class Character extends GameUnit {
     }
 
 
-    public static class Definition extends GameUnit.Definition implements Serializable {
+    public static class Definition extends GameUnit.Definition {
         public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY,
                           Ability[] abilities) {
             super(modelPath, shapeCreator, initialX, initialY, abilities);

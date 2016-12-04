@@ -11,7 +11,7 @@ import ru.spbau.blackout.utils.Textures;
 
 
 // I know that libgdx has its own API for progress bars, but this one is much better in some cases.
-// Also it's adapted for the project (project-specific methods like load and doneLoading).
+// Also it's adapted for the project (project-specific methods like load and initialize).
 /**
  * Provides easy and powerful API for creating progress bars.
  */
@@ -41,7 +41,11 @@ public abstract class SimpleProgressBar extends Actor {
     }
 
 
-    public void load(AssetManager assets) {
+    /**
+     * Loads textures.
+     * One can don't call this function if textures are already loaded.
+     */
+    public final void load(AssetManager assets) {
         Textures.loadMipMapAA(this.fullTexturePath, assets);
         Textures.loadMipMapAA(this.emptyTexturePath, assets);
     }

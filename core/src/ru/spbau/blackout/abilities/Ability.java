@@ -14,7 +14,7 @@ public abstract class Ability {
     private final int level;
     private float chargeTime;
 
-    private GameUnit unit;
+    private /*final*/ GameUnit unit;
 
     public Ability(int level) {
         this.level = level;
@@ -31,11 +31,13 @@ public abstract class Ability {
             assets.load(this.iconPath(), Texture.class)
         );
     }
+
+    public void doneLoading(GameContext context) {}
+
     /**
-     * When assets are loaded.
-     * Must be called once from <code>GameUnit::update</code>.
+     * Must be called exactly once from <code>GameUnit::new</code>.
      */
-    public void doneLoading(GameContext context, GameUnit unit) {
+    public void initialize(GameUnit unit) {
         this.unit = unit;
     }
 

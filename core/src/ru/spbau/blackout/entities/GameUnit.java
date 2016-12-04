@@ -11,12 +11,14 @@ import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Utils;
 
+import static ru.spbau.blackout.java8features.Functional.foreach;
+
 
 /**
  * Unit is a dynamic object which can move by itself and cast abilities.
  * Also it has friction.
  */
-public abstract class GameUnit extends DynamicObject {
+public abstract class GameUnit extends DynamicObject implements Damageable {
     /** Constant holder class to provide names for animations. */
     public static class Animations extends DynamicObject.Animations {
         protected Animations() {}
@@ -29,10 +31,11 @@ public abstract class GameUnit extends DynamicObject {
     public static final float LINEAR_FRICTION = 0.002f;
 
 
-    // Movement:
     private final Vector2 selfVelocity = new Vector2();
     private float speed;
     transient private final Ability[] abilities;
+    private float health;
+    private float maxHealth;
 
 
     protected GameUnit(Definition def, float x, float y, GameContext context) {
@@ -42,7 +45,7 @@ public abstract class GameUnit extends DynamicObject {
         this.abilities = def.abilities;
 
         for (Ability ability : abilities) {
-            ability.doneLoading(context, this);
+            ability.initialize(this);
         }
     }
 
@@ -99,6 +102,20 @@ public abstract class GameUnit extends DynamicObject {
     }
 
 
+    @Override
+    public void damage(float damage) {
+        this.health -= damage;
+        if (this.health <= 0) {
+            this.kill();
+        }
+    }
+
+    @Override
+    public float getHealth() { return this.health; }
+
+    public float getMaxHealth() { return this.maxHealth; }
+
+
     public void setSelfVelocity(Vector2 newVelocity) {
         if (Utils.isZeroVec(newVelocity)) {
             // on stop walking
@@ -141,6 +158,14 @@ public abstract class GameUnit extends DynamicObject {
             super.load(context);
             for (Ability ability : abilities) {
                 ability.load(context);
+            }
+        }
+
+        @Override
+        public void doneLoading(GameContext context) {
+            super.doneLoading(context);
+            for (Ability ability : abilities) {
+                ability.doneLoading(context);
             }
         }
     }

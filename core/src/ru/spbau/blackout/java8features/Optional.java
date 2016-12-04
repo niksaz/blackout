@@ -1,6 +1,6 @@
 package ru.spbau.blackout.java8features;
 
-public class Optional<T> {
+public final class Optional<T> {
     T value;
 
 

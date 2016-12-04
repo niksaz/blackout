@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
 import com.badlogic.gdx.physics.box2d.Box2D;
 
@@ -12,7 +13,7 @@ import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.network.IdleServer;
 import ru.spbau.blackout.play.services.PlayServices;
 import ru.spbau.blackout.play.services.PlayServicesInCore;
-import ru.spbau.blackout.gamesession.TestingSessionSettings;
+import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
 import ru.spbau.blackout.settings.GameSettings;
@@ -52,12 +53,14 @@ public class BlackoutGame extends Game {
     private /*final*/ BlackoutAssets assets;
     private /*final*/ ParticleSystem particleSystem;
 
+
     private BlackoutGame(ScreenManager screenManager) {
         this.screenManager = screenManager;
     }
 
-
     public static BlackoutGame get() { return SingletonHolder.INSTANCE; }
+
+
     public ModelBatch modelBatch() { return this.modelBatch; }
     public SpriteBatch spriteBatch() { return this.spriteBatch; }
     public ScreenManager screenManager() { return this.screenManager; }

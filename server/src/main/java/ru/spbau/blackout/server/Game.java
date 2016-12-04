@@ -68,7 +68,7 @@ class Game extends Thread {
 //
 //        gameWorld = new GameWorld();
 //        for (GameObject.Definition def : room.getObjectDefs()) {
-//            def.doneLoading();
+//            def.initialize();
 //            def.makeInstance(null, gameWorld);
 //        }
 //

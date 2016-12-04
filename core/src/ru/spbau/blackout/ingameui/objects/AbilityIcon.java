@@ -20,7 +20,7 @@ import static ru.spbau.blackout.utils.Utils.EMPTY_TEXTURE_PATH;
 import static ru.spbau.blackout.utils.Utils.floatEq;
 
 public class AbilityIcon extends IngameUIObject {
-    // fields marked as /*final*/ must be assigned only once inside doneLoading method.
+    // fields marked as /*final*/ must be assigned only once inside initialize method.
 
     public static final String FULL_TEXTURE_PATH = "images/ability_cell/full.png";
     public static final String CHARGED_TEXTURE_PATH = "images/ability_cell/charged.png";

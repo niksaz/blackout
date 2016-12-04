@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameWorld;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.gamesession.TestingSessionSettings;
+import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.screens.GameScreen;

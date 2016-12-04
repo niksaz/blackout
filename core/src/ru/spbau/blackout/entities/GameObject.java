@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -17,7 +16,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.effects.GameEffect;
+import ru.spbau.blackout.graphic_effects.GraphicEffect;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.InplaceSerializable;
@@ -39,7 +38,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
     /** Equals to Optional.empty() on a server or if the object is dead. */
     transient protected Optional<ModelInstance> model;
-    transient protected final Array<GameEffect> effects = new Array<>();
+    transient public final Array<GraphicEffect> graphicEffects = new Array<>();
 
     private boolean dead = false;
     private final float pivotHeight;
@@ -99,7 +98,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
      * Update things not connected with physics. See <code>GameWorld</code> documentation.
      */
     public void updateState(float deltaTime) {
-        for (GameEffect effect : this.effects) {
+        for (GraphicEffect effect : this.graphicEffects) {
             effect.update(deltaTime);
         }
     }
@@ -140,11 +139,11 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     public boolean isDead() { return this.dead; }
 
     /**
-     * Disposes all non-shared resources (like effects).
+     * Disposes all non-shared resources (like graphicEffects).
      * Shared resources (like models) will be disposed by AssetManager.
      */
     public void dispose() {
-        for (GameEffect effect : this.effects) {
+        for (GraphicEffect effect : this.graphicEffects) {
             effect.dispose();
         }
     }
@@ -228,7 +227,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
      * <p>Life cycle:
      * <br>constructor (once)
      * <br>load (once)
-     * <br>doneLoading (once)
+     * <br>initialize (once)
      * <br>makeInstance (Any number of calls)
      */
     public static abstract class Definition implements Serializable {
@@ -251,14 +250,14 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public Creator<Shape> shapeCreator;
         public final Vector2 position = new Vector2();
 
-        /** The loaded model object. Initialized by <code>doneLoading</code> method. */
+        /** The loaded model object. Initialized by <code>initialize</code> method. */
         private transient Optional<Model> model;
         /** Saving context is necessary in order to be able to make instances. */
         private transient GameContext context;
 
         /**
          * Path to the model for game objects. May be null. In this case objects will not have models.
-         * Must be final due to possible problems if this variable changed between calls of `load` and `doneLoading`.
+         * Must be final due to possible problems if this variable changed between calls of `load` and `initialize`.
          */
         public final String modelPath;
         public float pivotHeight = 0;

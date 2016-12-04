@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.effects.ParticleGameEffect;
+import ru.spbau.blackout.graphic_effects.ParticleGraphicEffect;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
@@ -23,13 +23,18 @@ public final class FireballObject extends AbilityObject {
         super(def, x, y);
         this.timeRest = def.timeToLive;
 
-        ParticleGameEffect effect = new ParticleGameEffect(this, def.particleEffect.map(ParticleEffect::copy));
-        this.effects.add(effect);
+        def.particleEffect.ifPresent(effect -> {
+            this.graphicEffects.add(new ParticleGraphicEffect(this, effect.copy()));
+        });
     }
 
 
     @Override
     public void beginContact(GameObject object) {
+        if (this.isDead()) {
+            return;
+        }
+
         super.beginContact(object);
         if (object instanceof GameUnit) {
             GameUnit unit = (GameUnit) object;
