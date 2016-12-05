@@ -20,16 +20,12 @@ class RoomServer {
     private final int port;
     private final Deque<ClientThread> clientThreads = new ConcurrentLinkedDeque<>();
     private final AtomicInteger playersNumber = new AtomicInteger();
+    private int gamesCreated;
 
-     RoomServer(int port) {
+    RoomServer(int port) {
         this.port = port;
     }
 
-    int getPlayersNumber() {
-        return playersNumber.get();
-    }
-
-    @SuppressWarnings("InfiniteLoopStatement")
     void run() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             do {
@@ -47,18 +43,6 @@ class RoomServer {
         }
     }
 
-    private synchronized void maybePlayGame(int playersForGame) {
-        if (playersNumber.get() >= playersForGame) {
-            playersNumber.addAndGet(-playersForGame);
-            final List<ClientThread> clients = new ArrayList<>(playersForGame);
-            for (int playerIndex = 0; playerIndex < playersForGame; playerIndex++) {
-                clients.add(clientThreads.removeFirst());
-            }
-            final Thread game = new Game(this, clients);
-            game.start();
-        }
-    }
-
     void discard(ClientThread clientThread) {
         playersNumber.decrementAndGet();
         clientThreads.remove(clientThread);
@@ -68,6 +52,18 @@ class RoomServer {
     void log(String message) {
         synchronized (System.out) {
             System.out.println(message);
+        }
+    }
+
+    private synchronized void maybePlayGame(int playersForGame) {
+        if (playersNumber.get() >= playersForGame) {
+            playersNumber.addAndGet(-playersForGame);
+            final List<ClientThread> clients = new ArrayList<>(playersForGame);
+            for (int playerIndex = 0; playerIndex < playersForGame; playerIndex++) {
+                clients.add(clientThreads.removeFirst());
+            }
+            final Thread newGameThread = new Game(this, clients, gamesCreated++);
+            newGameThread.start();
         }
     }
 }
