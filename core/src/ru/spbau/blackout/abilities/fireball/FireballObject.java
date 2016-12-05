@@ -103,7 +103,6 @@ public final class FireballObject extends AbilityObject {
         public void doneLoading(GameContext context) {
             super.doneLoading(context);
             this.fireEffect = Particles.getOriginal(FIRE_EFFECT_PATH, context);
-//            this.explosionEffect = Particles.getOriginal(EXPLOSION_EFFECT_PATH, context);
         }
 
         @Override
