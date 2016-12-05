@@ -176,10 +176,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+        BlackoutGame game = BlackoutGame.get();
+
         // model batch rendering
         {
-            ModelBatch modelBatch = BlackoutGame.get().modelBatch();
-            ParticleSystem particleSystem = BlackoutGame.get().particleSystem();
+            ModelBatch modelBatch = game.modelBatch();
+            ParticleSystem particleSystem = game.particleSystem();
 
             modelBatch.begin(this.camera);
 
@@ -196,12 +198,19 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             modelBatch.end();
         }
 
+        // special effects
+        game.specialEffects().update(deltaTime);
+
+        // music
         if (!this.currentTrack.isPlaying()) {
             this.switchTrack();
         }
 
+        // world
         this.gameWorld.update(deltaTime);
         this.updateCamera();
+
+        // ui
         this.ui.update(deltaTime);
         this.ui.draw();
     }

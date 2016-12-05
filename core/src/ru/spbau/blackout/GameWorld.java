@@ -37,7 +37,7 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  * <br>The first step is when external velocity is processed. In <code>updateForFirstStep</code> method
  * each object must set its external velocity as its body's velocity.
  *
- * <br>In <code>updateForSecondStep</code> method each object must get its new external velocity from
+ * <br>In <code>updateForSecondStep</code> method each object must getOriginal its new external velocity from
  * its body's velocity and then it must put its own velocity (just like <code>selfVelocity</code> of GameUnit) instead.
  * The resulting velocity of the second step isn't important.
  *

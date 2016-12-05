@@ -72,8 +72,8 @@ class Game extends Thread {
 //            def.makeInstance(null, gameWorld);
 //        }
 //
-//        clients.get(0).setSessionSettings(room, (Character.Definition)room.objectDefs.get(0));
-//        clients.get(1).setSessionSettings(room, (Character.Definition)room.objectDefs.get(1));
+//        clients.getOriginal(0).setSessionSettings(room, (Character.Definition)room.objectDefs.getOriginal(0));
+//        clients.getOriginal(1).setSessionSettings(room, (Character.Definition)room.objectDefs.getOriginal(1));
 
         // !!!!!!!
 
@@ -109,7 +109,7 @@ class Game extends Thread {
 //                    break;
 //                }
 //            }
-//        } while (gameState.get() != GameState.FINISHED);
+//        } while (gameState.getOriginal() != GameState.FINISHED);
     }
 
     public void setVelocityFor(int numberInArray, Vector2 newVelocity) {

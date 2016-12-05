@@ -7,6 +7,11 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
 import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.utils.Array;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
@@ -17,6 +22,8 @@ import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
 import ru.spbau.blackout.settings.GameSettings;
+import ru.spbau.blackout.special_effects.SpecialEffect;
+import ru.spbau.blackout.special_effects.SpecialEffectsSystem;
 import ru.spbau.blackout.utils.BlackoutAssets;
 import ru.spbau.blackout.utils.ScreenManager;
 
@@ -52,6 +59,7 @@ public class BlackoutGame extends Game {
     private /*final*/ SpriteBatch spriteBatch;
     private /*final*/ BlackoutAssets assets;
     private /*final*/ ParticleSystem particleSystem;
+    private final SpecialEffectsSystem specialEffects = new SpecialEffectsSystem();
 
 
     private BlackoutGame(ScreenManager screenManager) {
@@ -67,6 +75,7 @@ public class BlackoutGame extends Game {
     public PlayServicesInCore playServicesInCore() { return this.playServicesInCore; }
     public BlackoutAssets assets() { return this.assets; }
     public ParticleSystem particleSystem() { return this.particleSystem; }
+    public SpecialEffectsSystem specialEffects() { return this.specialEffects; }
 
 
 	// FIXME:  just for test

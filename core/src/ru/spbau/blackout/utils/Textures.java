@@ -12,7 +12,7 @@ public class Textures {
      * Parameters for loading textures with mipmap and antialiasing.
      *
      * <p>For some mystic reasons, sometimes loading with mipmap is necessary
-     * in order to get a good antialiasing.
+     * in order to getOriginal a good antialiasing.
      */
     public static final TextureParameter PARAMETER_MIP_MAP_AA = new TextureParameter();
     static {
@@ -25,7 +25,7 @@ public class Textures {
      * Parameters for loading textures without mipmap and with antialiasing.
      *
      * <p>For some mystic reasons, sometimes loading with mipmap is necessary
-     * in order to get a good antialiasing.
+     * in order to getOriginal a good antialiasing.
      */
     public static final TextureParameter PARAMETER_AA = new TextureParameter();
     static {
@@ -39,7 +39,7 @@ public class Textures {
      * Use this function to load textures with mipmap and antialiasing.
      *
      * <p>For some mystic reasons, sometimes loading with mipmap is necessary
-     * in order to get a good antialiasing.
+     * in order to getOriginal a good antialiasing.
      */
     public static void loadMipMapAA(String name, AssetManager assets) {
         assets.load(name, Texture.class, PARAMETER_MIP_MAP_AA);
@@ -49,7 +49,7 @@ public class Textures {
      * Use this function to load textures with mipmap and with antialiasing.
      *
      * <p>For some mystic reasons, sometimes loading with mipmap is necessary
-     * in order to get a good antialiasing.
+     * in order to getOriginal a good antialiasing.
      */
     public static void loadAA(String name, AssetManager assets) {
         assets.load(name, Texture.class, PARAMETER_AA);

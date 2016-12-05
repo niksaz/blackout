@@ -30,7 +30,7 @@ public final class Optional<T> {
 
     public T get() {
         if (!this.isPresent()) {
-            throw new IllegalStateException("emptyOptional.get()");
+            throw new IllegalStateException("emptyOptional.getOriginal()");
         }
         return value;
     }

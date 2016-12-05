@@ -10,23 +10,28 @@ import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.java8features.Optional;
+import ru.spbau.blackout.special_effects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
 
+import static ru.spbau.blackout.abilities.fireball.FireballAbility.EXPLOSION_EFFECT_PATH;
+import static ru.spbau.blackout.abilities.fireball.FireballAbility.FIRE_EFFECT_PATH;
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTOR;
 
 
 public final class FireballObject extends AbilityObject {
     private float timeRest;
-    private float damage;
+    private final float damage;
+    private final Optional<ParticleEffect> explosionEffect;
 
 
     protected FireballObject(FireballObject.Definition def, float x, float y) {
         super(def, x, y);
         this.timeRest = def.timeToLive;
         this.damage = def.damage;
+        this.explosionEffect = def.explosionEffect;
 
-        def.particleEffect.ifPresent(effect -> {
+        def.fireEffect.ifPresent(effect -> {
             this.graphicEffects.add(new ParticleGraphicEffect(this, effect.copy()));
         });
     }
@@ -50,6 +55,16 @@ public final class FireballObject extends AbilityObject {
         this.kill();
     }
 
+
+    @Override
+    public void kill() {
+        super.kill();
+        this.explosionEffect.ifPresent(effect -> {
+            ParticleSpecialEffect.create(effect.copy(), this.getPosition());
+        });
+    }
+
+
     @Override
     public void updateState(float deltaTime) {
         super.updateState(deltaTime);
@@ -68,12 +83,10 @@ public final class FireballObject extends AbilityObject {
      * Additionally defines timeToLive for an object.
      */
     public static class Definition extends AbilityObject.Definition {
-        public static final String PARTICLES_PATH = "abilities/fireball/particles/fireball.pfx";
-
-
         public float timeToLive;
         public float damage;
-        private /*final*/ Optional<ParticleEffect> particleEffect;
+        private /*final*/ transient Optional<ParticleEffect> fireEffect;
+        private /*final*/ transient Optional<ParticleEffect> explosionEffect;
 
 
         public Definition(String modelPath, Creator<Shape> shapeCreator, float mass) {
@@ -83,13 +96,15 @@ public final class FireballObject extends AbilityObject {
         @Override
         public void load(GameContext context) {
             super.load(context);
-            Particles.load(PARTICLES_PATH, context);
+            Particles.load(FIRE_EFFECT_PATH, context);
+            Particles.load(EXPLOSION_EFFECT_PATH, context);
         }
 
         @Override
         public void doneLoading(GameContext context) {
             super.doneLoading(context);
-            this.particleEffect = Particles.get(PARTICLES_PATH, context);
+            this.fireEffect = Particles.getOriginal(FIRE_EFFECT_PATH, context);
+            this.explosionEffect = Particles.getOriginal(EXPLOSION_EFFECT_PATH, context);
         }
 
         @Override

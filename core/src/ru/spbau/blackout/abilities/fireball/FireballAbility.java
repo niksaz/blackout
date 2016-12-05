@@ -21,6 +21,9 @@ public class FireballAbility extends InstantAbility {
     public static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;
     public static final float IMPULSE_FACTOR = 40f;
 
+    public static final String FIRE_EFFECT_PATH = "abilities/fireball/particles/fireball.pfx";
+    public static final String EXPLOSION_EFFECT_PATH = "effects/small_explosion/small_explosion.pfx";
+
 
     private final FireballObject.Definition shellDef;
 
@@ -48,7 +51,6 @@ public class FireballAbility extends InstantAbility {
     public void load(GameContext context) {
         super.load(context);
         this.shellDef.load(context);
-
     }
 
     @Override

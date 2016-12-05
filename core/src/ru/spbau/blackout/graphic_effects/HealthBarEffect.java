@@ -12,7 +12,7 @@ import ru.spbau.blackout.units.Vpx;
  * A small red health bar under the head of the unit.
  * This effect needs to be loaded.
  */
-public class HealthBarEffect extends GraphicEffect {
+public class HealthBarEffect implements GraphicEffect {
     private final GameUnit unit;
     private final SimpleProgressBar healthBar;
     private final Camera camera;
@@ -26,7 +26,6 @@ public class HealthBarEffect extends GraphicEffect {
 
     @Override
     public void update(float deltaTime) {
-        super.update(deltaTime);
         this.healthBar.setValue(this.unit.getHealth() / this.unit.getMaxHealth());
 
         Vector3 realPos = camera.project(this.unit.getOverHeadPivot());
@@ -39,7 +38,6 @@ public class HealthBarEffect extends GraphicEffect {
 
     @Override
     public void remove() {
-        super.remove();
         this.healthBar.remove();
     }
 }

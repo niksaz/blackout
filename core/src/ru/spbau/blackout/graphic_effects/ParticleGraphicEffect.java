@@ -10,7 +10,7 @@ import ru.spbau.blackout.entities.GameObject;
 /**
  * <code>GraphicEffect</code> which attaches a <code>ParticleEffect</code> to an object.
  */
-public class ParticleGraphicEffect extends GraphicEffect {
+public class ParticleGraphicEffect implements GraphicEffect {
     private ParticleEffect effect;
     private final Matrix4 tmpMatrix = new Matrix4();
     private final GameObject object;
@@ -38,7 +38,6 @@ public class ParticleGraphicEffect extends GraphicEffect {
 
     @Override
     public void remove() {
-        super.remove();
         BlackoutGame.get().particleSystem().remove(this.effect);
         this.effect.dispose();
     }

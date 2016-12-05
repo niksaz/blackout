@@ -31,9 +31,18 @@ public final class Particles {
     }
 
     /**
-     * Returns a copy of the particle effect. One must remove it by themselves.
+     * Returns the original of the particle effect.
+     * One must not call any modifying methods like <code>init</code> and <code>translate</code>.
      */
-    public static Optional<ParticleEffect> get(String path, GameContext context) {
-        return context.assets().map(assets -> assets.get(path, ParticleEffect.class)/*.copy()*/);
+    public static Optional<ParticleEffect> getOriginal(String path, GameContext context) {
+        return context.assets().map(assets -> assets.get(path, ParticleEffect.class));
+    }
+
+    /**
+     * Returns a copy of the particle effect.
+     * One must <code>dispose</code> after usage.
+     */
+    public static Optional<ParticleEffect> getCopy(String path, GameContext context) {
+        return context.assets().map(assets -> assets.get(path, ParticleEffect.class).copy());
     }
 }

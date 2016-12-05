@@ -37,7 +37,7 @@ public final class AbilityIcon extends IngameUIObject {
     private final AbstractServer server;  // TODO: use it
 
 
-    // I have to get unitDef here in order to get its abilityIcons
+    // I have to getOriginal unitDef here in order to getOriginal its abilityIcons
     public AbilityIcon(AbstractServer server, AbilityIconSettings settings) {
         this.server = server;
         this.settings = settings;
@@ -56,7 +56,7 @@ public final class AbilityIcon extends IngameUIObject {
 
         // Charged cell image
         Image ready = new Image(assets.get(CHARGED_TEXTURE_PATH, Texture.class));
-//        Image ready = new Image(Utils.addAntiAliasing(assets.get(CHARGED_TEXTURE_PATH, Texture.class)));
+//        Image ready = new Image(Utils.addAntiAliasing(assets.getOriginal(CHARGED_TEXTURE_PATH, Texture.class)));
         ready.setSize(CELL_SIZE, CELL_SIZE);
         ready.setPosition(settings.getStart().x, settings.getStart().y);
         ready.setZIndex(0);
