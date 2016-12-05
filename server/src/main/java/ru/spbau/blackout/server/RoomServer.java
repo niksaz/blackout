@@ -1,6 +1,7 @@
 package ru.spbau.blackout.server;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -15,15 +16,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 class RoomServer {
 
-    private static final int PLAYERS_NUMBER = 2;
+    private static final int PLAYERS_NUMBER_OT_START_GAME = 2;
 
     private final int port;
+    private final PrintStream logger;
     private final Deque<ClientThread> clientThreads = new ConcurrentLinkedDeque<>();
     private final AtomicInteger playersNumber = new AtomicInteger();
     private int gamesCreated;
 
-    RoomServer(int port) {
+    RoomServer(int port, PrintStream logger) {
         this.port = port;
+        this.logger = logger;
     }
 
     void run() {
@@ -35,7 +38,7 @@ class RoomServer {
                 clientThreads.add(nextThread);
                 playersNumber.addAndGet(1);
                 nextThread.start();
-                maybePlayGame(PLAYERS_NUMBER);
+                maybePlayGame(PLAYERS_NUMBER_OT_START_GAME);
             } while (true);
         } catch (IOException e) {
             log("Exception caught when trying to listen on port " + port +
@@ -49,9 +52,9 @@ class RoomServer {
         log("Client named " + clientThread.getClientName() + " disconnected.");
     }
 
-    void log(String message) {
-        synchronized (System.out) {
-            System.out.println(message);
+    void log(String logMessage) {
+        synchronized (logger) {
+            logger.println(logMessage);
         }
     }
 
