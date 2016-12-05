@@ -122,12 +122,22 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             track.setLooping(false);
             this.music.add(track);
         }
-        this.nextTrack();
+        this.switchTrack();
     }
 
 
-    public void nextTrack() {
-        this.currentTrack = this.music.random();
+    /**
+     * Switches current music track to a random one which isn't equal to the current.
+     */
+    public void switchTrack() {
+        if (this.currentTrack != null) {
+            this.currentTrack.stop();
+        }
+
+        Music oldTrack = this.currentTrack;
+        while (this.currentTrack == oldTrack) {
+            this.currentTrack = this.music.random();
+        }
         this.currentTrack.play();
     }
 
@@ -187,7 +197,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         }
 
         if (!this.currentTrack.isPlaying()) {
-            this.nextTrack();
+            this.switchTrack();
         }
 
         this.gameWorld.update(deltaTime);
