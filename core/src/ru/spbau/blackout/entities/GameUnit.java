@@ -38,7 +38,7 @@ public abstract class GameUnit extends DynamicObject implements Damageable {
     private float maxHealth;
 
 
-    protected GameUnit(Definition def, float x, float y, GameContext context) {
+    protected GameUnit(Definition def, float x, float y) {
         super(def, x, y);
         this.speed = def.speed;
         this.animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
@@ -160,18 +160,18 @@ public abstract class GameUnit extends DynamicObject implements Damageable {
 
 
         @Override
-        public void load(GameContext context) {
-            super.load(context);
+        public void load() {
+            super.load();
             for (Ability ability : abilities) {
-                ability.load(context);
+                ability.load();
             }
         }
 
         @Override
-        public void doneLoading(GameContext context) {
-            super.doneLoading(context);
+        public void doneLoading() {
+            super.doneLoading();
             for (Ability ability : abilities) {
-                ability.doneLoading(context);
+                ability.doneLoading();
             }
         }
     }

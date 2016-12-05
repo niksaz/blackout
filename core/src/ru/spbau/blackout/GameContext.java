@@ -11,6 +11,16 @@ import ru.spbau.blackout.java8features.Optional;
  * Some getters return optional values. It means that those values don't exist on server.
  */
 public interface GameContext {
-    Optional<AssetManager> assets();
+    // TODO: comments
+    boolean hasGraphics();
+    /*FIXME: use annotation nullable*/ AssetManager getAssets();
     GameWorld gameWorld();
+
+    default Optional<AssetManager> assets() {
+        if (this.hasGraphics()) {
+            return Optional.of(this.getAssets());
+        } else {
+            return Optional.empty();
+        }
+    }
 }

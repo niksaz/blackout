@@ -48,15 +48,15 @@ public class FireballAbility extends InstantAbility {
     }
 
     @Override
-    public void load(GameContext context) {
-        super.load(context);
-        this.shellDef.load(context);
+    public void load() {
+        super.load();
+        this.shellDef.load();
     }
 
     @Override
-    public void doneLoading(GameContext context) {
-        super.doneLoading(context);
-        this.shellDef.doneLoading(context);
+    public void doneLoading() {
+        super.doneLoading();
+        this.shellDef.doneLoading();
     }
 
     @Override

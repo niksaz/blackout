@@ -1,5 +1,6 @@
 package ru.spbau.blackout.utils;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 
 
@@ -13,25 +14,25 @@ import static com.badlogic.gdx.graphics.g3d.particles.ParticleEffectLoader.Parti
 public final class Particles {
     private Particles() {}
 
-    public static void load(String path, GameContext context) {
+    public static void load(String path) {
         ParticleEffectLoadParameter param =
                 new ParticleEffectLoadParameter(BlackoutGame.get().particleSystem().getBatches());
-        context.assets().ifPresent(assets -> assets.load(path, ParticleEffect.class, param));
+        BlackoutGame.get().context().getAssets().load(path, ParticleEffect.class, param);
     }
 
     /**
      * Returns the original of the particle effect.
      * One must not call any modifying methods like <code>init</code> and <code>translate</code>.
      */
-    public static Optional<ParticleEffect> getOriginal(String path, GameContext context) {
-        return context.assets().map(assets -> assets.get(path, ParticleEffect.class));
+    public static Optional<ParticleEffect> getOriginal(String path) {
+        return BlackoutGame.get().context().assets().map(assets -> assets.get(path, ParticleEffect.class));
     }
 
     /**
      * Returns a copy of the particle effect.
      * One must <code>dispose</code> after usage.
      */
-    public static Optional<ParticleEffect> getCopy(String path, GameContext context) {
-        return context.assets().map(assets -> assets.get(path, ParticleEffect.class).copy());
+    public static Optional<ParticleEffect> getCopy(String path) {
+        return BlackoutGame.get().context().assets().map(assets -> assets.get(path, ParticleEffect.class).copy());
     }
 }

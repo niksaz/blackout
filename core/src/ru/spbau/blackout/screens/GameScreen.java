@@ -41,7 +41,6 @@ import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.graphic_effects.GraphicEffect;
 import ru.spbau.blackout.graphic_effects.HealthBarEffect;
 import ru.spbau.blackout.ingameui.IngameUI;
-import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.game_session.GameSessionSettings;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
@@ -92,6 +91,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
 
     public GameScreen(GameSessionSettings sessionSettings, AbstractServer server, GameSettings settings) {
+        BlackoutGame.get().setContext(this);
+
         this.server = server;
         this.loadingScreen = new LoadingScreen(sessionSettings);
         this.ui = new IngameUI(this.getServer(), settings.ui);
@@ -141,10 +142,15 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         this.currentTrack.play();
     }
 
+    @Override
+    public boolean hasGraphics() {
+        return true;
+    }
+
     // instance of GameContext
     @Override
-    public Optional<AssetManager> assets() {
-        return Optional.of(this.assets);
+    public AssetManager getAssets() {
+        return this.assets;
     }
 
     @Override
@@ -377,7 +383,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         private void loadRealResources() {
             ui.load(assets);
-            foreach(this.objectDefs, def -> def.load(GameScreen.this));
+            foreach(this.objectDefs, def -> def.load());
             assets.load(this.mapPath, Model.class);
             this.commonHealthBar.load(assets);
         }
@@ -386,7 +392,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             this.commonHealthBar.doneLoading(assets);
 
             for (GameObject.Definition def : objectDefs) {
-                def.doneLoading(GameScreen.this);
+                def.doneLoading();
                 GameObject obj = def.makeInstance();
 
                 if (def == characterDef) {

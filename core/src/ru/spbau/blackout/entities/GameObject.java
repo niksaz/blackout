@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
+import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphic_effects.GraphicEffect;
 import ru.spbau.blackout.java8features.Optional;
@@ -267,8 +268,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
         /** The loaded model object. Initialized by <code>initialize</code> method. */
         private transient Optional<Model> model;
-        /** Saving context is necessary in order to be able to make instances. */
-        private transient GameContext context;
 
         /**
          * Path to the model for game objects. May be null. In this case objects will not have models.
@@ -291,15 +290,16 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         }
 
         /** Load necessary assets. */
-        public void load(GameContext context) {
-            if (this.modelPath != null && context.assets().isPresent()) {
-                context.assets().get().load(this.modelPath, Model.class);
+        public void load() {
+            GameContext context = BlackoutGame.get().context();
+            if (context.hasGraphics() && this.modelPath != null) {
+                context.getAssets().load(this.modelPath, Model.class);
             }
         }
 
         /** When assets are loaded. */
-        public void doneLoading(GameContext context) {
-            this.context = context;
+        public void doneLoading() {
+            GameContext context = BlackoutGame.get().context();
             if (this.modelPath == null) {
                 this.model = Optional.empty();
             } else {
@@ -324,8 +324,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
             this.rotation = direction.angleRad();
         }
 
-        protected GameContext getContext() { return context; }
-
 
         /**
          * Must be called from <code>GameObject</code> constructor to add this
@@ -336,7 +334,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
             bodyDef.position.set(this.position);
             bodyDef.type = getBodyType();
 
-            return context.gameWorld().addObject(object, bodyDef);
+            return BlackoutGame.get().context().gameWorld().addObject(object, bodyDef);
         }
 
         public abstract BodyDef.BodyType getBodyType();

@@ -2,6 +2,7 @@ package ru.spbau.blackout.abilities;
 
 import com.badlogic.gdx.graphics.Texture;
 
+import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
 
@@ -25,14 +26,12 @@ public abstract class Ability {
      * Load necessary assets.
      * Must be called once from <code>GameUnit.Definition::update</code>
      */
-    public void load(GameContext context) {
+    public void load() {
         // loading of icon has to be here because it isn't accessible from `AbilityIcon` class in the loading stage
-        context.assets().ifPresent(assets ->
-            assets.load(this.iconPath(), Texture.class)
-        );
+        BlackoutGame.get().context().getAssets().load(this.iconPath(), Texture.class);
     }
 
-    public void doneLoading(GameContext context) {}
+    public void doneLoading() {}
 
     /**
      * Must be called exactly once from <code>GameUnit::new</code>.
