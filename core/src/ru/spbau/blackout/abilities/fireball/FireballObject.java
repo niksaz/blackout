@@ -59,11 +59,10 @@ public final class FireballObject extends AbilityObject {
     @Override
     public void kill() {
         super.kill();
-        this.explosionEffect.ifPresent(effect -> {
-            ParticleSpecialEffect.create(effect.copy(), this.getPosition());
-        });
+//        this.explosionEffect.ifPresent(effect -> {
+//            ParticleSpecialEffect.create(effect.copy(), this.getPosition());
+//        });
     }
-
 
     @Override
     public void updateState(float deltaTime) {
@@ -97,14 +96,14 @@ public final class FireballObject extends AbilityObject {
         public void load(GameContext context) {
             super.load(context);
             Particles.load(FIRE_EFFECT_PATH, context);
-            Particles.load(EXPLOSION_EFFECT_PATH, context);
+//            Particles.load(EXPLOSION_EFFECT_PATH, context);
         }
 
         @Override
         public void doneLoading(GameContext context) {
             super.doneLoading(context);
             this.fireEffect = Particles.getOriginal(FIRE_EFFECT_PATH, context);
-            this.explosionEffect = Particles.getOriginal(EXPLOSION_EFFECT_PATH, context);
+//            this.explosionEffect = Particles.getOriginal(EXPLOSION_EFFECT_PATH, context);
         }
 
         @Override

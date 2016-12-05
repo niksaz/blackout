@@ -109,8 +109,8 @@ public class BlackoutGame extends Game {
     @Override
     public void dispose() {
         super.dispose();
+        this.screenManager.dispose();
         this.modelBatch.dispose();
         this.spriteBatch.dispose();
-        this.screenManager.dispose();
     }
 }

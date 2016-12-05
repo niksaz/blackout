@@ -1,9 +1,7 @@
 package ru.spbau.blackout.utils;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 
-import javax.swing.text.html.Option;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
