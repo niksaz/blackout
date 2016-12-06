@@ -2,19 +2,18 @@ package ru.spbau.blackout.abilities.fireball;
 
 import com.badlogic.gdx.math.Vector2;
 
-import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.abilities.InstantAbility;
+import ru.spbau.blackout.abilities.SimpleInstantAbility;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
 
-public class FireballAbility extends InstantAbility {
+public class FireballAbility extends SimpleInstantAbility {
     public static final String ICON_PATH = "abilities/fireball/icon.png";
     public static final float MAX_CHARGE_TIME = 1f;
 
     public static final float SHELL_START_SPEED = 30f;
     public static final float SHELL_MASS = 5f;
-    public static final float SHELL_RADIUS = 0.6f;
+    public static final float SHELL_RADIUS = 0.5f;
     public static final float CAST_DISTANCE = 1.5f;  // FIXME: use unit radius
     /** The estimated distance of the ability in case of no external force. */
     public static final float DISTANCE = 12f;
@@ -23,6 +22,8 @@ public class FireballAbility extends InstantAbility {
 
     public static final String FIRE_EFFECT_PATH = "abilities/fireball/particles/fireball.pfx";
     public static final String EXPLOSION_EFFECT_PATH = "effects/small_explosion/small_explosion.pfx";
+
+    public static final String CAST_SOUND = "sounds/fire.ogg";
 
 
     private final FireballObject.Definition shellDef;
@@ -45,6 +46,11 @@ public class FireballAbility extends InstantAbility {
         position.mulAdd(direction, CAST_DISTANCE);
         AbilityObject shell = (AbilityObject) shellDef.makeInstance(position);
         shell.velocity.mulAdd(direction, SHELL_START_SPEED);
+    }
+
+    @Override
+    public String castSoundPath() {
+        return CAST_SOUND;
     }
 
     @Override

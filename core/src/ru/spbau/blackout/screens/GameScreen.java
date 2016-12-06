@@ -57,7 +57,7 @@ import static ru.spbau.blackout.utils.Utils.fixTop;
 
 public class GameScreen extends BlackoutScreen implements GameContext {
     private static final String BATTLE_MUSIC_DIR_PATH = "music/battle";
-    private static final float BATTLE_MUSIC_MAX_VOLUME = 0.5f;
+    private static final float BATTLE_MUSIC_MAX_VOLUME = 0.4f;
 
     public static final class CameraDefaults {
         private CameraDefaults() {}
@@ -88,10 +88,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private volatile boolean doneLoading;
     private final Array<Music> music = new Array<>();
     private Music currentTrack;
+    private final GameSettings settings;
 
 
     public GameScreen(GameSessionSettings sessionSettings, AbstractServer server, GameSettings settings) {
-        BlackoutGame.get().setContext(this);
+        this.settings = settings;
 
         this.server = server;
         this.loadingScreen = new LoadingScreen(sessionSettings);
@@ -123,7 +124,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             track.setLooping(false);
             this.music.add(track);
         }
-        this.switchTrack();
     }
 
 
@@ -143,7 +143,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     @Override
-    public boolean hasGraphics() {
+    public boolean hasIO() {
         return true;
     }
 
@@ -159,6 +159,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     @Override
+    public GameSettings getSettings() {
+        return this.settings;
+    }
+
+    @Override
     public void resume() {
         super.resume();
         assets.update();
@@ -168,6 +173,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     @Override
     public void show() {
         super.show();
+
+        BlackoutGame.get().setContext(this);
+
+        // enable music
+        this.switchTrack();
 
         // if not loaded yet
         if (this.loadingScreen != null) {

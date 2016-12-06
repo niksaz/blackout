@@ -292,7 +292,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         /** Load necessary assets. */
         public void load() {
             GameContext context = BlackoutGame.get().context();
-            if (context.hasGraphics() && this.modelPath != null) {
+            if (context.hasIO() && this.modelPath != null) {
                 context.getAssets().load(this.modelPath, Model.class);
             }
         }

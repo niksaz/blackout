@@ -3,6 +3,7 @@ package ru.spbau.blackout;
 import com.badlogic.gdx.assets.AssetManager;
 
 import ru.spbau.blackout.java8features.Optional;
+import ru.spbau.blackout.settings.GameSettings;
 
 
 /**
@@ -12,15 +13,18 @@ import ru.spbau.blackout.java8features.Optional;
  */
 public interface GameContext {
     // TODO: comments
-    boolean hasGraphics();
-    /*FIXME: use annotation nullable*/ AssetManager getAssets();
+    boolean hasIO();
+    /*FIXME: use annotation nullable*/
+    AssetManager getAssets();
     GameWorld gameWorld();
+    /*FIXME: nullable*/
+    GameSettings getSettings();
 
     default Optional<AssetManager> assets() {
-        if (this.hasGraphics()) {
-            return Optional.of(this.getAssets());
-        } else {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(this.getAssets());
+    }
+
+    default Optional<GameSettings> settings() {
+        return Optional.ofNullable(this.getSettings());
     }
 }

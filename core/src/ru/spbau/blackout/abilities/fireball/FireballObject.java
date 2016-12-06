@@ -3,8 +3,6 @@ package ru.spbau.blackout.abilities.fireball;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.physics.box2d.Shape;
 
-import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.graphic_effects.ParticleGraphicEffect;
 import ru.spbau.blackout.entities.AbilityObject;
@@ -22,15 +20,14 @@ import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTO
 
 public final class FireballObject extends AbilityObject {
     private float timeRest;
-    private final float damage;
-    private final Optional<ParticleEffect> explosionEffect;
+    private final FireballObject.Definition def;
 
 
     protected FireballObject(FireballObject.Definition def, float x, float y) {
         super(def, x, y);
+        this.def = def;
+
         this.timeRest = def.timeToLive;
-        this.damage = def.damage;
-        this.explosionEffect = def.explosionEffect;
 
         def.fireEffect.ifPresent(effect -> {
             this.graphicEffects.add(new ParticleGraphicEffect(this, effect.copy()));
@@ -50,11 +47,11 @@ public final class FireballObject extends AbilityObject {
         }
 
         if (object instanceof Damageable) {
-            ((Damageable) object).damage(this.damage);
+            ((Damageable) object).damage(this.def.damage);
         }
 
         // play explosion effect
-        this.explosionEffect.ifPresent(effect -> {
+        this.def.explosionEffect.ifPresent(effect -> {
             ParticleSpecialEffect.create(effect.copy(), this.getChestPivot());
         });
 
