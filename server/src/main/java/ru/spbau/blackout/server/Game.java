@@ -1,5 +1,6 @@
 package ru.spbau.blackout.server;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.ByteArrayOutputStream;
@@ -8,16 +9,17 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 
-import ru.spbau.blackout.shapescreators.CircleCreator;
+import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.Utils;
+import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.worlds.GameWorldWithPhysics;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
@@ -28,7 +30,7 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  * disconnects it will finish the game. It serializes the current world and asks ClientThreads to send it
  * to devices. ClientThreads pass user inputs from devices.
  */
-class Game extends Thread {
+class Game extends Thread implements GameContext {
 
     private final int gameId;
     private final RoomServer server;
@@ -98,6 +100,26 @@ class Game extends Thread {
                 gameState = GameState.FINISHED;
             }
         }
+    }
+
+    @Override
+    public GameSettings getSettings() {
+        return null;
+    }
+
+    @Override
+    public GameWorld gameWorld() {
+        return gameWorld;
+    }
+
+    @Override
+    public AssetManager getAssets() {
+        return null;
+    }
+
+    @Override
+    public boolean hasIO() {
+        return false;
     }
 
     GameState getGameState() {

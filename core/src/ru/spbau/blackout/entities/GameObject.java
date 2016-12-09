@@ -267,7 +267,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public final Vector2 position = new Vector2();
 
         /** The loaded model object. Initialized by <code>initialize</code> method. */
-        private transient Optional<Model> model;
+        private transient Optional<Model> model = Optional.empty();
 
         /**
          * Path to the model for game objects. May be null. In this case objects will not have models.
