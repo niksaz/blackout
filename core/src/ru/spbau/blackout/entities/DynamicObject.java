@@ -1,7 +1,5 @@
 package ru.spbau.blackout.entities;
 
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -10,69 +8,73 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-import ru.spbau.blackout.worlds.GameWorld;
+import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 
+
 public abstract class DynamicObject extends GameObject {
-    protected static final class NullableAnimationController {
-        private final AnimationController animation;
-
-        public NullableAnimationController(ModelInstance model) {
-            if (model == null) {
-                this.animation = null;
-            } else {
-                this.animation = new AnimationController(model);
-            }
-        }
-
-        public void update(float deltaTime) {
-            if (animation != null) {
-                animation.update(deltaTime);
-            }
-        }
-
-        public void setAnimation(String id, int loopCount) {
-            if (animation != null) {
-                animation.setAnimation(id, loopCount);
-            }
-        }
-    }
-
+    /** Constant holder class to provide names for animations. */
     public static class Animations {
+        protected Animations() {}
         public static final String DEFAULT = "Armature|Stay";
-
-        protected Animations() {};
+        public static final String DEATH = "Armature|Death";
     }
 
-    protected final Vector2 velocity = new Vector2();
+
+    /**
+     * It is public because it's safe to update in almost any time.
+     * And it allows to do stuff like <code>object.velocity.mulAdd(...)</code>.
+     * It also has getter and setter to have similar interface to
+     * <code>selfVelocity</code> from <code>GameUnit</code>.
+     */
+    public final Vector2 velocity = new Vector2();
+
 
     // Appearance:
-    transient protected final NullableAnimationController animation;
-    protected float animationSpeed = 1f;
+    /** It is empty on server */
+    transient protected final Optional<AnimationController> animation;
+    transient protected float animationSpeed = 1f;
 
-    protected DynamicObject(Definition def, Model model, GameWorld gameWorld) {
-        super(def, model, gameWorld);
 
-        animation = new NullableAnimationController(this.model);
-        animation.setAnimation(Animations.DEFAULT, -1);
+    /** Construct DynamicObject at the giving position. */
+    protected DynamicObject(Definition def, float x, float y) {
+        super(def, x, y);
+
+        animation = this.model.map(AnimationController::new);
+        animation.ifPresent(controller -> controller.setAnimation(Animations.DEFAULT, -1));
     }
 
+
+    public final Vector2 getVelocity() { return this.velocity; }
+    public final void setVelocity(float x, float y) { this.velocity.set(x, y); }
+    public final void setVelocity(Vector2 newVelocity) { this.setVelocity(newVelocity.x, newVelocity.y); }
+
+    public void applyImpulse(float x, float y) {
+        float mass = this.getMass();
+        this.velocity.add(x / mass, y / mass);
+    }
+
+    public void applyImpulse(Vector2 impulse) {
+        this.applyImpulse(impulse.x, impulse.y);
+    }
+
+
     @Override
-    public void updateState(float delta) {
-        super.updateState(delta);
-        animation.update(delta * animationSpeed);
+    public void updateState(float deltaTime) {
+        super.updateState(deltaTime);
+        this.animation.ifPresent(controller -> controller.update(deltaTime * this.animationSpeed));
     }
 
     @Override
     public void updateForFirstStep() {
-        super.updateForFirstStep();
-        body.setLinearVelocity(velocity);
+        this.body.setLinearVelocity(this.velocity);
+        // to take into account velocity changes during the step
+        this.velocity.set(0, 0);
     }
 
     @Override
     public void updateForSecondStep() {
-        super.updateForSecondStep();
-        velocity.set(body.getLinearVelocity());
+        this.velocity.add(this.body.getLinearVelocity());
     }
 
     @Override
@@ -83,10 +85,10 @@ public abstract class DynamicObject extends GameObject {
         return other;
     }
 
+
+    /** Definition for objects which have Dynamic body type. */
     public static abstract class Definition extends GameObject.Definition {
-        public Definition(String modelPath, Creator<Shape> shapeCreator,
-                          float initialX, float initialY)
-        {
+        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
             super(modelPath, shapeCreator, initialX, initialY);
         }
 

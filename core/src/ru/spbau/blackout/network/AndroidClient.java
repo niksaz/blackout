@@ -15,15 +15,18 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.entities.Hero;
-import ru.spbau.blackout.gamesession.TestingSessionSettings;
+import ru.spbau.blackout.game_session.TestingSessionSettings;
+import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
+import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.MultiplayerTable;
 import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.GameWorldWithExternalSerial;
+
 
 /**
  * Task with the purpose of talking to a server: waiting in a queue, getting a game from a server,
@@ -53,9 +56,11 @@ public class AndroidClient implements Runnable, AbstractServer {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
+
             datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
-            out.writeUTF(BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().getPlayerName());
+            out.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
             out.writeInt(datagramSocket.getLocalPort());
+
             out.flush();
 
             final int serverDatagramPort = in.readInt();
@@ -73,15 +78,18 @@ public class AndroidClient implements Runnable, AbstractServer {
                         Gdx.app.postRunnable(() ->
                                 table.getStatusLabel().setText(READY_TO_START_MS));
 
-                        final GameSettings settings = new GameSettings();
+                        AbilityIconSettings firstIconSettings = new AbilityIconSettings(0);
+                        IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
+                        GameSettings settings = new GameSettings(uiSettings);  // just default settings
+
                         TestingSessionSettings room = (TestingSessionSettings) in.readObject();
-                        room.character = (Hero.Definition) in.readObject();
+                        room.character = (Character.Definition) in.readObject();
 
                         // using the fact that AndroidClient is AbstractServer itself.
                         // so synchronizing on server on loading
                         synchronized (this) {
                             gameScreen = new GameScreen(room, new GameWorldWithExternalSerial(), this, settings);
-                            BlackoutGame.getInstance().getScreenManager().setScreen(gameScreen);
+                            BlackoutGame.get().screenManager().setScreen(gameScreen);
                             try {
                                 wait();
                             } catch (InterruptedException ignored) {
@@ -90,6 +98,7 @@ public class AndroidClient implements Runnable, AbstractServer {
                         }
                         out.writeBoolean(!isInterrupted);
                         out.flush();
+
                         break;
                     default:
                         break;
@@ -141,7 +150,7 @@ public class AndroidClient implements Runnable, AbstractServer {
             });
             outputToServerThread.start();
 
-            final GameWorldWithExternalSerial currentWorld = (GameWorldWithExternalSerial) gameScreen.getGameWorld();
+            final GameWorldWithExternalSerial currentWorld = (GameWorldWithExternalSerial) gameScreen.gameWorld();
             final byte[] buffer = new byte[Network.DATAGRAM_WORLD_PACKET_SIZE];
             final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
 
@@ -160,7 +169,7 @@ public class AndroidClient implements Runnable, AbstractServer {
             Gdx.app.postRunnable(() -> {
                 final MenuScreen menuScreen = table.getMenuScreen();
                 menuScreen.changeMiddleTable(PlayScreenTable.getTable(menuScreen));
-                BlackoutGame.getInstance().getScreenManager().setScreen(menuScreen);
+                BlackoutGame.get().screenManager().setScreen(menuScreen);
             });
         }
     }

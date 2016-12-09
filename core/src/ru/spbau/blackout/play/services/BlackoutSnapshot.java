@@ -29,7 +29,7 @@ public class BlackoutSnapshot implements Serializable {
     }
 
     private void saveState() {
-        BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().saveSnapshot(this);
+        BlackoutGame.get().playServicesInCore().getPlayServices().saveSnapshot(this);
     }
 
 }

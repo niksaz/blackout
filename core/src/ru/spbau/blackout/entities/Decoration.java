@@ -7,20 +7,20 @@ import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.utils.Creator;
 
 public class Decoration extends StaticObject {
-    protected Decoration(Definition def, Model model, GameWorld gameWorld) {
-        super(def, model, gameWorld);
+    protected Decoration(Definition def, float x, float y) {
+        super(def, x, y);
     }
 
+
     public static class Definition extends StaticObject.Definition {
-        public Definition(String modelPath, Creator<Shape> shapeCreator,
-                          float initialX, float initialY)
-        {
+        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
             super(modelPath, shapeCreator, initialX, initialY);
         }
 
+
         @Override
-        public GameObject makeInstance(Model model, GameWorld gameWorld) {
-            return new Decoration(this, model, gameWorld);
+        public GameObject makeInstance(float x, float y) {
+            return new Decoration(this, x, y);
         }
     }
 }

@@ -1,6 +1,10 @@
 package ru.spbau.blackout.worlds;
 
+import java.util.Iterator;
+
 import ru.spbau.blackout.entities.GameObject;
+
+import static ru.spbau.blackout.java8features.Functional.foreach;
 
 public class GameWorldWithPhysics extends GameWorld {
 
@@ -9,13 +13,22 @@ public class GameWorldWithPhysics extends GameWorld {
     private float accumulator = 0;
 
     @Override
-    public void update(float delta) {
-        accumulator += delta;
+    public void update(float deltaTime) {
+        super.update(deltaTime);
 
-        for (GameObject object : gameObjects) {
-            object.updateState(delta);
+        for (GameObject object : this) {
+            object.updateState(deltaTime);
         }
 
+        for (Iterator<GameObject> it = this.iterator(); it.hasNext();) {
+            GameObject object = it.next();
+            if (object.isDead()) {
+                object.destroyBody(this.box2dWorld);
+                it.remove();
+            }
+        }
+
+        accumulator += deltaTime;
         while (accumulator >= WORLD_STEP) {
             step();
             accumulator -= WORLD_STEP;
@@ -26,16 +39,10 @@ public class GameWorldWithPhysics extends GameWorld {
     }
 
     private void step() {
-//        TODO: gameObjects.forEach(GameObject::updateForFirstStep);
-        for (GameObject object : this) {
-            object.updateForFirstStep();
-        }
-        world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+        foreach(this, GameObject::updateForFirstStep);
+        this.box2dWorld.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-//        TODO: gameObjects.forEach(GameObject::updateForSecondStep);
-        for (GameObject object : this) {
-            object.updateForSecondStep();
-        }
-        world.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+        foreach(this, GameObject::updateForSecondStep);
+        this.box2dWorld.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }
 }

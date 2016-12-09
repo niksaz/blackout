@@ -9,12 +9,16 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
-import ru.spbau.blackout.worlds.GameWorld;
+import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.graphic_effects.GraphicEffect;
+import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.InplaceSerializable;
 
@@ -25,29 +29,47 @@ import java.io.Serializable;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
+
 public abstract class GameObject implements RenderableProvider, InplaceSerializable, Serializable {
-    // physics:
-    transient protected Body body;
+    public static final float RESTITUTION = 0.5f;
+
+
+    transient protected final Body body;
     private float height;
 
-    // appearance:
-    transient protected ModelInstance model;
+    /** Equals to Optional.empty() on a server or if the object is dead. */
+    transient protected Optional<ModelInstance> model;
+    transient public final Array<GraphicEffect> graphicEffects = new Array<>();
 
-    protected GameObject(Definition def, Model model, GameWorld gameWorld) {
-        this.model = model == null ? null : new ModelInstance(model);
+    private boolean dead = false;
+    private final Vector3 chestPivotOffset;
+    private final Vector3 overHeadPivotOffset;
 
-        body = gameWorld.addObject(this, def);
+
+    /**
+     * Constructs defined object at the given position.
+     */
+    protected GameObject(Definition def, float x, float y) {
+        this.model = def.model.map(ModelInstance::new);
+
+        body = def.registerObject(this);
+        body.setUserData(this);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = def.getShapeCreator().create();
-        fixtureDef.density = def.getDensity();
+        fixtureDef.shape = def.shapeCreator.create();
+        fixtureDef.density = 1f;
         fixtureDef.friction = 0;
-        fixtureDef.restitution = 0;
+        fixtureDef.restitution = RESTITUTION;
+        fixtureDef.isSensor = def.isSensor;
         body.createFixture(fixtureDef);
         fixtureDef.shape.dispose();
 
-        setPosition(def.getPosition().x, def.getPosition().y);
+        this.chestPivotOffset = def.chestPivotOffset;
+        this.overHeadPivotOffset = def.overHeadPivotOffset;
+        this.setPosition(x, y);
+        this.setMass(def.mass);
     }
+
 
     @Override
     public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
@@ -68,17 +90,76 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
-        updateTransform();
-        model.getRenderables(renderables, pool);
+        model.ifPresent(model -> {
+            this.updateTransform();
+            model.getRenderables(renderables, pool);
+        });
+    }
+
+
+    /**
+     * Update things not connected with physics. See <code>GameWorld</code> documentation.
+     */
+    public void updateState(float deltaTime) {
+        for (GraphicEffect effect : this.graphicEffects) {
+            effect.update(deltaTime);
+        }
+    }
+    /** See <code>GameWorld</code> documentation. */
+    public abstract void updateForFirstStep();
+    /** See <code>GameWorld</code> documentation. */
+    public abstract void updateForSecondStep();
+
+    /**
+     * Sets mass of the object. It mainly works just like expected:
+     * the mass is higher, the harder to move object by applying external force.
+     * One thing which can be unexpected is that velocity itself isn't connected with mass.
+     */
+    public void setMass(float newMass) {
+        MassData massData = body.getMassData();
+
+        float scaleFactor = newMass / massData.mass;
+        massData.mass *= scaleFactor;
+        massData.I *= scaleFactor;
+
+        body.setMassData(massData);
     }
 
     /**
-     * Update things not connected with physics.
+     * Kills the unit. It will be removed from the <code>GameWorld</code> and from the map after paying death animation.
+     * Also calls <code>this.dispose()</code>.
      */
-    public void updateState(float delta) {}
+    public void kill() {
+        // TODO: override
+        // It will be handled in GameWorld::update. It's a bad idea to try to remove body
+        // from GameWorld right here because this method can be called in process of updating physics.
+        this.dead = true;
+        // FIXME: play death animation
+        this.model = Optional.empty();
+        this.dispose();
+    }
 
-    public void updateForFirstStep() {}
-    public void updateForSecondStep() {}
+    public boolean isDead() { return this.dead; }
+
+    /**
+     * Disposes all non-shared resources (like graphicEffects).
+     * Shared resources (like models) will be disposed by AssetManager.
+     */
+    public void dispose() {
+        for (GraphicEffect effect : this.graphicEffects) {
+            effect.remove();
+        }
+    }
+
+
+    /**
+     * This function is necessary for better encapsulation.
+     * I don't want anyone to access object's <code>Body</code> directly as well as I don't want anyone
+     * to access <code>World</code> (which is a part of <code>GameWorld</code> class) directly.
+     */
+    public void destroyBody(World world) {
+        world.destroyBody(this.body);
+    }
 
     // Transform:
 
@@ -90,148 +171,172 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         body.setTransform(position, angle);
     }
 
-    /**
-     * Model instance model to the physic body.
-     */
     protected void updateTransform() {
-        model.transform.setToRotationRad(Vector3.Z, body.getAngle());
-        fixTop(model);
-        Vector2 pos = body.getPosition();
-        model.transform.setTranslation(pos.x, pos.y, height);
+        model.ifPresent(model -> {
+            model.transform.setToRotationRad(Vector3.Z, body.getAngle());
+            fixTop(model);
+            Vector2 pos = body.getPosition();
+            model.transform.setTranslation(pos.x, pos.y, height);
+        });
     }
 
     // Rotation
 
-    /**
-     * Set rotation in radians.
-     */
+    /** Set rotation in radians. */
     public void setRotation(float angle) {
         Vector2 pos = getPosition();
         setTransform(pos.x, pos.y, angle);
     }
 
-    /**
-     * Rotates object to the given direction.
-     */
-    public void setDirection(Vector2 direction) {
-        setRotation(direction.angleRad());
-    }
-
-    /**
-     *  The current rotation in radians.
-     */
+    /** Returns the current rotation in radians. */
     public float getRotation() {
         return body.getAngle();
     }
 
+    /** Rotates object to the given direction. */
+    public void setDirection(Vector2 direction) {
+        setRotation(direction.angleRad());
+    }
 
-    // Position:
 
-    /**
-     *
-     */
     public Vector2 getPosition() {
         return body.getPosition();
+    }
+
+    public void setPosition(Vector2 position) {
+        setTransform(position, getRotation());
     }
 
     public void setPosition(float x, float y) {
         setTransform(x, y, getRotation());
     }
 
-    // Height:
-
-    public void setHeight(float height) {
-        this.height = height;
+    /**
+     * Returns new Vector3 (so, it's safe to change this vector without changing unit's position).
+     */
+    public Vector3 get3dPosition() {
+        Vector2 pos = this.getPosition();
+        return new Vector3(pos.x, pos.y, this.getHeight());
     }
 
-    public final float getHeight() {
-        return height;
+    public void setHeight(float height) { this.height = height; }
+    public final float getHeight() { return height; }
+
+    public final float getMass() {
+        return this.body.getMass();
     }
 
 
+    public Vector3 getChestPivot() {
+        return this.get3dPosition().add(chestPivotOffset);
+    }
 
+    public Vector3 getOverHeadPivot() {
+        return this.get3dPosition().add(overHeadPivotOffset);
+    }
+
+
+    /**
+     * Used to send via network a definition of an object to create.
+     * Each kind of objects must have its own <code>Definition</code> subclass.
+     *
+     * <p>Life cycle:
+     * <br>constructor (once)
+     * <br>load (once)
+     * <br>initialize (once)
+     * <br>makeInstance (Any number of calls)
+     */
     public static abstract class Definition implements Serializable {
         public static final float DEFAULT_HEIGHT = 0;
         public static final float DEFAULT_ROTATION = 0;
 
-        public static final float DEFAULT_DENSITY = 1f;
+        public static final float DEFAULT_MASS = 70f;
+
 
         // physics
         public float rotation = DEFAULT_ROTATION;
         public float height = DEFAULT_HEIGHT;
 
-        private float density = DEFAULT_DENSITY;
+        /** Mass of an object in kg */
+        public float mass = DEFAULT_MASS;
         /**
          * As far as Shape itself isn't serializable,
          * supplier will be sent instead.
          */
-        private Creator<Shape> shapeCreator;
-        private final Vector2 position = new Vector2();
+        public Creator<Shape> shapeCreator;
+        public final Vector2 position = new Vector2();
 
-
-        // appearance:
-        public String modelPath;
+        /** The loaded model object. Initialized by <code>initialize</code> method. */
+        private transient Optional<Model> model;
 
         /**
-         * ShapeCreator must be serializable.
+         * Path to the model for game objects. May be null. In this case objects will not have models.
+         * Must be final due to possible problems if this variable changed between calls of `load` and `initialize`.
          */
-        public Definition(String modelPath, Creator<Shape> shapeCreator,
-                          float initialX, float initialY)
-        {
+        public final String modelPath;
+        public final Vector3 chestPivotOffset = new Vector3();
+        public final Vector3 overHeadPivotOffset = new Vector3();
+        public boolean isSensor = false;
+
+
+        /**
+         * <code>modelPath</code> can be <code>null</code>.
+         * In this case objects created from this definition will not have models.
+         */
+        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
             this.modelPath = modelPath;
             this.shapeCreator = shapeCreator;
             this.position.set(initialX, initialY);
         }
 
-        public void setDensity(float density) {
-            this.density = density;
+        /** Load necessary assets. */
+        public void load() {
+            GameContext context = BlackoutGame.get().context();
+            if (context.hasIO() && this.modelPath != null) {
+                context.getAssets().load(this.modelPath, Model.class);
+            }
         }
 
-        public void setShapeCreator(Creator<Shape> shapeCreator) {
-            this.shapeCreator = shapeCreator;
+        /** When assets are loaded. */
+        public void doneLoading() {
+            GameContext context = BlackoutGame.get().context();
+            if (this.modelPath == null) {
+                this.model = Optional.empty();
+            } else {
+                this.model = context.assets().map(assets -> assets.get(this.modelPath, Model.class));
+            }
         }
 
-        public float getDensity() {
-            return this.density;
+
+        /** Create an object at the giving position. */
+        public abstract GameObject makeInstance(float x, float y);
+        /** Create an object at the giving position. */
+        public GameObject makeInstance(Vector2 position) {
+            return this.makeInstance(position.x, position.y);
+        }
+        /** Equal to <code>makeInstance(this.position)</code> */
+        public GameObject makeInstance() {
+            return this.makeInstance(this.position);
         }
 
-        public Creator<Shape> getShapeCreator() {
-            return this.shapeCreator;
-        }
-
-        public void setHeight(float height) {
-            this.height = height;
-        }
-
-        public float getHeight() {
-            return this.height;
-        }
-
-        public Vector2 getPosition() {
-            return this.position;
-        }
-
-        public void setPosition(float x, float y) {
-            this.position.set(x, y);
-        }
-
-        /**
-         * Rotates object to the given direction.
-         */
+        /** Rotates to the given direction. */
         public void setDirection(Vector2 direction) {
             this.rotation = direction.angleRad();
         }
 
-        public Body addToWorld(World world) {
+
+        /**
+         * Must be called from <code>GameObject</code> constructor to add this
+         * <code>GameObject</code> to the world and make <code>Body</code> for it.
+         */
+        private Body registerObject(GameObject object) {
             BodyDef bodyDef = new BodyDef();
             bodyDef.position.set(this.position);
             bodyDef.type = getBodyType();
-            return world.createBody(bodyDef);
+
+            return BlackoutGame.get().context().gameWorld().addObject(object, bodyDef);
         }
 
-        public abstract GameObject makeInstance(Model model, GameWorld gameWorld);
         public abstract BodyDef.BodyType getBodyType();
-//        public abstract float getDensity();
-//        public abstract float getFriction();i
     }
 }

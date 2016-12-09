@@ -12,8 +12,9 @@ abstract class StageScreen extends BlackoutScreen {
 
     public StageScreen() {
         super();
-        stage = new Stage(new ExtendViewport(BlackoutGame.VIRTUAL_WORLD_WIDTH,
-                BlackoutGame.VIRTUAL_WORLD_HEIGHT));
+//        stage = new Stage(new ExtendViewport(1280,
+//                740));
+        stage = new Stage(new ExtendViewport(BlackoutGame.getWorldWidth(), BlackoutGame.getWorldHeight()));
     }
 
     @Override

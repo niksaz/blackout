@@ -8,16 +8,20 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.entities.Hero;
-import ru.spbau.blackout.gamesession.TestingSessionSettings;
+import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
+
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Utils;
 import ru.spbau.blackout.worlds.GameWorldWithPhysics;
+
+import static ru.spbau.blackout.java8features.Functional.foreach;
+
 
 /**
  * Multiplayer game representation. Used for synchronizing game's state and watching for game flow, i.e. if someone
@@ -101,32 +105,14 @@ class Game extends Thread {
     }
 
     private void createRoomAndSendItToClients() {
-        final TestingSessionSettings room = new TestingSessionSettings();
-        room.map = "maps/duel/duel.g3db";
+        final TestingSessionSettings room = TestingSessionSettings.getTest();
 
-        final List<Hero.Definition> heroes = new ArrayList<>();
-        heroes.add(
-                new Hero.Definition(
-                        "models/wizard/wizard.g3db",
-                        new CircleCreator(0.7f),
-                        0, 0));
-        heroes.add(
-                new Hero.Definition(
-                        "models/wizard/wizard.g3db",
-                        new CircleCreator(0.7f),
-                        5, 5));
-        room.objectDefs.addAll(heroes);
+        final List<Character.Definition> heroes = new ArrayList<>();
+        heroes.add((Character.Definition) room.objectDefs.get(0));
+        heroes.add((Character.Definition) room.objectDefs.get(1));
 
-        final GameObject.Definition stone = new Decoration.Definition(
-                "models/stone/stone.g3db",
-                new CircleCreator(1.5f),
-                0, -20
-        );
-        room.objectDefs.add(stone);
 
-        for (GameObject.Definition gameObjectDef : room.getObjectDefs()) {
-            gameObjectDef.makeInstance(null, gameWorld);
-        }
+        foreach(room.getObjectDefs(), GameObject.Definition::makeInstance);
 
         for (int i = 0; i < clients.size(); i++) {
             clients.get(i).setGame(this, room, heroes.get(i));

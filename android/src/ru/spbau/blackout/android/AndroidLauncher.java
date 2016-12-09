@@ -41,7 +41,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         snapshotManager = new SnapshotManager(this);
 
         final AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        final BlackoutGame game = BlackoutGame.getInstance();
+        final BlackoutGame game = BlackoutGame.get();
         game.initializePlayServices(this);
         initialize(game, config);
     }

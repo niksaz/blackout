@@ -17,7 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.utils.AssetLoader;
+import ru.spbau.blackout.utils.BlackoutAssets;
 
 public class MenuScreen extends StageScreen {
 
@@ -53,7 +53,7 @@ public class MenuScreen extends StageScreen {
 
     private void addLeftPaneElements() {
         addLabelWithTextAt(
-                "Hello, " + BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().getPlayerName(),
+                "Hello, " + BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName(),
                 CORNER_LABEL_MARGIN,
                 stage.getViewport().getWorldHeight() - CORNER_LABEL_MARGIN,
                 Align.topLeft);
@@ -67,7 +67,7 @@ public class MenuScreen extends StageScreen {
 
     static TextButton addButton(Table table, String text, Drawable upImage, Drawable downImage, EventListener listener) {
         final TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.font = AssetLoader.getInstance().getFont();
+        style.font = BlackoutGame.get().assets().getFont();
         style.up = upImage;
         style.down = downImage;
 
@@ -83,7 +83,7 @@ public class MenuScreen extends StageScreen {
 
     private Label addLabelWithTextAt(CharSequence text, float x, float y, int align) {
         final Label.LabelStyle style = new Label.LabelStyle();
-        style.font = AssetLoader.getInstance().getFont();
+        style.font = BlackoutGame.get().assets().getFont();
 
         final Label label = new Label(text, style);
         label.setPosition(x, y, align);
@@ -120,8 +120,8 @@ public class MenuScreen extends StageScreen {
         gamesServicesImage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                BlackoutGame.getInstance().getPlayServicesInCore().getPlayServices().signOut();
-                BlackoutGame.getInstance().getScreenManager().disposeScreen();
+                BlackoutGame.get().playServicesInCore().getPlayServices().signOut();
+                BlackoutGame.get().screenManager().disposeScreen();
             }
         });
 
@@ -147,7 +147,7 @@ public class MenuScreen extends StageScreen {
     }
 
     private void refreshGoldLabel() {
-        goldLabel.setText("Gold: " + BlackoutGame.getInstance().getPlayServicesInCore().getSnapshot().getGold());
+        goldLabel.setText("Gold: " + BlackoutGame.get().playServicesInCore().getSnapshot().getGold());
         goldLabel.setSize(goldLabel.getPrefWidth(), goldLabel.getPrefHeight());
         goldLabel.setPosition(
                 stage.getViewport().getWorldWidth() - CORNER_LABEL_MARGIN,

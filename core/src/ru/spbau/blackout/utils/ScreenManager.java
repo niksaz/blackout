@@ -5,6 +5,8 @@ import com.badlogic.gdx.utils.Array;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.screens.BlackoutScreen;
 
+import static ru.spbau.blackout.java8features.Functional.foreach;
+
 /**
  * Used to put a new screen instead of last one but also saves references to screens for reusing.
  */
@@ -14,7 +16,7 @@ public class ScreenManager {
 
     public void setScreen(BlackoutScreen screen) {
         screens.add(screen);
-        BlackoutGame.getInstance().setScreen(screen);
+        BlackoutGame.get().setScreen(screen);
     }
 
     public void disposeScreen() {
@@ -28,6 +30,10 @@ public class ScreenManager {
             }
             screens.pop().dispose();
         }
-        BlackoutGame.getInstance().setScreen(screens.peek());
+        BlackoutGame.get().setScreen(screens.peek());
+    }
+
+    public void dispose() {
+        foreach(screens, BlackoutScreen::dispose);
     }
 }

@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 
-public class AssetLoader {
 
+public class BlackoutAssets {
     private static final String FONT_PATH = "fonts/good_dog_plain.ttf";
 
     private static final int FONT_BLACKOUT_LABEL_SIZE = 80;
@@ -16,20 +16,9 @@ public class AssetLoader {
     private static final int FONT_SIZE = 40;
     private static final float FONT_WIDTH = 0f;
 
-    private static AssetLoader instance;
-
     private BitmapFont fontBlackoutLabel;
     private BitmapFont font;
 
-    private AssetLoader() {
-    }
-
-    public static AssetLoader getInstance() {
-        if (instance == null) {
-            instance = new AssetLoader();
-        }
-        return instance;
-    }
 
     public void loadFonts() {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(FONT_PATH));

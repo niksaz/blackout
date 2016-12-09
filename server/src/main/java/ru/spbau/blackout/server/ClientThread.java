@@ -11,10 +11,11 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
-import ru.spbau.blackout.entities.Hero;
-import ru.spbau.blackout.gamesession.TestingSessionSettings;
+import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
+
 
 /**
  * A thread allocated for each client connected to the server. Initially it is waiting to be matched
@@ -26,9 +27,10 @@ class ClientThread extends Thread {
 
     private final RoomServer server;
     private final Socket socket;
+
     private volatile String name = UNKNOWN;
     private volatile TestingSessionSettings session;
-    private volatile Hero.Definition hero;
+    private volatile Character.Definition character;
     private volatile Game game;
     private volatile GameState clientGameState = GameState.WAITING;
     private final AtomicReference<byte[]> worldInBytes = new AtomicReference<>();
@@ -65,7 +67,7 @@ class ClientThread extends Thread {
                 out.writeObject(currentState);
                 if (currentState == GameState.READY_TO_START) {
                     out.writeObject(session);
-                    out.writeObject(hero);
+                    out.writeObject(character);
                     out.flush();
 
                     // loading may take a long time
@@ -146,9 +148,9 @@ class ClientThread extends Thread {
         return name;
     }
 
-    void setGame(Game game, TestingSessionSettings session, Hero.Definition hero) {
+    void setGame(Game game, TestingSessionSettings session, Character.Definition character) {
         this.session = session;
-        this.hero = hero;
+        this.character = character;
         this.game = game;
     }
 

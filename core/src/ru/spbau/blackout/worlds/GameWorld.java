@@ -8,37 +8,60 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
 import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
-import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
+import ru.spbau.blackout.BlackoutContactListener;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.utils.InplaceSerializable;
 
-public abstract class GameWorld implements Iterable<GameObject>, InplaceSerializable {
+import static ru.spbau.blackout.java8features.Functional.foreach;
 
+
+/**
+ * Main class for all in-game computation including physics.
+ * Isn't connected with any graphics or audio in order to be able to be run on server.
+ * Also used to send information about the game state from the server to clients.
+ *
+ *
+ * <p>Physics system:
+ * <br>Due to box2d limitations there is a complex system around it based on two steps.
+ *
+ * <br>Physic driver used with the fixed step (see WORLD_STEP static field) and without interpolation.
+ *
+ * <br>The first step is when external velocity is processed. In <code>updateForFirstStep</code> method
+ * each object must set its external velocity as its body's velocity.
+ *
+ * <br>In <code>updateForSecondStep</code> method each object must getOriginal its new external velocity from
+ * its body's velocity and then it must put its own velocity (just like <code>selfVelocity</code> of GameUnit) instead.
+ * The resulting velocity of the second step isn't important.
+ *
+ * <br>There is one more method called <code>updateState</code>. It must update things which are not connected
+ * with physic driver. This method called one time per frame (i.e. without fixed step).
+ */
+public abstract class GameWorld implements Iterable<GameObject>, InplaceSerializable {
+    /** The fixed physic driver's step. */
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
-    protected final List<GameObject> gameObjects = new ArrayList<>();
+    private final List<GameObject> gameObjects = new LinkedList<>();
+    transient protected final World box2dWorld;
 
-    protected final World world;
-    private Body ground;
 
     public GameWorld() {
         // without gravity, without sleeping
-        world = new World(Vector2.Zero, false);
+        this.box2dWorld = new World(Vector2.Zero, false);
+        this.box2dWorld.setContactListener(new BlackoutContactListener());
 
         {
             BodyDef def = new BodyDef();
             def.type = BodyDef.BodyType.StaticBody;
             def.position.set(0, 0);
-            ground = world.createBody(def);
         }
 
         {
@@ -49,19 +72,17 @@ public abstract class GameWorld implements Iterable<GameObject>, InplaceSerializ
             fixtureDef.shape = shape;
             fixtureDef.isSensor = true; // no collisions with the ground
 
-            ground.createFixture(fixtureDef);
-
             shape.dispose();
         }
     }
 
     public List<GameObject> getGameObjects() {
-        return gameObjects;
+        return this.gameObjects;
     }
 
     @Override
     public Iterator<GameObject> iterator() {
-        return gameObjects.iterator();
+        return this.gameObjects.iterator();
     }
 
     @Override
@@ -84,36 +105,20 @@ public abstract class GameWorld implements Iterable<GameObject>, InplaceSerializ
         return null;
     }
 
-    public abstract void update(float delta);
-
-    public Body addObject(GameObject object, GameObject.Definition def) {
-        gameObjects.add(object);
-        return def.addToWorld(world);
+    public void update(float delta) {
+        /// common things
     }
 
-    public FrictionJoint addFriction(Body body, float linearFriction, float angularFriction) {
-        FrictionJointDef frictionDef = new FrictionJointDef();
-
-        frictionDef.maxForce = linearFriction;
-        frictionDef.maxTorque = angularFriction;
-
-        frictionDef.initialize(body, ground, Vector2.Zero);
-
-        return (FrictionJoint) world.createJoint(frictionDef);
+    public Body addObject(GameObject object, BodyDef bodyDef) {
+        this.gameObjects.add(object);
+        return this.box2dWorld.createBody(bodyDef);
     }
 
-    public Body addController(Body body) {
-        // Create a controller's body
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(body.getPosition().x, body.getPosition().y);
-        Body controller = world.createBody(bodyDef);
-
-        // Glue it with the target body
-        WeldJointDef jointDef = new WeldJointDef();
-        jointDef.initialize(body, controller, Vector2.Zero);
-        world.createJoint(jointDef);
-
-        return controller;
+    public void dispose() {
+        this.box2dWorld.dispose();
+        for (GameObject object : this) {
+            object.dispose();
+        }
     }
 }
+

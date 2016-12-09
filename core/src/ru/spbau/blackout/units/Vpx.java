@@ -2,38 +2,26 @@ package ru.spbau.blackout.units;
 
 import com.badlogic.gdx.Gdx;
 
-import static ru.spbau.blackout.BlackoutGame.VIRTUAL_WORLD_HEIGHT;
-import static ru.spbau.blackout.BlackoutGame.VIRTUAL_WORLD_WIDTH;
+import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
+
 
 /**
  * Convert to virtual world pixels
  */
 public class Vpx {
-    public static final class X {
-        public static float getRpxPerVpx() {
-            return (float)Gdx.graphics.getWidth() / (float)VIRTUAL_WORLD_WIDTH;
-        }
-
-        public static int fromRpx(int rpx) {
-            return Math.round(rpx / getRpxPerVpx());
-        }
-
-        public static int fromCm(float cm) {
-            return fromRpx(Rpx.X.fromCm(cm));
-        }
+    /** For lazy initialization, to avoid NullPointerException */
+    private final static class ConstHolder {
+        public static final float RPX_PER_VPX = (float)Gdx.graphics.getWidth() / (float)getWorldWidth();
+    }
+    public static float getRpxPerVpx() {  // FIXME
+        return ConstHolder.RPX_PER_VPX;
     }
 
-    public static final class Y {
-        public static float getRpxPerVpx() {
-            return (float)Gdx.graphics.getHeight() / (float)VIRTUAL_WORLD_HEIGHT;
-        }
+    public static float fromRpx(float rpx) {
+        return Math.round(rpx / getRpxPerVpx());
+    }
 
-        public static int fromRpx(int rpx) {
-            return Math.round(rpx / getRpxPerVpx());
-        }
-
-        public static int fromCm(float cm) {
-            return fromRpx(Rpx.Y.fromCm(cm));
-        }
+    public static float fromCm(float cm) {
+        return fromRpx(Rpx.fromCm(cm));
     }
 }
