@@ -31,6 +31,7 @@ public class RoomServer extends ServerWithLogging {
 
     public void run() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
+            log("Server started.");
             do {
                 final Socket nextSocket = serverSocket.accept();
                 final RoomClientThread nextThread = new RoomClientThread(this, nextSocket);

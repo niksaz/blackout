@@ -3,14 +3,19 @@ package ru.spbau.blackout.network;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.HttpURLConnection;
 import java.net.Socket;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -26,7 +31,6 @@ import ru.spbau.blackout.screens.MultiplayerTable;
 import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.GameWorldWithExternalSerial;
-
 
 /**
  * Task with the purpose of talking to a server: waiting in a queue, getting a game from a server,
@@ -49,6 +53,51 @@ public class AndroidClient implements Runnable, AbstractServer {
 
     @Override
     public void run() {
+        try {
+            final String url = "http://" +
+                    Network.SERVER_IP_ADDRESS +
+                    ':' +
+                    Network.SERVER_HTTP_PORT_NUMBER +
+                    "/login";
+
+
+            final URL urlObject = new URL(url);
+            final HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+
+            try (
+                DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
+            ) {
+                outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+            }
+
+            final int responseCode = connection.getResponseCode();
+            System.out.println("Sending " + connection.getRequestMethod() + " request to URL : " + url);
+            System.out.println("Response Code : " + responseCode);
+
+            try (
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))
+            ) {
+                String inputLine;
+                while ((inputLine = reader.readLine()) != null) {
+                    System.out.println(inputLine);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            isInterrupted = true;
+            Gdx.app.postRunnable(() -> {
+                final MenuScreen menuScreen = table.getMenuScreen();
+                menuScreen.changeMiddleTable(PlayScreenTable.getTable(menuScreen));
+                BlackoutGame.get().screenManager().setScreen(menuScreen);
+            });
+        }
+    }
+
+    //@Override
+    public void rrun() {
         try (
             DatagramSocket datagramSocket = new DatagramSocket();
             Socket socket = new Socket(Network.SERVER_IP_ADDRESS, Network.SERVER_TCP_PORT_NUMBER);

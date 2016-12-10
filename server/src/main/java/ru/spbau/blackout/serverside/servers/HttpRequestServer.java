@@ -14,9 +14,10 @@ public class HttpRequestServer extends ServerWithLogging {
     public void start() {
         try {
             final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-            server.createContext("/login", new LoginRequestHandler());
+            server.createContext("/login", new LoginRequestHandler(this));
             server.setExecutor(null);
             server.start();
+            log("Server started.");
         } catch (Exception e) {
             log("Exception while creating HttpServer on port " + port + ":" + e.getMessage());
         }
