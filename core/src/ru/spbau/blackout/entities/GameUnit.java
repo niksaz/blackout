@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Utils;
@@ -156,10 +157,10 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
 
 
         @Override
-        public void load() {
-            super.load();
+        public void load(GameContext context) {
+            super.load(context);
             for (Ability ability : abilities) {
-                ability.load();
+                ability.load(this.context);
             }
         }
 
@@ -167,7 +168,7 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
         public void doneLoading() {
             super.doneLoading();
             for (Ability ability : abilities) {
-                ability.doneLoading();
+                ability.doneLoading(this.context);
             }
         }
     }

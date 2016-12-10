@@ -3,6 +3,7 @@ package ru.spbau.blackout.abilities.fireball;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.physics.box2d.Shape;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphic_effects.ParticleGraphicEffect;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
@@ -89,17 +90,17 @@ public final class FireballObject extends AbilityObject {
         }
 
         @Override
-        public void load() {
-            super.load();
-            Particles.load(FIRE_EFFECT_PATH);
-            Particles.load(EXPLOSION_EFFECT_PATH);
+        public void load(GameContext context) {
+            super.load(context);
+            Particles.load(context, FIRE_EFFECT_PATH);
+            Particles.load(context, EXPLOSION_EFFECT_PATH);
         }
 
         @Override
         public void doneLoading() {
             super.doneLoading();
-            this.fireEffect = Particles.getOriginal(FIRE_EFFECT_PATH);
-            this.explosionEffect = Particles.getOriginal(EXPLOSION_EFFECT_PATH);
+            this.fireEffect = Particles.getOriginal(context, FIRE_EFFECT_PATH);
+            this.explosionEffect = Particles.getOriginal(context, EXPLOSION_EFFECT_PATH);
         }
 
         @Override

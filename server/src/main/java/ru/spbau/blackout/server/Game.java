@@ -14,6 +14,7 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.game_session.TestingSessionSettings;
+import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 
@@ -118,6 +119,16 @@ class Game extends Thread implements GameContext {
     }
 
     @Override
+    public Optional<AssetManager> assets() {
+        return Optional.ofNullable(this.getAssets());
+    }
+
+    @Override
+    public Optional<GameSettings> settings() {
+        return Optional.ofNullable(this.getSettings());
+    }
+
+    @Override
     public boolean hasIO() {
         return false;
     }
@@ -133,8 +144,10 @@ class Game extends Thread implements GameContext {
         heroes.add((Character.Definition) room.objectDefs.get(0));
         heroes.add((Character.Definition) room.objectDefs.get(1));
 
-
-        foreach(room.getObjectDefs(), GameObject.Definition::makeInstance);
+        for (GameObject.Definition def : room.getObjectDefs()) {
+            def.setContextOnServer(this);
+            def.makeInstance();
+        }
 
         for (int i = 0; i < clients.size(); i++) {
             clients.get(i).setGame(this, room, heroes.get(i));

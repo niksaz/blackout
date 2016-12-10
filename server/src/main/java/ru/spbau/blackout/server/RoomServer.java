@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 class RoomServer {
 
-    private static final int PLAYERS_NUMBER_OT_START_GAME = 2;
+    private static final int PLAYERS_NUMBER_OT_START_GAME = 1;
 
     private final int port;
     private final PrintStream logger;

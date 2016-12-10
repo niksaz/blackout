@@ -2,6 +2,7 @@ package ru.spbau.blackout.abilities.fireball;
 
 import com.badlogic.gdx.math.Vector2;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.SimpleInstantAbility;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
@@ -54,14 +55,14 @@ public class FireballAbility extends SimpleInstantAbility {
     }
 
     @Override
-    public void load() {
-        super.load();
-        this.shellDef.load();
+    public void load(GameContext context) {
+        super.load(context);
+        this.shellDef.load(context);
     }
 
     @Override
-    public void doneLoading() {
-        super.doneLoading();
+    public void doneLoading(GameContext context) {
+        super.doneLoading(context);
         this.shellDef.doneLoading();
     }
 

@@ -4,7 +4,7 @@ package ru.spbau.blackout.abilities;
 import com.badlogic.gdx.audio.Sound;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.java8features.Optional;
 
 /**
@@ -26,7 +26,7 @@ public abstract class SimpleInstantAbility extends Ability {
     @Override
     public final void onCastStart() {
         this.startSound.ifPresent(sound -> {
-            sound.play(BlackoutGame.get().context().getSettings().effectsVolume);
+            sound.play(1f /*FIXME: use sound volume from settings*/);
         });
         this.cast();
         this.chargeStart();
@@ -40,14 +40,14 @@ public abstract class SimpleInstantAbility extends Ability {
 
 
     @Override
-    public void load() {
-        super.load();
-        BlackoutGame.get().context().getAssets().load(this.castSoundPath(), Sound.class);
+    public void load(GameContext context) {
+        super.load(context);
+        context.getAssets().load(this.castSoundPath(), Sound.class);
     }
 
     @Override
-    public void doneLoading() {
-        super.doneLoading();
-        this.startSound = Optional.of(BlackoutGame.get().context().getAssets().get(this.castSoundPath(), Sound.class));
+    public void doneLoading(GameContext context) {
+        super.doneLoading(context);
+        this.startSound = Optional.of(context.getAssets().get(this.castSoundPath(), Sound.class));
     }
 }

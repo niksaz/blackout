@@ -52,7 +52,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     protected GameObject(Definition def, float x, float y) {
         this.model = def.model.map(ModelInstance::new);
 
-        body = def.registerObject(this);
+        body = def.registerObject(def.context, this);
         body.setUserData(this);
 
         FixtureDef fixtureDef = new FixtureDef();
@@ -268,6 +268,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
         /** The loaded model object. Initialized by <code>initialize</code> method. */
         private transient Optional<Model> model = Optional.empty();
+        protected transient GameContext context;
 
         /**
          * Path to the model for game objects. May be null. In this case objects will not have models.
@@ -290,16 +291,19 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         }
 
         /** Load necessary assets. */
-        public void load() {
-            GameContext context = BlackoutGame.get().context();
+        public void load(GameContext context) {
+            this.context = context;
             if (context.hasIO() && this.modelPath != null) {
                 context.getAssets().load(this.modelPath, Model.class);
             }
         }
 
+        public final void setContextOnServer(GameContext context) {
+            this.context = context;
+        }
+
         /** When assets are loaded. */
         public void doneLoading() {
-            GameContext context = BlackoutGame.get().context();
             if (this.modelPath == null) {
                 this.model = Optional.empty();
             } else {
@@ -329,12 +333,12 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
          * Must be called from <code>GameObject</code> constructor to add this
          * <code>GameObject</code> to the world and make <code>Body</code> for it.
          */
-        private Body registerObject(GameObject object) {
+        private Body registerObject(GameContext context, GameObject object) {
             BodyDef bodyDef = new BodyDef();
             bodyDef.position.set(this.position);
             bodyDef.type = getBodyType();
 
-            return BlackoutGame.get().context().gameWorld().addObject(object, bodyDef);
+            return context.gameWorld().addObject(object, bodyDef);
         }
 
         public abstract BodyDef.BodyType getBodyType();

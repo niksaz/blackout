@@ -21,11 +21,7 @@ public interface GameContext {
     /*FIXME: nullable*/
     GameSettings getSettings();
 
-    default Optional<AssetManager> assets() {
-        return Optional.ofNullable(this.getAssets());
-    }
-
-    default Optional<GameSettings> settings() {
-        return Optional.ofNullable(this.getSettings());
-    }
+    // FIXME: default doesn't work
+    Optional<AssetManager> assets();
+    Optional<GameSettings> settings();
 }

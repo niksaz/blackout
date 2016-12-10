@@ -55,7 +55,6 @@ public class BlackoutGame extends Game {
     private /*final*/ BlackoutAssets assets;
     private /*final*/ ParticleSystem particleSystem;
     private final SpecialEffectsSystem specialEffects = new SpecialEffectsSystem();
-    private GameContext context;
 
 
     private BlackoutGame(ScreenManager screenManager) {
@@ -72,9 +71,6 @@ public class BlackoutGame extends Game {
     public final BlackoutAssets assets() { return this.assets; }
     public final ParticleSystem particleSystem() { return this.particleSystem; }
     public final SpecialEffectsSystem specialEffects() { return this.specialEffects; }
-    public final GameContext context() { return this.context; }
-
-    public final void setContext(GameContext context) { this.context = context; }
 
 
 	// FIXME:  just for test

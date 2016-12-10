@@ -26,12 +26,12 @@ public abstract class Ability {
      * Load necessary assets.
      * Must be called once from <code>GameUnit.Definition::update</code>
      */
-    public void load() {
+    public void load(GameContext context) {
         // loading of icon has to be here because it isn't accessible from `AbilityIcon` class in the loading stage
-        BlackoutGame.get().context().getAssets().load(this.iconPath(), Texture.class);
+        context.getAssets().load(this.iconPath(), Texture.class);
     }
 
-    public void doneLoading() {}
+    public void doneLoading(GameContext context) {}
 
     /**
      * Must be called exactly once from <code>GameUnit::new</code>.

@@ -2,6 +2,7 @@ package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.physics.box2d.Shape;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.utils.Creator;
 
 

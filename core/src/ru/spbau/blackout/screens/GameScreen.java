@@ -33,6 +33,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import java.util.List;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameObject;
@@ -161,6 +162,16 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     @Override
+    public Optional<AssetManager> assets() {
+        return Optional.ofNullable(this.getAssets());
+    }
+
+    @Override
+    public Optional<GameSettings> settings() {
+        return Optional.ofNullable(this.getSettings());
+    }
+
+    @Override
     public GameSettings getSettings() {
         return this.settings;
     }
@@ -176,8 +187,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     public void show() {
         super.show();
 
-        BlackoutGame.get().setContext(this);
-
         // enable music
         this.switchTrack();
 
@@ -188,8 +197,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     @Override
-    public void render(float deltaTime) {
-        super.render(deltaTime);
+    public void render(float delta) {
+        super.render(delta);
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -217,7 +226,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         }
 
         // special effects
-        game.specialEffects().update(deltaTime);
+        game.specialEffects().update(delta);
 
         // music
         if (!this.currentTrack.isPlaying()) {
@@ -225,11 +234,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         }
 
         // world
-        this.gameWorld.update(deltaTime);
+        this.gameWorld.update(delta);
         this.updateCamera();
 
         // ui
-        this.ui.update(deltaTime);
+        this.ui.update(delta);
         this.ui.draw();
     }
 
@@ -390,7 +399,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         private void loadRealResources() {
             ui.load(assets);
-            foreach(this.objectDefs, def -> def.load());
+            foreach(this.objectDefs, obj -> obj.load(GameScreen.this));
             assets.load(this.mapPath, Model.class);
             this.commonHealthBar.load(assets);
         }
