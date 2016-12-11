@@ -14,6 +14,10 @@ import java.util.List;
 
 import ru.spbau.blackout.database.PlayerEntity;
 
+/**
+ * Handler for update queries from clients.
+ * Assumes that client have logged in before so his entry exists in the database.
+ */
 public class UpdateRequestHandler implements HttpHandler {
 
     private final HttpRequestServer server;
@@ -23,7 +27,7 @@ public class UpdateRequestHandler implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) {
         try (
             InputStream input = exchange.getRequestBody();
             DataInputStream inputStream = new DataInputStream(input)

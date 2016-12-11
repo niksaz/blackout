@@ -2,7 +2,10 @@ package ru.spbau.blackout.serverside.servers;
 
 import java.io.PrintStream;
 
-class ServerWithLogging {
+/**
+ * Server base with intended port and ability to log.
+ */
+abstract class ServerWithLogging {
 
     final int port;
     private final PrintStream logger;

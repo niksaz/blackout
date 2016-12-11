@@ -29,5 +29,4 @@ public class PlayServicesInCore implements PlayServicesListener {
     public boolean removeListener(CorePlayServicesListener listener) {
         return listeners.removeValue(listener, true);
     }
-
 }

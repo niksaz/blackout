@@ -16,6 +16,10 @@ import java.util.List;
 
 import ru.spbau.blackout.database.PlayerEntity;
 
+/**
+ * Handler for load queries from clients.
+ * Checks whether this client exists and if he doesn't exist the creates a new account.
+ */
 public class LoadRequestHandler implements HttpHandler {
 
     private final HttpRequestServer server;
@@ -25,7 +29,7 @@ public class LoadRequestHandler implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) {
         try (
             InputStream input = exchange.getRequestBody();
             DataInputStream inputStream = new DataInputStream(input);

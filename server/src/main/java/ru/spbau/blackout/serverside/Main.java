@@ -7,7 +7,7 @@ import ru.spbau.blackout.serverside.servers.HttpRequestServer;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 
 /**
- * Class for starting servers.
+ * Class for starting servers for different purposes, i.e. multiplayer, loading game info.
  */
 public class Main {
 

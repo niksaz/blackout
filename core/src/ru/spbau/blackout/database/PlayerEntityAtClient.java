@@ -13,6 +13,9 @@ import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.screens.MenuScreen;
 
+/**
+ * Extended PlayerEntity which actually asks server if a query can be done and only then performs it.
+ */
 public class PlayerEntityAtClient extends PlayerEntity {
 
     public PlayerEntityAtClient(PlayerEntity playerEntity) {

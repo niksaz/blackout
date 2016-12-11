@@ -12,6 +12,9 @@ import java.net.InetSocketAddress;
 import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.database.PlayerEntity;
 
+/**
+ * Server for responding of loading and update of player's information. Stores connection to MongoDB database.
+ */
 public class HttpRequestServer extends ServerWithLogging {
 
     private final Datastore datastore;

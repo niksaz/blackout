@@ -5,6 +5,9 @@ import org.mongodb.morphia.annotations.Id;
 
 import java.io.Serializable;
 
+/**
+ * Representation of a player profile in a database.
+ */
 @Entity("players")
 public class PlayerEntity implements Serializable {
 
