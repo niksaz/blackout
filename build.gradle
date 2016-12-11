@@ -72,6 +72,7 @@ project(":core") {
     apply plugin: "me.tatarka.retrolambda"
 
     dependencies {
+        compile 'org.mongodb.morphia:morphia:1.2.1'
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
