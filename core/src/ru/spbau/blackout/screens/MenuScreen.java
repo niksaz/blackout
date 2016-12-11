@@ -17,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.utils.BlackoutAssets;
 
 public class MenuScreen extends StageScreen {
 
@@ -53,7 +52,7 @@ public class MenuScreen extends StageScreen {
 
     private void addLeftPaneElements() {
         addLabelWithTextAt(
-                "Hello, " + BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName(),
+                "Hello, " + BlackoutGame.get().getPlayerEntity().getName(),
                 CORNER_LABEL_MARGIN,
                 stage.getViewport().getWorldHeight() - CORNER_LABEL_MARGIN,
                 Align.topLeft);
@@ -147,7 +146,7 @@ public class MenuScreen extends StageScreen {
     }
 
     private void refreshGoldLabel() {
-        goldLabel.setText("Gold: " + BlackoutGame.get().playServicesInCore().getSnapshot().getGold());
+        goldLabel.setText("Gold: " + BlackoutGame.get().getPlayerEntity().getGold());
         goldLabel.setSize(goldLabel.getPrefWidth(), goldLabel.getPrefHeight());
         goldLabel.setPosition(
                 stage.getViewport().getWorldWidth() - CORNER_LABEL_MARGIN,

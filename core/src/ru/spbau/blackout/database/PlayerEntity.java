@@ -1,14 +1,14 @@
 package ru.spbau.blackout.database;
 
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
+import java.io.Serializable;
+
 @Entity("players")
-public class PlayerEntity {
+public class PlayerEntity implements Serializable {
 
     @Id
-    private ObjectId id;
     private String name;
     private int gold;
 
@@ -25,6 +25,11 @@ public class PlayerEntity {
         this.gold = gold;
     }
 
+    public PlayerEntity(PlayerEntity other) {
+        name = other.name;
+        gold = other.gold;
+    }
+
     public String getName() {
         return name;
     }
@@ -33,11 +38,7 @@ public class PlayerEntity {
         return gold;
     }
 
-    public void setGold(int gold) {
-        this.gold = gold;
-    }
-
     public void changeGold(int delta) {
-        setGold(getGold() + delta);
+        gold += delta;
     }
 }

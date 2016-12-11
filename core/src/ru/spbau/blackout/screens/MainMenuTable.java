@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.utils.BlackoutAssets;
 
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
@@ -46,7 +45,7 @@ class MainMenuTable {
         addButton(middleTable, BUTTON_SHOP_TEXT, upImage, downImage, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                BlackoutGame.get().playServicesInCore().getSnapshot().changeGold(10);
+                BlackoutGame.get().getPlayerEntity().changeGold(10);
             }
         });
         addButton(middleTable, BUTTON_ACHIEVEMENTS_TEXT, upImage, downImage, new ClickListener() {
