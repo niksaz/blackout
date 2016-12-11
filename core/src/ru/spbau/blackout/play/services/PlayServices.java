@@ -10,9 +10,6 @@ public interface PlayServices {
     boolean isSignedIn();
     String getPlayerName();
 
-    void startLoadingSnapshot();
-    void saveSnapshot(BlackoutSnapshot blackoutSnapshot);
-
     int getWin1vs1DuelId();
     int getWin2vs2FightId();
     int getWin3vs3Battle();

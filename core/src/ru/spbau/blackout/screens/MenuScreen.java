@@ -34,7 +34,7 @@ public class MenuScreen extends StageScreen {
     private Label goldLabel;
     private Table middleTable;
 
-    MenuScreen() {
+    public MenuScreen() {
         super();
 
         addLeftPaneElements();

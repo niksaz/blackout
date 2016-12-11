@@ -14,7 +14,6 @@ import com.google.example.games.basegameutils.GameHelper;
 import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.play.services.BlackoutSnapshot;
 import ru.spbau.blackout.play.services.PlayServices;
 import ru.spbau.blackout.play.services.PlayServicesListener;
 
@@ -24,7 +23,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
 
     private GameHelper gameHelper;
     private PlayServicesListener coreListener;
-    private SnapshotManager snapshotManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +35,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         gameHelper.setShowErrorDialogs(false);
         gameHelper.setConnectOnStart(false);
         gameHelper.setup(gameHelperListener);
-
-        snapshotManager = new SnapshotManager(this);
 
         final AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         final BlackoutGame game = BlackoutGame.get();
@@ -138,21 +134,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     @Override
     public String getPlayerName() {
         return Games.Players.getCurrentPlayer(gameHelper.getApiClient()).getDisplayName();
-    }
-
-    @Override
-    public void startLoadingSnapshot() {
-        try {
-            runOnUiThread(() -> snapshotManager.startLoadingSnapshot());
-        } catch (Exception e) {
-            Gdx.app.log(TAG, "startLoadingSnapshot: " + e.getMessage());
-        }
-
-    }
-
-    @Override
-    public void saveSnapshot(BlackoutSnapshot blackoutSnapshot) {
-        snapshotManager.saveSnapshot(blackoutSnapshot);
     }
 
     private void showUserIsNotSignedInDialog() {
