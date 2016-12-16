@@ -41,6 +41,7 @@ public class PlayerEntityAtClient extends PlayerEntity {
                     DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
                 ) {
                     outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+                    outputStream.writeInt(delta);
                 }
 
                 final int responseCode = connection.getResponseCode();
@@ -48,7 +49,7 @@ public class PlayerEntityAtClient extends PlayerEntity {
                 System.out.println("Response Code : " + responseCode);
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    super.changeGold(10);
+                    super.changeGold(delta);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

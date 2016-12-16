@@ -33,6 +33,7 @@ public class UpdateRequestHandler implements HttpHandler {
             DataInputStream inputStream = new DataInputStream(input)
         ) {
             final String name = inputStream.readUTF();
+            final int delta = inputStream.readInt();
 
             final Query<PlayerEntity> query =
                     server.getDatastore().createQuery(PlayerEntity.class).field("name").equal(name);
@@ -41,12 +42,19 @@ public class UpdateRequestHandler implements HttpHandler {
             if (result.size() != 1) {
                 throw new IllegalStateException();
             }
-            final UpdateOperations<PlayerEntity> updateOperations =
-                    server.getDatastore().createUpdateOperations(PlayerEntity.class).inc("gold", 10);
-            server.getDatastore().update(query, updateOperations);
 
-            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-            server.log("Updated gold for " + name);
+            final PlayerEntity playerEntity = result.get(0);
+            if (playerEntity.getGold() + delta >= 0) {
+                final UpdateOperations<PlayerEntity> updateOperations =
+                        server.getDatastore().createUpdateOperations(PlayerEntity.class).inc("gold", delta);
+                server.getDatastore().update(query, updateOperations);
+
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+                server.log("Updated gold for " + name);
+            } else {
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_FORBIDDEN, 0);
+                server.log("Denied updating of gold for " + name);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
