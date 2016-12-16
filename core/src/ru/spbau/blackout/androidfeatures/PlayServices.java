@@ -1,4 +1,4 @@
-package ru.spbau.blackout.play.services;
+package ru.spbau.blackout.androidfeatures;
 
 public interface PlayServices {
     void signIn();

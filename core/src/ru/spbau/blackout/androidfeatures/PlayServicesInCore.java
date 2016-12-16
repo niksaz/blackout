@@ -1,11 +1,11 @@
-package ru.spbau.blackout.play.services;
+package ru.spbau.blackout.androidfeatures;
 
 import com.badlogic.gdx.utils.Array;
 
 public class PlayServicesInCore implements PlayServicesListener {
 
     private PlayServices playServices;
-    private final Array<CorePlayServicesListener> listeners = new Array<>();
+    private final Array<PlayServicesListener> listeners = new Array<>();
 
     public PlayServicesInCore(PlayServices playServices) {
         this.playServices = playServices;
@@ -17,16 +17,23 @@ public class PlayServicesInCore implements PlayServicesListener {
 
     @Override
     public void onSignInSucceeded() {
-        for (CorePlayServicesListener listener : listeners) {
+        for (PlayServicesListener listener : listeners) {
             listener.onSignInSucceeded();
         }
     }
 
-    public void addListener(CorePlayServicesListener listener) {
+    @Override
+    public void onSignInFailed(String message) {
+        for (PlayServicesListener listener : listeners) {
+            listener.onSignInFailed(message);
+        }
+    }
+
+    public void addListener(PlayServicesListener listener) {
         listeners.add(listener);
     }
 
-    public boolean removeListener(CorePlayServicesListener listener) {
+    public boolean removeListener(PlayServicesListener listener) {
         return listeners.removeValue(listener, true);
     }
 }

@@ -1,6 +1,5 @@
 package ru.spbau.blackout.android;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,8 +13,8 @@ import com.google.example.games.basegameutils.GameHelper;
 import com.google.example.games.basegameutils.GameHelper.GameHelperListener;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.play.services.PlayServices;
-import ru.spbau.blackout.play.services.PlayServicesListener;
+import ru.spbau.blackout.androidfeatures.PlayServices;
+import ru.spbau.blackout.androidfeatures.PlayServicesListener;
 
 public class AndroidLauncher extends AndroidApplication implements PlayServices {
 
@@ -40,14 +39,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
         final BlackoutGame game = BlackoutGame.get();
         game.initializePlayServices(this);
         initialize(game, config);
-    }
-
-    public GameHelper getGameHelper() {
-        return gameHelper;
-    }
-
-    public PlayServicesListener getCoreListener() {
-        return coreListener;
     }
 
     public void setCoreListener(PlayServicesListener coreListener) {
@@ -185,41 +176,36 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     private class FailureResistantGameHelperListener implements GameHelperListener {
+
         @Override
         public void onSignInFailed() {
             final GameHelper.SignInFailureReason reason = gameHelper.getSignInError();
-            if (reason == null) {
-                gameHelper.beginUserInitiatedSignIn();
-                return;
-            }
-            Log.v(TAG, reason.toString());
-
-            final int resultCode = reason.getActivityResultCode();
             final String text;
+            if (reason == null) {
+                text = getString(R.string.result_sign_in_failed_ms);
+            } else {
+                Log.v(TAG, reason.toString());
 
-            switch (resultCode) {
-                case GamesActivityResultCodes.RESULT_APP_MISCONFIGURED:
-                    text = getString(R.string.result_app_misconfigured_ms);
-                    break;
+                final int resultCode = reason.getActivityResultCode();
+                switch (resultCode) {
+                    case GamesActivityResultCodes.RESULT_APP_MISCONFIGURED:
+                        text = getString(R.string.result_app_misconfigured_ms);
+                        break;
 
-                case GamesActivityResultCodes.RESULT_SIGN_IN_FAILED:
-                    text = getString(R.string.result_sign_in_failed_ms);
-                    break;
+                    case GamesActivityResultCodes.RESULT_SIGN_IN_FAILED:
+                        text = getString(R.string.result_sign_in_failed_ms);
+                        break;
 
-                case GamesActivityResultCodes.RESULT_LICENSE_FAILED:
-                    text = getString(R.string.result_license_failed_ms);
-                    break;
+                    case GamesActivityResultCodes.RESULT_LICENSE_FAILED:
+                        text = getString(R.string.result_license_failed_ms);
+                        break;
 
-                default:
-                    text = getString(R.string.result_default_error);
-                    break;
+                    default:
+                        text = getString(R.string.result_default_error);
+                        break;
+                }
             }
-
-            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setCancelable(false);
-            builder.setMessage(text);
-            builder.setNeutralButton(R.string.try_again, (dialogInterface, i) -> signIn());
-            builder.create().show();
+            coreListener.onSignInFailed(text);
         }
 
         @Override

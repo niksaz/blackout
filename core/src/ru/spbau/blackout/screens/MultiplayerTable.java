@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.network.AndroidClient;
-import ru.spbau.blackout.utils.BlackoutAssets;
 
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 

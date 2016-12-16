@@ -11,12 +11,18 @@ import java.util.Arrays;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.network.Network;
+import ru.spbau.blackout.screens.LoadScreen;
 import ru.spbau.blackout.screens.MenuScreen;
 
 /**
  * Extended PlayerEntity which actually asks server if a query can be done and only then performs it.
  */
 public class PlayerEntityAtClient extends PlayerEntity {
+
+    private static final int HTTP_CONNECT_TIMEOUT_MS = 2000;
+    private static final int HTTP_READ_TIMEOUT_MS = 2000;
+    private static final int LOAD_REQUEST_MAX_ATTEMPTS = 3;
+    private static final String UNSUCCESSFUL_LOADING = "The server is unavailable.";
 
     public PlayerEntityAtClient(PlayerEntity playerEntity) {
         super(playerEntity);
@@ -36,6 +42,9 @@ public class PlayerEntityAtClient extends PlayerEntity {
                 final HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setDoOutput(true);
+
+                connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_MS);
+                connection.setReadTimeout(HTTP_READ_TIMEOUT_MS);
 
                 try (
                     DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
@@ -57,43 +66,57 @@ public class PlayerEntityAtClient extends PlayerEntity {
         }).start();
     }
 
-    public static void loadPlayerEntity() {
+    public static void loadPlayerEntity(LoadScreen loadScreen) {
         new Thread(() -> {
-            try {
-                final String url = "http://" +
-                        Network.SERVER_IP_ADDRESS +
-                        ':' +
-                        Network.SERVER_HTTP_PORT_NUMBER +
-                        Database.LOAD_COMMAND;
+            boolean loadSuccessfully = false;
+            for (int attempt = 0; attempt < LOAD_REQUEST_MAX_ATTEMPTS; attempt++) {
+                try {
+                    final String url = "http://" +
+                            Network.SERVER_IP_ADDRESS +
+                            ':' +
+                            Network.SERVER_HTTP_PORT_NUMBER +
+                            Database.LOAD_COMMAND;
 
 
-                final URL urlObject = new URL(url);
-                final HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
+                    final URL urlObject = new URL(url);
+                    final HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setDoOutput(true);
 
-                try (
-                        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
-                ) {
-                    outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+                    connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_MS);
+                    connection.setReadTimeout(HTTP_READ_TIMEOUT_MS);
+
+                    try (
+                            DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
+                    ) {
+                        outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+                    }
+
+                    final int responseCode = connection.getResponseCode();
+                    final int responseLength = connection.getContentLength();
+                    System.out.println("Loading. " + connection.getRequestMethod() + " request to URL : " + url);
+                    System.out.println("Response Code : " + responseCode);
+
+                    final byte[] response = new byte[responseLength];
+                    final int result = connection.getInputStream().read(response);
+                    if (result == -1) {
+                        continue;
+                    }
+                    System.out.println("GOT " + responseLength + " " + Arrays.toString(response));
+
+                    final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(response));
+                    final PlayerEntity playerEntity = (PlayerEntity) in.readObject();
+                    BlackoutGame.get().setPlayerEntity(new PlayerEntityAtClient(playerEntity));
+                    Gdx.app.postRunnable(() ->
+                            BlackoutGame.get().screenManager().setScreen(new MenuScreen()));
+                    loadSuccessfully = true;
+                    break;
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-                final int responseCode = connection.getResponseCode();
-                final int responseLength = connection.getContentLength();
-                System.out.println("Loading. " + connection.getRequestMethod() + " request to URL : " + url);
-                System.out.println("Response Code : " + responseCode);
-
-                final byte[] response = new byte[responseLength];
-                final int result = connection.getInputStream().read(response);
-                System.out.println("GOT " + responseLength + " " + Arrays.toString(response));
-
-                final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(response));
-                final PlayerEntity playerEntity = (PlayerEntity) in.readObject();
-                BlackoutGame.get().setPlayerEntity(new PlayerEntityAtClient(playerEntity));
-                Gdx.app.postRunnable(() ->
-                        BlackoutGame.get().screenManager().setScreen(new MenuScreen()));
-            } catch (Exception e) {
-                e.printStackTrace();
+            }
+            if (!loadSuccessfully) {
+                Gdx.app.postRunnable(() -> loadScreen.showErrorDialog(UNSUCCESSFUL_LOADING));
             }
         }).start();
     }
