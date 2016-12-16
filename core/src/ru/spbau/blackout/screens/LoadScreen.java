@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.androidfeatures.PlayServicesListener;
@@ -17,6 +18,7 @@ public class LoadScreen extends StageScreen implements PlayServicesListener {
     private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
 
     private static final float LABEL_BOTTOM_PADDING = 25.0f;
+    private static final float DIALOG_PADDING = 15.0f;
 
     private static final String STARTED_LOGGING_IN = "Signing in...";
     private static final String STARTED_LOADING = "Loading your game info...";
@@ -72,8 +74,13 @@ public class LoadScreen extends StageScreen implements PlayServicesListener {
         middleTable.clear();
         new Dialog(UNSUCCESSFUL_MES, BlackoutGame.get().assets().getDefaultSkin()) {
             {
-                text(text);
-                button(TRY_AGAIN);
+                setMovable(false);
+                padTop(getTitleLabel().getHeight());
+                getTitleLabel().setAlignment(Align.center);
+                padLeft(DIALOG_PADDING);
+                padRight(DIALOG_PADDING);
+                getContentTable().add(text).padTop(DIALOG_PADDING).padBottom(DIALOG_PADDING);
+                button(TRY_AGAIN).padBottom(DIALOG_PADDING);
             }
 
             @Override
