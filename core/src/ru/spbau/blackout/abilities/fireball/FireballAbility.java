@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.SimpleInstantAbility;
 import ru.spbau.blackout.entities.AbilityObject;
+import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
 
@@ -45,7 +46,7 @@ public class FireballAbility extends SimpleInstantAbility {
         Vector2 direction = new Vector2(1, 0).rotateRad(getUnit().getRotation());
         Vector2 position = new Vector2(getUnit().getPosition());
         position.mulAdd(direction, CAST_DISTANCE);
-        AbilityObject shell = (AbilityObject) shellDef.makeInstance(position);
+        AbilityObject shell = (AbilityObject) shellDef.makeInstanceWithNextUid(position);
         shell.velocity.mulAdd(direction, SHELL_START_SPEED);
     }
 

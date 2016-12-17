@@ -15,7 +15,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
-import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphic_effects.GraphicEffect;
 import ru.spbau.blackout.java8features.Optional;
@@ -255,6 +254,8 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public static final float DEFAULT_MASS = 70f;
 
 
+        protected static long s_lastUid = 0;
+
         // physics
         public float rotation = DEFAULT_ROTATION;
         public float height = DEFAULT_HEIGHT;
@@ -320,10 +321,18 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public GameObject makeInstance(long uid, Vector2 position) {
             return makeInstance(uid, position.x, position.y);
         }
-        /** Equal to <code>makeInstance(this.position)</code> */
-        public GameObject makeInstance(long uid) {
-            return makeInstance(uid, position);
+
+        /**
+         * Create an object at the giving position.
+         */
+        public GameObject makeInstanceWithNextUid(float x, float y) {
+            return makeInstance(getNextUid(), x, y);
         }
+        /** Create an object at the giving position. */
+        public GameObject makeInstanceWithNextUid(Vector2 position) {
+            return makeInstanceWithNextUid(position.x, position.y);
+        }
+
 
         /** Rotates to the given direction. */
         public void setDirection(Vector2 direction) {
@@ -344,5 +353,10 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         }
 
         public abstract BodyDef.BodyType getBodyType();
+
+        public long getNextUid() {
+            s_lastUid += 1;
+            return s_lastUid;
+        }
     }
 }

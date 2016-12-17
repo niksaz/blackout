@@ -11,6 +11,7 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  */
 public class GameWorldWithPhysics extends GameWorld {
 
+    /** The fixed physic driver's step. */
     private static final float WORLD_STEP = 1 / 58f;
 
     private float accumulator = 0;
@@ -42,6 +43,8 @@ public class GameWorldWithPhysics extends GameWorld {
     }
 
     private void step() {
+        stepNumber += 1;
+
         foreach(this, GameObject::updateForFirstStep);
         this.box2dWorld.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 

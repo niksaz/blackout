@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.java8features.Optional;
+import ru.spbau.blackout.network.AbstractServer;
 
 /**
  * Abstract class for abilities which should be casted by single tap on the icon.
@@ -23,19 +24,16 @@ public abstract class SimpleInstantAbility extends Ability {
 
 
     @Override
-    public final void onCastStart() {
-        this.startSound.ifPresent(sound -> {
-            sound.play(1f /*FIXME: use sound volume from settings*/);
-        });
+    public final void onCastStart(AbstractServer server) {
+        this.startSound.get().play(1f /*FIXME: use sound volume from settings*/);
         this.cast();
-        this.chargeStart();
     }
 
     @Override
-    public final void inCast(float deltaTime) { /*nothing*/ }
+    public final void inCast(AbstractServer server, float delta) { /* nothing */ }
 
     @Override
-    public final void onCastEnd() { /*nothing*/ }
+    public final void onCastEnd(AbstractServer server) { /*nothing*/ }
 
 
     @Override

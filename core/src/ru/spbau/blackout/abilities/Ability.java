@@ -7,6 +7,7 @@ import java.io.Serializable;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.network.AbstractServer;
 
 
 /**
@@ -45,11 +46,11 @@ public abstract class Ability implements Serializable {
 
 
     /** Called once when a touch goes down on the icon. */
-    public abstract void onCastStart();
+    public abstract void onCastStart(AbstractServer server);
     /** Called each frame when the icon is pressed. */
-    public abstract void onCastEnd();
+    public abstract void onCastEnd(AbstractServer server);
     /** Called once when a touch goes up. */
-    public abstract void inCast(float deltaTime);
+    public abstract void inCast(AbstractServer server, float delta);
 
     /** Path to the icon in assets directory. */
     public abstract String iconPath();

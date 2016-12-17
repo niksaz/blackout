@@ -45,12 +45,13 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  * with physic driver. This method called one time per frame (i.e. without fixed step).
  */
 public abstract class GameWorld implements Iterable<GameObject>, InplaceSerializable {
-    /** The fixed physic driver's step. */
+
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
     private final List<GameObject> gameObjects = new LinkedList<>();
     transient protected final World box2dWorld;
+    protected long stepNumber = 0;
 
 
     public GameWorld() {
@@ -87,6 +88,8 @@ public abstract class GameWorld implements Iterable<GameObject>, InplaceSerializ
 
     @Override
     public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        out.writeLong(stepNumber);
+
         out.writeInt(gameObjects.size());
 
         for (GameObject object : this) {
@@ -96,10 +99,17 @@ public abstract class GameWorld implements Iterable<GameObject>, InplaceSerializ
 
     @Override
     public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.readInt();
+        long num = in.readLong();
 
-        for (GameObject object : this) {
-            object.inplaceDeserialize(in);
+        // this GameWorld is outdated
+        if (num > stepNumber) {
+            stepNumber = num;
+
+            in.readInt();
+
+            for (GameObject object : this) {
+                object.inplaceDeserialize(in);
+            }
         }
 
         return null;
