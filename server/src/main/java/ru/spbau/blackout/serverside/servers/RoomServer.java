@@ -1,4 +1,4 @@
-package ru.spbau.blackout.server;
+package ru.spbau.blackout.serverside.servers;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -10,58 +10,53 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import ru.spbau.blackout.serverside.multiplayer.Game;
+import ru.spbau.blackout.serverside.multiplayer.RoomClientThread;
+
 /**
  * Accepts incoming connections, creates a thread for each accepted connection (ClientThread),
  * stored them and match them to create Games.
  */
-class RoomServer {
+public class RoomServer extends ServerWithLogging {
 
-    private static final int PLAYERS_NUMBER_OT_START_GAME = 1;
+    private static final int PLAYERS_NUMBER_TO_START_GAME = 1;
 
-    private final int port;
-    private final PrintStream logger;
-    private final Deque<ClientThread> clientThreads = new ConcurrentLinkedDeque<>();
+    private final Deque<RoomClientThread> clientThreads = new ConcurrentLinkedDeque<>();
     private final AtomicInteger playersNumber = new AtomicInteger();
     private int gamesCreated;
 
-    RoomServer(int port, PrintStream logger) {
-        this.port = port;
-        this.logger = logger;
+    public RoomServer(int port, PrintStream logger, String tag) {
+        super(port, logger, tag);
     }
 
-    void run() {
+    public void run() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
+            log("Server started.");
             do {
                 final Socket nextSocket = serverSocket.accept();
-                final ClientThread nextThread = new ClientThread(this, nextSocket);
+                final RoomClientThread nextThread = new RoomClientThread(this, nextSocket);
                 log("New thread for a connection is created.");
                 clientThreads.add(nextThread);
                 playersNumber.addAndGet(1);
                 nextThread.start();
-                maybePlayGame(PLAYERS_NUMBER_OT_START_GAME);
+                maybePlayGame(PLAYERS_NUMBER_TO_START_GAME);
             } while (true);
         } catch (IOException e) {
             log("Exception caught when trying to listen on port " + port +
-                " or listening for a connection:" + e.getMessage());
+                    " or listening for a connection:" + e.getMessage());
         }
     }
 
-    void discard(ClientThread clientThread) {
+    public void discard(RoomClientThread clientThread) {
         playersNumber.decrementAndGet();
         clientThreads.remove(clientThread);
         log("Client named " + clientThread.getClientName() + " disconnected.");
     }
 
-    void log(String logMessage) {
-        synchronized (logger) {
-            logger.println(logMessage);
-        }
-    }
-
     private synchronized void maybePlayGame(int playersForGame) {
         if (playersNumber.get() >= playersForGame) {
             playersNumber.addAndGet(-playersForGame);
-            final List<ClientThread> clients = new ArrayList<>(playersForGame);
+            final List<RoomClientThread> clients = new ArrayList<>(playersForGame);
             for (int playerIndex = 0; playerIndex < playersForGame; playerIndex++) {
                 clients.add(clientThreads.removeFirst());
             }

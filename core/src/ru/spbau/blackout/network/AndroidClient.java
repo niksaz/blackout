@@ -27,7 +27,6 @@ import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.GameWorldWithExternalSerial;
 
-
 /**
  * Task with the purpose of talking to a server: waiting in a queue, getting a game from a server,
  * synchronizing state of a game, passing user inputs to a server (AbstractServer)

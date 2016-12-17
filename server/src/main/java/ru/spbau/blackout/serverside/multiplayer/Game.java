@@ -1,4 +1,4 @@
-package ru.spbau.blackout.server;
+package ru.spbau.blackout.serverside.multiplayer;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
@@ -17,29 +17,26 @@ import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
-
+import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.Utils;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.worlds.GameWorldWithPhysics;
-
-import static ru.spbau.blackout.java8features.Functional.foreach;
-
 
 /**
  * Multiplayer game representation. Used for synchronizing game's state and watching for game flow, i.e. if someone
  * disconnects it will finish the game. It serializes the current world and asks ClientThreads to send it
  * to devices. ClientThreads pass user inputs from devices.
  */
-class Game extends Thread implements GameContext {
+public class Game extends Thread implements GameContext {
 
     private final int gameId;
     private final RoomServer server;
-    private final List<ClientThread> clients;
+    private final List<RoomClientThread> clients;
     private final GameWorldWithPhysics gameWorld = new GameWorldWithPhysics();
     private volatile GameState gameState = GameState.READY_TO_START;
 
-    Game(RoomServer server, List<ClientThread> clients, int gameId) {
+    public Game(RoomServer server, List<RoomClientThread> clients, int gameId) {
         this.gameId = gameId;
         this.server = server;
         this.clients = clients;
@@ -47,7 +44,7 @@ class Game extends Thread implements GameContext {
 
 
     public void run() {
-        server.log("New game with id #" + gameId + " is going to start!");
+        server.log("New game with id #" + gameId + " is going to run!");
         createRoomAndSendItToClients();
         waitWhileEveryoneIsReady();
 
@@ -79,7 +76,7 @@ class Game extends Thread implements GameContext {
                 }
 
                 final byte[] worldInBytes = serializedVersionOfWorld.toByteArray();
-                for (ClientThread client : clients) {
+                for (RoomClientThread client : clients) {
                     if (client.getClientGameState() == GameState.FINISHED) {
                         gameState = GameState.FINISHED;
                         break;
@@ -160,7 +157,7 @@ class Game extends Thread implements GameContext {
             boolean everyoneIsReady;
             do {
                 everyoneIsReady = true;
-                for (ClientThread thread : clients) {
+                for (RoomClientThread thread : clients) {
                     final GameState currentClientGameState = thread.getClientGameState();
                     if (currentClientGameState == GameState.WAITING) {
                         everyoneIsReady = false;

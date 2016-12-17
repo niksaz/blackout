@@ -7,14 +7,13 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
 import com.badlogic.gdx.physics.box2d.Box2D;
 
-import ru.spbau.blackout.network.SinglePlayerServer;
-
+import ru.spbau.blackout.androidfeatures.PlayServices;
+import ru.spbau.blackout.androidfeatures.PlayServicesInCore;
+import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
-
-import ru.spbau.blackout.play.services.PlayServices;
-import ru.spbau.blackout.play.services.PlayServicesInCore;
-import ru.spbau.blackout.game_session.TestingSessionSettings;
+import ru.spbau.blackout.network.SinglePlayerServer;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
 import ru.spbau.blackout.settings.GameSettings;
@@ -47,6 +46,7 @@ public class BlackoutGame extends Game {
 
     // fields marked as /*final*/ must be assigned only once, but can't be assigned in constructor
 
+    private PlayerEntity playerEntity;
     private final ScreenManager screenManager;
     private /*final*/ PlayServicesInCore playServicesInCore;
 
@@ -56,13 +56,11 @@ public class BlackoutGame extends Game {
     private /*final*/ ParticleSystem particleSystem;
     private final SpecialEffectsSystem specialEffects = new SpecialEffectsSystem();
 
-
     private BlackoutGame(ScreenManager screenManager) {
         this.screenManager = screenManager;
     }
 
     public static BlackoutGame get() { return SingletonHolder.INSTANCE; }
-
 
     public final ModelBatch modelBatch() { return this.modelBatch; }
     public final SpriteBatch spriteBatch() { return this.spriteBatch; }
@@ -97,7 +95,7 @@ public class BlackoutGame extends Game {
         this.assets = new BlackoutAssets();
         this.particleSystem = new ParticleSystem();
 
-        this.assets.loadFonts();
+        this.assets.load();
 
         this.screenManager.setScreen(new LoadScreen());
 	}
@@ -108,5 +106,13 @@ public class BlackoutGame extends Game {
         this.screenManager.dispose();
         this.modelBatch.dispose();
         this.spriteBatch.dispose();
+    }
+
+    public PlayerEntity getPlayerEntity() {
+        return playerEntity;
+    }
+
+    public void setPlayerEntity(PlayerEntity playerEntity) {
+        this.playerEntity = playerEntity;
     }
 }

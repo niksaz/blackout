@@ -1,4 +1,4 @@
-package ru.spbau.blackout.server;
+package ru.spbau.blackout.serverside.multiplayer;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -15,13 +15,13 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
-
+import ru.spbau.blackout.serverside.servers.RoomServer;
 
 /**
  * A thread allocated for each client connected to the server. Initially it is waiting to be matched
  * and later acting as the representative of the client in the game.
  */
-class ClientThread extends Thread {
+public class RoomClientThread extends Thread {
 
     private static final String UNKNOWN = "UNKNOWN";
 
@@ -36,7 +36,7 @@ class ClientThread extends Thread {
     private final AtomicReference<byte[]> worldInBytes = new AtomicReference<>();
     private final AtomicReference<Vector2> velocityFromClient = new AtomicReference<>();
 
-    ClientThread(RoomServer server, Socket socket) {
+    public RoomClientThread(RoomServer server, Socket socket) {
         this.server = server;
         this.socket = socket;
     }
@@ -144,7 +144,7 @@ class ClientThread extends Thread {
         }
     }
 
-    String getClientName() {
+    public String getClientName() {
         return name;
     }
 

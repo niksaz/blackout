@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         // there is a bug in android gradle tools 2.2.2
         //noinspection GradleDependency
-        classpath 'com.android.tools.build:gradle:2.2.1'
+        classpath 'com.android.tools.build:gradle:2.2.3'
         classpath 'me.tatarka:gradle-retrolambda:3.2.4'
     }
 }
@@ -46,7 +46,7 @@ project(":android") {
     dependencies {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-        compile 'com.google.android.gms:play-services-games:9.8.0'
+        compile 'com.google.android.gms:play-services-games:10.0.1'
         compile project(':BaseGameUtils')
 
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
@@ -72,6 +72,7 @@ project(":core") {
     apply plugin: "me.tatarka.retrolambda"
 
     dependencies {
+        compile 'org.mongodb.morphia:morphia:1.2.1'
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"

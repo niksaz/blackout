@@ -6,6 +6,9 @@ import ru.spbau.blackout.entities.GameObject;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
+/**
+ * GameWorld with physics computations. Used in a single-player game and on server during a multi-player game.
+ */
 public class GameWorldWithPhysics extends GameWorld {
 
     private static final float WORLD_STEP = 1 / 58f;
