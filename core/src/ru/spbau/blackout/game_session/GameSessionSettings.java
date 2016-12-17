@@ -1,5 +1,7 @@
 package ru.spbau.blackout.game_session;
 
+import com.badlogic.gdx.math.Vector2;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -21,10 +23,4 @@ public interface GameSessionSettings extends Serializable {
      * Returns a list of definitions of all GameObjects in the game.
      */
     List<GameObject.Definition> getObjectDefs();
-
-    /**
-     * Returns a definition of current player's character.
-     * Note that it also must be represented in the common list of GameObjects
-     */
-    Character.Definition getCharacter();
 }

@@ -33,8 +33,6 @@ import static ru.spbau.blackout.utils.Utils.fixTop;
 public abstract class GameObject implements RenderableProvider, InplaceSerializable, Serializable {
     public static final float RESTITUTION = 0.5f;
 
-    private static long NEXT_UID = 1;
-
 
     transient protected final Body body;
     private float height;
@@ -51,12 +49,11 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     /**
      * Constructs defined object at the given position.
      */
-    protected GameObject(Definition def, float x, float y) {
+    protected GameObject(Definition def, long uid, float x, float y) {
         this.def = def;
-        this.model = def.model.map(ModelInstance::new);
+        this.uid = uid;
 
-        uid = NEXT_UID + 1;
-        ++NEXT_UID;
+        model = def.model.map(ModelInstance::new);
 
         body = def.registerObject(def.context, this);
         body.setUserData(this);
@@ -318,14 +315,14 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
 
         /** Create an object at the giving position. */
-        public abstract GameObject makeInstance(float x, float y);
+        public abstract GameObject makeInstance(long uid, float x, float y);
         /** Create an object at the giving position. */
-        public GameObject makeInstance(Vector2 position) {
-            return this.makeInstance(position.x, position.y);
+        public GameObject makeInstance(long uid, Vector2 position) {
+            return makeInstance(uid, position.x, position.y);
         }
         /** Equal to <code>makeInstance(this.position)</code> */
-        public GameObject makeInstance() {
-            return this.makeInstance(this.position);
+        public GameObject makeInstance(long uid) {
+            return makeInstance(uid, position);
         }
 
         /** Rotates to the given direction. */

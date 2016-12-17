@@ -10,8 +10,8 @@ import ru.spbau.blackout.utils.Creator;
  * Class for objects created by abilities.
  */
 public abstract class AbilityObject extends DynamicObject {
-    protected AbilityObject(Definition def, float x, float y) {
-        super(def, x, y);
+    protected AbilityObject(Definition def, long uid, float x, float y) {
+        super(def, uid, x, y);
     }
 
 

@@ -10,8 +10,8 @@ import ru.spbau.blackout.utils.Creator;
 
 
 public class Character extends GameUnit {
-    public Character(GameUnit.Definition def, float x, float y) {
-        super(def, x, y);
+    public Character(GameUnit.Definition def, long uid, float x, float y) {
+        super(def, uid, x, y);
     }
 
 
@@ -22,8 +22,8 @@ public class Character extends GameUnit {
         }
 
         @Override
-        public GameObject makeInstance(float x, float y) {
-            return new Character(this, x, y);
+        public GameObject makeInstance(long uid, float x, float y) {
+            return new Character(this, uid, x, y);
         }
     }
 }

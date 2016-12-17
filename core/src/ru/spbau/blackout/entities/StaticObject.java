@@ -8,8 +8,8 @@ import ru.spbau.blackout.utils.Creator;
 
 
 public abstract class StaticObject extends GameObject {
-    public StaticObject(GameObject.Definition def, float x, float y) {
-        super(def, x, y);
+    public StaticObject(GameObject.Definition def, long uid, float x, float y) {
+        super(def, uid, x, y);
     }
 
     // We don't need to update velocity for static objects

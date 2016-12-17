@@ -36,8 +36,8 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
     private float maxHealth;
 
 
-    protected GameUnit(Definition def, float x, float y) {
-        super(def, x, y);
+    protected GameUnit(Definition def, long uid, float x, float y) {
+        super(def, uid, x, y);
         this.speed = def.speed;
         this.animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
         this.abilities = def.abilities;

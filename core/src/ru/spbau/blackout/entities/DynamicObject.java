@@ -39,8 +39,8 @@ public abstract class DynamicObject extends GameObject {
 
 
     /** Construct DynamicObject at the giving position. */
-    protected DynamicObject(Definition def, float x, float y) {
-        super(def, x, y);
+    protected DynamicObject(Definition def, long uid, float x, float y) {
+        super(def, uid, x, y);
 
         animation = this.model.map(AnimationController::new);
         animation.ifPresent(controller -> controller.setAnimation(Animations.DEFAULT, -1));

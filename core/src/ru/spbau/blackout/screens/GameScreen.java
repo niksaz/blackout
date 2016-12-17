@@ -38,9 +38,6 @@ import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.graphic_effects.GraphicEffect;
-import ru.spbau.blackout.graphic_effects.HealthBarEffect;
 import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.game_session.GameSessionSettings;
@@ -77,9 +74,9 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private LoadingScreen loadingScreen;
 
     // appearance:
-    private ModelInstance map;
-    private PerspectiveCamera camera;
-    public Environment environment;
+    private /*final*/ ModelInstance map;
+    private final PerspectiveCamera camera;
+    public final Environment environment;
 
     private Character character;
     private final IngameUI ui;
@@ -90,6 +87,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private final Array<Music> music = new Array<>();
     private Music currentTrack;
     private final GameSettings settings;
+    private /*final*/ List<GameObject.Definition> definitions;
 
 
     public GameScreen(GameSessionSettings sessionSettings, GameWorld gameWorld, AbstractServer server,
@@ -290,9 +288,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         public static final String BACKGROUND_IMAGE = "images/loading_screen.png";
 
 
-        private final List<GameObject.Definition> objectDefs;
-        private final Character.Definition characterDef;
         private final String mapPath;
+
         private final Stage stage;
         private final SimpleProgressBar progressBar =
                 new HorizontalProgressBar(LoadingProgressBar.PATH_EMPTY, LoadingProgressBar.PATH_FULL);
@@ -301,22 +298,21 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                 new HorizontalProgressBar(SmallHealthBar.PATH_EMPTY, SmallHealthBar.PATH_FULL);
 
 
-        public LoadingScreen(GameSessionSettings room) {
+        public LoadingScreen(GameSessionSettings sessionSettings) {
             // getting information from room
-            this.objectDefs = room.getObjectDefs();
-            this.characterDef = room.getCharacter();
-            this.mapPath = room.getMap();
+            definitions = sessionSettings.getObjectDefs();
+            mapPath = sessionSettings.getMap();
 
             Camera camera = new OrthographicCamera();
             Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), camera);
-            this.stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
+            stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
 
             float startX = (getWorldWidth() - LoadingProgressBar.WIDTH) / 2;
-            this.progressBar.setPosition(startX, LoadingProgressBar.START_Y);
-            this.progressBar.setSize(LoadingProgressBar.WIDTH, LoadingProgressBar.HEIGHT);
+            progressBar.setPosition(startX, LoadingProgressBar.START_Y);
+            progressBar.setSize(LoadingProgressBar.WIDTH, LoadingProgressBar.HEIGHT);
 
-            this.commonHealthBar.setSize(SmallHealthBar.WIDTH, SmallHealthBar.HEIGHT);
-            this.commonHealthBar.toBack();
+            commonHealthBar.setSize(SmallHealthBar.WIDTH, SmallHealthBar.HEIGHT);
+            commonHealthBar.toBack();
         }
 
 
@@ -399,27 +395,25 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         private void loadRealResources() {
             ui.load(assets);
-            foreach(this.objectDefs, obj -> obj.load(GameScreen.this));
+            foreach(definitions, obj -> obj.load(GameScreen.this));
             assets.load(this.mapPath, Model.class);
             this.commonHealthBar.load(assets);
         }
 
         private void doneLoading() {
             this.commonHealthBar.doneLoading(assets);
+            foreach (definitions, GameObject.Definition::doneLoading);
 
-            for (GameObject.Definition def : objectDefs) {
-                def.doneLoading();
-                GameObject obj = def.makeInstance();
+            // FIXME: move into Character.Definition.makeInstance()
+//                } else if (obj instanceof Character) {
+//                    SimpleProgressBar healthBar = commonHealthBar.copy();
+//                    ui.stage.addActor(healthBar);
+//                    GraphicEffect healthBarEffect = new HealthBarEffect((GameUnit) obj, healthBar, camera);
+//                    obj.graphicEffects.add(healthBarEffect);
+//                }
 
-                if (def == characterDef) {
-                    character = (Character) obj;
-                } else if (obj instanceof Character) {
-                    SimpleProgressBar healthBar = commonHealthBar.copy();
-                    ui.stage.addActor(healthBar);
-                    GraphicEffect healthBarEffect = new HealthBarEffect((GameUnit) obj, healthBar, camera);
-                    obj.graphicEffects.add(healthBarEffect);
-                }
-            }
+
+
             if (character == null) {
                 throw new AssertionError("Player without character");
             }
