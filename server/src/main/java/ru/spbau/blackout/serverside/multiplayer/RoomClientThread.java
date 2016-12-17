@@ -57,43 +57,7 @@ public class RoomClientThread extends Thread {
             out.writeInt(datagramSocket.getLocalPort());
             out.flush();
 
-            do {
-                final Game game = this.game;
-                if (game != null) {
-                    clientGameState = game.getGameState();
-                }
-
-                final GameState currentState = clientGameState;
-                out.writeObject(currentState);
-                if (currentState == GameState.READY_TO_START) {
-                    out.writeObject(session);
-                    out.writeObject(character);
-                    out.flush();
-
-                    // loading may take a long time
-                    socket.setSoTimeout(0);
-                    // get boolean from the client when he will load the game components
-                    boolean success = in.readBoolean();
-                    if (!success) {
-                        clientGameState = GameState.FINISHED;
-                    }
-                    assert game != null;
-                    //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                    synchronized (game) {
-                        game.notify();
-                    }
-                    socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
-                } else {
-                    out.flush();
-                }
-
-                if (clientGameState == GameState.WAITING) {
-                    try {
-                        sleep(Network.STATE_UPDATE_CYCLE_MS);
-                    } catch (InterruptedException ignored) {
-                    }
-                }
-            } while (clientGameState == GameState.WAITING);
+            gameStartWaiting(in, out);
 
             final Thread clientInputThread = new Thread(() -> {
                 final byte[] buffer = new byte[Network.DATAGRAM_VELOCITY_PACKET_SIZE];
@@ -165,5 +129,45 @@ public class RoomClientThread extends Thread {
 
     AtomicReference<Vector2> getVelocityFromClient() {
         return velocityFromClient;
+    }
+
+    private void gameStartWaiting(ObjectInputStream in, ObjectOutputStream out) throws IOException {
+        do {
+            final Game game = this.game;
+            if (game != null) {
+                clientGameState = game.getGameState();
+            }
+
+            final GameState currentState = clientGameState;
+            out.writeObject(currentState);
+            if (currentState == GameState.READY_TO_START) {
+                out.writeObject(session);
+                out.writeObject(character);
+                out.flush();
+
+                // loading may take a long time
+                socket.setSoTimeout(0);
+                // get boolean from the client when he will load the game components
+                boolean success = in.readBoolean();
+                if (!success) {
+                    clientGameState = GameState.FINISHED;
+                }
+                assert game != null;
+                //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                synchronized (game) {
+                    game.notify();
+                }
+                socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
+            } else {
+                out.flush();
+            }
+
+            if (clientGameState == GameState.WAITING) {
+                try {
+                    sleep(Network.STATE_UPDATE_CYCLE_MS);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        } while (clientGameState == GameState.WAITING);
     }
 }

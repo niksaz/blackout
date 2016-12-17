@@ -55,101 +55,19 @@ public class AndroidClient implements Runnable, AbstractServer {
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
-
             datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             out.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
             out.writeInt(datagramSocket.getLocalPort());
-
             out.flush();
 
             final int serverDatagramPort = in.readInt();
 
-            GameState gameState;
-            do {
-                gameState = (GameState) in.readObject();
-
-                switch (gameState) {
-                    case WAITING:
-                        Gdx.app.postRunnable(() ->
-                                table.getStatusLabel().setText(WAITING));
-                        break;
-                    case READY_TO_START:
-                        Gdx.app.postRunnable(() ->
-                                table.getStatusLabel().setText(READY_TO_START_MS));
-
-                        AbilityIconSettings firstIconSettings = new AbilityIconSettings(0);
-                        IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
-                        GameSettings settings = new GameSettings(uiSettings);  // just default settings
-
-                        TestingSessionSettings room = (TestingSessionSettings) in.readObject();
-                        room.character = (Character.Definition) in.readObject();
-
-                        // using the fact that AndroidClient is AbstractServer itself.
-                        // so synchronizing on server on loading
-                        synchronized (this) {
-                            Gdx.app.postRunnable(() -> {
-                                gameScreen = new GameScreen(room, new GameWorldWithExternalSerial(), this, settings);
-                                BlackoutGame.get().screenManager().setScreen(gameScreen);
-                            });
-                            try {
-                                wait();
-                            } catch (InterruptedException ignored) {
-                                isInterrupted = true;
-                            }
-                        }
-                        out.writeBoolean(!isInterrupted);
-                        out.flush();
-
-                        break;
-                    default:
-                        break;
-                }
-            } while (gameState == GameState.WAITING && !isInterrupted);
-
+            gameStartWaiting(in, out);
             if (isInterrupted) {
                 return;
             }
 
-            final Thread outputToServerThread = new Thread(() -> {
-                final DatagramPacket velocityDatagram =
-                        new DatagramPacket(new byte[0], 0, socket.getInetAddress(), serverDatagramPort);
-
-                while (!isInterrupted) {
-                    if (velocityToSend.get() != null) {
-                        try (
-                            ByteArrayOutputStream velocityByteStream =
-                                    new ByteArrayOutputStream(Network.DATAGRAM_VELOCITY_PACKET_SIZE);
-                            ObjectOutputStream velocityObjectStream = new ObjectOutputStream(velocityByteStream)
-                        ) {
-                            velocityObjectStream.writeObject(velocityToSend.getAndSet(null));
-                            velocityObjectStream.flush();
-                            final byte[] byteArray = velocityByteStream.toByteArray();
-                            velocityDatagram.setData(byteArray);
-                            velocityDatagram.setLength(byteArray.length);
-                            datagramSocket.send(velocityDatagram);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            isInterrupted = true;
-                        }
-                    } else {
-                        synchronized (velocityToSend) {
-                            if (velocityToSend.get() == null) {
-                                try {
-                                    // setting timeout because if client not responding in SOCKET_IO_TIMEOUT_MS
-                                    // he will be disconnected
-                                    velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 2);
-                                    if (velocityToSend.get() == null) {
-                                        velocityToSend.set(new Vector2());
-                                    }
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            outputToServerThread.start();
+            new Thread(new UIChangeSender(socket, serverDatagramPort, datagramSocket)).start();
 
             final GameWorldWithExternalSerial currentWorld = (GameWorldWithExternalSerial) gameScreen.gameWorld();
             final byte[] buffer = new byte[Network.DATAGRAM_WORLD_PACKET_SIZE];
@@ -185,6 +103,107 @@ public class AndroidClient implements Runnable, AbstractServer {
         synchronized (velocityToSend) {
             velocityToSend.set(new Vector2(velocity));
             velocityToSend.notify();
+        }
+    }
+
+    private void gameStartWaiting(ObjectInputStream in, ObjectOutputStream out)
+            throws IOException, ClassNotFoundException {
+        GameState gameState;
+        do {
+            gameState = (GameState) in.readObject();
+
+            switch (gameState) {
+                case WAITING:
+                    Gdx.app.postRunnable(() ->
+                            table.getStatusLabel().setText(WAITING));
+                    break;
+                case READY_TO_START:
+                    Gdx.app.postRunnable(() ->
+                            table.getStatusLabel().setText(READY_TO_START_MS));
+
+                    AbilityIconSettings firstIconSettings = new AbilityIconSettings(0);
+                    IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
+                    GameSettings settings = new GameSettings(uiSettings);  // just default settings
+
+                    TestingSessionSettings room = (TestingSessionSettings) in.readObject();
+                    room.character = (Character.Definition) in.readObject();
+
+                    // using the fact that AndroidClient is AbstractServer itself.
+                    // so synchronizing on server on loading
+                    synchronized (this) {
+                        Gdx.app.postRunnable(() -> {
+                            gameScreen = new GameScreen(room, new GameWorldWithExternalSerial(), this, settings);
+                            BlackoutGame.get().screenManager().setScreen(gameScreen);
+                        });
+                        try {
+                            wait();
+                        } catch (InterruptedException ignored) {
+                            isInterrupted = true;
+                        }
+                    }
+                    out.writeBoolean(!isInterrupted);
+                    out.flush();
+
+                    break;
+                default:
+                    break;
+            }
+        } while (gameState == GameState.WAITING && !isInterrupted);
+    }
+
+    public class UIChangeSender implements Runnable {
+
+        private final Socket socket;
+        private final int serverDatagramPort;
+        private final DatagramSocket datagramSocket;
+
+        public UIChangeSender(Socket socket, int serverDatagramPort, DatagramSocket datagramSocket) {
+            this.socket = socket;
+            this.serverDatagramPort = serverDatagramPort;
+            this.datagramSocket = datagramSocket;
+        }
+
+        @Override
+        public void run() {
+            {
+                final DatagramPacket velocityDatagram =
+                        new DatagramPacket(new byte[0], 0, socket.getInetAddress(), serverDatagramPort);
+
+                while (!isInterrupted) {
+                    if (velocityToSend.get() != null) {
+                        try (
+                                ByteArrayOutputStream velocityByteStream =
+                                        new ByteArrayOutputStream(Network.DATAGRAM_VELOCITY_PACKET_SIZE);
+                                ObjectOutputStream velocityObjectStream = new ObjectOutputStream(velocityByteStream)
+                        ) {
+                            velocityObjectStream.writeObject(velocityToSend.getAndSet(null));
+                            velocityObjectStream.flush();
+                            final byte[] byteArray = velocityByteStream.toByteArray();
+                            velocityDatagram.setData(byteArray);
+                            velocityDatagram.setLength(byteArray.length);
+                            datagramSocket.send(velocityDatagram);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            isInterrupted = true;
+                        }
+                    } else {
+                        synchronized (velocityToSend) {
+                            if (velocityToSend.get() == null) {
+                                try {
+                                    // setting timeout because if client not responding in SOCKET_IO_TIMEOUT_MS
+                                    // he will be disconnected
+                                    velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 2);
+                                    if (velocityToSend.get() == null) {
+                                        velocityToSend.set(new Vector2());
+                                    }
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
