@@ -20,6 +20,9 @@ import com.badlogic.gdx.utils.Align;
 
 import ru.spbau.blackout.BlackoutGame;
 
+/**
+ * The part of menu ui which is used throughout all middle tables.
+ */
 public class MenuScreen extends StageScreen {
 
     private static final String SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";

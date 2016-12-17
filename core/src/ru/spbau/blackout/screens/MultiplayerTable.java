@@ -10,6 +10,9 @@ import ru.spbau.blackout.network.AndroidClient;
 
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
+/**
+ * Middle table which a player sees during multi-player match search.
+ */
 public class MultiplayerTable {
 
     private static final String BACK_TEXT = "Back";

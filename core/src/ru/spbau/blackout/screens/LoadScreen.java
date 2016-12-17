@@ -12,6 +12,10 @@ import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.androidfeatures.PlayServicesListener;
 import ru.spbau.blackout.database.PlayerEntityAtClient;
 
+/**
+ * When the app is signing-in a player and loading the profile from the server LoadScreen is showed. Also this class
+ * contains sign-in failure handling.
+ */
 public class LoadScreen extends StageScreen implements PlayServicesListener {
 
     private static final float LABEL_BOTTOM_PADDING = 25.0f;

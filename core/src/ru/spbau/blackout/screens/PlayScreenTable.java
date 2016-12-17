@@ -11,6 +11,9 @@ import ru.spbau.blackout.BlackoutGame;
 import static ru.spbau.blackout.screens.MenuScreen.addBlackoutLabel;
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
+/**
+ * Middle table after a player clicks play button on the first table.
+ */
 public class PlayScreenTable  {
 
     private static final String SINGLE_PLAYER_GAME_TEXT = "Single player game";

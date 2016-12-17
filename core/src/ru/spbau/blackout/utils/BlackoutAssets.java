@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+/**
+ * Loads fonts, skins, colors which are later used for menu ui. Loading is done right after a start of the app.
+ */
 public class BlackoutAssets {
 
     private static final String FONT_PATH = "fonts/good_dog_plain.ttf";

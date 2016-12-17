@@ -13,6 +13,9 @@ import ru.spbau.blackout.BlackoutGame;
 import static ru.spbau.blackout.screens.MenuScreen.addBlackoutLabel;
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
+/**
+ * Middle table which a player faces every time he completes signing-in.
+ */
 class MainMenuTable {
 
     private static final String BUTTON_PLAY_TEXT = "Play";

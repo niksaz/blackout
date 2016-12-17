@@ -2,6 +2,10 @@ package ru.spbau.blackout.androidfeatures;
 
 import com.badlogic.gdx.utils.Array;
 
+/**
+ * Exclusive play services listener for all core classes. If you want to get notifications from the play services you
+ * should call {@link #addListener(PlayServicesListener) addListener} method.
+ */
 public class PlayServicesInCore implements PlayServicesListener {
 
     private PlayServices playServices;
