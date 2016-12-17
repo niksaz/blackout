@@ -76,6 +76,7 @@ public class LoadScreen extends StageScreen implements PlayServicesListener {
             {
                 setMovable(false);
                 padTop(getTitleLabel().getHeight());
+                setWidth(getTitleLabel().getWidth());
                 getTitleLabel().setAlignment(Align.center);
                 padLeft(DIALOG_PADDING);
                 padRight(DIALOG_PADDING);

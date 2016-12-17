@@ -1,13 +1,9 @@
 package ru.spbau.blackout.screens;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.network.AndroidClient;
@@ -38,12 +34,7 @@ public class MultiplayerTable {
     static Table getTable(final MenuScreen screen) {
         final MultiplayerTable result = new MultiplayerTable(screen);
 
-        final Drawable upImage = new TextureRegionDrawable(
-                new TextureRegion(new Texture(MenuScreen.BUTTON_UP_TEXTURE_PATH)));
-        final Drawable downImage = new TextureRegionDrawable(
-                new TextureRegion(new Texture(MenuScreen.BUTTON_DOWN_TEXTURE_PATH)));
-
-        addButton(result.middleTable, BACK_TEXT, upImage, downImage, new ClickListener() {
+        addButton(result.middleTable, BACK_TEXT, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 result.task.stop();

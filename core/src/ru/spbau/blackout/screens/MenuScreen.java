@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 
 import ru.spbau.blackout.BlackoutGame;
@@ -21,11 +20,15 @@ import ru.spbau.blackout.BlackoutGame;
 public class MenuScreen extends StageScreen {
 
     private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
-    static final String BUTTON_UP_TEXTURE_PATH = "images/menuscreen/button_up.png";
-    static final String BUTTON_DOWN_TEXTURE_PATH = "images/menuscreen/button_down.png";
+    private static final Color BLACKOUT_LABEL_COLOR = Color.BLACK;
+
     private static final String SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";
     private static final String GAME_SERVICES_TEXTURE_PATH = "images/menuscreen/games_controller_grey.png";
+    private static final String BLACKOUT_TEXT = "Blackout";
 
+    private static final float BLACKOUT_LABEL_BOTTOM_PADDING = 25.0f;
+    private static final float BUTTON_WIDTH = 450.0f;
+    private static final float BUTTON_HEIGHT = 50.0f;
     private static final float BUTTON_PADDING = 10.0f;
     private static final float CORNER_LABEL_MARGIN = 20.0f;
     private static final float SETTINGS_ICON_SIZE = 128.0f;
@@ -64,20 +67,25 @@ public class MenuScreen extends StageScreen {
         goldLabel = addLabelWithTextAt("", 0, 0, 0);
     }
 
-    static TextButton addButton(Table table, String text, Drawable upImage, Drawable downImage, EventListener listener) {
-        final TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.font = BlackoutGame.get().assets().getFont();
-        style.up = upImage;
-        style.down = downImage;
-
-        final TextButton button = new TextButton(text, style);
+    static TextButton addButton(Table table, String text, EventListener listener) {
+        final TextButton button = new TextButton(text, BlackoutGame.get().assets().getDefaultSkin());
         if (listener != null) {
             button.addListener(listener);
         }
 
-        table.add(button).pad(BUTTON_PADDING).row();
+        table.add(button).pad(BUTTON_PADDING).width(BUTTON_WIDTH).height(BUTTON_HEIGHT).row();
 
         return button;
+    }
+
+    static Label addBlackoutLabel(Table table) {
+        final Label.LabelStyle style = new Label.LabelStyle(BlackoutGame.get().assets().getFontBlackoutLabel(),
+                BLACKOUT_LABEL_COLOR);
+        final Label label = new Label(BLACKOUT_TEXT, style);
+
+        table.add(label).pad(BLACKOUT_LABEL_BOTTOM_PADDING).row();
+
+        return label;
     }
 
     private Label addLabelWithTextAt(CharSequence text, float x, float y, int align) {
