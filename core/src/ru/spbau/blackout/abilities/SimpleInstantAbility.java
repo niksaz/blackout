@@ -3,7 +3,6 @@ package ru.spbau.blackout.abilities;
 
 import com.badlogic.gdx.audio.Sound;
 
-import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.java8features.Optional;
 
@@ -11,7 +10,7 @@ import ru.spbau.blackout.java8features.Optional;
  * Abstract class for abilities which should be casted by single tap on the icon.
  */
 public abstract class SimpleInstantAbility extends Ability {
-    private Optional<Sound> startSound = Optional.empty();
+    private transient Optional<Sound> /*final*/ startSound = Optional.empty();
 
 
     public SimpleInstantAbility(int level) {

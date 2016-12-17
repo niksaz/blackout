@@ -2,6 +2,8 @@ package ru.spbau.blackout.abilities;
 
 import com.badlogic.gdx.graphics.Texture;
 
+import java.io.Serializable;
+
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
@@ -11,11 +13,12 @@ import ru.spbau.blackout.entities.GameUnit;
  * Abstract class for ability in-game representation.
  * Each unit has its own instance of each its ability.
  */
-public abstract class Ability {
+public abstract class Ability implements Serializable {
     private final int level;
-    private float chargeTime;
+    private transient float chargeTime;
 
-    private /*final*/ GameUnit unit;
+    private transient /*final*/ GameUnit unit;
+
 
     public Ability(int level) {
         this.level = level;

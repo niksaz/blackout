@@ -45,6 +45,7 @@ class Game extends Thread implements GameContext {
         this.clients = clients;
     }
 
+
     public void run() {
         server.log("New game with id #" + gameId + " is going to start!");
         createRoomAndSendItToClients();

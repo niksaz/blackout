@@ -88,8 +88,10 @@ public class AndroidClient implements Runnable, AbstractServer {
                         // using the fact that AndroidClient is AbstractServer itself.
                         // so synchronizing on server on loading
                         synchronized (this) {
-                            gameScreen = new GameScreen(room, new GameWorldWithExternalSerial(), this, settings);
-                            BlackoutGame.get().screenManager().setScreen(gameScreen);
+                            Gdx.app.postRunnable(() -> {
+                                gameScreen = new GameScreen(room, new GameWorldWithExternalSerial(), this, settings);
+                                BlackoutGame.get().screenManager().setScreen(gameScreen);
+                            });
                             try {
                                 wait();
                             } catch (InterruptedException ignored) {
