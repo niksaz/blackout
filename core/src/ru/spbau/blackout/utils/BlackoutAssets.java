@@ -20,7 +20,7 @@ public class BlackoutAssets {
     private static final int FONT_SIZE = 40;
     private static final float FONT_WIDTH = 0f;
 
-    private BitmapFont fontBlackoutLabel;
+    private BitmapFont blackoutLabelFont;
     private BitmapFont font;
     private Skin defaultSkin;
 
@@ -29,8 +29,8 @@ public class BlackoutAssets {
         loadSkins();
     }
 
-    public BitmapFont getFontBlackoutLabel() {
-        return fontBlackoutLabel;
+    public BitmapFont getBlackoutLabelFont() {
+        return blackoutLabelFont;
     }
 
     public BitmapFont getFont() {
@@ -43,7 +43,7 @@ public class BlackoutAssets {
 
     private void loadFonts() {
         final FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(FONT_PATH));
-        fontBlackoutLabel = generator.generateFont(
+        blackoutLabelFont = generator.generateFont(
                 getParameter(FONT_BLACKOUT_LABEL_SIZE, FONT_BLACKOUT_LABEL_WIDTH));
         font = generator.generateFont(getParameter(FONT_SIZE, FONT_WIDTH));
         generator.dispose();
@@ -54,6 +54,7 @@ public class BlackoutAssets {
         defaultSkin = new Skin();
         defaultSkin.addRegions(defaultSkinAtlas);
         defaultSkin.add("default-font", getFont());
+        defaultSkin.add("blackout-font", getBlackoutLabelFont());
         defaultSkin.load(Gdx.files.internal(DEFAULT_SKIN_JSON_PATH));
     }
 

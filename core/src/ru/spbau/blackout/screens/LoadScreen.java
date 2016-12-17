@@ -94,11 +94,8 @@ public class LoadScreen extends StageScreen implements PlayServicesListener {
     }
 
     private Label addLabel(CharSequence text) {
-        final Label.LabelStyle style = new Label.LabelStyle(BlackoutGame.get().assets().getFont(), LABEL_COLOR);
-        final Label label = new Label(text , style);
-
+        final Label label = new Label(text, BlackoutGame.get().assets().getDefaultSkin());
         middleTable.add(label).pad(LABEL_BOTTOM_PADDING).row();
-
         return label;
     }
 }
