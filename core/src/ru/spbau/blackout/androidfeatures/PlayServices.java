@@ -1,4 +1,4 @@
-package ru.spbau.blackout.play.services;
+package ru.spbau.blackout.androidfeatures;
 
 public interface PlayServices {
     void signIn();
@@ -9,9 +9,6 @@ public interface PlayServices {
     void showLeaderboards();
     boolean isSignedIn();
     String getPlayerName();
-
-    void startLoadingSnapshot();
-    void saveSnapshot(BlackoutSnapshot blackoutSnapshot);
 
     int getWin1vs1DuelId();
     int getWin2vs2FightId();
