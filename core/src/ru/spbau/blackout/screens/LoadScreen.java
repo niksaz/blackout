@@ -14,9 +14,6 @@ import ru.spbau.blackout.database.PlayerEntityAtClient;
 
 public class LoadScreen extends StageScreen implements PlayServicesListener {
 
-    private static final Color LABEL_COLOR = Color.WHITE;
-    private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
-
     private static final float LABEL_BOTTOM_PADDING = 25.0f;
     private static final float DIALOG_PADDING = 15.0f;
 
@@ -63,9 +60,8 @@ public class LoadScreen extends StageScreen implements PlayServicesListener {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(
-                BACKGROUND_COLOR.r, BACKGROUND_COLOR.g,
-                BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
+        final Color color = BlackoutGame.get().assets().getBackgroundColor();
+        Gdx.gl.glClearColor(color.r, color.g, color.b, color.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         super.render(delta);
     }

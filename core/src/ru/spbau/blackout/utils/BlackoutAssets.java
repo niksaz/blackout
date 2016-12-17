@@ -1,6 +1,7 @@
 package ru.spbau.blackout.utils;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -23,10 +24,12 @@ public class BlackoutAssets {
     private BitmapFont blackoutLabelFont;
     private BitmapFont font;
     private Skin defaultSkin;
+    private Color backgroundColor;
 
     public void load() {
         loadFonts();
         loadSkins();
+        loadColors();
     }
 
     public BitmapFont getBlackoutLabelFont() {
@@ -39,6 +42,10 @@ public class BlackoutAssets {
 
     public Skin getDefaultSkin() {
         return defaultSkin;
+    }
+
+    public Color getBackgroundColor() {
+        return backgroundColor;
     }
 
     private void loadFonts() {
@@ -56,6 +63,10 @@ public class BlackoutAssets {
         defaultSkin.add("default-font", getFont());
         defaultSkin.add("blackout-font", getBlackoutLabelFont());
         defaultSkin.load(Gdx.files.internal(DEFAULT_SKIN_JSON_PATH));
+    }
+
+    private void loadColors() {
+        backgroundColor = getDefaultSkin().getColor("gray");
     }
 
     private FreeTypeFontParameter getParameter(int font_size, float width) {

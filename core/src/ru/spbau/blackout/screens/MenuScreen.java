@@ -22,8 +22,6 @@ import ru.spbau.blackout.BlackoutGame;
 
 public class MenuScreen extends StageScreen {
 
-    private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1.0f);
-
     private static final String SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";
     private static final String GAME_SERVICES_TEXTURE_PATH = "images/menuscreen/games_controller_grey.png";
     private static final String GOLD_COIN_PATH_PREFIX = "images/menuscreen/goldCoin";
@@ -165,9 +163,8 @@ public class MenuScreen extends StageScreen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(
-                BACKGROUND_COLOR.r, BACKGROUND_COLOR.g,
-                BACKGROUND_COLOR.b, BACKGROUND_COLOR.a);
+        final Color color = BlackoutGame.get().assets().getBackgroundColor();
+        Gdx.gl.glClearColor(color.r, color.g, color.b, color.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stateTime += delta;
