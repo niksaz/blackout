@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.util.List;
 
 import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 
 /**
  * Handler for load queries from clients.
@@ -40,14 +41,17 @@ public class LoadRequestHandler implements HttpHandler {
             final String name = inputStream.readUTF();
 
             final Query<PlayerEntity> query =
-                    server.getDatastore().createQuery(PlayerEntity.class).field("name").equal(name);
+                    DatabaseAccessor.getInstance().getDatastore()
+                            .createQuery(PlayerEntity.class)
+                            .field("name")
+                            .equal(name);
             final List<PlayerEntity> result = query.asList();
 
             PlayerEntity entity;
             switch (result.size()) {
                 case 0:
                     entity = new PlayerEntity(name);
-                    server.getDatastore().save(entity);
+                    DatabaseAccessor.getInstance().getDatastore().save(entity);
                     break;
 
                 case 1:

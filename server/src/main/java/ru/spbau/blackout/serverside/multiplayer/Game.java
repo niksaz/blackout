@@ -3,22 +3,30 @@ package ru.spbau.blackout.serverside.multiplayer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
 
+import org.mongodb.morphia.query.Query;
+
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.database.PlayerEntity;
 import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
+import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.settings.GameSettings;
+import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Utils;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.worlds.GameWorldWithPhysics;
@@ -136,11 +144,42 @@ public class Game extends Thread implements GameContext {
     }
 
     private void createRoomAndSendItToClients() {
-        final TestingSessionSettings room = TestingSessionSettings.getTest();
+        final TestingSessionSettings room = new TestingSessionSettings();
+        room.map = "maps/duel/duel.g3db";
 
         final List<Character.Definition> heroes = new ArrayList<>();
-        heroes.add((Character.Definition) room.objectDefs.get(0));
-        heroes.add((Character.Definition) room.objectDefs.get(1));
+        for (RoomClientThread client : clients) {
+            final Query<PlayerEntity> query =
+                    DatabaseAccessor.getInstance().getDatastore()
+                            .createQuery(PlayerEntity.class)
+                            .field("name")
+                            .equal(client.getClientName());
+            final List<PlayerEntity> result = query.asList();
+            if (result.size() != 1) {
+                throw new IllegalStateException();
+            }
+            final PlayerEntity entity = result.get(0);
+
+            try (
+                    ByteArrayInputStream byteInput = new ByteArrayInputStream(entity.getSerializedDefinition());
+                    ObjectInputStream in = new ObjectInputStream(byteInput)
+            ) {
+                final Character.Definition hero = (Character.Definition) in.readObject();
+                hero.overHeadPivotOffset.set(0, 0, 3.5f);
+                room.objectDefs.add(hero);
+                heroes.add(hero);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                throw new IllegalStateException(e);
+            }
+        }
+
+        final GameObject.Definition stone = new Decoration.Definition(
+                "models/stone/stone.g3db",
+                new CircleCreator(1.1f),
+                0, -20
+        );
+        room.objectDefs.add(stone);
 
         for (GameObject.Definition def : room.getObjectDefs()) {
             def.setContextOnServer(this);

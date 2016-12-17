@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.util.List;
 
 import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 
 /**
  * Handler for update queries from clients.
@@ -36,7 +37,10 @@ public class UpdateRequestHandler implements HttpHandler {
             final int delta = inputStream.readInt();
 
             final Query<PlayerEntity> query =
-                    server.getDatastore().createQuery(PlayerEntity.class).field("name").equal(name);
+                    DatabaseAccessor.getInstance().getDatastore()
+                            .createQuery(PlayerEntity.class)
+                            .field("name")
+                            .equal(name);
             final List<PlayerEntity> result = query.asList();
 
             if (result.size() != 1) {
@@ -46,8 +50,10 @@ public class UpdateRequestHandler implements HttpHandler {
             final PlayerEntity playerEntity = result.get(0);
             if (playerEntity.getGold() + delta >= 0) {
                 final UpdateOperations<PlayerEntity> updateOperations =
-                        server.getDatastore().createUpdateOperations(PlayerEntity.class).inc("gold", delta);
-                server.getDatastore().update(query, updateOperations);
+                        DatabaseAccessor.getInstance().getDatastore()
+                                .createUpdateOperations(PlayerEntity.class)
+                                .inc("gold", delta);
+                DatabaseAccessor.getInstance().getDatastore().update(query, updateOperations);
 
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
                 server.log("Updated gold for " + name);
