@@ -10,6 +10,6 @@ import ru.spbau.blackout.entities.GameUnit;
 public interface AbstractServer {
 
     void sendSelfVelocity(GameUnit unit, Vector2 velocity);
-//    void sendStartCasting(GameUnit unit, );
-//    void sendStopCasting();
+//    void sendStartCasting(GameUnit unit, Ability ability);
+//    void sendStopCasting(GameUnit unit, Ability ability);
 }

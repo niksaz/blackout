@@ -33,6 +33,8 @@ import static ru.spbau.blackout.utils.Utils.fixTop;
 public abstract class GameObject implements RenderableProvider, InplaceSerializable, Serializable {
     public static final float RESTITUTION = 0.5f;
 
+    private static long NEXT_UID = 1;
+
 
     transient protected final Body body;
     private float height;
@@ -42,15 +44,19 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
     transient public final Array<GraphicEffect> graphicEffects = new Array<>();
 
     private boolean dead = false;
-    private final Vector3 chestPivotOffset;
-    private final Vector3 overHeadPivotOffset;
+    private final GameObject.Definition def;
+    private final long uid;
 
 
     /**
      * Constructs defined object at the given position.
      */
     protected GameObject(Definition def, float x, float y) {
+        this.def = def;
         this.model = def.model.map(ModelInstance::new);
+
+        uid = NEXT_UID + 1;
+        ++NEXT_UID;
 
         body = def.registerObject(def.context, this);
         body.setUserData(this);
@@ -64,27 +70,25 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         body.createFixture(fixtureDef);
         fixtureDef.shape.dispose();
 
-        this.chestPivotOffset = def.chestPivotOffset;
-        this.overHeadPivotOffset = def.overHeadPivotOffset;
-        this.setPosition(x, y);
-        this.setMass(def.mass);
+        setPosition(x, y);
+        setMass(def.mass);
     }
 
 
     @Override
     public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeObject(this);
-        out.writeObject(this.getPosition());
-        out.writeFloat(this.getRotation());
+        out.writeObject(getPosition());
+        out.writeFloat(getRotation());
     }
 
     @Override
     public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameObject other = (GameObject) in.readObject();
-        this.height = other.height;
+        height = other.height;
         Vector2 position = (Vector2) in.readObject();
         float rotation = in.readFloat();
-        this.setTransform(position, rotation);
+        setTransform(position, rotation);
         return other;
     }
 
@@ -198,6 +202,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         setRotation(direction.angleRad());
     }
 
+    public long getUid() { return uid; }
 
     public Vector2 getPosition() {
         return body.getPosition();
@@ -215,24 +220,24 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
      * Returns new Vector3 (so, it's safe to change this vector without changing unit's position).
      */
     public Vector3 get3dPosition() {
-        Vector2 pos = this.getPosition();
-        return new Vector3(pos.x, pos.y, this.getHeight());
+        Vector2 pos = getPosition();
+        return new Vector3(pos.x, pos.y, getHeight());
     }
 
     public void setHeight(float height) { this.height = height; }
     public final float getHeight() { return height; }
 
     public final float getMass() {
-        return this.body.getMass();
+        return body.getMass();
     }
 
 
     public Vector3 getChestPivot() {
-        return this.get3dPosition().add(chestPivotOffset);
+        return get3dPosition().add(def.chestPivotOffset);
     }
 
     public Vector3 getOverHeadPivot() {
-        return this.get3dPosition().add(overHeadPivotOffset);
+        return get3dPosition().add(def.overHeadPivotOffset);
     }
 
 
