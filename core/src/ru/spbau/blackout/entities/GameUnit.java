@@ -20,6 +20,7 @@ import ru.spbau.blackout.utils.Utils;
  * Also it has friction.
  */
 public abstract class GameUnit extends DynamicObject /*implements Damageable */ {
+
     /** Constant holder class to provide names for animations. */
     public static class Animations extends DynamicObject.Animations {
         protected Animations() {}
@@ -58,6 +59,10 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
         return abilities.get(num);
     }
 
+    public void castAbility(int abilityNum, Vector2 target) {
+        getAbility(abilityNum).cast(target);
+        // TODO: cast animation
+    }
 
     @Override
     public void updateForFirstStep() {

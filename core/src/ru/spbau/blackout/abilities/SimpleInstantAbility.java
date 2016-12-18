@@ -21,7 +21,6 @@ public abstract class SimpleInstantAbility extends Ability {
     }
 
 
-    public abstract void cast();
     public abstract String castSoundPath();
 
 

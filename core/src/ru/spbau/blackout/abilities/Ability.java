@@ -1,6 +1,7 @@
 package ru.spbau.blackout.abilities;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 
 import java.io.Serializable;
 
@@ -51,6 +52,8 @@ public abstract class Ability implements Serializable {
     public abstract void onCastEnd(UIServer server);
     /** Called once when a touch goes up. */
     public abstract void inCast(UIServer server, float delta);
+
+    public abstract void cast(Vector2 target);
 
     /** Path to the icon in assets directory. */
     public abstract String iconPath();

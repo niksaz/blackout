@@ -83,7 +83,7 @@ public final class AbilityIcon extends IngameUIObject {
     @Override
     public void update(float deltaTime) {
         if (this.isPressed) {
-            this.ability.inCast(deltaTime);
+            this.ability.inCast(server, deltaTime);
         }
 
         float chargeTime = this.ability.getChargeTime();
@@ -123,7 +123,7 @@ public final class AbilityIcon extends IngameUIObject {
     private class Listener extends InputListener {
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-            getAbility().onCastStart();
+            getAbility().onCastStart(server);
             isPressed = true;
 
             // It means that I want it to receive all touchDragged and touchUp events,
@@ -134,7 +134,7 @@ public final class AbilityIcon extends IngameUIObject {
         @Override
         public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
             isPressed = false;
-            getAbility().onCastEnd();
+            getAbility().onCastEnd(server);
         }
     }
 }
