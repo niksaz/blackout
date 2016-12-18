@@ -41,7 +41,7 @@ public class Game extends Thread implements GameContext {
     private final int gameId;
     private final RoomServer server;
     private final List<RoomClientThread> clients;
-    private final ServerGameWorld gameWorld = new ServerGameWorld();
+    private final ServerGameWorld gameWorld = new ServerGameWorld(/*all possible definitions*/);
     private volatile GameState gameState = GameState.READY_TO_START;
 
     public Game(RoomServer server, List<RoomClientThread> clients, int gameId) {
@@ -183,8 +183,12 @@ public class Game extends Thread implements GameContext {
 
         for (GameObject.Definition def : room.getDefintions()) {
             def.setContextOnServer(this);
-            def.makeInstance();
         }
+
+        // FIXME: just for test
+        room.getDefintions().get(0).makeInstanceWithNextUid(0, 0);
+        room.getDefintions().get(1).makeInstanceWithNextUid(5, 5);
+        room.getDefintions().get(2).makeInstanceWithNextUid(0, -10);
 
         for (int i = 0; i < clients.size(); i++) {
             clients.get(i).setGame(this, room, heroes.get(i));

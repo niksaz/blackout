@@ -25,6 +25,7 @@ public abstract class Ability implements Serializable {
     }
 
 
+
     /**
      * Load necessary assets.
      * Must be called once from <code>GameUnit.Definition::update</code>

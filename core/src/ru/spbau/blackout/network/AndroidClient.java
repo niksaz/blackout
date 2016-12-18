@@ -108,11 +108,6 @@ public class AndroidClient implements Runnable, UIServer {
         }
     }
 
-    @Override
-    public void sendAbilityCast(Ability ability, Vector2 target) {
-
-    }
-
     private void gameStartWaiting(ObjectInputStream in, ObjectOutputStream out)
             throws IOException, ClassNotFoundException {
         GameState gameState;

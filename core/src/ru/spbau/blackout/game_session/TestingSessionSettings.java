@@ -14,8 +14,9 @@ public class TestingSessionSettings implements SessionSettings {
     public String map;
     public List<GameObject.Definition> objectDefs = new ArrayList<>();
     public Character.Definition character;
+    public long playerUid;
 
-    //@Override
+    @Override
     public String getMap() {
         return map;
     }
@@ -23,6 +24,11 @@ public class TestingSessionSettings implements SessionSettings {
     @Override
     public List<GameObject.Definition> getDefintions() {
         return objectDefs;
+    }
+
+    @Override
+    public long getPlayerUid() {
+        return playerUid;
     }
 
     //@Override

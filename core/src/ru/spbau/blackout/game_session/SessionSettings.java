@@ -23,4 +23,6 @@ public interface SessionSettings extends Serializable {
      * Returns a list of definitions of all GameObjects in the game.
      */
     List<GameObject.Definition> getDefintions();
+
+    long getPlayerUid();
 }

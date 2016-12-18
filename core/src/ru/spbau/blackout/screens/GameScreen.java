@@ -87,7 +87,9 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private final GameSettings settings;
 
 
-    public GameScreen(SessionSettings sessionSettings, GameWorld gameWorld, UIServer server,
+    public GameScreen(SessionSettings sessionSettings,
+                      GameWorld gameWorld,
+                      UIServer server,
                       GameSettings settings) {
         this.settings = settings;
         this.gameWorld = gameWorld;
