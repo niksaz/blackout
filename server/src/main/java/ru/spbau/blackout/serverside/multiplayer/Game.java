@@ -21,6 +21,8 @@ import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.java8features.Optional;
+import ru.spbau.blackout.network.AndroidClient.AbilityCast;
+import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
@@ -40,11 +42,11 @@ public class Game extends Thread implements GameContext {
 
     private final int gameId;
     private final RoomServer server;
-    private final List<RoomClientThread> clients;
+    private final List<ClientThread> clients;
     private ServerGameWorld gameWorld;
     private volatile GameState gameState = GameState.READY_TO_START;
 
-    public Game(RoomServer server, List<RoomClientThread> clients, int gameId) {
+    public Game(RoomServer server, List<ClientThread> clients, int gameId) {
         this.gameId = gameId;
         this.server = server;
         this.clients = clients;
@@ -66,9 +68,16 @@ public class Game extends Thread implements GameContext {
         while (gameState != GameState.FINISHED) {
             try {
                 for (int clientIndex = 0; clientIndex < clients.size(); clientIndex++) {
-                    final Vector2 heroVelocity = clients.get(clientIndex).getVelocityFromClient().getAndSet(null);
+                    final ClientThread clientThread = clients.get(clientIndex);
+                    final GameUnit clientUnit = (GameUnit) gameWorld.getGameObjects().get(clientIndex);
+
+                    final Vector2 heroVelocity = clientThread.getVelocityFromClient();
                     if (heroVelocity != null) {
-                        ((GameUnit) gameWorld.getGameObjects().get(clientIndex)).setSelfVelocity(heroVelocity);
+                        clientUnit.setSelfVelocity(heroVelocity);
+                    }
+                    final AbilityCast abilityCast = clientThread.getAbilityCastFromClient();
+                    if (abilityCast != null) {
+                        Events.abilityCast(clientUnit, abilityCast.abilityNum, abilityCast.target);
                     }
                 }
 
@@ -79,7 +88,7 @@ public class Game extends Thread implements GameContext {
                 server.log("Updating gameWorld: " + worldDeltaInSecs);
 
                 final byte[] worldInBytes = serializeWorld();
-                for (RoomClientThread client : clients) {
+                for (ClientThread client : clients) {
                     if (client.getClientGameState() == GameState.FINISHED) {
                         gameState = GameState.FINISHED;
                         break;
@@ -143,7 +152,7 @@ public class Game extends Thread implements GameContext {
         room.map = "maps/duel/duel.g3db";
 
         final List<Character.Definition> heroes = new ArrayList<>();
-        for (RoomClientThread client : clients) {
+        for (ClientThread client : clients) {
             final Query<PlayerEntity> query =
                     DatabaseAccessor.getInstance().getDatastore()
                             .createQuery(PlayerEntity.class)
@@ -181,8 +190,9 @@ public class Game extends Thread implements GameContext {
         }
 
         // FIXME: just for test
-        room.getDefintions().get(0).makeInstanceWithNextUid(0, 0);
-        room.getDefintions().get(1).makeInstanceWithNextUid(5, 5);
+        final List<GameObject> heroesObjects = new ArrayList<>();
+        heroesObjects.add(room.getDefintions().get(0).makeInstanceWithNextUid(0, 0));
+        heroesObjects.add(room.getDefintions().get(1).makeInstanceWithNextUid(5, 5));
         room.getDefintions().get(2).makeInstanceWithNextUid(0, -10);
 
         gameWorld = new ServerGameWorld(room.objectDefs);
@@ -190,15 +200,15 @@ public class Game extends Thread implements GameContext {
         final byte[] worldInBytes = serializeWorld();
 
         for (int i = 0; i < clients.size(); i++) {
-            final RoomClientThread client = clients.get(i);
+            final ClientThread client = clients.get(i);
             client.setWorldToSend(worldInBytes);
-            client.setGame(this, room, heroes.get(i));
+            client.setGame(this, room, heroes.get(i), heroesObjects.get(i).getUid());
         }
     }
 
     private byte[] serializeWorld() throws IOException {
         final ByteArrayOutputStream serializedVersionOfWorld = new ByteArrayOutputStream();
-        final ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld)
+        final ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld);
         try {
             gameWorld.getState(objectOutputStreamForWorld);
             objectOutputStreamForWorld.flush();
@@ -214,7 +224,7 @@ public class Game extends Thread implements GameContext {
             boolean everyoneIsReady;
             do {
                 everyoneIsReady = true;
-                for (RoomClientThread thread : clients) {
+                for (ClientThread thread : clients) {
                     final GameState currentClientGameState = thread.getClientGameState();
                     if (currentClientGameState == GameState.WAITING) {
                         everyoneIsReady = false;

@@ -17,11 +17,13 @@ import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 
+import static ru.spbau.blackout.network.AndroidClient.AbilityCast;
+
 /**
  * A thread allocated for each client connected to the server. Initially it is waiting to be matched
  * and later acting as the representative of the client in the game.
  */
-public class RoomClientThread extends Thread {
+public class ClientThread extends Thread {
 
     private static final String UNKNOWN = "UNKNOWN";
 
@@ -36,8 +38,9 @@ public class RoomClientThread extends Thread {
     private volatile GameState clientGameState = GameState.WAITING;
     private final AtomicReference<byte[]> worldInBytes = new AtomicReference<>();
     private final AtomicReference<Vector2> velocityFromClient = new AtomicReference<>();
+    private final AtomicReference<AbilityCast> abilityCastFromClient = new AtomicReference<>();
 
-    public RoomClientThread(RoomServer server, Socket socket) {
+    public ClientThread(RoomServer server, Socket socket) {
         this.server = server;
         this.socket = socket;
     }
@@ -60,23 +63,11 @@ public class RoomClientThread extends Thread {
 
             gameStartWaiting(in, out);
 
-            final Thread clientInputThread = new Thread(() -> {
-                final byte[] buffer = new byte[Network.DATAGRAM_VELOCITY_PACKET_SIZE];
-                final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
-                try {
-                    while (clientGameState != GameState.FINISHED) {
-                        datagramSocket.receive(receivedPacket);
-                        final ObjectInputStream clientsVelocityStream =
-                                new ObjectInputStream(new ByteArrayInputStream(receivedPacket.getData()));
-                        final Vector2 velocity = (Vector2) clientsVelocityStream.readObject();
-                        velocityFromClient.set(velocity);
-                    }
-                } catch (ClassNotFoundException | IOException e) {
-                    e.printStackTrace();
-                    clientGameState = GameState.FINISHED;
-                }
-            });
-            clientInputThread.start();
+            // won't need the timeout later
+            socket.setSoTimeout(0);
+
+            new Thread(new UIChangeGetterUDP(datagramSocket)).start();
+            new Thread(new UIChangeGetterTCP(in)).start();
 
             final DatagramPacket worldDatagramPacket =
                     new DatagramPacket(new byte[0], 0, socket.getInetAddress(), clientDatagramPort);
@@ -129,8 +120,61 @@ public class RoomClientThread extends Thread {
         return clientGameState;
     }
 
-    AtomicReference<Vector2> getVelocityFromClient() {
-        return velocityFromClient;
+    Vector2 getVelocityFromClient() {
+        return velocityFromClient.getAndSet(null);
+    }
+
+    AbilityCast getAbilityCastFromClient() {
+        return abilityCastFromClient.getAndSet(null);
+    }
+
+    private class UIChangeGetterUDP implements Runnable {
+
+        private final DatagramSocket datagramSocket;
+
+        UIChangeGetterUDP(DatagramSocket datagramSocket) {
+            this.datagramSocket = datagramSocket;
+        }
+
+        @Override
+        public void run() {
+            final byte[] buffer = new byte[Network.DATAGRAM_VELOCITY_PACKET_SIZE];
+            final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
+            while (clientGameState != GameState.FINISHED) {
+                try {
+                    datagramSocket.receive(receivedPacket);
+                    final ObjectInputStream clientsVelocityStream =
+                            new ObjectInputStream(new ByteArrayInputStream(receivedPacket.getData()));
+                    final Vector2 velocity = (Vector2) clientsVelocityStream.readObject();
+                    velocityFromClient.set(velocity);
+                } catch (ClassNotFoundException | IOException e) {
+                    e.printStackTrace();
+                    clientGameState = GameState.FINISHED;
+                }
+            }
+        }
+    }
+
+    private class UIChangeGetterTCP implements Runnable {
+
+        private final ObjectInputStream objectInputStream;
+
+        UIChangeGetterTCP(ObjectInputStream objectInputStream) {
+            this.objectInputStream = objectInputStream;
+        }
+
+        @Override
+        public void run() {
+            while (clientGameState != GameState.FINISHED) {
+                try {
+                    final AbilityCast abilityCast = (AbilityCast) objectInputStream.readObject();
+                    abilityCastFromClient.set(abilityCast);
+                } catch (ClassNotFoundException | IOException e) {
+                    e.printStackTrace();
+                    clientGameState = GameState.FINISHED;
+                }
+            }
+        }
     }
 
     private void gameStartWaiting(ObjectInputStream in, ObjectOutputStream out) throws IOException {
