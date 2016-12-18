@@ -41,7 +41,7 @@ public class Game extends Thread implements GameContext {
     private final int gameId;
     private final RoomServer server;
     private final List<RoomClientThread> clients;
-    private final ServerGameWorld gameWorld = new ServerGameWorld(/*all possible definitions*/);
+    private ServerGameWorld gameWorld;
     private volatile GameState gameState = GameState.READY_TO_START;
 
     public Game(RoomServer server, List<RoomClientThread> clients, int gameId) {
@@ -50,19 +50,21 @@ public class Game extends Thread implements GameContext {
         this.clients = clients;
     }
 
-
     public void run() {
         server.log("New game with id #" + gameId + " is going to run!");
-        createRoomAndSendItToClients();
-        waitWhileEveryoneIsReady();
+        try {
+            createRoomAndSendItToClients();
+            waitWhileEveryoneIsReady();
+        } catch (IOException e) {
+            e.printStackTrace();
+            gameState = GameState.FINISHED;
+            return;
+        }
 
         long timeLastIterationFinished = System.currentTimeMillis();
         long lastWorldUpdateTime = System.currentTimeMillis();
         while (gameState != GameState.FINISHED) {
-            try (
-                ByteArrayOutputStream serializedVersionOfWorld = new ByteArrayOutputStream();
-                ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld)
-            ) {
+            try {
                 for (int clientIndex = 0; clientIndex < clients.size(); clientIndex++) {
                     final Vector2 heroVelocity = clients.get(clientIndex).getVelocityFromClient().getAndSet(null);
                     if (heroVelocity != null) {
@@ -75,15 +77,8 @@ public class Game extends Thread implements GameContext {
                 gameWorld.update(worldDeltaInSecs);
                 lastWorldUpdateTime = currentTime;
                 server.log("Updating gameWorld: " + worldDeltaInSecs);
-                try {
-                    gameWorld.getState(objectOutputStreamForWorld);
-                    objectOutputStreamForWorld.flush();
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                    gameState = GameState.FINISHED;
-                }
 
-                final byte[] worldInBytes = serializedVersionOfWorld.toByteArray();
+                final byte[] worldInBytes = serializeWorld();
                 for (RoomClientThread client : clients) {
                     if (client.getClientGameState() == GameState.FINISHED) {
                         gameState = GameState.FINISHED;
@@ -143,7 +138,7 @@ public class Game extends Thread implements GameContext {
         return gameState;
     }
 
-    private void createRoomAndSendItToClients() {
+    private void createRoomAndSendItToClients() throws IOException {
         final TestingSessionSettings room = new TestingSessionSettings();
         room.map = "maps/duel/duel.g3db";
 
@@ -190,9 +185,28 @@ public class Game extends Thread implements GameContext {
         room.getDefintions().get(1).makeInstanceWithNextUid(5, 5);
         room.getDefintions().get(2).makeInstanceWithNextUid(0, -10);
 
+        gameWorld = new ServerGameWorld(room.objectDefs);
+
+        final byte[] worldInBytes = serializeWorld();
+
         for (int i = 0; i < clients.size(); i++) {
-            clients.get(i).setGame(this, room, heroes.get(i));
+            final RoomClientThread client = clients.get(i);
+            client.setWorldToSend(worldInBytes);
+            client.setGame(this, room, heroes.get(i));
         }
+    }
+
+    private byte[] serializeWorld() throws IOException {
+        final ByteArrayOutputStream serializedVersionOfWorld = new ByteArrayOutputStream();
+        final ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld)
+        try {
+            gameWorld.getState(objectOutputStreamForWorld);
+            objectOutputStreamForWorld.flush();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            gameState = GameState.FINISHED;
+        }
+        return serializedVersionOfWorld.toByteArray();
     }
 
     private void waitWhileEveryoneIsReady() {

@@ -15,7 +15,6 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.game_session.TestingSessionSettings;
@@ -27,7 +26,6 @@ import ru.spbau.blackout.screens.MultiplayerTable;
 import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.ClientGameWorld;
-import ru.spbau.blackout.worlds.GameWorld;
 
 /**
  * Task with the purpose of talking to a server: waiting in a queue, getting a game from a server,
@@ -129,14 +127,21 @@ public class AndroidClient implements Runnable, UIServer {
 
                     TestingSessionSettings sessionSettings = (TestingSessionSettings) in.readObject();
                     sessionSettings.character = (Character.Definition) in.readObject();
+                    sessionSettings.playerUid = in.readLong();
 
                     // using the fact that AndroidClient is UIServer itself.
                     // so synchronizing on server on loading
                     synchronized (this) {
                         Gdx.app.postRunnable(() -> {
-                            GameWorld gameWorld = new ClientGameWorld(sessionSettings.getDefintions());
-                            gameScreen = new GameScreen(sessionSettings, gameWorld, this, settings);
-                            BlackoutGame.get().screenManager().setScreen(gameScreen);
+                            final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings.getDefintions());
+                            try {
+                                gameWorld.setState(in);
+                                gameScreen = new GameScreen(sessionSettings, gameWorld, this, settings);
+                                BlackoutGame.get().screenManager().setScreen(gameScreen);
+                            } catch (IOException | ClassNotFoundException e) {
+                                e.printStackTrace();
+                                isInterrupted = true;
+                            }
                         });
                         try {
                             wait();

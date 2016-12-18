@@ -31,6 +31,7 @@ public class RoomClientThread extends Thread {
     private volatile String name = UNKNOWN;
     private volatile TestingSessionSettings session;
     private volatile Character.Definition character;
+    private volatile long playerUid;
     private volatile Game game;
     private volatile GameState clientGameState = GameState.WAITING;
     private final AtomicReference<byte[]> worldInBytes = new AtomicReference<>();
@@ -112,9 +113,10 @@ public class RoomClientThread extends Thread {
         return name;
     }
 
-    void setGame(Game game, TestingSessionSettings session, Character.Definition character) {
+    void setGame(Game game, TestingSessionSettings session, Character.Definition character, long playerUid) {
         this.session = session;
         this.character = character;
+        this.playerUid = playerUid;
         this.game = game;
     }
 
@@ -143,6 +145,8 @@ public class RoomClientThread extends Thread {
             if (currentState == GameState.READY_TO_START) {
                 out.writeObject(session);
                 out.writeObject(character);
+                out.writeLong(playerUid);
+                out.writeObject(worldInBytes.getAndSet(null));
                 out.flush();
 
                 // loading may take a long time
