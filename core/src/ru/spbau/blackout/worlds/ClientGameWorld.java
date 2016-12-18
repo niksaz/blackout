@@ -10,18 +10,18 @@ import ru.spbau.blackout.entities.GameObject;
 
 
 /**
- * GameWorld which is used on client side of multi-player game. It receives a serialized stepNumber of the world from the
- * server and updates its own.
+ * GameWorld which is used on client side of multi-player game. It receives a serialized stepNumber of the world from
+ * the server and updates its own.
  */
-public class GameWorldWithExternalSerial extends GameWorld {
+public class ClientGameWorld extends GameWorld {
 
     private final AtomicReference<ObjectInputStream> externalWorldStream = new AtomicReference<>();
-    private final List<GameObject.Definition> definitions;
 
 
-    public GameWorldWithExternalSerial(List<GameObject.Definition> definitions) {
-        this.definitions = definitions;
+    public ClientGameWorld(List<GameObject.Definition> definitions) {
+        super(definitions);
     }
+
 
     public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         long newStepNumber = in.readLong();
@@ -78,7 +78,7 @@ public class GameWorldWithExternalSerial extends GameWorld {
 
             while (!exist.endOfStream || !input.endOfStream) {
                 if (exist.endOfStream || (!input.endOfStream && exist.go.getUid() > input.uid)) {
-                    GameObject newObj = definitions.get(input.defNumber).makeInstance(input.uid);
+                    GameObject newObj = getDefinitions().get(input.defNumber).makeInstance(input.uid);
                     exist.it.add(newObj);
                     newObj.setState(in);
                     input.step(in);

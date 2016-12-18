@@ -10,7 +10,7 @@ import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
-public class TestingSessionSettings implements GameSessionSettings {
+public class TestingSessionSettings implements SessionSettings {
     public String map;
     public List<GameObject.Definition> objectDefs = new ArrayList<>();
     public Character.Definition character;
@@ -21,7 +21,7 @@ public class TestingSessionSettings implements GameSessionSettings {
     }
 
     @Override
-    public List<GameObject.Definition> getObjectDefs() {
+    public List<GameObject.Definition> getDefintions() {
         return objectDefs;
     }
 

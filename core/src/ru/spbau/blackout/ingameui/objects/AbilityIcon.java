@@ -11,13 +11,12 @@ import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
-import ru.spbau.blackout.network.AbstractServer;
+import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.progressbar.VerticalProgressBar;
 import ru.spbau.blackout.utils.Textures;
 
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
-import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 import static ru.spbau.blackout.utils.Utils.EMPTY_TEXTURE_PATH;
 import static ru.spbau.blackout.utils.Utils.floatEq;
 
@@ -34,11 +33,11 @@ public final class AbilityIcon extends IngameUIObject {
     private /*final*/ Ability ability;
     private boolean isPressed = false;
     private SimpleProgressBar chargingBar = new VerticalProgressBar(EMPTY_TEXTURE_PATH, FULL_TEXTURE_PATH);
-    private final AbstractServer server;  // TODO: use it
+    private final UIServer server;  // TODO: use it
 
 
     // I have to getOriginal unitDef here in order to getOriginal its abilityIcons
-    public AbilityIcon(AbstractServer server, AbilityIconSettings settings) {
+    public AbilityIcon(UIServer server, AbilityIconSettings settings) {
         this.server = server;
         this.settings = settings;
     }

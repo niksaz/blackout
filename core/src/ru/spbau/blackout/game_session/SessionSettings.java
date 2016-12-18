@@ -11,7 +11,7 @@ import ru.spbau.blackout.entities.GameObject;
 /**
  * Contains settings for particular game session.
  */
-public interface GameSessionSettings extends Serializable {
+public interface SessionSettings extends Serializable {
 
     // FIXME: map is more complicated thing than just a model
     /**
@@ -22,5 +22,5 @@ public interface GameSessionSettings extends Serializable {
     /**
      * Returns a list of definitions of all GameObjects in the game.
      */
-    List<GameObject.Definition> getObjectDefs();
+    List<GameObject.Definition> getDefintions();
 }

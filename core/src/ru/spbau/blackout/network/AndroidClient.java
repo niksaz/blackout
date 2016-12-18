@@ -15,6 +15,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.game_session.TestingSessionSettings;
@@ -25,13 +26,14 @@ import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.MultiplayerTable;
 import ru.spbau.blackout.screens.PlayScreenTable;
 import ru.spbau.blackout.settings.GameSettings;
-import ru.spbau.blackout.worlds.GameWorldWithExternalSerial;
+import ru.spbau.blackout.worlds.ClientGameWorld;
+import ru.spbau.blackout.worlds.GameWorld;
 
 /**
  * Task with the purpose of talking to a server: waiting in a queue, getting a game from a server,
- * synchronizing state of a game, passing user inputs to a server (AbstractServer)
+ * synchronizing state of a game, passing user inputs to a server (UIServer)
  */
-public class AndroidClient implements Runnable, AbstractServer {
+public class AndroidClient implements Runnable, UIServer {
 
     private static final String TAG = "AndroidClient";
     private static final String WAITING = "Waiting for a game.";
@@ -69,7 +71,7 @@ public class AndroidClient implements Runnable, AbstractServer {
 
             new Thread(new UIChangeSender(socket, serverDatagramPort, datagramSocket)).start();
 
-            final GameWorldWithExternalSerial currentWorld = (GameWorldWithExternalSerial) gameScreen.gameWorld();
+            final ClientGameWorld currentWorld = (ClientGameWorld) gameScreen.gameWorld();
             final byte[] buffer = new byte[Network.DATAGRAM_WORLD_PACKET_SIZE];
             final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
 
@@ -106,6 +108,11 @@ public class AndroidClient implements Runnable, AbstractServer {
         }
     }
 
+    @Override
+    public void sendAbilityCast(Ability ability, Vector2 target) {
+
+    }
+
     private void gameStartWaiting(ObjectInputStream in, ObjectOutputStream out)
             throws IOException, ClassNotFoundException {
         GameState gameState;
@@ -125,14 +132,15 @@ public class AndroidClient implements Runnable, AbstractServer {
                     IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
                     GameSettings settings = new GameSettings(uiSettings);  // just default settings
 
-                    TestingSessionSettings room = (TestingSessionSettings) in.readObject();
-                    room.character = (Character.Definition) in.readObject();
+                    TestingSessionSettings sessionSettings = (TestingSessionSettings) in.readObject();
+                    sessionSettings.character = (Character.Definition) in.readObject();
 
-                    // using the fact that AndroidClient is AbstractServer itself.
+                    // using the fact that AndroidClient is UIServer itself.
                     // so synchronizing on server on loading
                     synchronized (this) {
                         Gdx.app.postRunnable(() -> {
-                            gameScreen = new GameScreen(room, this, settings);
+                            GameWorld gameWorld = new ClientGameWorld(sessionSettings.getDefintions());
+                            gameScreen = new GameScreen(sessionSettings, gameWorld, this, settings);
                             BlackoutGame.get().screenManager().setScreen(gameScreen);
                         });
                         try {

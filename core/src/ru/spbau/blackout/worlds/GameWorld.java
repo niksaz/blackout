@@ -1,5 +1,6 @@
 package ru.spbau.blackout.worlds;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -10,7 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ru.spbau.blackout.BlackoutContactListener;
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.screens.GameScreen;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
@@ -44,17 +47,23 @@ public abstract class GameWorld {
     private final List<GameObject> gameObjects = new LinkedList<>();
     protected long stepNumber = 0;
     transient protected final World box2dWorld;  // FIXME: should be only on server
+    private final List<GameObject.Definition> definitions;
 
 
-    public GameWorld() {
+    public GameWorld(List<GameObject.Definition> definitions) {
         // without gravity, without sleeping
         this.box2dWorld = new World(Vector2.Zero, false);
         this.box2dWorld.setContactListener(new BlackoutContactListener());
+        this.definitions = definitions;
     }
 
 
     public List<GameObject> getGameObjects() {
         return gameObjects;
+    }
+
+    public List<GameObject.Definition> getDefinitions() {
+        return definitions;
     }
 
     public void update(float delta) {
@@ -64,6 +73,14 @@ public abstract class GameWorld {
     public Body addObject(GameObject object, BodyDef bodyDef) {
         this.gameObjects.add(object);
         return box2dWorld.createBody(bodyDef);
+    }
+
+    public void load(GameContext context) {
+        foreach(definitions, def -> def.load(context));
+    }
+
+    public void doneLoading() {
+        foreach(definitions, GameObject.Definition::doneLoading);
     }
 
     public void dispose() {

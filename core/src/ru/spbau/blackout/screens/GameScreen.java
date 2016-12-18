@@ -30,17 +30,15 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.util.List;
-
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.java8features.Optional;
+import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUI;
-import ru.spbau.blackout.network.AbstractServer;
-import ru.spbau.blackout.game_session.GameSessionSettings;
+import ru.spbau.blackout.game_session.SessionSettings;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.units.Vpx;
@@ -82,16 +80,15 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private final IngameUI ui;
 
     private final GameWorld gameWorld;
-    private final AbstractServer server;
+    private final UIServer server;
 
     private final Array<Music> music = new Array<>();
     private Music currentTrack;
     private final GameSettings settings;
-    private /*final*/ List<GameObject.Definition> definitions;
 
 
-    public GameScreen(GameSessionSettings sessionSettings, GameWorld gameWorld, AbstractServer server,
-                GameSettings settings) {
+    public GameScreen(SessionSettings sessionSettings, GameWorld gameWorld, UIServer server,
+                      GameSettings settings) {
         this.settings = settings;
         this.gameWorld = gameWorld;
         this.server = server;
@@ -210,7 +207,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
             modelBatch.begin(this.camera);
 
-            modelBatch.render(this.gameWorld, this.environment);
+            modelBatch.render(this.gameWorld.getGameObjects(), this.environment);
             modelBatch.render(this.map, this.environment);
 
             // render particles
@@ -257,7 +254,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
 
-    public AbstractServer getServer() {
+    public UIServer getServer() {
         return server;
     }
 
@@ -298,9 +295,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                 new HorizontalProgressBar(SmallHealthBar.PATH_EMPTY, SmallHealthBar.PATH_FULL);
 
 
-        public LoadingScreen(GameSessionSettings sessionSettings) {
+        public LoadingScreen(SessionSettings sessionSettings) {
             // getting information from room
-            definitions = sessionSettings.getObjectDefs();
             mapPath = sessionSettings.getMap();
 
             Camera camera = new OrthographicCamera();
@@ -395,14 +391,14 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         private void loadRealResources() {
             ui.load(assets);
-            foreach(definitions, obj -> obj.load(GameScreen.this));
+            gameWorld().load(GameScreen.this);
             assets.load(this.mapPath, Model.class);
             this.commonHealthBar.load(assets);
         }
 
         private void doneLoading() {
             this.commonHealthBar.doneLoading(assets);
-            foreach (definitions, GameObject.Definition::doneLoading);
+            gameWorld.doneLoading();
 
             // FIXME: move into Character.Definition.makeInstance()
 //                } else if (obj instanceof Character) {

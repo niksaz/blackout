@@ -12,7 +12,7 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.ingameui.settings.StickSettings;
-import ru.spbau.blackout.network.AbstractServer;
+import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.units.Vpx;
 import ru.spbau.blackout.utils.Textures;
 
@@ -40,10 +40,10 @@ public final class Stick extends IngameUIObject {
     private GameUnit unit;
     private Image touchImage;
     private final StickSettings settings;
-    private final AbstractServer server;
+    private final UIServer server;
 
 
-    public Stick(AbstractServer server, StickSettings settings) {
+    public Stick(UIServer server, StickSettings settings) {
         this.server = server;
         this.settings = settings;
     }

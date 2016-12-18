@@ -3,9 +3,7 @@ package ru.spbau.blackout.ingameui;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.network.AbstractServer;
 
 
 /**

@@ -4,10 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 
 import java.io.Serializable;
 
-import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.network.AbstractServer;
+import ru.spbau.blackout.network.UIServer;
 
 
 /**
@@ -46,11 +45,11 @@ public abstract class Ability implements Serializable {
 
 
     /** Called once when a touch goes down on the icon. */
-    public abstract void onCastStart(AbstractServer server);
+    public abstract void onCastStart(UIServer server);
     /** Called each frame when the icon is pressed. */
-    public abstract void onCastEnd(AbstractServer server);
+    public abstract void onCastEnd(UIServer server);
     /** Called once when a touch goes up. */
-    public abstract void inCast(AbstractServer server, float delta);
+    public abstract void inCast(UIServer server, float delta);
 
     /** Path to the icon in assets directory. */
     public abstract String iconPath();

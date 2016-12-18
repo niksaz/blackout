@@ -10,10 +10,10 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 import ru.spbau.blackout.androidfeatures.PlayServices;
 import ru.spbau.blackout.androidfeatures.PlayServicesInCore;
 import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.game_session.SessionSettings;
 import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
-import ru.spbau.blackout.network.AbstractServer;
 import ru.spbau.blackout.network.SinglePlayerServer;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
@@ -21,13 +21,15 @@ import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.special_effects.SpecialEffectsSystem;
 import ru.spbau.blackout.utils.BlackoutAssets;
 import ru.spbau.blackout.utils.ScreenManager;
-import ru.spbau.blackout.worlds.GameWorldWithPhysics;
+import ru.spbau.blackout.worlds.GameWorld;
+import ru.spbau.blackout.worlds.ServerGameWorld;
 
 
 /**
  * Singleton game class which is called by libGdx when it starts a game on a platform.
  */
 public class BlackoutGame extends Game {
+
     private static final class SingletonHolder {
         public static final BlackoutGame INSTANCE = new BlackoutGame(new ScreenManager());
     }
@@ -74,13 +76,14 @@ public class BlackoutGame extends Game {
 
 
 	// FIXME:  just for test
-    public void testGameScreen() {
+    public void startTestSinglePlayerGame() {
         AbilityIconSettings firstIconSettings = new AbilityIconSettings(0);
         IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
         GameSettings settings = new GameSettings(uiSettings);  // just default settings
+        SessionSettings sessionSettings = TestingSessionSettings.getTest();
 
-        screenManager.setScreen(new GameScreen(TestingSessionSettings.getTest(), new GameWorldWithPhysics(),
-                new SinglePlayerServer(), settings));
+        GameWorld gameWorld = new ServerGameWorld(sessionSettings.getDefintions());
+        screenManager.setScreen(new GameScreen(sessionSettings, gameWorld, new SinglePlayerServer(), settings));
 	}
 
     public void initializePlayServices(PlayServices playServices) {

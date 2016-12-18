@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.java8features.Optional;
-import ru.spbau.blackout.network.AbstractServer;
+import ru.spbau.blackout.network.UIServer;
 
 /**
  * Abstract class for abilities which should be casted by single tap on the icon.
@@ -26,7 +26,7 @@ public abstract class SimpleInstantAbility extends Ability {
 
 
     @Override
-    public final void onCastStart(AbstractServer server) {
+    public final void onCastStart(UIServer server) {
         this.startSound.get().play(1f /*FIXME: use sound volume from settings*/);
 
         Vector2 direction = new Vector2(1, 0).rotateRad(getUnit().getRotation());
@@ -37,10 +37,10 @@ public abstract class SimpleInstantAbility extends Ability {
     }
 
     @Override
-    public final void inCast(AbstractServer server, float delta) { /* nothing */ }
+    public final void inCast(UIServer server, float delta) { /* nothing */ }
 
     @Override
-    public final void onCastEnd(AbstractServer server) { /*nothing*/ }
+    public final void onCastEnd(UIServer server) { /*nothing*/ }
 
 
     @Override

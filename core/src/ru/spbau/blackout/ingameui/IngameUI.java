@@ -4,23 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.objects.AbilityIcon;
 import ru.spbau.blackout.ingameui.objects.HealthBar;
 import ru.spbau.blackout.ingameui.objects.Stick;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
-import ru.spbau.blackout.network.AbstractServer;
-import ru.spbau.blackout.units.Vpx;
+import ru.spbau.blackout.network.UIServer;
 
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
@@ -37,7 +33,7 @@ public class IngameUI {
     /**
      * Creates all UI elements and sets itself as input processor.
      */
-    public IngameUI(AbstractServer server, IngameUISettings settings) {
+    public IngameUI(UIServer server, IngameUISettings settings) {
         Camera camera = new OrthographicCamera(getWorldWidth(), getWorldHeight());
         Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), camera);
         this.stage = new Stage(viewport, BlackoutGame.get().spriteBatch());

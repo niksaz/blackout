@@ -29,7 +29,7 @@ import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Utils;
 import ru.spbau.blackout.worlds.GameWorld;
-import ru.spbau.blackout.worlds.GameWorldWithPhysics;
+import ru.spbau.blackout.worlds.ServerGameWorld;
 
 /**
  * Multiplayer game representation. Used for synchronizing game's state and watching for game flow, i.e. if someone
@@ -41,7 +41,7 @@ public class Game extends Thread implements GameContext {
     private final int gameId;
     private final RoomServer server;
     private final List<RoomClientThread> clients;
-    private final GameWorldWithPhysics gameWorld = new GameWorldWithPhysics();
+    private final ServerGameWorld gameWorld = new ServerGameWorld();
     private volatile GameState gameState = GameState.READY_TO_START;
 
     public Game(RoomServer server, List<RoomClientThread> clients, int gameId) {
@@ -181,7 +181,7 @@ public class Game extends Thread implements GameContext {
         );
         room.objectDefs.add(stone);
 
-        for (GameObject.Definition def : room.getObjectDefs()) {
+        for (GameObject.Definition def : room.getDefintions()) {
             def.setContextOnServer(this);
             def.makeInstance();
         }

@@ -1,28 +1,32 @@
 package ru.spbau.blackout.worlds;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.World;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
+import java.util.List;
 
-import ru.spbau.blackout.BlackoutContactListener;
 import ru.spbau.blackout.entities.GameObject;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
+
 /**
  * GameWorld with physics computations. Used in a single-player game and on server during a multi-player game.
  */
-public class GameWorldWithPhysics extends GameWorld {
+public class ServerGameWorld extends GameWorld {
 
     /** The fixed physic driver's step. */
     private static final float WORLD_STEP = 1 / 58f;
 
     private float accumulator = 0;
+
+
+    public ServerGameWorld(List<GameObject.Definition> definitions) {
+        super(definitions);
+    }
 
 
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
