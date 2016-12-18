@@ -144,6 +144,7 @@ public class RoomClientThread extends Thread {
             out.writeObject(currentState);
             if (currentState == GameState.READY_TO_START) {
                 out.writeObject(session);
+                //TODO: one of the next two is obviously redundant
                 out.writeObject(character);
                 out.writeLong(playerUid);
                 out.writeObject(worldInBytes.getAndSet(null));

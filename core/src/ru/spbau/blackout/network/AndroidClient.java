@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,6 +41,7 @@ public class AndroidClient implements Runnable, UIServer {
     private final MultiplayerTable table;
     private volatile boolean isInterrupted = false;
     private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>();
+    private final AtomicReference<AbilityCast> abilityToSend = new AtomicReference<>();
     private GameScreen gameScreen;
 
     public AndroidClient(MultiplayerTable table) {
@@ -67,7 +69,8 @@ public class AndroidClient implements Runnable, UIServer {
                 return;
             }
 
-            new Thread(new UIChangeSender(socket, serverDatagramPort, datagramSocket)).start();
+            new Thread(new UIChangeSenderUDP(socket.getInetAddress(), serverDatagramPort, datagramSocket)).start();
+            new Thread(new UIChangeSenderTCP(out)).start();
 
             final ClientGameWorld currentWorld = (ClientGameWorld) gameScreen.gameWorld();
             final byte[] buffer = new byte[Network.DATAGRAM_WORLD_PACKET_SIZE];
@@ -103,6 +106,14 @@ public class AndroidClient implements Runnable, UIServer {
         synchronized (velocityToSend) {
             velocityToSend.set(new Vector2(velocity));
             velocityToSend.notify();
+        }
+    }
+
+    @Override
+    public void sendAbilityCast(GameUnit unit, int abilityNum, Vector2 target) {
+        synchronized (abilityToSend) {
+            abilityToSend.set(new AbilityCast(abilityNum, target));
+            abilityToSend.notify();
         }
     }
 
@@ -159,59 +170,103 @@ public class AndroidClient implements Runnable, UIServer {
         } while (gameState == GameState.WAITING && !isInterrupted);
     }
 
-    public class UIChangeSender implements Runnable {
+    class UIChangeSenderUDP implements Runnable {
 
-        private final Socket socket;
+        private final InetAddress serverInetAddress;
         private final int serverDatagramPort;
         private final DatagramSocket datagramSocket;
 
-        public UIChangeSender(Socket socket, int serverDatagramPort, DatagramSocket datagramSocket) {
-            this.socket = socket;
+        public UIChangeSenderUDP(InetAddress serverInetAddress, int serverDatagramPort, DatagramSocket datagramSocket) {
+            this.serverInetAddress = serverInetAddress;
             this.serverDatagramPort = serverDatagramPort;
             this.datagramSocket = datagramSocket;
         }
 
         @Override
         public void run() {
-            {
-                final DatagramPacket velocityDatagram =
-                        new DatagramPacket(new byte[0], 0, socket.getInetAddress(), serverDatagramPort);
+            final DatagramPacket velocityDatagram =
+                    new DatagramPacket(new byte[0], 0, serverInetAddress, serverDatagramPort);
 
-                while (!isInterrupted) {
-                    if (velocityToSend.get() != null) {
-                        try (
-                                ByteArrayOutputStream velocityByteStream =
-                                        new ByteArrayOutputStream(Network.DATAGRAM_VELOCITY_PACKET_SIZE);
-                                ObjectOutputStream velocityObjectStream = new ObjectOutputStream(velocityByteStream)
-                        ) {
-                            velocityObjectStream.writeObject(velocityToSend.getAndSet(null));
-                            velocityObjectStream.flush();
-                            final byte[] byteArray = velocityByteStream.toByteArray();
-                            velocityDatagram.setData(byteArray);
-                            velocityDatagram.setLength(byteArray.length);
-                            datagramSocket.send(velocityDatagram);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            isInterrupted = true;
-                        }
-                    } else {
-                        synchronized (velocityToSend) {
-                            if (velocityToSend.get() == null) {
-                                try {
-                                    // setting timeout because if client not responding in SOCKET_IO_TIMEOUT_MS
-                                    // he will be disconnected
-                                    velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 2);
-                                    if (velocityToSend.get() == null) {
-                                        velocityToSend.set(new Vector2());
-                                    }
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
+            while (!isInterrupted) {
+                if (velocityToSend.get() != null) {
+                    try (
+                            ByteArrayOutputStream velocityByteStream =
+                                    new ByteArrayOutputStream(Network.DATAGRAM_VELOCITY_PACKET_SIZE);
+                            ObjectOutputStream velocityObjectStream = new ObjectOutputStream(velocityByteStream)
+                    ) {
+                        velocityObjectStream.writeObject(velocityToSend.getAndSet(null));
+                        velocityObjectStream.flush();
+                        final byte[] byteArray = velocityByteStream.toByteArray();
+                        velocityDatagram.setData(byteArray);
+                        velocityDatagram.setLength(byteArray.length);
+                        datagramSocket.send(velocityDatagram);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        isInterrupted = true;
+                    }
+                } else {
+                    synchronized (velocityToSend) {
+                        if (velocityToSend.get() == null) {
+                            try {
+                                // setting timeout because if client not responding in SOCKET_IO_TIMEOUT_MS
+                                // he will be disconnected
+                                velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 2);
+                                if (velocityToSend.get() == null) {
+                                    velocityToSend.set(new Vector2());
                                 }
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    class UIChangeSenderTCP implements Runnable {
+
+        private final ObjectOutputStream objectOutputStream;
+
+        public UIChangeSenderTCP(ObjectOutputStream objectOutputStream) {
+            this.objectOutputStream = objectOutputStream;
+        }
+
+        @Override
+        public void run() {
+            while (!isInterrupted) {
+                if (abilityToSend.get() != null) {
+                    try {
+                        final AbilityCast abilityCast = abilityToSend.getAndSet(null);
+                        objectOutputStream.writeInt(abilityCast.abilityNum);
+                        objectOutputStream.writeObject(abilityCast.target);
+                        objectOutputStream.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        isInterrupted = true;
+                    }
+                } else {
+                    synchronized (abilityToSend) {
+                        if (abilityToSend.get() == null) {
+                            try {
+                                abilityToSend.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static class AbilityCast {
+        int abilityNum;
+        Vector2 target;
+
+        AbilityCast(int abilityNum, Vector2 target) {
+            this.abilityNum = abilityNum;
+            this.target = target;
         }
     }
 }
