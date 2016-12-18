@@ -94,8 +94,8 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
     }
 
     @Override
-    public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        GameUnit other = (GameUnit) super.inplaceDeserialize(in);
+    public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        GameUnit other = (GameUnit) super.setState(in);
         this.setSelfVelocity(other.selfVelocity);
         this.speed = other.speed;
         return other;

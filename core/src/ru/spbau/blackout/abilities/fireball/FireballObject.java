@@ -23,8 +23,8 @@ public final class FireballObject extends AbilityObject {
     private final FireballObject.Definition def;
 
 
-    protected FireballObject(FireballObject.Definition def, float x, float y) {
-        super(def, x, y);
+    protected FireballObject(FireballObject.Definition def, long uid, float x, float y) {
+        super(def, uid, x, y);
         this.def = def;
 
         this.timeRest = def.timeToLive;
@@ -104,8 +104,8 @@ public final class FireballObject extends AbilityObject {
         }
 
         @Override
-        public GameObject makeInstance(float x, float y) {
-            return new FireballObject(this, x, y);
+        public GameObject makeInstance(long uid, float x, float y) {
+            return new FireballObject(this, uid, x, y);
         }
     }
 }

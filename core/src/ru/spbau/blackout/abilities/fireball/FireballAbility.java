@@ -16,7 +16,6 @@ public class FireballAbility extends SimpleInstantAbility {
     public static final float SHELL_START_SPEED = 30f;
     public static final float SHELL_MASS = 5f;
     public static final float SHELL_RADIUS = 0.5f;
-    public static final float CAST_DISTANCE = 1.5f;  // FIXME: use unit radius
     /** The estimated distance of the ability in case of no external force. */
     public static final float DISTANCE = 12f;
     public static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;
@@ -43,11 +42,11 @@ public class FireballAbility extends SimpleInstantAbility {
 
     @Override
     public void cast() {
-        Vector2 direction = new Vector2(1, 0).rotateRad(getUnit().getRotation());
-        Vector2 position = new Vector2(getUnit().getPosition());
-        position.mulAdd(direction, CAST_DISTANCE);
-        AbilityObject shell = (AbilityObject) shellDef.makeInstanceWithNextUid(position);
-        shell.velocity.mulAdd(direction, SHELL_START_SPEED);
+//        Vector2 direction = new Vector2(1, 0).rotateRad(getUnit().getRotation());
+//        Vector2 position = new Vector2(getUnit().getPosition());
+//        position.mulAdd(direction, CAST_DISTANCE);
+//        AbilityObject shell = (AbilityObject) shellDef.makeInstanceWithNextUid(position);
+//        shell.velocity.mulAdd(direction, SHELL_START_SPEED);
     }
 
     @Override

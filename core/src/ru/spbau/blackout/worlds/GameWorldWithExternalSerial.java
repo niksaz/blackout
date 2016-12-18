@@ -2,23 +2,110 @@ package ru.spbau.blackout.worlds;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicReference;
 
+import ru.spbau.blackout.entities.GameObject;
+
+
 /**
- * GameWorld which is used on client side of multi-player game. It receives a serialized version of the world from the
+ * GameWorld which is used on client side of multi-player game. It receives a serialized stepNumber of the world from the
  * server and updates its own.
  */
 public class GameWorldWithExternalSerial extends GameWorld {
 
     private final AtomicReference<ObjectInputStream> externalWorldStream = new AtomicReference<>();
+    private final List<GameObject.Definition> definitions;
+
+
+    public GameWorldWithExternalSerial(List<GameObject.Definition> definitions) {
+        this.definitions = definitions;
+    }
+
+    public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        long newStepNumber = in.readLong();
+
+        // this GameWorld is outdated
+        if (newStepNumber > stepNumber) {
+            stepNumber = newStepNumber;
+
+            class ExistIterator {
+                final ListIterator<GameObject> it;
+                boolean endOfStream = false;
+                // null means the end of the array
+                GameObject go;
+
+                ExistIterator() {
+                    it = getGameObjects().listIterator();
+                    step();
+                }
+
+                void step() {
+                    if (it.hasNext()) {
+                        go = it.next();
+                    } else {
+                        endOfStream = true;
+                    }
+                }
+            }
+
+            ExistIterator exist = new ExistIterator();
+
+            class InputIterator {
+                int length;
+                boolean endOfStream = false;
+                long uid = 0;
+                int defNumber;
+
+                InputIterator(ObjectInputStream in) throws IOException {
+                    this.length = in.readInt();
+                    step(in);
+                }
+
+                void step(ObjectInputStream in) throws IOException {
+                    if (length == 0) {
+                        endOfStream = true;
+                    } else {
+                        length -= 1;
+                        uid = in.readLong();
+                        defNumber = in.readInt();
+                    }
+                }
+            }
+
+            InputIterator input = new InputIterator(in);
+
+            while (!exist.endOfStream || !input.endOfStream) {
+                if (exist.endOfStream || (!input.endOfStream && exist.go.getUid() > input.uid)) {
+                    GameObject newObj = definitions.get(input.defNumber).makeInstance(input.uid);
+                    exist.it.add(newObj);
+                    newObj.setState(in);
+                    input.step(in);
+                } else if (input.endOfStream || exist.go.getUid() < input.uid) {
+                    exist.go.kill();
+                    exist.it.remove();
+                    exist.step();
+                } else {
+                    assert !exist.endOfStream && !input.endOfStream && exist.go.getUid() == input.uid;
+                    exist.go.setState(in);
+                    exist.step();
+                    input.step(in);
+                }
+            }
+        }
+
+        return null;
+    }
+
 
     @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
+    public void update(float delta) {
+        super.update(delta);
 
         if (externalWorldStream.get() != null) {
             try {
-                inplaceDeserialize(externalWorldStream.getAndSet(null));
+                setState(externalWorldStream.getAndSet(null));
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }

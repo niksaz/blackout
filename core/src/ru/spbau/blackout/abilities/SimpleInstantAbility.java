@@ -2,6 +2,7 @@ package ru.spbau.blackout.abilities;
 
 
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.math.Vector2;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.java8features.Optional;
@@ -12,6 +13,7 @@ import ru.spbau.blackout.network.AbstractServer;
  */
 public abstract class SimpleInstantAbility extends Ability {
     private transient Optional<Sound> /*final*/ startSound = Optional.empty();
+    public static final float CAST_DISTANCE = 1.5f;  // FIXME: use unit radius
 
 
     public SimpleInstantAbility(int level) {
@@ -26,7 +28,12 @@ public abstract class SimpleInstantAbility extends Ability {
     @Override
     public final void onCastStart(AbstractServer server) {
         this.startSound.get().play(1f /*FIXME: use sound volume from settings*/);
-        this.cast();
+
+        Vector2 direction = new Vector2(1, 0).rotateRad(getUnit().getRotation());
+        Vector2 target = new Vector2(getUnit().getPosition());
+        target.mulAdd(direction, CAST_DISTANCE);
+
+        server.sendAbilityCast(this, target);
     }
 
     @Override

@@ -19,7 +19,7 @@ import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphic_effects.GraphicEffect;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
-import ru.spbau.blackout.utils.InplaceSerializable;
+import ru.spbau.blackout.utils.HasState;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -29,7 +29,7 @@ import java.io.Serializable;
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
-public abstract class GameObject implements RenderableProvider, InplaceSerializable, Serializable {
+public abstract class GameObject implements RenderableProvider, HasState, Serializable {
     public static final float RESTITUTION = 0.5f;
 
 
@@ -42,7 +42,7 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
     private boolean dead = false;
     private final GameObject.Definition def;
-    private final long uid;
+    private final transient long uid;
 
 
     /**
@@ -72,14 +72,14 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
 
 
     @Override
-    public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeObject(this);
         out.writeObject(getPosition());
         out.writeFloat(getRotation());
     }
 
     @Override
-    public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameObject other = (GameObject) in.readObject();
         height = other.height;
         Vector2 position = (Vector2) in.readObject();
@@ -236,6 +236,10 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         return get3dPosition().add(def.overHeadPivotOffset);
     }
 
+    public Definition getDef() {
+        return def;
+    }
+
 
     /**
      * Used to send via network a definition of an object to create.
@@ -249,7 +253,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
      */
     public static abstract class Definition implements Serializable {
         public static final float DEFAULT_HEIGHT = 0;
-        public static final float DEFAULT_ROTATION = 0;
 
         public static final float DEFAULT_MASS = 70f;
 
@@ -257,7 +260,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         protected static long s_lastUid = 0;
 
         // physics
-        public float rotation = DEFAULT_ROTATION;
         public float height = DEFAULT_HEIGHT;
 
         /** Mass of an object in kg */
@@ -267,7 +269,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
          * supplier will be sent instead.
          */
         public Creator<Shape> shapeCreator;
-        public final Vector2 position = new Vector2();
 
         /** The loaded model object. Initialized by <code>initialize</code> method. */
         private transient Optional<Model> model = Optional.empty();
@@ -282,6 +283,8 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public final Vector3 overHeadPivotOffset = new Vector3();
         public boolean isSensor = false;
 
+        private int defNumber;
+
 
         /**
          * <code>modelPath</code> can be <code>null</code>.
@@ -290,7 +293,6 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
             this.modelPath = modelPath;
             this.shapeCreator = shapeCreator;
-            this.position.set(initialX, initialY);
         }
 
         /** Load necessary assets. */
@@ -321,6 +323,10 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         public GameObject makeInstance(long uid, Vector2 position) {
             return makeInstance(uid, position.x, position.y);
         }
+        /** Create an object at (0, 0). */
+        public GameObject makeInstance(long uid) {
+            return makeInstance(uid, 0, 0);
+        }
 
         /**
          * Create an object at the giving position.
@@ -334,19 +340,12 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
         }
 
 
-        /** Rotates to the given direction. */
-        public void setDirection(Vector2 direction) {
-            this.rotation = direction.angleRad();
-        }
-
-
         /**
          * Must be called from <code>GameObject</code> constructor to add this
          * <code>GameObject</code> to the world and make <code>Body</code> for it.
          */
         private Body registerObject(GameContext context, GameObject object) {
             BodyDef bodyDef = new BodyDef();
-            bodyDef.position.set(this.position);
             bodyDef.type = getBodyType();
 
             return context.gameWorld().addObject(object, bodyDef);
@@ -358,5 +357,9 @@ public abstract class GameObject implements RenderableProvider, InplaceSerializa
             s_lastUid += 1;
             return s_lastUid;
         }
+
+        public int getDefNumber() { return defNumber; }
+
+        public void setDefNumber(int defNumber) { this.defNumber = defNumber; }
     }
 }

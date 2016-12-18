@@ -3,22 +3,14 @@ package ru.spbau.blackout.worlds;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.joints.FrictionJoint;
-import com.badlogic.gdx.physics.box2d.joints.FrictionJointDef;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import ru.spbau.blackout.BlackoutContactListener;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.utils.InplaceSerializable;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
@@ -44,75 +36,25 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  * <br>There is one more method called <code>updateState</code>. It must update things which are not connected
  * with physic driver. This method called one time per frame (i.e. without fixed step).
  */
-public abstract class GameWorld implements Iterable<GameObject>, InplaceSerializable {
+public abstract class GameWorld {
 
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
     private final List<GameObject> gameObjects = new LinkedList<>();
-    transient protected final World box2dWorld;
     protected long stepNumber = 0;
+    transient protected final World box2dWorld;  // FIXME: should be only on server
 
 
     public GameWorld() {
         // without gravity, without sleeping
         this.box2dWorld = new World(Vector2.Zero, false);
         this.box2dWorld.setContactListener(new BlackoutContactListener());
-
-        {
-            BodyDef def = new BodyDef();
-            def.type = BodyDef.BodyType.StaticBody;
-            def.position.set(0, 0);
-        }
-
-        {
-            CircleShape shape = new CircleShape();
-            shape.setRadius(10000f); // infinity radius
-
-            FixtureDef fixtureDef = new FixtureDef();
-            fixtureDef.shape = shape;
-            fixtureDef.isSensor = true; // no collisions with the ground
-
-            shape.dispose();
-        }
     }
+
 
     public List<GameObject> getGameObjects() {
-        return this.gameObjects;
-    }
-
-    @Override
-    public Iterator<GameObject> iterator() {
-        return this.gameObjects.iterator();
-    }
-
-    @Override
-    public void inplaceSerialize(ObjectOutputStream out) throws IOException, ClassNotFoundException {
-        out.writeLong(stepNumber);
-
-        out.writeInt(gameObjects.size());
-
-        for (GameObject object : this) {
-            object.inplaceSerialize(out);
-        }
-    }
-
-    @Override
-    public Object inplaceDeserialize(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        long num = in.readLong();
-
-        // this GameWorld is outdated
-        if (num > stepNumber) {
-            stepNumber = num;
-
-            in.readInt();
-
-            for (GameObject object : this) {
-                object.inplaceDeserialize(in);
-            }
-        }
-
-        return null;
+        return gameObjects;
     }
 
     public void update(float delta) {
@@ -121,14 +63,12 @@ public abstract class GameWorld implements Iterable<GameObject>, InplaceSerializ
 
     public Body addObject(GameObject object, BodyDef bodyDef) {
         this.gameObjects.add(object);
-        return this.box2dWorld.createBody(bodyDef);
+        return box2dWorld.createBody(bodyDef);
     }
 
     public void dispose() {
         this.box2dWorld.dispose();
-        for (GameObject object : this) {
-            object.dispose();
-        }
+        foreach (getGameObjects(), GameObject::dispose);
     }
 }
 

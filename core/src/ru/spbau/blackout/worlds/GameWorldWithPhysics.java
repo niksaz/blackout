@@ -1,7 +1,15 @@
 package ru.spbau.blackout.worlds;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.World;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Iterator;
 
+import ru.spbau.blackout.BlackoutContactListener;
 import ru.spbau.blackout.entities.GameObject;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
@@ -16,15 +24,28 @@ public class GameWorldWithPhysics extends GameWorld {
 
     private float accumulator = 0;
 
+
+    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        out.writeLong(stepNumber);
+
+        out.writeInt(getGameObjects().size());
+
+        for (GameObject go : getGameObjects()) {
+            out.writeLong(go.getUid());
+            out.writeInt(go.getDef().getDefNumber());
+            go.getState(out);
+        }
+    }
+
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        for (GameObject object : this) {
+        for (GameObject object : getGameObjects()) {
             object.updateState(deltaTime);
         }
 
-        for (Iterator<GameObject> it = this.iterator(); it.hasNext();) {
+        for (Iterator<GameObject> it = getGameObjects().iterator(); it.hasNext();) {
             GameObject object = it.next();
             if (object.isDead()) {
                 object.destroyBody(this.box2dWorld);
@@ -45,10 +66,20 @@ public class GameWorldWithPhysics extends GameWorld {
     private void step() {
         stepNumber += 1;
 
-        foreach(this, GameObject::updateForFirstStep);
+        foreach(getGameObjects(), GameObject::updateForFirstStep);
         this.box2dWorld.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-        foreach(this, GameObject::updateForSecondStep);
+        foreach(getGameObjects(), GameObject::updateForSecondStep);
         this.box2dWorld.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
+    }
+
+    @Override
+    public Body addObject(GameObject object, BodyDef bodyDef) {
+        return super.addObject(object, bodyDef);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
     }
 }

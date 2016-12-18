@@ -32,7 +32,7 @@ public abstract class Ability implements Serializable {
      */
     public void load(GameContext context) {
         // loading of icon has to be here because it isn't accessible from `AbilityIcon` class in the loading stage
-        context.getAssets().load(this.iconPath(), Texture.class);
+        context.getAssets().load(iconPath(), Texture.class);
     }
 
     public void doneLoading(GameContext context) {}
@@ -61,7 +61,7 @@ public abstract class Ability implements Serializable {
     public float getChargeTime() { return chargeTime; }
     public void setChargeTime(float chargeTime) { this.chargeTime = chargeTime; }
     public void charge(float deltaTime) {
-        this.chargeTime -= Math.min(deltaTime, this.chargeTime);
+        chargeTime -= Math.min(deltaTime, chargeTime);
     }
 
     /** Sets current charge time as <code>maxChargeTime</code>. */

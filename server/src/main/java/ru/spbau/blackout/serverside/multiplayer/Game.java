@@ -76,7 +76,7 @@ public class Game extends Thread implements GameContext {
                 lastWorldUpdateTime = currentTime;
                 server.log("Updating gameWorld: " + worldDeltaInSecs);
                 try {
-                    gameWorld.inplaceSerialize(objectOutputStreamForWorld);
+                    gameWorld.getState(objectOutputStreamForWorld);
                     objectOutputStreamForWorld.flush();
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
