@@ -5,6 +5,9 @@ import com.badlogic.gdx.physics.box2d.Shape;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
@@ -31,19 +34,19 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
 
     private final Vector2 selfVelocity = new Vector2();
     private float speed;
-    transient private final Ability[] abilities;
+    transient private final List<Ability> abilities;
     private float health;
     private float maxHealth;
 
 
     protected GameUnit(Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
-        this.speed = def.speed;
-        this.animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
-        this.abilities = def.abilities;
+        speed = def.speed;
+        animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
+        abilities = Arrays.asList(def.abilities);
 
-        this.maxHealth = def.maxHealth;
-        this.health = this.maxHealth;
+        maxHealth = def.maxHealth;
+        health = maxHealth;
 
         for (Ability ability : abilities) {
             ability.initialize(this);
@@ -52,7 +55,7 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
 
 
     public final Ability getAbility(int num) {
-        return this.abilities[num];
+        return abilities.get(num);
     }
 
 
@@ -99,6 +102,15 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
         this.setSelfVelocity(other.selfVelocity);
         this.speed = other.speed;
         return other;
+    }
+
+    public int getAbilityNum(Ability ability) {
+        for (int i = 0; i < abilities.size(); i++) {
+            if (abilities.get(i) == ability) {
+                return i;
+            }
+        }
+        return -1;
     }
 
 

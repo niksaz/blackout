@@ -33,7 +33,7 @@ public abstract class SimpleInstantAbility extends Ability {
         Vector2 target = new Vector2(getUnit().getPosition());
         target.mulAdd(direction, CAST_DISTANCE);
 
-        server.sendAbilityCast(this, target);
+        server.sendAbilityCast(getUnit(), getUnit().getAbilityNum(this), target);
     }
 
     @Override
