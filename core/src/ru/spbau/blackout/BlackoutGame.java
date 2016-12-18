@@ -33,16 +33,17 @@ public class BlackoutGame extends Game {
     }
 
 
-    /** For lazy initialization (NullPointerException otherwise) */
-    private static final class ScreenSizeHolder {
-        public static final float ASPECT_RATION = (float)Gdx.graphics.getWidth() / (float)Gdx.graphics.getHeight();
-        public static final int VIRTUAL_WORLD_WIDTH  = 1280;
-        public static final int VIRTUAL_WORLD_HEIGHT = Math.round(VIRTUAL_WORLD_WIDTH / ASPECT_RATION);
+    public static float getAspectRatio() {
+        return (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
     }
 
-    public static float getAspectRation() { return ScreenSizeHolder.ASPECT_RATION; }
-    public static int getWorldWidth() { return ScreenSizeHolder.VIRTUAL_WORLD_WIDTH; }
-    public static int getWorldHeight() { return ScreenSizeHolder.VIRTUAL_WORLD_HEIGHT; }
+    public static int getWorldWidth() {
+        return 1280;
+    }
+
+    public static int getWorldHeight() {
+        return Math.round(getWorldWidth() / getAspectRatio());
+    }
 
 
     // fields marked as /*final*/ must be assigned only once, but can't be assigned in constructor
