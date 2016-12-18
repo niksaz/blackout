@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import ru.spbau.blackout.serverside.multiplayer.ClientThread;
 import ru.spbau.blackout.serverside.multiplayer.Game;
-import ru.spbau.blackout.serverside.multiplayer.RoomClientThread;
 
 /**
  * Accepts incoming connections, creates a thread for each accepted connection (ClientThread),
@@ -21,7 +21,7 @@ public class RoomServer extends ServerWithLogging {
 
     private static final int PLAYERS_NUMBER_TO_START_GAME = 1;
 
-    private final Deque<RoomClientThread> clientThreads = new ConcurrentLinkedDeque<>();
+    private final Deque<ClientThread> clientThreads = new ConcurrentLinkedDeque<>();
     private final AtomicInteger playersNumber = new AtomicInteger();
     private int gamesCreated;
 
@@ -34,7 +34,7 @@ public class RoomServer extends ServerWithLogging {
             log("Server started.");
             do {
                 final Socket nextSocket = serverSocket.accept();
-                final RoomClientThread nextThread = new RoomClientThread(this, nextSocket);
+                final ClientThread nextThread = new ClientThread(this, nextSocket);
                 log("New thread for a connection is created.");
                 clientThreads.add(nextThread);
                 playersNumber.addAndGet(1);
@@ -47,7 +47,7 @@ public class RoomServer extends ServerWithLogging {
         }
     }
 
-    public void discard(RoomClientThread clientThread) {
+    public void discard(ClientThread clientThread) {
         playersNumber.decrementAndGet();
         clientThreads.remove(clientThread);
         log("Client named " + clientThread.getClientName() + " disconnected.");
@@ -56,7 +56,7 @@ public class RoomServer extends ServerWithLogging {
     private synchronized void maybePlayGame(int playersForGame) {
         if (playersNumber.get() >= playersForGame) {
             playersNumber.addAndGet(-playersForGame);
-            final List<RoomClientThread> clients = new ArrayList<>(playersForGame);
+            final List<ClientThread> clients = new ArrayList<>(playersForGame);
             for (int playerIndex = 0; playerIndex < playersForGame; playerIndex++) {
                 clients.add(clientThreads.removeFirst());
             }

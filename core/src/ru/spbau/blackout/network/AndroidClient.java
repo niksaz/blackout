@@ -170,7 +170,7 @@ public class AndroidClient implements Runnable, UIServer {
         } while (gameState == GameState.WAITING && !isInterrupted);
     }
 
-    class UIChangeSenderUDP implements Runnable {
+    private class UIChangeSenderUDP implements Runnable {
 
         private final InetAddress serverInetAddress;
         private final int serverDatagramPort;
@@ -224,7 +224,7 @@ public class AndroidClient implements Runnable, UIServer {
         }
     }
 
-    class UIChangeSenderTCP implements Runnable {
+    private class UIChangeSenderTCP implements Runnable {
 
         private final ObjectOutputStream objectOutputStream;
 
@@ -237,9 +237,7 @@ public class AndroidClient implements Runnable, UIServer {
             while (!isInterrupted) {
                 if (abilityToSend.get() != null) {
                     try {
-                        final AbilityCast abilityCast = abilityToSend.getAndSet(null);
-                        objectOutputStream.writeInt(abilityCast.abilityNum);
-                        objectOutputStream.writeObject(abilityCast.target);
+                        objectOutputStream.writeObject(abilityToSend.getAndSet(null));
                         objectOutputStream.flush();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -260,9 +258,9 @@ public class AndroidClient implements Runnable, UIServer {
         }
     }
 
-    private static class AbilityCast {
-        int abilityNum;
-        Vector2 target;
+    public static class AbilityCast {
+        public int abilityNum;
+        public Vector2 target;
 
         AbilityCast(int abilityNum, Vector2 target) {
             this.abilityNum = abilityNum;

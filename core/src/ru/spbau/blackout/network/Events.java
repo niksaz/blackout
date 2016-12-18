@@ -6,7 +6,7 @@ import ru.spbau.blackout.entities.GameUnit;
 
 public class Events {
 
-    void abilityCast(GameUnit unit, int abilityNum, Vector2 target) {
+    static public void abilityCast(GameUnit unit, int abilityNum, Vector2 target) {
         // TODO: I will make this function
     }
 }
