@@ -15,16 +15,16 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphic_effects.GraphicEffect;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.HasState;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
@@ -252,6 +252,8 @@ public abstract class GameObject implements RenderableProvider, HasState, Serial
      * <br>makeInstance (Any number of calls)
      */
     public static abstract class Definition implements Serializable {
+        private static final long serialVersionUID = 1000000000L;
+
         public static final float DEFAULT_HEIGHT = 0;
 
         public static final float DEFAULT_MASS = 70f;

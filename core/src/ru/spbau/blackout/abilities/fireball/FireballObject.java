@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.graphic_effects.ParticleGraphicEffect;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.graphic_effects.ParticleGraphicEffect;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.special_effects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
@@ -79,6 +79,9 @@ public final class FireballObject extends AbilityObject {
      * Additionally defines timeToLive for an object.
      */
     public static class Definition extends AbilityObject.Definition {
+
+        private static final long serialVersionUID = 1000000000L;
+
         public float timeToLive;
         public float damage;
         private /*final*/ transient Optional<ParticleEffect> fireEffect;
