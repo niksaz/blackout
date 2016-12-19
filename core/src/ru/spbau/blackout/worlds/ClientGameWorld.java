@@ -16,9 +16,9 @@ import ru.spbau.blackout.entities.GameObject;
 public class ClientGameWorld extends GameWorld {
 
     private final AtomicReference<ObjectInputStream> externalWorldStream = new AtomicReference<>();
+    private ObjectInputStream firstStateStream;
 
-
-    public ClientGameWorld(List<GameObject.Definition> definitions) {
+    public ClientGameWorld(List<GameObject.Definition> definitions, ObjectInputStream firstStateStream) {
         super(definitions);
     }
 
@@ -75,6 +75,14 @@ public class ClientGameWorld extends GameWorld {
             }
 
             InputIterator input = new InputIterator(in);
+            System.out.println(input.length);
+            System.out.println(input.length);
+            System.out.println(input.length);
+            System.out.println(input.length);
+            System.out.println(input.length);
+            if (true) {
+                throw new AssertionError("" + input.length);
+            }
 
             while (!exist.endOfStream || !input.endOfStream) {
                 if (exist.endOfStream || (!input.endOfStream && exist.go.getUid() > input.uid)) {
@@ -98,6 +106,17 @@ public class ClientGameWorld extends GameWorld {
         return null;
     }
 
+    @Override
+    public void doneLoading() {
+        super.doneLoading();
+        try {
+            setState(firstStateStream);
+            firstStateStream = null;  // let it be removed
+        } catch (Exception e) {
+            e.printStackTrace();
+            // TODO: do something
+        }
+    }
 
     @Override
     public void update(float delta) {

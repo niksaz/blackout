@@ -31,14 +31,13 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.game_session.SessionSettings;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUI;
-import ru.spbau.blackout.game_session.SessionSettings;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.units.Vpx;
@@ -287,19 +286,16 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         public static final String BACKGROUND_IMAGE = "images/loading_screen.png";
 
 
-        private final String mapPath;
-
         private final Stage stage;
         private final SimpleProgressBar progressBar =
                 new HorizontalProgressBar(LoadingProgressBar.PATH_EMPTY, LoadingProgressBar.PATH_FULL);
         private boolean loadingScreenLoaded = false;
         private final SimpleProgressBar commonHealthBar =
                 new HorizontalProgressBar(SmallHealthBar.PATH_EMPTY, SmallHealthBar.PATH_FULL);
-
+        private final SessionSettings sessionSettings;
 
         public LoadingScreen(SessionSettings sessionSettings) {
-            // getting information from room
-            mapPath = sessionSettings.getMap();
+            this.sessionSettings = sessionSettings;
 
             Camera camera = new OrthographicCamera();
             Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), camera);
@@ -394,8 +390,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private void loadRealResources() {
             ui.load(assets);
             gameWorld().load(GameScreen.this);
-            assets.load(this.mapPath, Model.class);
-            this.commonHealthBar.load(assets);
+            assets.load(sessionSettings.getMapPath(), Model.class);
+            commonHealthBar.load(assets);
         }
 
         private void doneLoading() {
@@ -410,13 +406,15 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 //                    obj.graphicEffects.add(healthBarEffect);
 //                }
 
+            character = (Character) gameWorld.getObjectById(sessionSettings.getPlayerUid());
+            assert character != null;
 
-
+            // FIXME
             if (character == null) {
                 throw new AssertionError("Player without character");
             }
 
-            map = new ModelInstance(assets.get(mapPath, Model.class));
+            map = new ModelInstance(assets.get(sessionSettings.getMapPath(), Model.class));
             fixTop(map);
 
             ui.doneLoading(assets, character);

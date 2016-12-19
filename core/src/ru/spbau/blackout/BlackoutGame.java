@@ -10,8 +10,8 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 import ru.spbau.blackout.androidfeatures.PlayServices;
 import ru.spbau.blackout.androidfeatures.PlayServicesInCore;
 import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.game_session.SessionSettings;
-import ru.spbau.blackout.game_session.TestingSessionSettings;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.network.SinglePlayerServer;
@@ -80,9 +80,10 @@ public class BlackoutGame extends Game {
         AbilityIconSettings firstIconSettings = new AbilityIconSettings(0);
         IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
         GameSettings settings = new GameSettings(uiSettings);  // just default settings
-        SessionSettings sessionSettings = TestingSessionSettings.getTest();
+        SessionSettings sessionSettings = SessionSettings.getTest();
 
-        GameWorld gameWorld = new ServerGameWorld(sessionSettings.getDefintions());
+        GameWorld gameWorld = new ServerGameWorld(sessionSettings.getDefinitions());
+
         screenManager.setScreen(new GameScreen(sessionSettings, gameWorld, new SinglePlayerServer(), settings));
 	}
 

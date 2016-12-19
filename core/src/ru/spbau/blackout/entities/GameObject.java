@@ -126,7 +126,7 @@ public abstract class GameObject implements RenderableProvider, HasState, Serial
     }
 
     /**
-     * Kills the unit. It will be removed from the <code>GameWorld</code> and from the map after paying death animation.
+     * Kills the unit. It will be removed from the <code>GameWorld</code> and from the mapPath after paying death animation.
      * Also calls <code>this.dispose()</code>.
      */
     public void kill() {
@@ -290,7 +290,7 @@ public abstract class GameObject implements RenderableProvider, HasState, Serial
          * <code>modelPath</code> can be <code>null</code>.
          * In this case objects created from this definition will not have models.
          */
-        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
+        public Definition(String modelPath, Creator<Shape> shapeCreator) {
             this.modelPath = modelPath;
             this.shapeCreator = shapeCreator;
         }

@@ -19,7 +19,7 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.game_session.TestingSessionSettings;
+import ru.spbau.blackout.game_session.SessionSettings;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
 import ru.spbau.blackout.network.Events;
@@ -148,8 +148,8 @@ public class Game extends Thread implements GameContext {
     }
 
     private void createRoomAndSendItToClients() throws IOException {
-        final TestingSessionSettings room = new TestingSessionSettings();
-        room.map = "maps/duel/duel.g3db";
+        final SessionSettings room = new SessionSettings();
+        room.mapPath = "maps/duel/duel.g3db";
 
         final List<Character.Definition> heroes = new ArrayList<>();
         for (ClientThread client : clients) {
@@ -170,7 +170,7 @@ public class Game extends Thread implements GameContext {
             ) {
                 final Character.Definition hero = (Character.Definition) in.readObject();
                 hero.overHeadPivotOffset.set(0, 0, 3.5f);
-                room.objectDefs.add(hero);
+                room.definitions.add(hero);
                 heroes.add(hero);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
@@ -183,19 +183,19 @@ public class Game extends Thread implements GameContext {
                 new CircleCreator(1.1f),
                 0, -20
         );
-        room.objectDefs.add(stone);
+        room.definitions.add(stone);
 
-        for (GameObject.Definition def : room.getDefintions()) {
+        for (GameObject.Definition def : room.getDefinitions()) {
             def.setContextOnServer(this);
         }
 
         // FIXME: just for test
         final List<GameObject> heroesObjects = new ArrayList<>();
-        heroesObjects.add(room.getDefintions().get(0).makeInstanceWithNextUid(0, 0));
-        heroesObjects.add(room.getDefintions().get(1).makeInstanceWithNextUid(5, 5));
-        room.getDefintions().get(2).makeInstanceWithNextUid(0, -10);
+        heroesObjects.add(room.getDefinitions().get(0).makeInstanceWithNextUid(0, 0));
+        heroesObjects.add(room.getDefinitions().get(1).makeInstanceWithNextUid(5, 5));
+        room.getDefinitions().get(2).makeInstanceWithNextUid(0, -10);
 
-        gameWorld = new ServerGameWorld(room.objectDefs);
+        gameWorld = new ServerGameWorld(room.definitions);
 
         final byte[] worldInBytes = serializeWorld();
 

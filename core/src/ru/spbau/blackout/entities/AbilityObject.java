@@ -27,7 +27,7 @@ public abstract class AbilityObject extends DynamicObject {
 
     public static abstract class Definition extends DynamicObject.Definition {
         public Definition(String modelPath, Creator<Shape> shapeCreator, float mass) {
-            super(modelPath, shapeCreator, 0, 0);
+            super(modelPath, shapeCreator);
             this.mass = mass;
         }
     }

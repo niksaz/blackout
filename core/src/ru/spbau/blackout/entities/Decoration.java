@@ -12,8 +12,8 @@ public class Decoration extends StaticObject {
 
 
     public static class Definition extends StaticObject.Definition {
-        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
-            super(modelPath, shapeCreator, initialX, initialY);
+        public Definition(String modelPath, Creator<Shape> shapeCreator) {
+            super(modelPath, shapeCreator);
         }
 
 

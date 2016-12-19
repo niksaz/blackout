@@ -165,9 +165,8 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
         public float maxHealth;
 
 
-        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY,
-                          Ability[] abilities, float maxHealth) {
-            super(modelPath, shapeCreator, initialX, initialY);
+        public Definition(String modelPath, Creator<Shape> shapeCreator, Ability[] abilities, float maxHealth) {
+            super(modelPath, shapeCreator);
             this.abilities = abilities;
             this.maxHealth = maxHealth;
         }

@@ -88,8 +88,8 @@ public abstract class DynamicObject extends GameObject {
 
     /** Definition for objects which have Dynamic body type. */
     public static abstract class Definition extends GameObject.Definition {
-        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY) {
-            super(modelPath, shapeCreator, initialX, initialY);
+        public Definition(String modelPath, Creator<Shape> shapeCreator) {
+            super(modelPath, shapeCreator);
         }
 
         @Override

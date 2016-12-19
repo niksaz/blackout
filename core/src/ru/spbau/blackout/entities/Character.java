@@ -16,9 +16,8 @@ public class Character extends GameUnit {
 
 
     public static class Definition extends GameUnit.Definition {
-        public Definition(String modelPath, Creator<Shape> shapeCreator, float initialX, float initialY,
-                          Ability[] abilities, float maxHealth) {
-            super(modelPath, shapeCreator, initialX, initialY, abilities, maxHealth);
+        public Definition(String modelPath, Creator<Shape> shapeCreator, Ability[] abilities, float maxHealth) {
+            super(modelPath, shapeCreator, abilities, maxHealth);
         }
 
         @Override

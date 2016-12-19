@@ -34,8 +34,7 @@ public class PlayerEntity implements Serializable {
         final Character.Definition initialCharacter = new Character.Definition(
                 "models/wizard/wizard.g3db",
                 new CircleCreator(0.6f),
-                0, 0,
-                new Ability[] { new FireballAbility(7) },
+                new Ability[] { new FireballAbility(1) },
                 200
         );
         try (

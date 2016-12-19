@@ -12,6 +12,7 @@ import java.util.List;
 
 import ru.spbau.blackout.BlackoutContactListener;
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.screens.GameScreen;
 
@@ -87,5 +88,13 @@ public abstract class GameWorld {
         this.box2dWorld.dispose();
         foreach (getGameObjects(), GameObject::dispose);
     }
-}
 
+    public GameObject getObjectById(long uid) {
+        for (GameObject obj : getGameObjects()) {
+            if (obj.getUid() == uid) {
+                return obj;
+            }
+        }
+        return null;
+    }
+}

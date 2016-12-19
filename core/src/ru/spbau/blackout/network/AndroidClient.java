@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.game_session.TestingSessionSettings;
+import ru.spbau.blackout.game_session.SessionSettings;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.screens.GameScreen;
@@ -136,23 +136,16 @@ public class AndroidClient implements Runnable, UIServer {
                     IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
                     GameSettings settings = new GameSettings(uiSettings);  // just default settings
 
-                    TestingSessionSettings sessionSettings = (TestingSessionSettings) in.readObject();
-                    sessionSettings.character = (Character.Definition) in.readObject();
+                    SessionSettings sessionSettings = (SessionSettings) in.readObject();
                     sessionSettings.playerUid = in.readLong();
 
                     // using the fact that AndroidClient is UIServer itself.
                     // so synchronizing on server on loading
                     synchronized (this) {
                         Gdx.app.postRunnable(() -> {
-                            final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings.getDefintions());
-                            try {
-                                gameWorld.setState(in);
-                                gameScreen = new GameScreen(sessionSettings, gameWorld, this, settings);
-                                BlackoutGame.get().screenManager().setScreen(gameScreen);
-                            } catch (IOException | ClassNotFoundException e) {
-                                e.printStackTrace();
-                                isInterrupted = true;
-                            }
+                            final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings.getDefinitions(), in);
+                            gameScreen = new GameScreen(sessionSettings, gameWorld, this, settings);
+                            BlackoutGame.get().screenManager().setScreen(gameScreen);
                         });
                         try {
                             wait();
