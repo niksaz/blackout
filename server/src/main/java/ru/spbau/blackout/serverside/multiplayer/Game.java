@@ -180,8 +180,7 @@ public class Game extends Thread implements GameContext {
 
         final GameObject.Definition stone = new Decoration.Definition(
                 "models/stone/stone.g3db",
-                new CircleCreator(1.1f),
-                0, -20
+                new CircleCreator(1.1f)
         );
         room.definitions.add(stone);
 
