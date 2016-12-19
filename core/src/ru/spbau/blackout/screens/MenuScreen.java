@@ -18,6 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
+import java.util.Random;
+
 import ru.spbau.blackout.BlackoutGame;
 
 /**
@@ -44,6 +46,9 @@ public class MenuScreen extends StageScreen {
     private static final float SETTINGS_ICON_SIZE = 128.0f;
     private static final float SETTINGS_ICON_PADDING = 12.0f;
 
+    // FIXME: just for testing
+    private static final Random generator = new Random();
+
     private Label goldLabel;
     private Table middleTable;
     private Animation animation;
@@ -68,7 +73,7 @@ public class MenuScreen extends StageScreen {
 
     private void addLeftPaneElements() {
         addLabelWithTextAt(
-                "Hello, " + BlackoutGame.get().getPlayerEntity().getName(),
+                "Greetings, " + BlackoutGame.get().getPlayerEntity().getName(),
                 CORNERS_MARGIN,
                 stage.getViewport().getWorldHeight() - CORNERS_MARGIN,
                 Align.topLeft);
@@ -111,6 +116,15 @@ public class MenuScreen extends StageScreen {
                 BlackoutGame.get().assets().getDefaultSkin(),
                 BLACKOUT_LABEL_STYLE_NAME);
         table.add(label).pad(BLACKOUT_LABEL_BOTTOM_PADDING).row();
+
+        // FIXME: a way to get free gold. :)
+        label.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                BlackoutGame.get().getPlayerEntity().changeGold(generator.nextInt(101) - 50);
+            }
+        });
+
         return label;
     }
 
