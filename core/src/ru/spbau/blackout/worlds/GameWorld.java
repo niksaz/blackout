@@ -53,8 +53,8 @@ public abstract class GameWorld {
 
     public GameWorld(List<GameObject.Definition> definitions) {
         // without gravity, without sleeping
-        this.box2dWorld = new World(Vector2.Zero, false);
-        this.box2dWorld.setContactListener(new BlackoutContactListener());
+        box2dWorld = new World(Vector2.Zero, false);
+        box2dWorld.setContactListener(new BlackoutContactListener());
         this.definitions = definitions;
     }
 
@@ -72,7 +72,7 @@ public abstract class GameWorld {
     }
 
     public Body addObject(GameObject object, BodyDef bodyDef) {
-        this.gameObjects.add(object);
+        gameObjects.add(object);
         return box2dWorld.createBody(bodyDef);
     }
 
@@ -85,7 +85,7 @@ public abstract class GameWorld {
     }
 
     public void dispose() {
-        this.box2dWorld.dispose();
+        box2dWorld.dispose();
         foreach (getGameObjects(), GameObject::dispose);
     }
 

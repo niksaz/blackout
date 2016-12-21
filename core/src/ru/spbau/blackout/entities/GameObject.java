@@ -21,7 +21,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.graphic_effects.GraphicEffect;
+import ru.spbau.blackout.graphiceffects.GraphicEffect;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.HasState;

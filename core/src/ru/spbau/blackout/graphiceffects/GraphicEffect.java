@@ -1,4 +1,4 @@
-package ru.spbau.blackout.graphic_effects;
+package ru.spbau.blackout.graphiceffects;
 
 
 /**

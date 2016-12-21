@@ -5,4 +5,4 @@
  * <br>A good example of <code>SpecialEffect</code> is an explosion. You don't want to
  * care about it after creating one.
  */
-package ru.spbau.blackout.special_effects;
+package ru.spbau.blackout.specialeffects;

@@ -1,4 +1,4 @@
-package ru.spbau.blackout.special_effects;
+package ru.spbau.blackout.specialeffects;
 
 import java.util.HashSet;
 import java.util.Iterator;

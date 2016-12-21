@@ -31,7 +31,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.game_session.SessionSettings;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.worlds.GameWorld;
@@ -397,6 +397,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private void doneLoading() {
             this.commonHealthBar.doneLoading(assets);
             gameWorld.doneLoading();
+            // TODO: sessionSettings.getInitialStates()
 
             // FIXME: move into Character.Definition.makeInstance()
 //                } else if (obj instanceof Character) {
@@ -406,10 +407,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 //                    obj.graphicEffects.add(healthBarEffect);
 //                }
 
-            character = (Character) gameWorld.getObjectById(sessionSettings.getPlayerUid());
-            assert character != null;
 
-            // FIXME
+
+
+            character = (Character) gameWorld.getObjectById(sessionSettings.getPlayerUid());
+
+            // FIXME: remove
             if (character == null) {
                 throw new AssertionError("Player without character");
             }

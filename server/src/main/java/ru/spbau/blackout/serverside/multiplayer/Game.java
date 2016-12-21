@@ -17,7 +17,7 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.game_session.SessionSettings;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
 import ru.spbau.blackout.network.Events;
@@ -163,7 +163,7 @@ public class Game extends Thread implements GameContext {
             final PlayerEntity entity = result.get(0);
 
             final Character.Definition hero = entity.deserializeCharacterDefinition();
-            hero.overHeadPivotOffset.set(0, 0, 3.5f);
+            hero.overHeadPivotOffset.set(0, 0, 3.5f);  // FIXME: what is it?
             room.definitions.add(hero);
             heroes.add(hero);
         }

@@ -1,4 +1,4 @@
-package ru.spbau.blackout.game_session;
+package ru.spbau.blackout.sessionsettings;
 
 import com.badlogic.gdx.math.Vector2;
 
@@ -12,11 +12,18 @@ import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
+
+/**
+ * Contains information about a game session.
+ */
 public class SessionSettings {
+
+    // FIXME: make fields private?
     public String mapPath;
     public List<GameObject.Definition> definitions = new ArrayList<>();
     public long playerUid;
     public List<InitialState> initialStates = new ArrayList<>();
+
 
     public String getMapPath() { return mapPath; }
 
@@ -25,6 +32,7 @@ public class SessionSettings {
     public long getPlayerUid() { return playerUid; }
 
     public List<InitialState> getInitialStates() { return initialStates; }
+
 
     public static SessionSettings getTest() {
         SessionSettings session = new SessionSettings();
@@ -59,6 +67,7 @@ public class SessionSettings {
 
         return session;
     }
+
 
     public static class InitialState {
         public int defId;

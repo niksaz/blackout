@@ -1,6 +1,5 @@
-package ru.spbau.blackout.graphic_effects;
+package ru.spbau.blackout.graphiceffects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Matrix4;
 

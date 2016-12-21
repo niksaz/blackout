@@ -16,9 +16,8 @@ import ru.spbau.blackout.entities.GameObject;
 public class ClientGameWorld extends GameWorld {
 
     private final AtomicReference<ObjectInputStream> externalWorldStream = new AtomicReference<>();
-    private ObjectInputStream firstStateStream;
 
-    public ClientGameWorld(List<GameObject.Definition> definitions, ObjectInputStream firstStateStream) {
+    public ClientGameWorld(List<GameObject.Definition> definitions) {
         super(definitions);
     }
 
@@ -59,7 +58,7 @@ public class ClientGameWorld extends GameWorld {
                 int defNumber;
 
                 InputIterator(ObjectInputStream in) throws IOException {
-                    this.length = in.readInt();
+                    length = in.readInt();
                     step(in);
                 }
 
@@ -109,13 +108,6 @@ public class ClientGameWorld extends GameWorld {
     @Override
     public void doneLoading() {
         super.doneLoading();
-        try {
-            setState(firstStateStream);
-            firstStateStream = null;  // let it be removed
-        } catch (Exception e) {
-            e.printStackTrace();
-            // TODO: do something
-        }
     }
 
     @Override

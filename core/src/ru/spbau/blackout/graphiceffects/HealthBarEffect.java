@@ -1,4 +1,4 @@
-package ru.spbau.blackout.graphic_effects;
+package ru.spbau.blackout.graphiceffects;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;

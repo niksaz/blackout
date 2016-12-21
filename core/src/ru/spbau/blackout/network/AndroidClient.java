@@ -16,9 +16,8 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.game_session.SessionSettings;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.screens.GameScreen;
@@ -143,7 +142,7 @@ public class AndroidClient implements Runnable, UIServer {
                     // so synchronizing on server on loading
                     synchronized (this) {
                         Gdx.app.postRunnable(() -> {
-                            final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings.getDefinitions(), in);
+                            final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings.getDefinitions());
                             gameScreen = new GameScreen(sessionSettings, gameWorld, this, settings);
                             BlackoutGame.get().screenManager().setScreen(gameScreen);
                         });

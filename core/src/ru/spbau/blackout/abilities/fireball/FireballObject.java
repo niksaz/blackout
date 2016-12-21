@@ -5,12 +5,12 @@ import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Damageable;
-import ru.spbau.blackout.graphic_effects.ParticleGraphicEffect;
+import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.java8features.Optional;
-import ru.spbau.blackout.special_effects.ParticleSpecialEffect;
+import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
 
@@ -30,9 +30,9 @@ public final class FireballObject extends AbilityObject {
 
         timeRest = def.timeToLive;
 
-        def.fireEffect.ifPresent(effect -> {
-            graphicEffects.add(new ParticleGraphicEffect(this, effect.copy()));
-        });
+        def.fireEffect.ifPresent(effect ->
+            graphicEffects.add(new ParticleGraphicEffect(this, effect.copy()))
+        );
     }
 
 
@@ -52,9 +52,9 @@ public final class FireballObject extends AbilityObject {
         }
 
         // play explosion effect
-        this.def.explosionEffect.ifPresent(effect -> {
-            ParticleSpecialEffect.create(effect.copy(), this.getChestPivot());
-        });
+        this.def.explosionEffect.ifPresent(effect ->
+            ParticleSpecialEffect.create(effect.copy(), this.getChestPivot())
+        );
 
         this.kill();
     }

@@ -12,7 +12,7 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.game_session.SessionSettings;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.serverside.servers.RoomServer;
