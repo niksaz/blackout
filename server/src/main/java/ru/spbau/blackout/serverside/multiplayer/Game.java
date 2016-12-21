@@ -10,13 +10,13 @@ import java.util.List;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
 import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.serverside.servers.RoomServer;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.Utils;
 import ru.spbau.blackout.worlds.GameWorld;
@@ -142,11 +142,8 @@ public class Game extends Thread implements GameContext {
         gameWorld = new ServerGameWorld(sessionSettings.getDefinitions(), this);
         sessionSettings.initializeGameWorld();
 
-        final byte[] worldInBytes = serializeWorld();
-
         for (int i = 0; i < clients.size(); i++) {
             final ClientThread client = clients.get(i);
-            client.setWorldToSend(worldInBytes);
             client.setGame(this, sessionSettings, i + 1);
         }
     }
