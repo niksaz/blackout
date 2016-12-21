@@ -26,7 +26,7 @@ public abstract class SimpleInstantAbility extends Ability {
 
     @Override
     public final void onCastStart(UIServer server) {
-        this.startSound.get().play(1f /*FIXME: use sound volume from settings*/);
+        startSound.get().play(1f /*FIXME: use sound volume from settings*/);
 
         Vector2 direction = new Vector2(1, 0).rotateRad(getUnit().getRotation());
         Vector2 target = new Vector2(getUnit().getPosition());
@@ -45,12 +45,12 @@ public abstract class SimpleInstantAbility extends Ability {
     @Override
     public void load(GameContext context) {
         super.load(context);
-        context.getAssets().load(this.castSoundPath(), Sound.class);
+        context.getAssets().load(castSoundPath(), Sound.class);
     }
 
     @Override
     public void doneLoading(GameContext context) {
         super.doneLoading(context);
-        this.startSound = Optional.of(context.getAssets().get(this.castSoundPath(), Sound.class));
+        startSound = Optional.of(context.getAssets().get(castSoundPath(), Sound.class));
     }
 }

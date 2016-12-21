@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.graphic_effects.ParticleGraphicEffect;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
@@ -27,10 +28,10 @@ public final class FireballObject extends AbilityObject {
         super(def, uid, x, y);
         this.def = def;
 
-        this.timeRest = def.timeToLive;
+        timeRest = def.timeToLive;
 
         def.fireEffect.ifPresent(effect -> {
-            this.graphicEffects.add(new ParticleGraphicEffect(this, effect.copy()));
+            graphicEffects.add(new ParticleGraphicEffect(this, effect.copy()));
         });
     }
 
@@ -42,15 +43,12 @@ public final class FireballObject extends AbilityObject {
         if (object instanceof GameUnit) {
             GameUnit unit = (GameUnit) object;
             // This object is going to dye. So, we don't care about changes of its velocity.
-            this.velocity.add(this.body.getLinearVelocity()).scl(IMPULSE_FACTOR);
-            unit.applyImpulse(this.velocity);
+            velocity.add(body.getLinearVelocity()).scl(IMPULSE_FACTOR);
+            unit.applyImpulse(velocity);
         }
 
-//        if (object instanceof Damageable) {
-//            ((Damageable) object).damage(this.def.damage);
-//        }
-        if (object instanceof GameUnit) {
-            ((GameUnit) object).damage(this.def.damage);
+        if (object instanceof Damageable) {
+            ((Damageable) object).damage(this.def.damage);
         }
 
         // play explosion effect

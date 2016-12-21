@@ -60,7 +60,7 @@ public abstract class Ability implements Serializable {
 
     public abstract float getMaxChargeTime();
 
-    public GameUnit getUnit() { return this.unit; }
+    public GameUnit getUnit() { return unit; }
     public float getChargeTime() { return chargeTime; }
     public void setChargeTime(float chargeTime) { this.chargeTime = chargeTime; }
     public void charge(float deltaTime) {
@@ -68,5 +68,5 @@ public abstract class Ability implements Serializable {
     }
 
     /** Sets current charge time as <code>maxChargeTime</code>. */
-    public void chargeStart() { this.setChargeTime(this.getMaxChargeTime()); }
+    public void chargeStart() { setChargeTime(getMaxChargeTime()); }
 }

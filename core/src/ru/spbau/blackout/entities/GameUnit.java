@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import ru.spbau.blackout.GameContext;
@@ -19,11 +18,11 @@ import ru.spbau.blackout.utils.Utils;
  * Unit is a dynamic object which can move by itself and cast abilities.
  * Also it has friction.
  */
-public abstract class GameUnit extends DynamicObject /*implements Damageable */ {
+public abstract class GameUnit extends DynamicObject implements Damageable  {
 
     /** Constant holder class to provide names for animations. */
-    public static class Animations extends DynamicObject.Animations {
-        protected Animations() {}
+    public static class UnitAnimations extends DynamicObject.Animations {
+        protected UnitAnimations() {}
         public static final String WALK = "Armature|Walk";
         public static final String STAY = "Armature|Stay";
         public static final float WALK_ANIM_SPEED_FACTOR = 3f;
@@ -43,7 +42,7 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
     protected GameUnit(Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
         speed = def.speed;
-        animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
+        animation.ifPresent(controller -> controller.setAnimation(UnitAnimations.STAY, -1));
         abilities = Arrays.asList(def.abilities);
 
         maxHealth = def.maxHealth;
@@ -67,10 +66,10 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
     @Override
     public void updateForFirstStep() {
         // apply friction
-        if (!Utils.isZeroVec(this.velocity)){
-            float k = 1f - (this.getMass() * LINEAR_FRICTION) / this.velocity.len();
+        if (!Utils.isZeroVec(velocity)){
+            float k = 1f - (getMass() * LINEAR_FRICTION) / velocity.len();
             if (k < 0) k = 0;
-            this.velocity.scl(k);
+            velocity.scl(k);
         }
         super.updateForFirstStep();
     }
@@ -81,31 +80,31 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
         super.updateForSecondStep();
 
         // Resistance to external velocity by unit (selfVelocity)
-        if (!Utils.isZeroVec(this.velocity)) {
+        if (!Utils.isZeroVec(velocity)) {
             // some inefficient, but clear pseudocode in comments:
             // float proj = |projection of selfVelocity on velocity|
             // float k = proj / |velocity| * SLOW_DOWN_FACTOR
-            float k = this.selfVelocity.dot(this.velocity) / this.velocity.len2() * SELF_RESISTANCE_FACTOR;
+            float k = selfVelocity.dot(velocity) / velocity.len2() * SELF_RESISTANCE_FACTOR;
             // don't increase velocity
             if (k > 0) k = 0;
             // don't accelerate to the opposite direction
             if (k < -1) k = -1;
-            this.velocity.mulAdd(this.velocity, k);
+            velocity.mulAdd(velocity, k);
         }
 
-        this.body.setLinearVelocity(this.selfVelocity);
+        body.setLinearVelocity(selfVelocity);
     }
 
     public final synchronized Vector2 getSelfVelocity() {
         // to ensure that nobody will change it outside avoiding setSelfVelocity method.
-        return new Vector2(this.selfVelocity);
+        return new Vector2(selfVelocity);
     }
 
     @Override
     public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameUnit other = (GameUnit) super.setState(in);
-        this.setSelfVelocity(other.selfVelocity);
-        this.speed = other.speed;
+        setSelfVelocity(other.selfVelocity);
+        speed = other.speed;
         return other;
     }
 
@@ -119,38 +118,38 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
     }
 
 
-//    @Override
+    @Override
     public void damage(float damage) {
-        this.health -= damage;
-        if (this.health <= 0) {
-            this.kill();
+        health -= damage;
+        if (health <= 0) {
+            kill();
         }
     }
 
-//    @Override
-    public float getHealth() { return this.health; }
+    @Override
+    public float getHealth() { return health; }
 
-    public float getMaxHealth() { return this.maxHealth; }
+    public float getMaxHealth() { return maxHealth; }
 
 
     public void setSelfVelocity(Vector2 newVelocity) {
         if (Utils.isZeroVec(newVelocity)) {
             // on stop walking
-            if (!Utils.isZeroVec(this.selfVelocity)) {
-                this.animation.ifPresent(controller -> controller.setAnimation(Animations.STAY, -1));
-                this.animationSpeed = 1f;
+            if (!Utils.isZeroVec(selfVelocity)) {
+                animation.ifPresent(controller -> controller.setAnimation(UnitAnimations.STAY, -1));
+                animationSpeed = 1f;
             }
         } else {
             // on start walking
-            if (Utils.isZeroVec(this.selfVelocity)) {
-                this.animation.ifPresent(controller -> controller.setAnimation(Animations.WALK, -1));
+            if (Utils.isZeroVec(selfVelocity)) {
+                animation.ifPresent(controller -> controller.setAnimation(UnitAnimations.WALK, -1));
             }
 
-            this.animationSpeed = newVelocity.len() * Animations.WALK_ANIM_SPEED_FACTOR;
-            this.setDirection(newVelocity);
+            animationSpeed = newVelocity.len() * UnitAnimations.WALK_ANIM_SPEED_FACTOR;
+            setDirection(newVelocity);
         }
 
-        this.selfVelocity.set(newVelocity.x * speed, newVelocity.y * speed);
+        selfVelocity.set(newVelocity.x * speed, newVelocity.y * speed);
     }
 
     public void setSelfVelocity(float x, float y) { setSelfVelocity(new Vector2(x, y)); }
@@ -176,7 +175,7 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
         public void load(GameContext context) {
             super.load(context);
             for (Ability ability : abilities) {
-                ability.load(this.context);
+                ability.load(context);
             }
         }
 
@@ -184,7 +183,7 @@ public abstract class GameUnit extends DynamicObject /*implements Damageable */ 
         public void doneLoading() {
             super.doneLoading();
             for (Ability ability : abilities) {
-                ability.doneLoading(this.context);
+                ability.doneLoading(context);
             }
         }
     }

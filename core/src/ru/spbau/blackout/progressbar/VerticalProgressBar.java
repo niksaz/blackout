@@ -9,7 +9,7 @@ public class VerticalProgressBar extends SimpleProgressBar {
 
     protected VerticalProgressBar(VerticalProgressBar other) {
         super(other);
-        this.fullHeight = other.fullHeight;
+        fullHeight = other.fullHeight;
     }
 
     public VerticalProgressBar(String emptyTexturePath, String fullTexturePath, float minValue, float maxValue) {
@@ -24,7 +24,7 @@ public class VerticalProgressBar extends SimpleProgressBar {
     @Override
     public void doneLoading(AssetManager assets) {
         super.doneLoading(assets);
-        this.fullHeight = this.full.getRegion().getTexture().getHeight();
+        fullHeight = full.getRegion().getTexture().getHeight();
     }
 
     @Override
@@ -33,17 +33,17 @@ public class VerticalProgressBar extends SimpleProgressBar {
     }
 
     @Override
-    public void act(float deltaTime) {
-        super.act(deltaTime);
-        int newHeight = (int) (this.valueToShow * this.fullHeight);
+    public void act(float delta) {
+        super.act(delta);
+        int newHeight = (int) (valueToShow * fullHeight);
         // region coordinates start from left up corner
-        this.full.getRegion().setRegionHeight(newHeight);
-        this.full.getRegion().setRegionY(this.fullHeight - newHeight);
+        full.getRegion().setRegionHeight(newHeight);
+        full.getRegion().setRegionY(fullHeight - newHeight);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        this.full.draw(batch, this.getX(), this.getY(), this.getWidth(), this.valueToShow * this.getHeight());
+        full.draw(batch, getX(), getY(), getWidth(), valueToShow * getHeight());
     }
 }

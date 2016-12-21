@@ -10,7 +10,7 @@ public class HorizontalProgressBar extends SimpleProgressBar {
 
     protected HorizontalProgressBar(HorizontalProgressBar other) {
         super(other);
-        this.fullWidth = other.fullWidth;
+        fullWidth = other.fullWidth;
     }
 
     public HorizontalProgressBar(String emptyTexturePath, String fullTexturePath, float minValue, float maxValue) {
@@ -25,7 +25,7 @@ public class HorizontalProgressBar extends SimpleProgressBar {
     @Override
     public void doneLoading(AssetManager assets) {
         super.doneLoading(assets);
-        this.fullWidth = this.full.getRegion().getTexture().getWidth();
+        fullWidth = full.getRegion().getTexture().getWidth();
     }
 
 
@@ -35,14 +35,14 @@ public class HorizontalProgressBar extends SimpleProgressBar {
     }
 
     @Override
-    public void act(float deltaTime) {
-        super.act(deltaTime);
-        this.full.getRegion().setRegionWidth(Math.round(this.valueToShow * this.fullWidth));
+    public void act(float delta) {
+        super.act(delta);
+        full.getRegion().setRegionWidth(Math.round(valueToShow * fullWidth));
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        this.full.draw(batch, this.getX(), this.getY(), this.valueToShow * this.getWidth(), this.getHeight());
+        full.draw(batch, getX(), getY(), valueToShow * getWidth(), getHeight());
     }
 }

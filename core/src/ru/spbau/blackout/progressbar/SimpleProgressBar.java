@@ -34,25 +34,25 @@ public abstract class SimpleProgressBar extends Actor {
 
 
     protected SimpleProgressBar(SimpleProgressBar other) {
-        this.fullTexturePath = other.fullTexturePath;
-        this.emptyTexturePath = other.emptyTexturePath;
+        fullTexturePath = other.fullTexturePath;
+        emptyTexturePath = other.emptyTexturePath;
         if (other.full != null) {
-            this.full = new TextureRegionDrawable(other.full.getRegion());
+            full = new TextureRegionDrawable(other.full.getRegion());
         }
         if (other.empty != null) {
-            this.empty = new TextureRegionDrawable(other.empty.getRegion());
+            empty = new TextureRegionDrawable(other.empty.getRegion());
         }
-        this.minValue = other.minValue;
-        this.maxValue = other.maxValue;
-        this.realValue = other.realValue;
-        this.valueToShow = other.valueToShow;
+        minValue = other.minValue;
+        maxValue = other.maxValue;
+        realValue = other.realValue;
+        valueToShow = other.valueToShow;
 
-        this.setSize(other.getWidth(), other.getHeight());
-        this.setPosition(other.getX(), other.getY());
+        setSize(other.getWidth(), other.getHeight());
+        setPosition(other.getX(), other.getY());
 
         int zIndex = other.getZIndex();
         if (zIndex >= 0) {
-            this.setZIndex(zIndex);
+            setZIndex(zIndex);
         }
     }
 
@@ -70,22 +70,22 @@ public abstract class SimpleProgressBar extends Actor {
      * One can don't call this function if textures are already loaded.
      */
     public final void load(AssetManager assets) {
-        Textures.loadMipMapAA(this.fullTexturePath, assets);
-        Textures.loadMipMapAA(this.emptyTexturePath, assets);
+        Textures.loadMipMapAA(fullTexturePath, assets);
+        Textures.loadMipMapAA(emptyTexturePath, assets);
     }
 
 
     public void doneLoading(AssetManager assets) {
-        Texture fullTexture = assets.get(this.fullTexturePath, Texture.class);
-        this.full = new TextureRegionDrawable(new TextureRegion(fullTexture));
+        Texture fullTexture = assets.get(fullTexturePath, Texture.class);
+        full = new TextureRegionDrawable(new TextureRegion(fullTexture));
 
-        Texture emptyTexture = assets.get(this.emptyTexturePath, Texture.class);
-        this.empty = new TextureRegionDrawable(new TextureRegion(emptyTexture));
+        Texture emptyTexture = assets.get(emptyTexturePath, Texture.class);
+        empty = new TextureRegionDrawable(new TextureRegion(emptyTexture));
 
-        this.setValue(minValue);
+        setValue(minValue);
 
-        this.fullTexturePath = null;
-        this.emptyTexturePath = null;
+        fullTexturePath = null;
+        emptyTexturePath = null;
     }
 
 
@@ -96,28 +96,28 @@ public abstract class SimpleProgressBar extends Actor {
 
 
     @Override
-    public void act(float deltaTime) {
-        super.act(deltaTime);
+    public void act(float delta) {
+        super.act(delta);
 
-        float dValue = this.realValue - this.valueToShow;
-        float maxDValue = MAX_SPEED * deltaTime;
-        this.valueToShow += Math.min(Math.max(dValue, -maxDValue), maxDValue);
+        float dValue = realValue - valueToShow;
+        float maxDValue = MAX_SPEED * delta;
+        valueToShow += Math.min(Math.max(dValue, -maxDValue), maxDValue);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        empty.draw(batch, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        empty.draw(batch, getX(), getY(), getWidth(), getHeight());
     }
 
     public void setValue(float value) {
-        this.realValue = (value - this.minValue) / this.maxValue;  // from 0 to 1
-        if (this.realValue > 1) { this.realValue = 1; }
-        if (this.realValue < 0) { this.realValue = 0; }
+        realValue = (value - minValue) / maxValue;  // from 0 to 1
+        if (realValue > 1) { realValue = 1; }
+        if (realValue < 0) { realValue = 0; }
     }
 
     public void setValueInstant(float value) {
-        this.setValue(value);
-        this.valueToShow = this.realValue;
+        setValue(value);
+        valueToShow = realValue;
     }
 }
