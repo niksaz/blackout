@@ -11,10 +11,10 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
-import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.serverside.servers.RoomServer;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 
 import static ru.spbau.blackout.network.AndroidClient.AbilityCast;
 
@@ -186,7 +186,6 @@ public class ClientThread extends Thread {
             if (currentState == GameState.READY_TO_START) {
                 out.writeObject(session);
                 out.writeLong(playerUid);
-                out.writeObject(worldInBytes.getAndSet(null));
                 out.flush();
 
                 // loading may take a long time
