@@ -11,7 +11,7 @@ import ru.spbau.blackout.utils.Textures;
 
 
 // I know that libgdx has its own API for progress bars, but this one is much better in some cases.
-// Also it's adapted for the project (project-specific methods like load and initialize).
+// Also it's adapted for the project (project-specific methods like load and initializeGameWorld).
 /**
  * Provides easy and powerful API for creating progress bars.
  */

@@ -248,7 +248,7 @@ public abstract class GameObject implements RenderableProvider, HasState, Serial
      * <p>Life cycle:
      * <br>constructor (once)
      * <br>load (once)
-     * <br>initialize (once)
+     * <br>initializeGameWorld (once)
      * <br>makeInstance (Any number of calls)
      */
     public static abstract class Definition implements Serializable {
@@ -272,13 +272,13 @@ public abstract class GameObject implements RenderableProvider, HasState, Serial
          */
         public Creator<Shape> shapeCreator;
 
-        /** The loaded model object. Initialized by <code>initialize</code> method. */
+        /** The loaded model object. Initialized by <code>initializeGameWorld</code> method. */
         private transient Optional<Model> model = Optional.empty();
         protected transient GameContext context;
 
         /**
          * Path to the model for game objects. May be null. In this case objects will not have models.
-         * Must be final due to possible problems if this variable changed between calls of `load` and `initialize`.
+         * Must be final due to possible problems if this variable changed between calls of `load` and `initializeGameWorld`.
          */
         public final String modelPath;
         public final Vector3 chestPivotOffset = new Vector3();

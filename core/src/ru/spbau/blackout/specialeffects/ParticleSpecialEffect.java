@@ -17,7 +17,7 @@ public class ParticleSpecialEffect implements SpecialEffect {
     protected ParticleSpecialEffect(ParticleEffect effect, float x, float y, float height) {
         this.effect = effect;
 
-        // initialize
+        // initializeGameWorld
         this.effect.init();
         this.effect.start();
         BlackoutGame.get().particleSystem().add(this.effect);

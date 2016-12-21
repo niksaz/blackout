@@ -9,7 +9,7 @@ import ru.spbau.blackout.worlds.GameWorld;
 
 /**
  * Provides some access to environment.
- * Used in functions like <code>load</code> and <code>initialize</code>.
+ * Used in functions like <code>load</code> and <code>initializeGameWorld</code>.
  * Some getters return optional values. It means that those values don't exist on server.
  */
 public interface GameContext {

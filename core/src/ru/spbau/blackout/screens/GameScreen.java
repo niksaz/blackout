@@ -97,25 +97,25 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         this.loadingScreen = new LoadingScreen(sessionSettings);
         this.ui = new IngameUI(this.getServer(), settings.ui);
 
-        // initialize main camera
+        // initializeGameWorld main camera
         this.camera = new PerspectiveCamera();
         this.camera.fieldOfView = CameraDefaults.FIELD_OF_VIEW;
         this.camera.near = 1f;
         this.camera.far = 300f;
 
-        // initialize environment
+        // initializeGameWorld environment
         this.environment = new Environment();
         this.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 100f));
         this.environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.2f, 0f, 0.2f, -1f));
 
-        // initialize particles
+        // initializeGameWorld particles
         BillboardParticleBatch particleBatch = new BillboardParticleBatch();
         particleBatch.setCamera(this.camera);
         BlackoutGame.get().particleSystem().add(particleBatch);
         ParticleEffectLoader loader = new ParticleEffectLoader(new InternalFileHandleResolver());
         this.assets.setLoader(ParticleEffect.class, loader);
 
-        // initialize music
+        // initializeGameWorld music
         FileHandle battleMusicDir = Gdx.files.internal(BATTLE_MUSIC_DIR_PATH);
         for (FileHandle file : battleMusicDir.list()) {
             Music track = Gdx.audio.newMusic(file);
@@ -341,7 +341,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                     this.stage.draw();
                 }
             } else if (loaded) {
-                // initialize loading screen and start loading real resources
+                // initializeGameWorld loading screen and start loading real resources
                 this.initializeLoadingScreen();
                 this.loadRealResources();
                 loadingScreenLoaded = true;
@@ -397,7 +397,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private void doneLoading() {
             this.commonHealthBar.doneLoading(assets);
             gameWorld.doneLoading();
-            // TODO: sessionSettings.getInitialStates()
+            sessionSettings.initializeGameWorld();
 
             // FIXME: move into Character.Definition.makeInstance()
 //                } else if (obj instanceof Character) {
@@ -408,9 +408,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 //                }
 
 
-
-
             character = (Character) gameWorld.getObjectById(sessionSettings.getPlayerUid());
+            assert character != null;
 
             // FIXME: remove
             if (character == null) {

@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.List;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameObject;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
@@ -28,6 +29,10 @@ public class ServerGameWorld extends GameWorld {
         super(definitions);
     }
 
+    public ServerGameWorld(List<GameObject.Definition> definitions, GameContext context) {
+        this(definitions);
+        foreach(getDefinitions(), def -> def.setContextOnServer(context));
+    }
 
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeLong(stepNumber);
@@ -42,11 +47,11 @@ public class ServerGameWorld extends GameWorld {
     }
 
     @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
+    public void update(float delta) {
+        super.update(delta);
 
         for (GameObject object : getGameObjects()) {
-            object.updateState(deltaTime);
+            object.updateState(delta);
         }
 
         for (Iterator<GameObject> it = getGameObjects().iterator(); it.hasNext();) {
@@ -57,7 +62,7 @@ public class ServerGameWorld extends GameWorld {
             }
         }
 
-        accumulator += deltaTime;
+        accumulator += delta;
         while (accumulator >= WORLD_STEP) {
             step();
             accumulator -= WORLD_STEP;

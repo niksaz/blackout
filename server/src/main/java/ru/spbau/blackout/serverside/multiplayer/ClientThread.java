@@ -11,7 +11,6 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
-import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
@@ -32,7 +31,6 @@ public class ClientThread extends Thread {
 
     private volatile String name = UNKNOWN;
     private volatile SessionSettings session;
-    private volatile Character.Definition character;
     private volatile long playerUid;
     private volatile Game game;
     private volatile GameState clientGameState = GameState.WAITING;
@@ -104,9 +102,8 @@ public class ClientThread extends Thread {
         return name;
     }
 
-    void setGame(Game game, SessionSettings session, Character.Definition character, long playerUid) {
+    void setGame(Game game, SessionSettings session, long playerUid) {
         this.session = session;
-        this.character = character;
         this.playerUid = playerUid;
         this.game = game;
     }

@@ -136,7 +136,7 @@ public class AndroidClient implements Runnable, UIServer {
                     GameSettings settings = new GameSettings(uiSettings);  // just default settings
 
                     SessionSettings sessionSettings = (SessionSettings) in.readObject();
-                    sessionSettings.playerUid = in.readLong();
+                    sessionSettings.setPlayerUid(in.readLong());
 
                     // using the fact that AndroidClient is UIServer itself.
                     // so synchronizing on server on loading
