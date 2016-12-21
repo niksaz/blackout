@@ -147,7 +147,7 @@ public class Game extends Thread implements GameContext {
         for (int i = 0; i < clients.size(); i++) {
             final ClientThread client = clients.get(i);
             client.setWorldToSend(worldInBytes);
-            client.setGame(this, sessionSettings, i);
+            client.setGame(this, sessionSettings, i + 1);
         }
     }
 

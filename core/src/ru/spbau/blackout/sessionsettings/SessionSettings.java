@@ -2,6 +2,7 @@ package ru.spbau.blackout.sessionsettings;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import static ru.spbau.blackout.utils.ReflectUtils.findAllImpls;
  * If a definition contains reference to another one, you won't be able to
  * add both of them as initial objects.
  */
-public final class SessionSettings {
+public final class SessionSettings implements Serializable {
 
     private String mapPath;
     private final List<GameObject.Definition> definitions = new ArrayList<>();
@@ -43,7 +44,7 @@ public final class SessionSettings {
 
     public void initializeGameWorld() {
         for (InitialState state : initialStates) {
-            // WARNING: be careful with keeping uid synchronized
+            System.out.println(state.uid);
             getDefinitions().get(state.defNum).makeInstance(state.uid, state.initialPosition);
         }
     }
@@ -63,7 +64,7 @@ public final class SessionSettings {
      * An instance of the definition will appear in the given position in the beginning of the game.
      * The definition also will be added to the list of possible definitions.
      */
-    public int addInitialObject(GameObject.Definition def, float initialX, float initialY, int uid) {
+    public int addInitialObject(GameObject.Definition def, float initialX, float initialY, long uid) {
         if (finder.getVisited().contains(def)) {
             throw new IllegalArgumentException("The definition is already added.");
         }
@@ -104,12 +105,12 @@ public final class SessionSettings {
     }
 
 
-    private static class InitialState {
+    private static class InitialState implements Serializable {
         int defNum;
         final Vector2 initialPosition = new Vector2();
-        int uid;
+        long uid;
 
-        public InitialState(int defNum, float initialX, float initialY, int uid) {
+        public InitialState(int defNum, float initialX, float initialY, long uid) {
             this.defNum = defNum;
             this.initialPosition.set(initialX, initialY);
             this.uid = uid;

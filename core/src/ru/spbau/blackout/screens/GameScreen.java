@@ -406,7 +406,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 //                    GraphicEffect healthBarEffect = new HealthBarEffect((GameUnit) obj, healthBar, camera);
 //                    obj.graphicEffects.add(healthBarEffect);
 //                }
-
+            System.out.println("Player uid " + sessionSettings.getPlayerUid());
 
             character = (Character) gameWorld.getObjectById(sessionSettings.getPlayerUid());
             assert character != null;
