@@ -5,10 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 
 import org.mongodb.morphia.query.Query;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,18 +162,10 @@ public class Game extends Thread implements GameContext {
             }
             final PlayerEntity entity = result.get(0);
 
-            try (
-                    ByteArrayInputStream byteInput = new ByteArrayInputStream(entity.getSerializedDefinition());
-                    ObjectInputStream in = new ObjectInputStream(byteInput)
-            ) {
-                final Character.Definition hero = (Character.Definition) in.readObject();
-                hero.overHeadPivotOffset.set(0, 0, 3.5f);
-                room.definitions.add(hero);
-                heroes.add(hero);
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-                throw new IllegalStateException(e);
-            }
+            final Character.Definition hero = entity.deserializeCharacterDefinition();
+            hero.overHeadPivotOffset.set(0, 0, 3.5f);
+            room.definitions.add(hero);
+            heroes.add(hero);
         }
 
         final GameObject.Definition stone = new Decoration.Definition(

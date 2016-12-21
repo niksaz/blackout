@@ -88,6 +88,9 @@ public abstract class DynamicObject extends GameObject {
 
     /** Definition for objects which have Dynamic body type. */
     public static abstract class Definition extends GameObject.Definition {
+
+        private static final long serialVersionUID = 1000000000L;
+
         public Definition(String modelPath, Creator<Shape> shapeCreator) {
             super(modelPath, shapeCreator);
         }

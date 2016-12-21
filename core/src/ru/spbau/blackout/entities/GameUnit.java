@@ -157,6 +157,9 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
 
     /** Definition for units. Loads abilities. */
     public static abstract class Definition extends DynamicObject.Definition {
+
+        private static final long serialVersionUID = 1000000000L;
+
         public static final float DEFAULT_SPEED = 8f;
 
         public float speed = DEFAULT_SPEED;
@@ -169,7 +172,6 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
             this.abilities = abilities;
             this.maxHealth = maxHealth;
         }
-
 
         @Override
         public void load(GameContext context) {

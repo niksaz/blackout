@@ -2,7 +2,6 @@ package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.physics.box2d.Shape;
 
-import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.utils.Creator;
 
 
@@ -26,6 +25,9 @@ public abstract class AbilityObject extends DynamicObject {
 
 
     public static abstract class Definition extends DynamicObject.Definition {
+
+        private static final long serialVersionUID = 1000000000L;
+
         public Definition(String modelPath, Creator<Shape> shapeCreator, float mass) {
             super(modelPath, shapeCreator);
             this.mass = mass;

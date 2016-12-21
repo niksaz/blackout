@@ -2,9 +2,6 @@ package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.physics.box2d.Shape;
 
-import java.io.Serializable;
-
-import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
 
@@ -16,6 +13,9 @@ public class Character extends GameUnit {
 
 
     public static class Definition extends GameUnit.Definition {
+
+        private static final long serialVersionUID = 1000000000L;
+
         public Definition(String modelPath, Creator<Shape> shapeCreator, Ability[] abilities, float maxHealth) {
             super(modelPath, shapeCreator, abilities, maxHealth);
         }

@@ -6,8 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import java.util.Random;
-
 import ru.spbau.blackout.BlackoutGame;
 
 import static ru.spbau.blackout.screens.MenuScreen.addBlackoutLabel;
@@ -20,11 +18,10 @@ class MainMenuTable {
 
     private static final String BUTTON_PLAY_TEXT = "Play";
     private static final String BUTTON_SHOP_TEXT = "Try your luck!";
+    private static final String BUTTON_UPGRADES_TEXT = "Upgrades";
     private static final String BUTTON_ACHIEVEMENTS_TEXT = "Achievements";
     private static final String BUTTON_LEADERBOARD_TEXT = "Leaderboard";
 
-    // FIXME: just for testing
-    private static final Random generator = new Random();
 
     static Table getTable(final MenuScreen screen) {
         final Table middleTable = new Table();
@@ -37,10 +34,10 @@ class MainMenuTable {
                 screen.changeMiddleTable(PlayScreenTable.getTable(screen));
             }
         });
-        addButton(middleTable, BUTTON_SHOP_TEXT, new ChangeListener() {
+        addButton(middleTable, BUTTON_UPGRADES_TEXT, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                BlackoutGame.get().getPlayerEntity().changeGold(generator.nextInt(101) - 50);
+                screen.changeMiddleTable(UpgradesTable.getTable(screen));
             }
         });
         addButton(middleTable, BUTTON_ACHIEVEMENTS_TEXT, new ClickListener() {

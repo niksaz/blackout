@@ -15,7 +15,10 @@ import ru.spbau.blackout.network.UIServer;
  * Each unit has its own instance of each its ability.
  */
 public abstract class Ability implements Serializable {
-    private final int level;
+
+    private static final long serialVersionUID = 1000000000L;
+
+    private int level;
     private transient float chargeTime;
 
     private transient /*final*/ GameUnit unit;
@@ -62,7 +65,11 @@ public abstract class Ability implements Serializable {
 
     public GameUnit getUnit() { return unit; }
     public float getChargeTime() { return chargeTime; }
+    public int getLevel() { return level; }
     public void setChargeTime(float chargeTime) { this.chargeTime = chargeTime; }
+    public void increaseLevel() {
+        level += 1;
+    }
     public void charge(float deltaTime) {
         chargeTime -= Math.min(deltaTime, chargeTime);
     }
