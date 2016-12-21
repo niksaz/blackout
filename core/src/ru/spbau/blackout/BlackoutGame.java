@@ -115,7 +115,7 @@ public class BlackoutGame extends Game {
         List<GameObject.Definition> allDefs = ReflectUtils.findAllImpls(l, GameObject.Definition.class);
         System.out.println(allDefs.size());
         for (GameObject.Definition def : allDefs) {
-            System.out.println(def.getClass().getName());
+            Gdx.app.log("QWERTY", def.getClass().getName());
         }*/
     }
 

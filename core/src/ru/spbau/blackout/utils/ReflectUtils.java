@@ -4,14 +4,25 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Set;
 
 
-public final class ReflectUtils {
+/**
+ * Reflection utility.
+ */
+public final class ReflectUtils {  // FIXME: create tests
     private ReflectUtils() {}
+
 
     private static final String PROJECT_PACKAGE_PREFIX = "ru.spbau.blackout";
 
+
+    /**
+     * Returns all fields including inherited.
+     */
     public static void getAllFields(Class<?> type, Collection<Field> store) {
         store.addAll(Arrays.asList(type.getDeclaredFields()));
 
@@ -20,6 +31,9 @@ public final class ReflectUtils {
         }
     }
 
+    /**
+     * {@see #getAllFields(Class, Collection)}
+     */
     public static List<Field> getAllFields(Class<?> type) {
         List<Field> store = new ArrayList<>();
         getAllFields(type, store);
@@ -27,11 +41,18 @@ public final class ReflectUtils {
     }
 
 
+    /**
+     * Recursively finds all fields or containing elements which are instances of <code>baseClass</code>.
+     * Finds only in collections, arrays and classes in this project.
+     */
     public static <T> void findAllImpls(Object root, Class<T> baseClass, Collection<? super T> store) {
         Finder<T> finder = new Finder<>(baseClass, store);
         finder.find(root);
     }
 
+    /**
+     * {@see #getAllImpls(Object, Class, Collection)}
+     */
     public static <T> List<T> findAllImpls(Object root, Class<T> baseClass) {
         List<T> store = new ArrayList<>();
         findAllImpls(root, baseClass, store);
@@ -42,6 +63,7 @@ public final class ReflectUtils {
     private static final class Finder<T> {
         Class<T> baseClass;
         Collection<? super T> store;
+        Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
 
         public Finder(Class<T> baseClass, Collection<? super T> store) {
             this.baseClass = baseClass;
@@ -49,9 +71,11 @@ public final class ReflectUtils {
         }
 
         void find(Object root) {
-            if (root == null) {
+            if (root == null || visited.contains(root)) {
                 return;
             }
+
+            visited.add(root);
 
             if (baseClass.isInstance(root)) {
                 store.add(baseClass.cast(root));
