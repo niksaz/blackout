@@ -35,7 +35,9 @@ public class ServerGameWorld extends GameWorld {
     }
 
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
-        out.writeLong(stepNumber);
+        getGameObjects().get(0).getState(out);
+
+        /*out.writeLong(stepNumber);
 
         out.writeInt(getGameObjects().size());
 
@@ -43,7 +45,7 @@ public class ServerGameWorld extends GameWorld {
             out.writeLong(go.getUid());
             out.writeInt(go.getDef().getDefNumber());
             go.getState(out);
-        }
+        }*/
     }
 
     @Override

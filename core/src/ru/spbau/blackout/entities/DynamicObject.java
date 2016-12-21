@@ -27,13 +27,13 @@ public abstract class DynamicObject extends GameObject {
      * It also has getter and setter to have similar interface to
      * <code>selfVelocity</code> from <code>GameUnit</code>.
      */
-    public final Vector2 velocity = new Vector2();
+    /**/transient public final Vector2 velocity = new Vector2();
 
 
     // Appearance:
     /** It is empty on server */
-    transient protected final Optional<AnimationController> animation;
-    transient protected float animationSpeed = 1f;
+    protected transient final Optional<AnimationController> animation;
+    protected transient float animationSpeed = 1f;
 
 
     /** Construct DynamicObject at the giving position. */
@@ -80,8 +80,8 @@ public abstract class DynamicObject extends GameObject {
     @Override
     public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         DynamicObject other = (DynamicObject) super.setState(in);
-        this.velocity.set(other.velocity);
-        this.animationSpeed = other.animationSpeed;  // FIXME: probably should be removed
+        /*this.velocity.set(other.velocity);
+        this.animationSpeed = other.animationSpeed;  // FIXME: probably should be removed*/
         return other;
     }
 

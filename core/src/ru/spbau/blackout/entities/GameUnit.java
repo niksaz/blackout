@@ -32,11 +32,11 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
     public static final float LINEAR_FRICTION = 0.002f;
 
 
-    private final Vector2 selfVelocity = new Vector2();
-    private float speed;
-    transient private final List<Ability> abilities;
-    private float health;
-    private float maxHealth;
+    /**/transient private final Vector2 selfVelocity = new Vector2();
+    /**/transient private float speed;
+    private transient final List<Ability> abilities;
+    /**/transient private float health;
+    private transient float maxHealth;
 
 
     protected GameUnit(Definition def, long uid, float x, float y) {
@@ -103,8 +103,8 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
     @Override
     public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         GameUnit other = (GameUnit) super.setState(in);
-        setSelfVelocity(other.selfVelocity);
-        speed = other.speed;
+        /*setSelfVelocity(other.selfVelocity);
+        speed = other.speed;*/
         return other;
     }
 

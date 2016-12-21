@@ -1,5 +1,7 @@
 package ru.spbau.blackout.worlds;
 
+import com.badlogic.gdx.Gdx;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
@@ -23,10 +25,13 @@ public class ClientGameWorld extends GameWorld {
 
 
     public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        long newStepNumber = in.readLong();
+        getGameObjects().get(0).setState(in);
+
+        /*long newStepNumber = in.readLong();
 
         // this GameWorld is outdated
         if (newStepNumber > stepNumber) {
+            Gdx.app.log("WTF", "step number = " + newStepNumber);
             stepNumber = newStepNumber;
 
             class ExistIterator {
@@ -74,14 +79,6 @@ public class ClientGameWorld extends GameWorld {
             }
 
             InputIterator input = new InputIterator(in);
-            System.out.println(input.length);
-            System.out.println(input.length);
-            System.out.println(input.length);
-            System.out.println(input.length);
-            System.out.println(input.length);
-            if (true) {
-                throw new AssertionError("" + input.length);
-            }
 
             while (!exist.endOfStream || !input.endOfStream) {
                 if (exist.endOfStream || (!input.endOfStream && exist.go.getUid() > input.uid)) {
@@ -95,12 +92,14 @@ public class ClientGameWorld extends GameWorld {
                     exist.step();
                 } else {
                     assert !exist.endOfStream && !input.endOfStream && exist.go.getUid() == input.uid;
+                    Gdx.app.log("WTF", "begin update state for unit " + exist.go.getUid());
                     exist.go.setState(in);
+                    Gdx.app.log("WTF", "end update state for unit " + exist.go.getUid());
                     exist.step();
                     input.step(in);
                 }
             }
-        }
+        }*/
 
         return null;
     }

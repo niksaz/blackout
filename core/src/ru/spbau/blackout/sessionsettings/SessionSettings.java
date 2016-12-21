@@ -47,6 +47,9 @@ public final class SessionSettings implements Serializable {
             System.out.println(state.uid);
             getDefinitions().get(state.defNum).makeInstance(state.uid, state.initialPosition);
         }
+        for (int i = 0; i < definitions.size(); i++) {
+            definitions.get(i).setDefNumber(i);
+        }
     }
 
     /**

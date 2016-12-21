@@ -102,6 +102,7 @@ public class AndroidClient implements Runnable, UIServer {
 
     @Override
     public void sendSelfVelocity(GameUnit unit, Vector2 velocity) {
+        Gdx.app.log("WTF", "new velocity = " + velocity);
         synchronized (velocityToSend) {
             velocityToSend.set(new Vector2(velocity));
             velocityToSend.notify();

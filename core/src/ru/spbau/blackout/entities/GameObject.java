@@ -1,5 +1,6 @@
 package ru.spbau.blackout.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
@@ -33,16 +34,16 @@ public abstract class GameObject implements RenderableProvider, HasState, Serial
     public static final float RESTITUTION = 0.5f;
 
 
-    transient protected final Body body;
-    private float height;
+    protected transient final Body body;
+    /**/transient private float height;
 
     /** Equals to Optional.empty() on a server or if the object is dead. */
-    transient protected Optional<ModelInstance> model;
-    transient public final Array<GraphicEffect> graphicEffects = new Array<>();
+    protected transient Optional<ModelInstance> model;
+    public transient final Array<GraphicEffect> graphicEffects = new Array<>();
 
-    private boolean dead = false;
-    private final GameObject.Definition def;
-    private final transient long uid;
+    private transient boolean dead = false;
+    private transient final GameObject.Definition def;
+    private transient final long uid;
 
 
     /**
@@ -74,17 +75,20 @@ public abstract class GameObject implements RenderableProvider, HasState, Serial
     @Override
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeObject(this);
-        out.writeObject(getPosition());
-        out.writeFloat(getRotation());
+        /*out.writeObject(getPosition());
+        out.writeFloat(getRotation());*/
     }
 
     @Override
     public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        Gdx.app.log("QQQ", getClass().getName());
+        Gdx.app.log("QQQ", "QQQ");
         GameObject other = (GameObject) in.readObject();
-        height = other.height;
+        Gdx.app.log("QQQ", "WWW");
+        /*height = other.height;
         Vector2 position = (Vector2) in.readObject();
         float rotation = in.readFloat();
-        setTransform(position, rotation);
+        setTransform(position, rotation);*/
         return other;
     }
 
