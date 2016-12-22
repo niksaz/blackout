@@ -60,8 +60,8 @@ public abstract class DynamicObject extends GameObject {
 
 
     @Override
-    public void updateState(float delta) {
-        super.updateState(delta);
+    public void updateGraphics(float delta) {
+        super.updateGraphics(delta);
         this.animation.ifPresent(controller -> controller.update(delta * this.animationSpeed));
     }
 

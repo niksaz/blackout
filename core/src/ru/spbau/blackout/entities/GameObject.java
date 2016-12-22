@@ -95,14 +95,20 @@ public abstract class GameObject implements RenderableProvider, HasState {
     }
 
 
-    /**
-     * Update things not connected with physics. See <code>GameWorld</code> documentation.
-     */
-    public void updateState(float delta) {
+    public void updateGraphics(float delta) {
         for (GraphicEffect effect : graphicEffects) {
             effect.update(delta);
         }
     }
+
+    /**
+     * Update things which are not connected with physics and don't require fixed step.
+     * See <code>GameWorld</code> documentation.
+     */
+    public void updateState(float delta) {
+
+    }
+
     /** See <code>GameWorld</code> documentation. */
     public abstract void updateForFirstStep();
     /** See <code>GameWorld</code> documentation. */

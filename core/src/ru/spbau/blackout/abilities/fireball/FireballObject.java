@@ -3,6 +3,10 @@ package ru.spbau.blackout.abilities.fireball;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.physics.box2d.Shape;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
@@ -23,6 +27,7 @@ public final class FireballObject extends AbilityObject {
 
     private float timeRest;
     private final FireballObject.Definition def;
+    private boolean shouldExplode = false;
 
 
     protected FireballObject(FireballObject.Definition def, long uid, float x, float y) {
@@ -52,22 +57,40 @@ public final class FireballObject extends AbilityObject {
             ((Damageable) object).damage(this.def.damage);
         }
 
-        // play explosion effect
-        this.def.explosionEffect.ifPresent(effect ->
-            ParticleSpecialEffect.create(effect.copy(), this.getChestPivot())
-        );
+        shouldExplode = true;
 
         this.kill();
     }
 
-//    @Override
-//    public void updateState(float deltaTime) {
-//        super.updateState(deltaTime);
-//        timeRest -= deltaTime;
-//        if (timeRest <= 0) {
-//            this.kill();
-//        }
-//    }
+    @Override
+    public void updateState(float delta) {
+        super.updateState(delta);
+        timeRest -= delta;
+        if (timeRest <= 0) {
+            this.kill();
+        }
+    }
+
+    @Override
+    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        super.getState(out);
+        out.writeBoolean(shouldExplode);
+    }
+
+    @Override
+    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        super.setState(in);
+        shouldExplode = in.readBoolean();
+    }
+
+    @Override
+    public void kill() {
+        super.kill();
+        // play explosion effect
+        if (shouldExplode && def.explosionEffect.isPresent()) {
+            ParticleSpecialEffect.create(def.explosionEffect.get().copy(), this.getChestPivot());
+        }
+    }
 
     @Override
     public void updateForSecondStep() {
