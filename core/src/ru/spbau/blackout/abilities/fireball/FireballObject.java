@@ -101,8 +101,15 @@ public final class FireballObject extends AbilityObject {
         @Override
         public void doneLoading() {
             super.doneLoading();
-            this.fireEffect = Particles.getOriginal(context, FIRE_EFFECT_PATH);
-            this.explosionEffect = Particles.getOriginal(context, EXPLOSION_EFFECT_PATH);
+            this.fireEffect = Optional.of(Particles.getOriginal(context, FIRE_EFFECT_PATH));
+            this.explosionEffect = Optional.of(Particles.getOriginal(context, EXPLOSION_EFFECT_PATH));
+        }
+
+        @Override
+        public void initializeWithoutUi(GameContext context) {
+            super.initializeWithoutUi(context);
+            fireEffect = Optional.empty();
+            explosionEffect = Optional.empty();
         }
 
         @Override

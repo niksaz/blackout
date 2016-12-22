@@ -64,7 +64,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
 
-    // should be here, not in loading screen because it owns all assets
+    // should be here, not in loading getScreen because it owns all assets
     private final AssetManager assets = new AssetManager();
 
     // null if loading is done
@@ -141,8 +141,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         this.currentTrack.play();
     }
 
+    public IngameUI getUi() { return ui; }
+
+    public PerspectiveCamera getCamera() { return camera; }
+
     @Override
-    public boolean hasIO() {
+    public boolean hasUI() {
         return true;
     }
 
@@ -158,13 +162,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     @Override
-    public Optional<AssetManager> assets() {
-        return Optional.ofNullable(this.getAssets());
-    }
-
-    @Override
-    public Optional<GameSettings> settings() {
-        return Optional.ofNullable(this.getSettings());
+    public GameScreen getScreen() {
+        return this;
     }
 
     @Override
@@ -290,8 +289,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private final SimpleProgressBar progressBar =
                 new HorizontalProgressBar(LoadingProgressBar.PATH_EMPTY, LoadingProgressBar.PATH_FULL);
         private boolean loadingScreenLoaded = false;
-        private final SimpleProgressBar commonHealthBar =
-                new HorizontalProgressBar(SmallHealthBar.PATH_EMPTY, SmallHealthBar.PATH_FULL);
         private final SessionSettings sessionSettings;
 
         public LoadingScreen(SessionSettings sessionSettings) {
@@ -304,9 +301,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             float startX = (getWorldWidth() - LoadingProgressBar.WIDTH) / 2;
             progressBar.setPosition(startX, LoadingProgressBar.START_Y);
             progressBar.setSize(LoadingProgressBar.WIDTH, LoadingProgressBar.HEIGHT);
-
-            commonHealthBar.setSize(SmallHealthBar.WIDTH, SmallHealthBar.HEIGHT);
-            commonHealthBar.toBack();
         }
 
 
@@ -322,7 +316,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         public void render(float delta) {
             super.render(delta);
 
-            // fill screen by gray color
+            // fill getScreen by gray color
             Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
@@ -334,14 +328,14 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                     // end loading
                     this.doneLoading();
                 } else {
-                    // show loading screen
+                    // show loading getScreen
                     float progress = assets.getProgress();
                     this.progressBar.setValue(progress);
                     this.stage.act();
                     this.stage.draw();
                 }
             } else if (loaded) {
-                // initializeGameWorld loading screen and start loading real resources
+                // initializeGameWorld loading getScreen and start loading real resources
                 this.initializeLoadingScreen();
                 this.loadRealResources();
                 loadingScreenLoaded = true;
@@ -391,27 +385,16 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             ui.load(assets);
             gameWorld().load(GameScreen.this);
             assets.load(sessionSettings.getMapPath(), Model.class);
-            commonHealthBar.load(assets);
         }
 
         private void doneLoading() {
-            this.commonHealthBar.doneLoading(assets);
             gameWorld.doneLoading();
             sessionSettings.initializeGameWorld();
 
-            // FIXME: move into Character.Definition.makeInstance()
-//                } else if (obj instanceof Character) {
-//                    SimpleProgressBar healthBar = commonHealthBar.copy();
-//                    ui.stage.addActor(healthBar);
-//                    GraphicEffect healthBarEffect = new HealthBarEffect((GameUnit) obj, healthBar, camera);
-//                    obj.graphicEffects.add(healthBarEffect);
-//                }
             System.out.println("Player uid " + sessionSettings.getPlayerUid());
 
             character = (Character) gameWorld.getObjectById(sessionSettings.getPlayerUid());
-            assert character != null;
 
-            // FIXME: remove
             if (character == null) {
                 throw new AssertionError("Player without character");
             }
@@ -433,7 +416,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
 
     /**
-     * constant holder for progress bar in loading screen
+     * constant holder for progress bar in loading getScreen
      */
     private static final class LoadingProgressBar {
         private LoadingProgressBar() {}
@@ -447,7 +430,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
 
     /**
-     * constant holder for label in loading screen
+     * constant holder for label in loading getScreen
      */
     private static final class LoadingLabel {
         private LoadingLabel() {}
@@ -458,15 +441,5 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         public static final float MIN_Y = getWorldHeight() * 2 / 5;
         public static final float WIDTH = getWorldWidth() / 2;
         public static final float MIN_X = (getWorldWidth() - LoadingLabel.WIDTH) / 2;
-    }
-
-    private static final class SmallHealthBar {
-        SmallHealthBar() {}
-
-        public static final String PATH_FULL = "images/health_bar/full.png";
-        public static final String PATH_EMPTY = "images/health_bar/empty.png";
-
-        public static final float WIDTH = getWorldWidth() * 0.06f;
-        public static final float HEIGHT = getWorldHeight() * 0.013f;
     }
 }

@@ -10,11 +10,13 @@ import java.util.List;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
 import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
+import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
@@ -118,18 +120,13 @@ public class Game extends Thread implements GameContext {
     }
 
     @Override
-    public Optional<AssetManager> assets() {
-        return Optional.ofNullable(this.getAssets());
-    }
-
-    @Override
-    public Optional<GameSettings> settings() {
-        return Optional.ofNullable(this.getSettings());
-    }
-
-    @Override
-    public boolean hasIO() {
+    public boolean hasUI() {
         return false;
+    }
+
+    @Override
+    public GameScreen getScreen() {
+        return null;
     }
 
     GameState getGameState() {

@@ -2,7 +2,9 @@ package ru.spbau.blackout;
 
 import com.badlogic.gdx.assets.AssetManager;
 
+import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.java8features.Optional;
+import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.GameWorld;
 
@@ -13,15 +15,14 @@ import ru.spbau.blackout.worlds.GameWorld;
  * Some getters return optional values. It means that those values don't exist on server.
  */
 public interface GameContext {
+    GameWorld gameWorld();
+
     // TODO: comments
-    boolean hasIO();
+    boolean hasUI();
     /*FIXME: use annotation nullable*/
     AssetManager getAssets();
-    GameWorld gameWorld();
     /*FIXME: nullable*/
     GameSettings getSettings();
-
-    // FIXME: default doesn't work
-    Optional<AssetManager> assets();
-    Optional<GameSettings> settings();
+    /*FIXME: nullable*/
+    GameScreen getScreen();
 }

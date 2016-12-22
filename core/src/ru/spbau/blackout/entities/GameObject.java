@@ -1,6 +1,5 @@
 package ru.spbau.blackout.entities;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
@@ -90,7 +89,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
         model.ifPresent(model -> {
-            this.updateTransform();
+            updateTransform();
             model.getRenderables(renderables, pool);
         });
     }
@@ -100,7 +99,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
      * Update things not connected with physics. See <code>GameWorld</code> documentation.
      */
     public void updateState(float delta) {
-        for (GraphicEffect effect : this.graphicEffects) {
+        for (GraphicEffect effect : graphicEffects) {
             effect.update(delta);
         }
     }
@@ -126,26 +125,26 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
     /**
      * Kills the unit. It will be removed from the <code>GameWorld</code> and from the mapPath after paying death animation.
-     * Also calls <code>this.dispose()</code>.
+     * Also calls <code>dispose()</code>.
      */
     public void kill() {
         // TODO: override
         // It will be handled in GameWorld::update. It's a bad idea to try to remove body
         // from GameWorld right here because this method can be called in process of updating physics.
-        this.dead = true;
+        dead = true;
         // FIXME: play death animation
-        this.model = Optional.empty();
-        this.dispose();
+        model = Optional.empty();
+        dispose();
     }
 
-    public boolean isDead() { return this.dead; }
+    public boolean isDead() { return dead; }
 
     /**
      * Disposes all non-shared resources (like graphicEffects).
      * Shared resources (like models) will be disposed by AssetManager.
      */
     public void dispose() {
-        for (GraphicEffect effect : this.graphicEffects) {
+        for (GraphicEffect effect : graphicEffects) {
             effect.remove();
         }
     }
@@ -157,7 +156,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
      * to access <code>World</code> (which is a part of <code>GameWorld</code> class) directly.
      */
     public void destroyBody(World world) {
-        world.destroyBody(this.body);
+        world.destroyBody(body);
     }
 
     // Transform:
@@ -272,7 +271,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
         public Creator<Shape> shapeCreator;
 
         /** The loaded model object. Initialized by <code>initializeGameWorld</code> method. */
-        private transient Optional<Model> model = Optional.empty();
+        private transient Optional<Model> model;
         protected transient GameContext context;
 
         /**
@@ -298,22 +297,31 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
         /** Load necessary assets. */
         public void load(GameContext context) {
+            if (!context.hasUI()) {
+                throw new IllegalArgumentException("Don't use `load` method on server.");
+            }
+
             this.context = context;
-            if (context.hasIO() && this.modelPath != null) {
-                context.getAssets().load(this.modelPath, Model.class);
+            if (modelPath != null) {
+                context.getAssets().load(modelPath, Model.class);
             }
         }
 
-        public final void setContextOnServer(GameContext context) {
+        public void initializeWithoutUi(GameContext context) {
             this.context = context;
+            model = Optional.empty();
         }
 
         /** When assets are loaded. */
         public void doneLoading() {
-            if (this.modelPath == null) {
-                this.model = Optional.empty();
+            if (!context.hasUI()) {
+                throw new IllegalArgumentException("Don't use `doneLoading` method on server.");
+            }
+
+            if (modelPath == null) {
+                model = Optional.empty();
             } else {
-                this.model = context.assets().map(assets -> assets.get(this.modelPath, Model.class));
+                model = Optional.of(context.getAssets().get(modelPath, Model.class));
             }
         }
 

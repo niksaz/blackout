@@ -3,6 +3,7 @@ package ru.spbau.blackout.graphiceffects;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.units.Vpx;
@@ -18,10 +19,10 @@ public class HealthBarEffect implements GraphicEffect {
     private final Camera camera;
 
 
-    public HealthBarEffect(GameUnit unit, SimpleProgressBar healthBar, Camera camera) {
+    public HealthBarEffect(GameUnit unit, SimpleProgressBar healthBar, GameContext context) {
         this.unit = unit;
         this.healthBar = healthBar;
-        this.camera = camera;
+        this.camera = context.getScreen().getCamera();
     }
 
     @Override

@@ -8,7 +8,7 @@ import ru.spbau.blackout.screens.BlackoutScreen;
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
 /**
- * Used to put a new screen instead of last one but also saves references to screens for reusing.
+ * Used to put a new getScreen instead of last one but also saves references to screens for reusing.
  */
 public class ScreenManager {
 

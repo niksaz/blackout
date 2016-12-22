@@ -1,6 +1,5 @@
 package ru.spbau.blackout.worlds;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 
@@ -32,7 +31,7 @@ public class ServerGameWorld extends GameWorld {
 
     public ServerGameWorld(List<GameObject.Definition> definitions, GameContext context) {
         this(definitions);
-        foreach(getDefinitions(), def -> def.setContextOnServer(context));
+        foreach(getDefinitions(), def -> def.initializeWithoutUi(context));
     }
 
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
