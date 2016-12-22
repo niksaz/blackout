@@ -12,6 +12,7 @@ import ru.spbau.blackout.network.UIServer;
  * Abstract class for abilities which should be casted by single tap on the icon.
  */
 public abstract class SimpleInstantAbility extends Ability {
+
     private transient Optional<Sound> /*final*/ startSound = Optional.empty();
     public static final float CAST_DISTANCE = 1.5f;  // FIXME: use unit radius
 

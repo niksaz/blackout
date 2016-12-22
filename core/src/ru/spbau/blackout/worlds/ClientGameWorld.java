@@ -24,7 +24,7 @@ public class ClientGameWorld extends GameWorld {
     }
 
 
-    public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         getGameObjects().get(0).setState(in);
 
         /*long newStepNumber = in.readLong();
@@ -100,8 +100,6 @@ public class ClientGameWorld extends GameWorld {
                 }
             }
         }*/
-
-        return null;
     }
 
     @Override

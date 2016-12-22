@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,11 +33,11 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
     public static final float LINEAR_FRICTION = 0.002f;
 
 
-    /**/transient private final Vector2 selfVelocity = new Vector2();
-    /**/transient private float speed;
-    private transient final List<Ability> abilities;
-    /**/transient private float health;
-    private transient float maxHealth;
+    private final Vector2 selfVelocity = new Vector2();
+    private float speed;
+    private final List<Ability> abilities;
+    private float health;
+    private float maxHealth;
 
 
     protected GameUnit(Definition def, long uid, float x, float y) {
@@ -59,8 +60,15 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
     }
 
     public void castAbility(int abilityNum, Vector2 target) {
-        getAbility(abilityNum).cast(target);
+        Ability ability = getAbility(abilityNum);
+        ability.cast(target);
         // TODO: cast animation
+    }
+
+    @Override
+    public void updateState(float delta) {
+        super.updateState(delta);
+
     }
 
     @Override
@@ -92,7 +100,7 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
             velocity.mulAdd(velocity, k);
         }
 
-        body.setLinearVelocity(selfVelocity);
+        body.setLinearVelocity(selfVelocity.x * speed, selfVelocity.y * speed);
     }
 
     public final synchronized Vector2 getSelfVelocity() {
@@ -101,11 +109,17 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
     }
 
     @Override
-    public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        GameUnit other = (GameUnit) super.setState(in);
-        /*setSelfVelocity(other.selfVelocity);
-        speed = other.speed;*/
-        return other;
+    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        super.getState(out);
+        out.writeFloat(speed);
+        out.writeObject(getSelfVelocity());
+    }
+
+    @Override
+    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        super.setState(in);
+        speed = in.readFloat();
+        setSelfVelocity((Vector2) in.readObject());
     }
 
     public int getAbilityNum(Ability ability) {
@@ -149,7 +163,7 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
             setDirection(newVelocity);
         }
 
-        selfVelocity.set(newVelocity.x * speed, newVelocity.y * speed);
+        selfVelocity.set(newVelocity.x, newVelocity.y);
     }
 
     public void setSelfVelocity(float x, float y) { setSelfVelocity(new Vector2(x, y)); }

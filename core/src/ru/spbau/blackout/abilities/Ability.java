@@ -3,18 +3,22 @@ package ru.spbau.blackout.abilities;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.UIServer;
+import ru.spbau.blackout.utils.HasState;
 
 
 /**
  * Abstract class for ability in-game representation.
  * Each unit has its own instance of each its ability.
  */
-public abstract class Ability implements Serializable {
+public abstract class Ability implements Serializable, HasState {
 
     private static final long serialVersionUID = 1000000000L;
 
@@ -29,6 +33,15 @@ public abstract class Ability implements Serializable {
     }
 
 
+    @Override
+    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        out.writeFloat(chargeTime);
+    }
+
+    @Override
+    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        setChargeTime(in.readFloat());
+    }
 
     /**
      * Load necessary assets.
@@ -56,7 +69,9 @@ public abstract class Ability implements Serializable {
     /** Called once when a touch goes up. */
     public abstract void inCast(UIServer server, float delta);
 
-    public abstract void cast(Vector2 target);
+    public void cast(Vector2 target) {
+        chargeStart();
+    }
 
     /** Path to the icon in assets directory. */
     public abstract String iconPath();

@@ -16,5 +16,5 @@ public interface HasState {
      * Returns any data which is necessary for deserialization of derived classes.
      * (look at <code>GameObject</code> deserialization, to see when the return value is necessary)
      */
-    Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException;
+    void setState(ObjectInputStream in) throws IOException, ClassNotFoundException;
 }

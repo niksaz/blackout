@@ -1,20 +1,16 @@
 package ru.spbau.blackout.worlds;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import ru.spbau.blackout.BlackoutContactListener;
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.screens.GameScreen;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
@@ -68,7 +64,7 @@ public abstract class GameWorld {
     }
 
     public void update(float delta) {
-        /// common things
+        foreach(getGameObjects(), object -> object.updateState(delta));
     }
 
     public Body addObject(GameObject object, BodyDef bodyDef) {

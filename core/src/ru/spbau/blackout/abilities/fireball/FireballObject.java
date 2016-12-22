@@ -20,6 +20,7 @@ import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTO
 
 
 public final class FireballObject extends AbilityObject {
+
     private float timeRest;
     private final FireballObject.Definition def;
 
@@ -59,14 +60,14 @@ public final class FireballObject extends AbilityObject {
         this.kill();
     }
 
-    @Override
-    public void updateState(float deltaTime) {
-        super.updateState(deltaTime);
-        timeRest -= deltaTime;
-        if (timeRest <= 0) {
-            this.kill();
-        }
-    }
+//    @Override
+//    public void updateState(float deltaTime) {
+//        super.updateState(deltaTime);
+//        timeRest -= deltaTime;
+//        if (timeRest <= 0) {
+//            this.kill();
+//        }
+//    }
 
     @Override
     public void updateForSecondStep() {

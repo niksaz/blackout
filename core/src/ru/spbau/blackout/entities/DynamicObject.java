@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
@@ -17,7 +18,6 @@ public abstract class DynamicObject extends GameObject {
     public static class Animations {
         protected Animations() {}
         public static final String DEFAULT = "Armature|Stay";
-        public static final String DEATH = "Armature|Death";
     }
 
 
@@ -27,13 +27,13 @@ public abstract class DynamicObject extends GameObject {
      * It also has getter and setter to have similar interface to
      * <code>selfVelocity</code> from <code>GameUnit</code>.
      */
-    /**/transient public final Vector2 velocity = new Vector2();
+    public final Vector2 velocity = new Vector2();
 
 
     // Appearance:
     /** It is empty on server */
-    protected transient final Optional<AnimationController> animation;
-    protected transient float animationSpeed = 1f;
+    protected final Optional<AnimationController> animation;
+    protected float animationSpeed = 1f;
 
 
     /** Construct DynamicObject at the giving position. */
@@ -60,9 +60,9 @@ public abstract class DynamicObject extends GameObject {
 
 
     @Override
-    public void updateState(float deltaTime) {
-        super.updateState(deltaTime);
-        this.animation.ifPresent(controller -> controller.update(deltaTime * this.animationSpeed));
+    public void updateState(float delta) {
+        super.updateState(delta);
+        this.animation.ifPresent(controller -> controller.update(delta * this.animationSpeed));
     }
 
     @Override
@@ -78,11 +78,15 @@ public abstract class DynamicObject extends GameObject {
     }
 
     @Override
-    public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        DynamicObject other = (DynamicObject) super.setState(in);
-        /*this.velocity.set(other.velocity);
-        this.animationSpeed = other.animationSpeed;  // FIXME: probably should be removed*/
-        return other;
+    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        super.getState(out);
+        out.writeFloat(animationSpeed);
+    }
+
+    @Override
+    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        super.setState(in);
+        animationSpeed = in.readFloat();
     }
 
 

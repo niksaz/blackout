@@ -30,20 +30,20 @@ import ru.spbau.blackout.utils.HasState;
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
-public abstract class GameObject implements RenderableProvider, HasState, Serializable {
+public abstract class GameObject implements RenderableProvider, HasState {
     public static final float RESTITUTION = 0.5f;
 
 
-    protected transient final Body body;
-    /**/transient private float height;
+    protected final Body body;
+    private float height;
 
     /** Equals to Optional.empty() on a server or if the object is dead. */
-    protected transient Optional<ModelInstance> model;
-    public transient final Array<GraphicEffect> graphicEffects = new Array<>();
+    protected Optional<ModelInstance> model;
+    public final Array<GraphicEffect> graphicEffects = new Array<>();
 
-    private transient boolean dead = false;
-    private transient final GameObject.Definition def;
-    private transient final long uid;
+    private boolean dead = false;
+    private final GameObject.Definition def;
+    private final long uid;
 
 
     /**
@@ -74,22 +74,17 @@ public abstract class GameObject implements RenderableProvider, HasState, Serial
 
     @Override
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
-        out.writeObject(this);
-        /*out.writeObject(getPosition());
-        out.writeFloat(getRotation());*/
+        out.writeFloat(height);
+        out.writeObject(getPosition());
+        out.writeFloat(getRotation());
     }
 
     @Override
-    public Object setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        Gdx.app.log("QQQ", getClass().getName());
-        Gdx.app.log("QQQ", "QQQ");
-        GameObject other = (GameObject) in.readObject();
-        Gdx.app.log("QQQ", "WWW");
-        /*height = other.height;
+    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        height = in.readFloat();
         Vector2 position = (Vector2) in.readObject();
         float rotation = in.readFloat();
-        setTransform(position, rotation);*/
-        return other;
+        setTransform(position, rotation);
     }
 
     @Override
@@ -104,9 +99,9 @@ public abstract class GameObject implements RenderableProvider, HasState, Serial
     /**
      * Update things not connected with physics. See <code>GameWorld</code> documentation.
      */
-    public void updateState(float deltaTime) {
+    public void updateState(float delta) {
         for (GraphicEffect effect : this.graphicEffects) {
-            effect.update(deltaTime);
+            effect.update(delta);
         }
     }
     /** See <code>GameWorld</code> documentation. */

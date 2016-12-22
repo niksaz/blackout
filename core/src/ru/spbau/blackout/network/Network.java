@@ -7,7 +7,7 @@ public class Network {
 
     public static final long TIME_SHOULD_BE_SPENT_IN_ITERATION = 17;
 
-    public static final String SERVER_IP_ADDRESS = "192.168.210.201";
+    public static final String SERVER_IP_ADDRESS = "192.168.43.189";
     public static final int SERVER_TCP_PORT_NUMBER = 48800;
     public static final int SERVER_HTTP_PORT_NUMBER = 48801;
 

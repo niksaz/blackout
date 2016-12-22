@@ -9,6 +9,7 @@ import ru.spbau.blackout.shapescreators.CircleCreator;
 
 
 public class FireballAbility extends SimpleInstantAbility {
+
     public static final String ICON_PATH = "abilities/fireball/icon.png";
     public static final float MAX_CHARGE_TIME = 1f;
 
@@ -41,6 +42,8 @@ public class FireballAbility extends SimpleInstantAbility {
 
     @Override
     public void cast(Vector2 target) {
+        super.cast(target);
+
         AbilityObject shell = (AbilityObject) shellDef.makeInstanceWithNextUid(target);
 
         Vector2 direction = target.mulAdd(getUnit().getPosition(), -1);
