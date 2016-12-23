@@ -113,6 +113,7 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
         super.getState(out);
         out.writeFloat(speed);
         out.writeObject(getSelfVelocity());
+        out.writeFloat(health);
     }
 
     @Override
@@ -120,6 +121,7 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
         super.setState(in);
         speed = in.readFloat();
         setSelfVelocity((Vector2) in.readObject());
+        health = in.readFloat();
     }
 
     public int getAbilityNum(Ability ability) {

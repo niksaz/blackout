@@ -19,7 +19,7 @@ import ru.spbau.blackout.serverside.multiplayer.Game;
  */
 public class RoomServer extends ServerWithLogging {
 
-    private static final int PLAYERS_NUMBER_TO_START_GAME = 1;
+    private static final int PLAYERS_NUMBER_TO_START_GAME = 2;
 
     private final Deque<ClientThread> clientThreads = new ConcurrentLinkedDeque<>();
     private final AtomicInteger playersNumber = new AtomicInteger();

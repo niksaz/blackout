@@ -213,4 +213,6 @@ public class ClientThread extends Thread {
             }
         } while (clientGameState == GameState.WAITING);
     }
+
+    public long getPlayerUid() { return playerUid; }
 }

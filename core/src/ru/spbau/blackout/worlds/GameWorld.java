@@ -5,8 +5,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import ru.spbau.blackout.BlackoutContactListener;
 import ru.spbau.blackout.GameContext;
@@ -41,7 +43,7 @@ public abstract class GameWorld {
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
-    private final List<GameObject> gameObjects = new LinkedList<>();
+    protected final SortedMap<Long, GameObject> gameObjectsMap = new TreeMap<>();
     protected long stepNumber = 0;
     transient protected final World box2dWorld;  // FIXME: should be only on server
     private final List<GameObject.Definition> definitions;
@@ -55,12 +57,14 @@ public abstract class GameWorld {
     }
 
 
-    public List<GameObject> getGameObjects() {
-        return gameObjects;
+    public final Collection<GameObject> getGameObjects() {
+        return gameObjectsMap.values();
     }
 
-    public List<GameObject.Definition> getDefinitions() {
-        return definitions;
+    public final List<GameObject.Definition> getDefinitions() { return definitions; }
+
+    public final GameObject getObjectById(long uid) {
+        return gameObjectsMap.get(uid);
     }
 
     public void update(float delta) {
@@ -68,7 +72,7 @@ public abstract class GameWorld {
     }
 
     public Body addObject(GameObject object, BodyDef bodyDef) {
-
+        gameObjectsMap.put(object.getUid(), object);
         return box2dWorld.createBody(bodyDef);
     }
 
@@ -83,14 +87,5 @@ public abstract class GameWorld {
     public void dispose() {
         box2dWorld.dispose();
         foreach (getGameObjects(), GameObject::dispose);
-    }
-
-    public GameObject getObjectById(long uid) {
-        for (GameObject obj : getGameObjects()) {
-            if (obj.getUid() == uid) {
-                return obj;
-            }
-        }
-        return null;
     }
 }

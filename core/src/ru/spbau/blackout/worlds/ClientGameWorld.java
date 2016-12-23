@@ -1,14 +1,21 @@
 package ru.spbau.blackout.worlds;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.maps.Map;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.screens.LoadScreen;
 
 
 /**
@@ -27,71 +34,26 @@ public class ClientGameWorld extends GameWorld {
     public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
         long newStepNumber = in.readLong();
 
-        // this GameWorld is outdated
         if (newStepNumber > stepNumber) {
             stepNumber = newStepNumber;
 
-            class ExistIterator {
-                final ListIterator<GameObject> it;
-                boolean endOfStream = false;
-                // null means the end of the array
-                GameObject go;
-
-                ExistIterator() {
-                    it = getGameObjects().listIterator();
-                    step();
+            Set<Long> updated = new HashSet<>();
+            int length = in.readInt();
+            for (int i = 0; i < length; i++) {
+                long uid = in.readLong();
+                int defNumber = in.readInt();
+                updated.add(uid);
+                if (!gameObjectsMap.containsKey(uid)) {
+                    getDefinitions().get(defNumber).makeInstance(uid);
                 }
-
-                void step() {
-                    if (it.hasNext()) {
-                        go = it.next();
-                    } else {
-                        endOfStream = true;
-                    }
-                }
+                gameObjectsMap.get(uid).setState(in);
             }
 
-            ExistIterator exist = new ExistIterator();
-
-            class InputIterator {
-                int length;
-                boolean endOfStream = false;
-                long uid = 0;
-                int defNumber;
-
-                InputIterator(ObjectInputStream in) throws IOException {
-                    length = in.readInt();
-                    step(in);
-                }
-
-                void step(ObjectInputStream in) throws IOException {
-                    if (length == 0) {
-                        endOfStream = true;
-                    } else {
-                        length -= 1;
-                        uid = in.readLong();
-                        defNumber = in.readInt();
-                    }
-                }
-            }
-
-            InputIterator input = new InputIterator(in);
-
-            while (!exist.endOfStream || !input.endOfStream) {
-                if (exist.endOfStream || (!input.endOfStream && exist.go.getUid() > input.uid)) {
-                    GameObject newObj = getDefinitions().get(input.defNumber).makeInstance(input.uid);
-                    exist.it.add(newObj);
-                    newObj.setState(in);
-                    input.step(in);
-                } else if (input.endOfStream || exist.go.getUid() < input.uid) {
-                    exist.go.kill();
-                    exist.it.remove();
-                    exist.step();
-                } else {
-                    assert !exist.endOfStream && !input.endOfStream && exist.go.getUid() == input.uid;
-                    exist.go.setState(in);
-                    exist.step();
-                    input.step(in);
+            for (Iterator<GameObject> it = gameObjectsMap.values().iterator(); it.hasNext();) {
+                GameObject go = it.next();
+                if (!updated.contains(go.getUid())) {
+                    go.kill();
+                    it.remove();
                 }
             }
         }

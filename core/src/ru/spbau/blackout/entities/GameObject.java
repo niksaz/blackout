@@ -355,7 +355,6 @@ public abstract class GameObject implements RenderableProvider, HasState {
             return makeInstanceWithNextUid(position.x, position.y);
         }
 
-
         /**
          * Must be called from <code>GameObject</code> constructor to add this
          * <code>GameObject</code> to the world and make <code>Body</code> for it.
@@ -369,7 +368,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
         public abstract BodyDef.BodyType getBodyType();
 
-        public long getNextUid() {
+        public static long getNextUid() {
             s_lastUid += 1;
             return s_lastUid;
         }
