@@ -72,6 +72,14 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
     }
 
     @Override
+    public void updateState(float delta) {
+        super.updateState(delta);
+        for (Ability ability : abilities) {
+            ability.charge(delta);
+        }
+    }
+
+    @Override
     public void updateForFirstStep() {
         // apply friction
         if (!Utils.isZeroVec(velocity)){
@@ -114,6 +122,10 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
         out.writeFloat(speed);
         out.writeObject(getSelfVelocity());
         out.writeFloat(health);
+
+        for (Ability ability : abilities) {
+            ability.getState(out);
+        }
     }
 
     @Override
@@ -122,6 +134,10 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
         speed = in.readFloat();
         setSelfVelocity((Vector2) in.readObject());
         health = in.readFloat();
+
+        for (Ability ability : abilities) {
+            ability.setState(in);
+        }
     }
 
     public int getAbilityNum(Ability ability) {

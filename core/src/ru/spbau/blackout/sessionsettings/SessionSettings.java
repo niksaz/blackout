@@ -102,6 +102,15 @@ public final class SessionSettings implements Serializable {
         enemy.overHeadPivotOffset.set(0, 0, 3.5f);
         session.addInitialObject(enemy, 5, 5, GameUnit.Definition.getNextUid());
 
+        Character.Definition enemy2 = new Character.Definition(
+                "models/wizard/wizard.g3db",
+                new CircleCreator(0.6f),
+                new Ability[] { new FireballAbility(2) },
+                200
+        );
+        enemy2.overHeadPivotOffset.set(0, 0, 3.5f);
+        session.addInitialObject(enemy2, -5, 5, GameUnit.Definition.getNextUid());
+
         GameObject.Definition stone = new Decoration.Definition("models/stone/stone.g3db", new CircleCreator(1.1f));
         session.addInitialObject(stone, -5, 0, GameUnit.Definition.getNextUid());
 

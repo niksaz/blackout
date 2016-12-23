@@ -96,7 +96,6 @@ public final class AbilityIcon extends IngameUIObject {
             if (this.isCharging()) {
                 // update charging
                 this.chargingBar.setValue(chargeTime / this.ability.getMaxChargeTime());
-                this.ability.charge(deltaTime);
             } else {
                 // start charging
                 this.chargingBar.setValueInstant(chargeTime / this.ability.getMaxChargeTime());
