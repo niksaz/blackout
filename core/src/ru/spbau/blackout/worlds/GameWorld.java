@@ -68,7 +68,7 @@ public abstract class GameWorld {
     }
 
     public Body addObject(GameObject object, BodyDef bodyDef) {
-        gameObjects.add(object);
+
         return box2dWorld.createBody(bodyDef);
     }
 

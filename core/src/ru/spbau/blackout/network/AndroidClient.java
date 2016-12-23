@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -250,7 +251,7 @@ public class AndroidClient implements Runnable, UIServer {
         }
     }
 
-    public static class AbilityCast {
+    public static class AbilityCast implements Serializable {
         public int abilityNum;
         public Vector2 target;
 

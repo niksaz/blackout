@@ -12,6 +12,9 @@ public class Decoration extends StaticObject {
 
 
     public static class Definition extends StaticObject.Definition {
+
+        private static final long serialVersionUID = 1000000000L;
+
         public Definition(String modelPath, Creator<Shape> shapeCreator) {
             super(modelPath, shapeCreator);
         }

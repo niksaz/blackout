@@ -29,7 +29,6 @@ public class ClientGameWorld extends GameWorld {
 
         // this GameWorld is outdated
         if (newStepNumber > stepNumber) {
-            Gdx.app.log("WTF", "step number = " + newStepNumber);
             stepNumber = newStepNumber;
 
             class ExistIterator {
