@@ -1,17 +1,9 @@
 package ru.spbau.blackout.database;
 
-import com.badlogic.gdx.utils.ByteArray;
-
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Arrays;
 
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.abilities.fireball.FireballAbility;
@@ -29,32 +21,49 @@ public class PlayerEntity implements Serializable {
     private int gold;
     private byte[] serializedDefinition;
 
+    /**
+     * Used by Morphia to initialize objects extracted from the database.
+     */
     public PlayerEntity() {
-        this("");
+        this("", 0, null);
+        System.out.println("constructor () called");
     }
 
+    /**
+     * Initialize the character of a new player.
+     *
+     * @param name name of a new player
+     */
     public PlayerEntity(String name) {
+        this(name, 0, getSerializedGrantedCharacter());
+        System.out.println("constructor (String) called");
+    }
+
+    /**
+     * Shallow copy of the object.
+     */
+    public PlayerEntity(PlayerEntity other) {
+        this(other.getName(), other.getGold(), other.getSerializedDefinition());
+        System.out.println("construct (PlayerEntity) called");
+    }
+
+    private PlayerEntity(String name, int gold, byte[] serializedDefinition) {
         this.name = name;
-        this.gold = 0;
-        final Character.Definition initialCharacter = new Character.Definition(
+        this.gold = gold;
+        this.serializedDefinition = serializedDefinition;
+    }
+
+
+    private static byte[] getSerializedGrantedCharacter() {
+        final Character.Definition grantedCharacter = new Character.Definition(
                 "models/wizard/wizard.g3db",
                 new CircleCreator(0.6f),
                 new Ability[] { new FireballAbility(1) },
                 200
         );
-        setSerializedCharacterDefinition(initialCharacter);
-        Character.Definition def = deserializeCharacterDefinition();
-        System.out.println(def);
-        System.out.println("LENGTH OF DEF ON SERVER IS " + serializedDefinition.length);
-        System.out.println(Arrays.toString(serializedDefinition));
+        return grantedCharacter.serializeToByteArray();
     }
 
-    // just sets references to the same objects, because the other object won't be used later
-    public PlayerEntity(PlayerEntity other) {
-        name = other.name;
-        gold = other.gold;
-        serializedDefinition = other.serializedDefinition;
-    }
 
     public String getName() {
         return name;
@@ -70,31 +79,5 @@ public class PlayerEntity implements Serializable {
 
     public void changeGold(int delta) {
         gold += delta;
-    }
-
-    public Character.Definition deserializeCharacterDefinition() {
-        Character.Definition characterDefinition;
-        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedDefinition);
-             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)
-        ) {
-            characterDefinition = (Character.Definition) objectInputStream.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-            throw new IllegalStateException();
-        }
-        return characterDefinition;
-    }
-
-    public void setSerializedCharacterDefinition(Character.Definition characterDefinition) {
-        try (ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-             ObjectOutputStream out = new ObjectOutputStream(byteOutputStream)
-        ) {
-            out.writeObject(characterDefinition);
-            out.flush();
-            serializedDefinition = byteOutputStream.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IllegalStateException();
-        }
     }
 }

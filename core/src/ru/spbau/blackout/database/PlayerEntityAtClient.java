@@ -34,7 +34,7 @@ public class PlayerEntityAtClient extends PlayerEntity {
                         Network.SERVER_IP_ADDRESS +
                         ':' +
                         Network.SERVER_HTTP_PORT_NUMBER +
-                        Database.UPDATE_COMMAND;
+                        Database.UPGRADE_COMMAND;
 
                 final URL urlObject = new URL(url);
                 final HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
@@ -45,9 +45,10 @@ public class PlayerEntityAtClient extends PlayerEntity {
                 connection.setReadTimeout(HTTP_READ_TIMEOUT_MS);
 
                 try (
-                    DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
+                        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
                 ) {
                     outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+                    outputStream.writeUTF(Database.GOLD_FIELD);
                     outputStream.writeInt(delta);
                 }
 

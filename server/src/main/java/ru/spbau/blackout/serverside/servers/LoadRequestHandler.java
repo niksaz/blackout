@@ -45,6 +45,7 @@ public class LoadRequestHandler implements HttpHandler {
             final PlayerEntity entity;
             switch (result.size()) {
                 case 0:
+                    System.out.println("COULD NOT FIND");
                     entity = new PlayerEntity(name);
                     DatabaseAccessor.getInstance().getDatastore().save(entity);
                     break;

@@ -20,7 +20,7 @@ public class HttpRequestServer extends ServerWithLogging {
         try {
             final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             server.createContext(Database.LOAD_COMMAND, new LoadRequestHandler(this));
-            server.createContext(Database.UPDATE_COMMAND, new UpdateRequestHandler(this));
+            server.createContext(Database.UPGRADE_COMMAND, new UpgradeRequestHandler(this));
             server.setExecutor(null);
             server.start();
             log("Server started.");
