@@ -5,18 +5,14 @@ import com.sun.net.httpserver.HttpHandler;
 
 import org.mongodb.morphia.query.Query;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.util.Arrays;
 import java.util.List;
 
 import ru.spbau.blackout.database.PlayerEntity;
-import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 
 /**
@@ -36,9 +32,6 @@ public class LoadRequestHandler implements HttpHandler {
         try (
             InputStream input = exchange.getRequestBody();
             DataInputStream inputStream = new DataInputStream(input);
-            ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-            ObjectOutputStream objectOutput = new ObjectOutputStream(byteOutput);
-            OutputStream outputStream = exchange.getResponseBody()
         ) {
             final String name = inputStream.readUTF();
 
@@ -49,7 +42,7 @@ public class LoadRequestHandler implements HttpHandler {
                             .equal(name);
             final List<PlayerEntity> result = query.asList();
 
-            PlayerEntity entity;
+            final PlayerEntity entity;
             switch (result.size()) {
                 case 0:
                     entity = new PlayerEntity(name);
@@ -64,16 +57,14 @@ public class LoadRequestHandler implements HttpHandler {
                     throw new IllegalStateException();
             }
 
-            Character.Definition def = entity.deserializeCharacterDefinition();
-            System.out.println(def);
-            System.out.println("LENGTH OF DEF ON SERVER IS " + entity.getSerializedDefinition().length);
-            System.out.println(Arrays.toString(entity.getSerializedDefinition()));
-
-            objectOutput.writeObject(entity);
-            objectOutput.flush();
-            final byte[] bytesToWrite = byteOutput.toByteArray();
-            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, bytesToWrite.length);
-            outputStream.write(bytesToWrite);
+            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(exchange.getResponseBody())
+            ) {
+                objectOutputStream.writeObject(entity);
+                objectOutputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             server.log("Sent: " + entity.toString());
         } catch (IOException e) {
             e.printStackTrace();
