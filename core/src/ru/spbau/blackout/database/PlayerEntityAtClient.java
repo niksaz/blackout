@@ -2,12 +2,10 @@ package ru.spbau.blackout.database;
 
 import com.badlogic.gdx.Gdx;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.ObjectInputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.network.Network;
@@ -96,15 +94,13 @@ public class PlayerEntityAtClient extends PlayerEntity {
                     final int responseLength = connection.getContentLength();
                     System.out.println("Loading. " + connection.getRequestMethod() + " request to URL : " + url);
                     System.out.println("Response Code : " + responseCode);
+                    System.out.println("Response Length : " + responseLength);
 
-                    final byte[] response = new byte[responseLength];
-                    final int result = connection.getInputStream().read(response);
-                    if (result == -1) {
+                    if (responseCode != HttpURLConnection.HTTP_OK) {
                         continue;
                     }
-                    System.out.println("GOT " + responseLength + " " + Arrays.toString(response));
+                    final ObjectInputStream in = new ObjectInputStream(connection.getInputStream());
 
-                    final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(response));
                     final PlayerEntity playerEntity = (PlayerEntity) in.readObject();
                     BlackoutGame.get().setPlayerEntity(new PlayerEntityAtClient(playerEntity));
                     Gdx.app.postRunnable(() ->

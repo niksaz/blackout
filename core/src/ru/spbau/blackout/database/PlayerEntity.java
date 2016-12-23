@@ -1,5 +1,7 @@
 package ru.spbau.blackout.database;
 
+import com.badlogic.gdx.utils.ByteArray;
+
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
@@ -84,12 +86,12 @@ public class PlayerEntity implements Serializable {
     }
 
     public void setSerializedCharacterDefinition(Character.Definition characterDefinition) {
-        try (ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-             ObjectOutputStream out = new ObjectOutputStream(byteOutput)
+        try (ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+             ObjectOutputStream out = new ObjectOutputStream(byteOutputStream)
         ) {
             out.writeObject(characterDefinition);
             out.flush();
-            serializedDefinition = byteOutput.toByteArray();
+            serializedDefinition = byteOutputStream.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
             throw new IllegalStateException();
