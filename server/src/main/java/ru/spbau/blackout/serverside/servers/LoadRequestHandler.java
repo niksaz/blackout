@@ -12,9 +12,11 @@ import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.util.Arrays;
 import java.util.List;
 
 import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 
 /**
@@ -61,6 +63,11 @@ public class LoadRequestHandler implements HttpHandler {
                 default:
                     throw new IllegalStateException();
             }
+
+            Character.Definition def = entity.deserializeCharacterDefinition();
+            System.out.println(def);
+            System.out.println("LENGTH OF DEF ON SERVER IS " + entity.getSerializedDefinition().length);
+            System.out.println(Arrays.toString(entity.getSerializedDefinition()));
 
             objectOutput.writeObject(entity);
             objectOutput.flush();

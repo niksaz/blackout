@@ -10,8 +10,6 @@ import java.util.List;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.ingameui.IngameUI;
-import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
 import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;

@@ -7,23 +7,18 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
 import com.badlogic.gdx.physics.box2d.Box2D;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ru.spbau.blackout.androidfeatures.PlayServices;
 import ru.spbau.blackout.androidfeatures.PlayServicesInCore;
 import ru.spbau.blackout.database.PlayerEntity;
-import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.screens.LoadScreen;
-import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.network.SinglePlayerServer;
 import ru.spbau.blackout.screens.GameScreen;
+import ru.spbau.blackout.screens.LoadScreen;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.specialeffects.SpecialEffectsSystem;
 import ru.spbau.blackout.utils.BlackoutAssets;
-import ru.spbau.blackout.utils.ReflectUtils;
 import ru.spbau.blackout.utils.ScreenManager;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.worlds.ServerGameWorld;
@@ -54,7 +49,7 @@ public class BlackoutGame extends Game {
 
     // fields marked as /*final*/ must be assigned only once, but can't be assigned in constructor
 
-    private PlayerEntity playerEntity;
+    private volatile PlayerEntity playerEntity;
     private final ScreenManager screenManager;
     private /*final*/ PlayServicesInCore playServicesInCore;
 

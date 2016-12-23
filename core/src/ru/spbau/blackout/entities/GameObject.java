@@ -256,6 +256,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
      * <br>makeInstance (Any number of calls)
      */
     public static abstract class Definition implements Serializable {
+
         private static final long serialVersionUID = 1000000000L;
 
         public static final float DEFAULT_HEIGHT = 0;

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.abilities.fireball.FireballAbility;
@@ -40,14 +41,17 @@ public class PlayerEntity implements Serializable {
                 200
         );
         setSerializedCharacterDefinition(initialCharacter);
+        Character.Definition def = deserializeCharacterDefinition();
+        System.out.println(def);
+        System.out.println("LENGTH OF DEF ON SERVER IS " + serializedDefinition.length);
+        System.out.println(Arrays.toString(serializedDefinition));
     }
 
+    // just sets references to the same objects, because the other object won't be used later
     public PlayerEntity(PlayerEntity other) {
         name = other.name;
         gold = other.gold;
-        final byte[] otherSerializedDefinition = other.getSerializedDefinition();
-        serializedDefinition = new byte[otherSerializedDefinition.length];
-        System.arraycopy(otherSerializedDefinition, 0, serializedDefinition, 0, otherSerializedDefinition.length);
+        serializedDefinition = other.serializedDefinition;
     }
 
     public String getName() {

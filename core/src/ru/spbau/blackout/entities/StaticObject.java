@@ -3,7 +3,6 @@ package ru.spbau.blackout.entities;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 
-import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.utils.Creator;
 
 
@@ -20,6 +19,9 @@ public abstract class StaticObject extends GameObject {
 
     /** Definition for objects which have Static body type. */
     public static abstract class Definition extends GameObject.Definition {
+
+        private static final long serialVersionUID = 1000000000L;
+
         public Definition(String modelPath, Creator<Shape> shapeCreator) {
             super(modelPath, shapeCreator);
         }

@@ -4,13 +4,10 @@ import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
-import ru.spbau.blackout.graphiceffects.GraphicEffect;
 import ru.spbau.blackout.graphiceffects.HealthBarEffect;
-import ru.spbau.blackout.ingameui.IngameUI;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.utils.Creator;
-import ru.spbau.blackout.utils.HasState;
 
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;

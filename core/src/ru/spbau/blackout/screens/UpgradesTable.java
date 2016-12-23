@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import java.util.Arrays;
+
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.database.PlayerEntity;
@@ -26,6 +28,8 @@ public class UpgradesTable {
         final Table middleTable = new Table();
 
         final PlayerEntity entity = BlackoutGame.get().getPlayerEntity();
+        System.out.println("LENGTH ON THE CLIENT IS " + entity.getSerializedDefinition().length);
+        System.out.println(Arrays.toString(entity.getSerializedDefinition()));
         final Character.Definition characterDefinition = entity.deserializeCharacterDefinition();
 
         addButton(middleTable, HEALTH_TEXT, "current health " + characterDefinition.maxHealth);
