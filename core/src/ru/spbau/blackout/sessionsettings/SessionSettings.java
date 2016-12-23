@@ -11,6 +11,7 @@ import ru.spbau.blackout.abilities.fireball.FireballAbility;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Finder;
 
@@ -89,7 +90,7 @@ public final class SessionSettings implements Serializable {
                 200
         );
         hero.overHeadPivotOffset.set(0, 0, 3.5f);
-        session.addInitialObject(hero, 0, 0, 1);
+        session.addInitialObject(hero, 0, 0, GameUnit.Definition.getNextUid());
         session.setPlayerUid(1);
 
         Character.Definition enemy = new Character.Definition(
@@ -99,10 +100,10 @@ public final class SessionSettings implements Serializable {
                 200
         );
         enemy.overHeadPivotOffset.set(0, 0, 3.5f);
-        session.addInitialObject(enemy, 5, 5, 2);
+        session.addInitialObject(enemy, 5, 5, GameUnit.Definition.getNextUid());
 
         GameObject.Definition stone = new Decoration.Definition("models/stone/stone.g3db", new CircleCreator(1.1f));
-        session.addInitialObject(stone, -5, 0, 3);
+        session.addInitialObject(stone, -5, 0, GameUnit.Definition.getNextUid());
 
         return session;
     }

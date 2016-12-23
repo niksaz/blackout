@@ -139,7 +139,7 @@ public class Game extends Thread implements GameContext {
 
         for (int i = 0; i < clients.size(); i++) {
             final ClientThread client = clients.get(i);
-            client.setGame(this, sessionSettings, GameUnit.Definition.getNextUid());
+            client.setGame(this, sessionSettings, i + 1);
         }
     }
 
