@@ -2,6 +2,12 @@ package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.physics.box2d.Shape;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.graphiceffects.HealthBarEffect;
@@ -54,6 +60,34 @@ public class Character extends GameUnit {
             }
 
             return character;
+        }
+
+        public byte[] serializeToByteArray() {
+            final byte[] result;
+            try (ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+                 ObjectOutputStream out = new ObjectOutputStream(byteOutputStream)
+            ) {
+                out.writeObject(this);
+                out.flush();
+                result = byteOutputStream.toByteArray();
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new IllegalStateException(e);
+            }
+            return result;
+        }
+
+        public static Definition deserializeFromByteArray(byte[] byteRepresentation) {
+            final Definition characterDefinition;
+            try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteRepresentation);
+                 ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)
+            ) {
+                characterDefinition = (Definition) objectInputStream.readObject();
+            } catch (ClassNotFoundException | IOException e) {
+                e.printStackTrace();
+                throw new IllegalStateException(e);
+            }
+            return characterDefinition;
         }
 
         private static final class HealthBar {
