@@ -72,7 +72,7 @@ public class Game extends Thread implements GameContext {
 
                 long currentTime = System.currentTimeMillis();
                 final float worldDeltaInSecs = (currentTime - lastWorldUpdateTime) / Utils.MILLIS_IN_SECOND;
-                gameWorld.update(worldDeltaInSecs);
+                gameWorld.updateState(worldDeltaInSecs);
                 lastWorldUpdateTime = currentTime;
                 server.log("Updating gameWorld: " + worldDeltaInSecs);
 

@@ -25,7 +25,7 @@ import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_PER_LEVEL;
 
 /**
- * Handler for update queries from clients.
+ * Handler for updateState queries from clients.
  * Assumes that client have logged in before so his entry exists in the database.
  */
 public class UpgradeRequestHandler implements HttpHandler {

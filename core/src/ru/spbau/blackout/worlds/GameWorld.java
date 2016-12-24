@@ -35,7 +35,7 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  * its body's velocity and then it must put its own velocity (just like <code>selfVelocity</code> of GameUnit) instead.
  * The resulting velocity of the second step isn't important.
  *
- * <br>There is one more method called <code>updateGraphics</code>. It must update things which are not connected
+ * <br>There is one more method called <code>updateGraphics</code>. It must updateState things which are not connected
  * with physic driver. This method called one time per frame (i.e. without fixed step).
  */
 public abstract class GameWorld {
@@ -43,7 +43,7 @@ public abstract class GameWorld {
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
-    protected final SortedMap<Long, GameObject> gameObjectsMap = new TreeMap<>();
+    private final SortedMap<Long, GameObject> gameObjectsMap = new TreeMap<>();
     protected long stepNumber = 0;
     transient protected final World box2dWorld;  // FIXME: should be only on server
     private final List<GameObject.Definition> definitions;
@@ -67,8 +67,13 @@ public abstract class GameWorld {
         return gameObjectsMap.get(uid);
     }
 
-    public void update(float delta) {
-        foreach(getGameObjects(), object -> object.updateGraphics(delta));
+    public final boolean hasObjectWithId(long uid) {
+        return gameObjectsMap.containsKey(uid);
+    }
+
+    public abstract void updateState(float delta);
+
+    protected void updateGraphics(float delta) {
     }
 
     public Body addObject(GameObject object, BodyDef bodyDef) {
@@ -87,5 +92,9 @@ public abstract class GameWorld {
     public void dispose() {
         box2dWorld.dispose();
         foreach (getGameObjects(), GameObject::dispose);
+    }
+
+    public void updateGraphic(float delta) {
+        foreach(getGameObjects(), object -> object.updateGraphics(delta));
     }
 }

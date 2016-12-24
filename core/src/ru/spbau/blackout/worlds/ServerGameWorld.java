@@ -55,9 +55,7 @@ public class ServerGameWorld extends GameWorld {
     }
 
     @Override
-    public void update(float delta) {
-        super.update(delta);
-
+    public void updateState(float delta) {
         for (GameObject object : getGameObjects()) {
             object.updateState(delta);
         }
@@ -76,8 +74,7 @@ public class ServerGameWorld extends GameWorld {
             accumulator -= WORLD_STEP;
         }
 
-        // I don't think that interpolation is necessary.
-        // It would be very hard and takes many resources.
+        updateGraphics(delta);
     }
 
     private void step() {

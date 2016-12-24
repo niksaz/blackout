@@ -136,7 +136,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
      */
     public void kill() {
         // TODO: override
-        // It will be handled in GameWorld::update. It's a bad idea to try to remove body
+        // It will be handled in GameWorld::updateState. It's a bad idea to try to remove body
         // from GameWorld right here because this method can be called in process of updating physics.
         dead = true;
         // FIXME: play death animation

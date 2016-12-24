@@ -8,7 +8,7 @@ import java.net.InetSocketAddress;
 import ru.spbau.blackout.database.Database;
 
 /**
- * Server for responding of loading and update of player's information. Stores connection to MongoDB database.
+ * Server for responding of loading and updateState of player's information. Stores connection to MongoDB database.
  */
 public class HttpRequestServer extends ServerWithLogging {
 

@@ -45,7 +45,7 @@ public abstract class Ability implements Serializable, HasState {
 
     /**
      * Load necessary assets.
-     * Must be called once from <code>GameUnit.Definition::update</code>
+     * Must be called once from <code>GameUnit.Definition::updateState</code>
      */
     public void load(GameContext context) {
         // loading of icon has to be here because it isn't accessible from `AbilityIcon` class in the loading stage

@@ -22,7 +22,7 @@ public abstract class DynamicObject extends GameObject {
 
 
     /**
-     * It is public because it's safe to update in almost any time.
+     * It is public because it's safe to updateState in almost any time.
      * And it allows to do stuff like <code>object.velocity.mulAdd(...)</code>.
      * It also has getter and setter to have similar interface to
      * <code>selfVelocity</code> from <code>GameUnit</code>.

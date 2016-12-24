@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.screens.LoadScreen;
 
+import static ru.spbau.blackout.java8features.Functional.foreach;
+
 
 /**
  * GameWorld which is used on client side of multi-player game. It receives a serialized stepNumber of the world from
@@ -43,13 +45,13 @@ public class ClientGameWorld extends GameWorld {
                 long uid = in.readLong();
                 int defNumber = in.readInt();
                 updated.add(uid);
-                if (!gameObjectsMap.containsKey(uid)) {
+                if (!hasObjectWithId(uid)) {
                     getDefinitions().get(defNumber).makeInstance(uid);
                 }
-                gameObjectsMap.get(uid).setState(in);
+                getObjectById(uid).setState(in);
             }
 
-            for (Iterator<GameObject> it = gameObjectsMap.values().iterator(); it.hasNext();) {
+            for (Iterator<GameObject> it = getGameObjects().iterator(); it.hasNext();) {
                 GameObject go = it.next();
                 if (!updated.contains(go.getUid())) {
                     go.kill();
@@ -65,9 +67,7 @@ public class ClientGameWorld extends GameWorld {
     }
 
     @Override
-    public void update(float delta) {
-        super.update(delta);
-
+    public void updateState(float delta) {
         if (externalWorldStream.get() != null) {
             try {
                 setState(externalWorldStream.getAndSet(null));
@@ -75,6 +75,8 @@ public class ClientGameWorld extends GameWorld {
                 e.printStackTrace();
             }
         }
+
+        updateGraphics(delta);
     }
 
     public void setExternalWorldStream(ObjectInputStream externalWorldStream) {

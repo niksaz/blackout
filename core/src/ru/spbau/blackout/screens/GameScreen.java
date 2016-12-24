@@ -32,7 +32,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
-import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.GameContext;
@@ -200,6 +199,21 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         BlackoutGame game = BlackoutGame.get();
 
+        // music
+        if (!currentTrack.isPlaying()) {
+            switchTrack();
+        }
+
+        // world
+        gameWorld.updateState(delta);
+        updateCamera();
+        gameWorld.updateGraphic(delta);
+
+        // special effects
+        game.specialEffects().update(delta);
+
+        ui.update(delta);
+
         // model batch rendering
         {
             ModelBatch modelBatch = game.modelBatch();
@@ -220,20 +234,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             modelBatch.end();
         }
 
-        // special effects
-        game.specialEffects().update(delta);
-
-        // music
-        if (!currentTrack.isPlaying()) {
-            switchTrack();
-        }
-
-        // world
-        gameWorld.update(delta);
-        updateCamera();
-
         // ui
-        ui.update(delta);
         ui.draw();
     }
 
@@ -264,7 +265,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     private void updateCamera() {
-        // Must go after gameWorld.update to be synced.
+        // Must go after gameWorld.updateState to be synced.
         Vector2 charPos = character.getPosition();
         camera.position.set(
                 CameraDefaults.X_OFFSET + charPos.x,
