@@ -132,7 +132,7 @@ public class AndroidClient implements Runnable, UIServer {
                     Gdx.app.postRunnable(() ->
                             table.getStatusLabel().setText(READY_TO_START_MS));
 
-                    final GameSettings settings = GameSettings.createDefaultGameSettings();
+                    final GameSettings settings = BlackoutGame.get().getPlayerEntity().getGameSettings();
 
                     SessionSettings sessionSettings = (SessionSettings) in.readObject();
                     sessionSettings.setPlayerUid(in.readLong());
