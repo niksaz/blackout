@@ -19,17 +19,27 @@ import ru.spbau.blackout.serverside.multiplayer.Game;
  */
 public class RoomServer extends ServerWithLogging {
 
-    private static final int PLAYERS_NUMBER_TO_START_GAME = 1;
-
+    private final int playersToStartGame;
     private final Deque<ClientThread> clientThreads = new ConcurrentLinkedDeque<>();
     private final AtomicInteger playersNumber = new AtomicInteger();
     private int gamesCreated;
 
-    public RoomServer(int port, PrintStream logger, String tag) {
+    public RoomServer(int port, int playersToStartGame, PrintStream logger, String tag) {
         super(port, logger, tag);
+        this.playersToStartGame = playersToStartGame;
     }
 
-    public void run() {
+    public void start() {
+        new Thread(this::run).start();
+    }
+
+    public void discard(ClientThread clientThread) {
+        playersNumber.decrementAndGet();
+        clientThreads.remove(clientThread);
+        log("Client named " + clientThread.getClientName() + " disconnected.");
+    }
+
+    private void run() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             log("Server started.");
             do {
@@ -39,18 +49,12 @@ public class RoomServer extends ServerWithLogging {
                 clientThreads.add(nextThread);
                 playersNumber.addAndGet(1);
                 nextThread.start();
-                maybePlayGame(PLAYERS_NUMBER_TO_START_GAME);
+                maybePlayGame(playersToStartGame);
             } while (true);
         } catch (IOException e) {
             log("Exception caught when trying to listen on port " + port +
                     " or listening for a connection:" + e.getMessage());
         }
-    }
-
-    public void discard(ClientThread clientThread) {
-        playersNumber.decrementAndGet();
-        clientThreads.remove(clientThread);
-        log("Client named " + clientThread.getClientName() + " disconnected.");
     }
 
     private synchronized void maybePlayGame(int playersForGame) {

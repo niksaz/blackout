@@ -30,6 +30,7 @@ public class MenuScreen extends StageScreen {
 
     public static final float BUTTON_HEIGHT = 50.0f;
     public static final float BUTTON_PADDING = 10.0f;
+    public static final String BACK_TEXT = "Back";
 
     private static final String UP_ARROW_PATH = "images/menuscreen/up-arrow.png";
     private static final String DOWN_ARROW_PATH = "images/menuscreen/down-arrow.png";
@@ -40,7 +41,6 @@ public class MenuScreen extends StageScreen {
 
     private static final String BLACKOUT_TEXT = "Blackout";
     private static final String BLACKOUT_LABEL_STYLE_NAME = "blackout";
-    private static final String BACK_TEXT = "Back";
 
     private static final int GOLD_COIN_FRAMES = 9;
 

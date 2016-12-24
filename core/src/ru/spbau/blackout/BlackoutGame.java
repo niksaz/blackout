@@ -74,7 +74,7 @@ public class BlackoutGame extends Game {
 
 	// FIXME:  just for test
     public void startTestSinglePlayerGame() {
-        final GameSettings settings = GameSettings.createDefaultGameSettings();
+        final GameSettings settings = BlackoutGame.get().getPlayerEntity().getGameSettings();
         SessionSettings sessionSettings = SessionSettings.getTest();
 
         GameWorld gameWorld = new ServerGameWorld(sessionSettings);

@@ -14,6 +14,14 @@ public class Main {
     public static void main(String[] args) {
         Box2D.init();
         new HttpRequestServer(Network.SERVER_HTTP_PORT_NUMBER, System.out, "HTTP").start();
-        new RoomServer(Network.SERVER_TCP_PORT_NUMBER, System.out, "ROOM").run();
+        for (Network.RoomServerDescription description : Network.ROOM_SERVERS) {
+            final RoomServer roomServer =
+                    new RoomServer(
+                        description.getPort(),
+                        description.getPlayersToStart(),
+                        System.out,
+                        "ROOM " + description.getPort());
+            roomServer.start();
+        }
     }
 }

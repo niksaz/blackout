@@ -17,6 +17,7 @@ import static ru.spbau.blackout.screens.MenuScreen.addButton;
  */
 public class MultiplayerTable {
 
+    private static final String CONNECTION_MESSAGE = "Connecting to the server...";
     private static final String BACK_TEXT = "Back";
 
     private final Table middleTable;
@@ -24,22 +25,20 @@ public class MultiplayerTable {
     private final MenuScreen screen;
     private final AndroidClient task;
 
-    private MultiplayerTable(MenuScreen screen) {
+    private MultiplayerTable(MenuScreen screen, int port) {
         this.screen = screen;
 
         middleTable = new Table();
 
         addBlackoutLabel(middleTable);
-        final Label.LabelStyle style = new Label.LabelStyle();
-        style.font = BlackoutGame.get().assets().getFont();
-        status = new Label("Connecting to the server...", style);
+        status = new Label(CONNECTION_MESSAGE, BlackoutGame.get().assets().getDefaultSkin());
         middleTable.add(status).row();
 
-        task = new AndroidClient(this);
+        task = new AndroidClient(this, port);
     }
 
-    public static Table getTable(final MenuScreen screen) {
-        final MultiplayerTable result = new MultiplayerTable(screen);
+    public static Table getTable(final MenuScreen screen, int port) {
+        final MultiplayerTable result = new MultiplayerTable(screen, port);
 
         addButton(result.middleTable, BACK_TEXT, new ClickListener() {
             @Override
