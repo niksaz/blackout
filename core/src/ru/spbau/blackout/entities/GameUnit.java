@@ -66,9 +66,10 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
     }
 
     @Override
-    public void updateGraphics(float delta) {
-        super.updateGraphics(delta);
-
+    public void kill() {
+        super.kill();
+        setSelfVelocity(Vector2.Zero);
+        
     }
 
     @Override

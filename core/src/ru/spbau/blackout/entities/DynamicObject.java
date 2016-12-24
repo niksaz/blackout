@@ -44,6 +44,12 @@ public abstract class DynamicObject extends GameObject {
         animation.ifPresent(controller -> controller.setAnimation(Animations.DEFAULT, -1));
     }
 
+    @Override
+    public void kill() {
+        super.kill();
+        velocity.setZero();
+        body.setLinearVelocity(Vector2.Zero);
+    }
 
     public final Vector2 getVelocity() { return this.velocity; }
     public final void setVelocity(float x, float y) { this.velocity.set(x, y); }
