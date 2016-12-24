@@ -23,7 +23,6 @@ public class PlayerEntity implements Serializable {
      */
     public PlayerEntity() {
         this("", 0, null);
-        System.out.println("constructor () called");
     }
 
     /**
@@ -33,7 +32,6 @@ public class PlayerEntity implements Serializable {
      */
     public PlayerEntity(String name) {
         this(name, 0, Character.Definition.createSerializedDefaultCharacterDefinition());
-        System.out.println("constructor (String) called");
     }
 
     /**
@@ -41,7 +39,6 @@ public class PlayerEntity implements Serializable {
      */
     public PlayerEntity(PlayerEntity other) {
         this(other.getName(), other.getGold(), other.getSerializedDefinition());
-        System.out.println("construct (PlayerEntity) called");
     }
 
     private PlayerEntity(String name, int gold, byte[] serializedDefinition) {

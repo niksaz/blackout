@@ -31,7 +31,7 @@ public class LoadRequestHandler implements HttpHandler {
     public void handle(HttpExchange exchange) {
         try (
             InputStream input = exchange.getRequestBody();
-            DataInputStream inputStream = new DataInputStream(input);
+            DataInputStream inputStream = new DataInputStream(input)
         ) {
             final String name = inputStream.readUTF();
 
@@ -45,7 +45,6 @@ public class LoadRequestHandler implements HttpHandler {
             final PlayerEntity entity;
             switch (result.size()) {
                 case 0:
-                    System.out.println("COULD NOT FIND");
                     entity = new PlayerEntity(name);
                     DatabaseAccessor.getInstance().getDatastore().save(entity);
                     break;

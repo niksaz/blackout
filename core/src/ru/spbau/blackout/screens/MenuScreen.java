@@ -49,11 +49,7 @@ public class MenuScreen extends StageScreen {
     // FIXME: just for testing
     private static final Random generator = new Random();
 
-    private Label goldLabel;
     private Table middleTable;
-    private Animation animation;
-    private float stateTime;
-    private Image coinImage;
 
     public MenuScreen() {
         super();
@@ -82,16 +78,38 @@ public class MenuScreen extends StageScreen {
     }
 
     private void addRightPaneElements() {
-        goldLabel = addLabelWithTextAt("0", 0, 0, 0);
-
         final TextureRegion[] coinTextures = new TextureRegion[GOLD_COIN_FRAMES];
         for (int i = 0; i < GOLD_COIN_FRAMES; i++)  {
             final Texture coinTexture = new Texture(GOLD_COIN_PATH_PREFIX + i + ".png");
             coinTextures[i] = new TextureRegion(coinTexture);
         }
-        animation = new Animation(ANIMATION_FRAME_DURATION, coinTextures);
+        final Animation animation = new Animation(ANIMATION_FRAME_DURATION, coinTextures);
 
-        coinImage = new Image();
+        final Image coinImage = new Image() {
+            private float stateTime = 0;
+
+            @Override
+            public void act(float delta) {
+                stateTime += delta;
+                setDrawable(new TextureRegionDrawable(animation.getKeyFrame(stateTime, true)));
+                super.act(delta);
+            }
+        };
+
+        final Label goldLabel = new Label("0", BlackoutGame.get().assets().getDefaultSkin()) {
+            @Override
+            public void act(float delta) {
+                setText(String.valueOf(BlackoutGame.get().getPlayerEntity().getGold()));
+                setSize(getPrefWidth(), getPrefHeight());
+                setPosition(
+                        coinImage.getX(),
+                        stage.getViewport().getWorldHeight() - CORNERS_MARGIN,
+                        Align.topRight);
+                super.act(delta);
+            }
+        };
+        stage.addActor(goldLabel);
+
         final float square = goldLabel.getHeight() + COIN_IMAGE_SIZE_EXTENSION;
         coinImage.setSize(square, square);
         coinImage.setPosition(
@@ -184,20 +202,9 @@ public class MenuScreen extends StageScreen {
         Gdx.gl.glClearColor(color.r, color.g, color.b, color.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        stateTime += delta;
-        coinImage.setDrawable(new TextureRegionDrawable(animation.getKeyFrame(stateTime, true)));
-
-        refreshGoldLabel();
+        stage.act(delta);
+        stage.draw();
 
         super.render(delta);
-    }
-
-    private void refreshGoldLabel() {
-        goldLabel.setText(String.valueOf(BlackoutGame.get().getPlayerEntity().getGold()));
-        goldLabel.setSize(goldLabel.getPrefWidth(), goldLabel.getPrefHeight());
-        goldLabel.setPosition(
-                coinImage.getX(),
-                stage.getViewport().getWorldHeight() - CORNERS_MARGIN,
-                Align.topRight);
     }
 }

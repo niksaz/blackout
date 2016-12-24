@@ -17,8 +17,10 @@ public class UpgradesTable {
     private static final float BUTTON_HEIGHT = 50.0f;
     private static final float BUTTON_PADDING = 10.0f;
 
-    private static final String HEALTH_TEXT = "Increase initial health";
-    private static final String UPGRADE = "Upgrade";
+    private static final String HEALTH_UPGRADE = "Increase initial health";
+    private static final String HEALTH_CURRENT = "current health";
+    private static final String ABILITY_UPGRADE = "Upgrade";
+    private static final String ABILITY_CURRENT = "current level";
 
     private static final String BACK_TEXT = "Back";
 
@@ -29,12 +31,25 @@ public class UpgradesTable {
         final Character.Definition characterDefinition =
                 Character.Definition.deserializeFromByteArray(entity.getSerializedDefinition());
 
-        addButton(middleTable, HEALTH_TEXT, "current health " + characterDefinition.maxHealth);
+        final Label updatingHealthLabel = new Label("", BlackoutGame.get().assets().getDefaultSkin()) {
+            @Override
+            public void act(float delta) {
+                setText(HEALTH_CURRENT + " " + characterDefinition.maxHealth);
+            }
+        };
+        addRowWithButtonAndLabel(middleTable, HEALTH_UPGRADE, updatingHealthLabel);
 
         for (Ability ability : characterDefinition.abilities) {
-            addButton(middleTable,
-                      UPGRADE + " " + ability.getClass().getSimpleName(),
-                      "current level " + ability.getLevel());
+            final Label updatingLabel = new Label("", BlackoutGame.get().assets().getDefaultSkin()) {
+                @Override
+                public void act(float delta) {
+                    setText(ABILITY_CURRENT + " " + ability.getLevel());
+                }
+            };
+            addRowWithButtonAndLabel(
+                    middleTable,
+                    ABILITY_UPGRADE + " " + ability.getClass().getSimpleName(),
+                    updatingLabel);
         }
 
         final TextButton button = new TextButton(BACK_TEXT, BlackoutGame.get().assets().getDefaultSkin());
@@ -50,10 +65,9 @@ public class UpgradesTable {
         return middleTable;
     }
 
-    private static void addButton(Table table, String buttonText, String labelText) {
+    private static void addRowWithButtonAndLabel(Table table, String buttonText, Label labelAfter) {
         final TextButton button = new TextButton(buttonText, BlackoutGame.get().assets().getDefaultSkin());
         table.add(button).pad(BUTTON_PADDING).width(BUTTON_WIDTH).height(BUTTON_HEIGHT);
-        final Label currentLabel = new Label(labelText, BlackoutGame.get().assets().getDefaultSkin());
-        table.add(currentLabel).row();
+        table.add(labelAfter).row();
     }
 }
