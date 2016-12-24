@@ -134,7 +134,7 @@ public class Game extends Thread implements GameContext {
     private void createRoomAndSendItToClients() throws IOException {
 
         SessionSettings sessionSettings = SessionSettings.getTest();
-        gameWorld = new ServerGameWorld(sessionSettings.getDefinitions(), this);
+        gameWorld = new ServerGameWorld(sessionSettings, this);
         sessionSettings.initializeGameWorld();
 
         for (int i = 0; i < clients.size(); i++) {

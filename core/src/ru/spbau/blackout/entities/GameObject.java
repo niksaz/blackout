@@ -25,6 +25,7 @@ import ru.spbau.blackout.graphiceffects.GraphicEffect;
 import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.HasState;
+import ru.spbau.blackout.worlds.ServerGameWorld;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
@@ -264,8 +265,6 @@ public abstract class GameObject implements RenderableProvider, HasState {
         public static final float DEFAULT_MASS = 70f;
 
 
-        protected static long s_lastUid = 0;
-
         // physics
         public float height = DEFAULT_HEIGHT;
 
@@ -345,11 +344,13 @@ public abstract class GameObject implements RenderableProvider, HasState {
         }
 
         /**
-         * Create an object at the giving position.
+         * Creates new instance of the unit with nextUid.
+         * Must be called only on <code>ServerGameWorld</code>
          */
         public GameObject makeInstanceWithNextUid(float x, float y) {
-            return makeInstance(getNextUid(), x, y);
+            return makeInstance(((ServerGameWorld) context.gameWorld()).getNextUid(), x, y);
         }
+
         /** Create an object at the giving position. */
         public GameObject makeInstanceWithNextUid(Vector2 position) {
             return makeInstanceWithNextUid(position.x, position.y);
@@ -367,11 +368,6 @@ public abstract class GameObject implements RenderableProvider, HasState {
         }
 
         public abstract BodyDef.BodyType getBodyType();
-
-        public static long getNextUid() {
-            s_lastUid += 1;
-            return s_lastUid;
-        }
 
         public int getDefNumber() { return defNumber; }
 

@@ -81,8 +81,7 @@ public class BlackoutGame extends Game {
         GameSettings settings = new GameSettings(uiSettings);  // just default settings
         SessionSettings sessionSettings = SessionSettings.getTest();
 
-        GameWorld gameWorld = new ServerGameWorld(sessionSettings.getDefinitions());
-
+        GameWorld gameWorld = new ServerGameWorld(sessionSettings);
         screenManager.setScreen(new GameScreen(sessionSettings, gameWorld, new SinglePlayerServer(), settings));
 	}
 

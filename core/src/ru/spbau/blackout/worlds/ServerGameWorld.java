@@ -10,6 +10,7 @@ import java.util.List;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
@@ -23,15 +24,17 @@ public class ServerGameWorld extends GameWorld {
     private static final float WORLD_STEP = 1 / 58f;
 
     private float accumulator = 0;
+    private long lastUid;
 
 
-    public ServerGameWorld(List<GameObject.Definition> definitions) {
-        super(definitions);
+    public ServerGameWorld(SessionSettings sessionSettings) {
+        super(sessionSettings.getDefinitions());
     }
 
-    public ServerGameWorld(List<GameObject.Definition> definitions, GameContext context) {
-        this(definitions);
+    public ServerGameWorld(SessionSettings sessionSettings, GameContext context) {
+        this(sessionSettings);
         foreach(getDefinitions(), def -> def.initializeWithoutUi(context));
+        lastUid = sessionSettings.getLastUid();
     }
 
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
@@ -44,6 +47,11 @@ public class ServerGameWorld extends GameWorld {
             out.writeInt(go.getDef().getDefNumber());
             go.getState(out);
         }
+    }
+
+    public long getNextUid() {
+        lastUid += 1;
+        return lastUid;
     }
 
     @Override

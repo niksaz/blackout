@@ -28,11 +28,11 @@ public final class SessionSettings implements Serializable {
     private long playerUid = 0;
     private final List<InitialState> initialStates = new ArrayList<>();
     private transient Finder<GameObject.Definition> finder = new Finder<>(GameObject.Definition.class, definitions);
+    private transient long lastUid = 0;
 
     public SessionSettings(String mapPath) {
         this.mapPath = mapPath;
     }
-
 
     public String getMapPath() { return mapPath; }
     public List<GameObject.Definition> getDefinitions() { return definitions; }
@@ -64,16 +64,20 @@ public final class SessionSettings implements Serializable {
      * An instance of the definition will appear in the given position in the beginning of the game.
      * The definition also will be added to the list of possible definitions.
      */
-    public int addInitialObject(GameObject.Definition def, float initialX, float initialY, long uid) {
+    public int addInitialObject(GameObject.Definition def, float initialX, float initialY) {
         if (finder.getVisited().contains(def)) {
             throw new IllegalArgumentException("The definition is already added.");
         }
 
         int num = addDefinition(def);
-        initialStates.add(new InitialState(num, initialX, initialY, uid));
+        initialStates.add(new InitialState(num, initialX, initialY, getNextUid()));
         return num;
     }
 
+    private long getNextUid() {
+        lastUid += 1;
+        return lastUid;
+    }
 
     // FIXME: just for test
     public static SessionSettings getTest() {
@@ -81,23 +85,26 @@ public final class SessionSettings implements Serializable {
 
         final Character.Definition hero = Character.Definition.createDefaultCharacterDefinition();
         hero.overHeadPivotOffset.set(0, 0, 3.5f);
-        session.addInitialObject(hero, 0, 0, GameUnit.Definition.getNextUid());
+        session.addInitialObject(hero, 0, 0);
         session.setPlayerUid(1);
 
         final Character.Definition enemy = Character.Definition.createDefaultCharacterDefinition();
         enemy.overHeadPivotOffset.set(0, 0, 3.5f);
-        session.addInitialObject(enemy, 5, 5, GameUnit.Definition.getNextUid());
+        session.addInitialObject(enemy, 5, 5);
 
         final Character.Definition enemy2 = Character.Definition.createDefaultCharacterDefinition();
         enemy2.overHeadPivotOffset.set(0, 0, 3.5f);
-        session.addInitialObject(enemy2, -5, 5, GameUnit.Definition.getNextUid());
+        session.addInitialObject(enemy2, -5, 5);
 
         final GameObject.Definition stone = new Decoration.Definition("models/stone/stone.g3db", new CircleCreator(1.1f));
-        session.addInitialObject(stone, -5, 0, GameUnit.Definition.getNextUid());
+        session.addInitialObject(stone, -5, 0);
 
         return session;
     }
 
+    public long getLastUid() {
+        return lastUid;
+    }
 
     private static class InitialState implements Serializable {
         int defNum;
