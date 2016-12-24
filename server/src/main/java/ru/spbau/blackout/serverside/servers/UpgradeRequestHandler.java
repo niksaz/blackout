@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
+import org.mongodb.morphia.query.UpdateResults;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -16,7 +17,9 @@ import ru.spbau.blackout.database.PlayerEntity;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 
-import static ru.spbau.blackout.database.Database.GOLD_UPGRADE;
+import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE;
+import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE_COST;
+import static ru.spbau.blackout.database.Database.GOLD_CHANGE;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_PER_LEVEL;
@@ -49,19 +52,17 @@ public class UpgradeRequestHandler implements HttpHandler {
             if (result.size() != 1) {
                 throw new IllegalStateException();
             }
+
             final PlayerEntity playerEntity = result.get(0);
+            final Character.Definition definition = playerEntity.getDeserializedCharacterDefinition();
 
             final String characteristic = inputStream.readUTF();
             boolean successful;
             switch (characteristic) {
-                case GOLD_UPGRADE:
+                case GOLD_CHANGE:
                     final int delta = inputStream.readInt();
                     if (playerEntity.getGold() + delta >= 0) {
-                        final UpdateOperations<PlayerEntity> updateOperations =
-                                DatabaseAccessor.getInstance().getDatastore()
-                                        .createUpdateOperations(PlayerEntity.class)
-                                        .inc("gold", delta);
-                        DatabaseAccessor.getInstance().getDatastore().update(query, updateOperations);
+                        performDatabaseUpdate(query, generateUpdateOperations(delta, definition));
                         successful = true;
                     } else {
                         successful = false;
@@ -70,14 +71,19 @@ public class UpgradeRequestHandler implements HttpHandler {
 
                 case HEALTH_UPGRADE:
                     if (playerEntity.getGold() >= HEALTH_UPGRADE_COST) {
-                        final Character.Definition definition = playerEntity.getDeserializedCharacterDefinition();
                         definition.maxHealth += HEALTH_UPGRADE_PER_LEVEL;
-                        final UpdateOperations<PlayerEntity> updateOperations =
-                                DatabaseAccessor.getInstance().getDatastore()
-                                        .createUpdateOperations(PlayerEntity.class)
-                                        .inc("gold", -HEALTH_UPGRADE_COST)
-                                        .set("serializedDefinition", definition.serializeToByteArray());
-                        DatabaseAccessor.getInstance().getDatastore().update(query, updateOperations);
+                        performDatabaseUpdate(query, generateUpdateOperations(-HEALTH_UPGRADE_COST, definition));
+                        successful = true;
+                    } else {
+                        successful = false;
+                    }
+                    break;
+
+                case ABILITY_UPGRADE:
+                    final int abilityIndex = inputStream.readInt();
+                    if (playerEntity.getGold() >= ABILITY_UPGRADE_COST) {
+                        definition.abilities[abilityIndex].increaseLevel();
+                        performDatabaseUpdate(query, generateUpdateOperations(-ABILITY_UPGRADE_COST, definition));
                         successful = true;
                     } else {
                         successful = false;
@@ -99,5 +105,16 @@ public class UpgradeRequestHandler implements HttpHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static UpdateOperations<PlayerEntity> generateUpdateOperations(int goldCost, Character.Definition newDefinition) {
+        return DatabaseAccessor.getInstance().getDatastore()
+                .createUpdateOperations(PlayerEntity.class)
+                .inc("gold", goldCost)
+                .set("serializedDefinition", newDefinition.serializeToByteArray());
+    }
+
+    private static <T> UpdateResults performDatabaseUpdate(Query<T> query, UpdateOperations<T> updateOperations) {
+        return DatabaseAccessor.getInstance().getDatastore().update(query, updateOperations);
     }
 }

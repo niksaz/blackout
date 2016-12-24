@@ -11,9 +11,11 @@ import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.database.PlayerEntity;
 import ru.spbau.blackout.entities.Character;
 
+import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE_COST;
+import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
+
 public class UpgradesTable {
 
-    private static final float BUTTON_WIDTH = 300.0f;
     private static final float BUTTON_HEIGHT = 50.0f;
     private static final float BUTTON_PADDING = 10.0f;
 
@@ -29,7 +31,7 @@ public class UpgradesTable {
 
         addRowWithButtonAndLabel(
                 middleTable,
-                HEALTH_UPGRADE,
+                appendPrice(HEALTH_UPGRADE, HEALTH_UPGRADE_COST),
                 new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
@@ -52,12 +54,14 @@ public class UpgradesTable {
             final int currentAbilityIndex = abilityIndex;
             addRowWithButtonAndLabel(
                     middleTable,
-                    ABILITY_UPGRADE + " " +
-                            characterDefinition.abilities[currentAbilityIndex].getClass().getSimpleName(),
+                    appendPrice(
+                        ABILITY_UPGRADE + " " + characterDefinition.abilities[currentAbilityIndex].getClass().getSimpleName(),
+                        ABILITY_UPGRADE_COST
+                    ),
                     new ClickListener() {
                         @Override
                         public void clicked(InputEvent event, float x, float y) {
-                            screen.changeMiddleTable(MainMenuTable.getTable(screen));
+                            BlackoutGame.get().getPlayerEntity().upgradeAbility(currentAbilityIndex);
                             super.clicked(event, x, y);
                         }
                     },
@@ -89,7 +93,11 @@ public class UpgradesTable {
                                                  EventListener buttonListener, Label labelAfter) {
         final TextButton button = new TextButton(buttonText, BlackoutGame.get().assets().getDefaultSkin());
         button.addListener(buttonListener);
-        table.add(button).pad(BUTTON_PADDING).width(BUTTON_WIDTH).height(BUTTON_HEIGHT);
+        table.add(button).fill(true, false).pad(BUTTON_PADDING).height(BUTTON_HEIGHT);
         table.add(labelAfter).row();
+    }
+
+    private static String appendPrice(String statement, int price) {
+        return statement + " for " + price + " gold";
     }
 }

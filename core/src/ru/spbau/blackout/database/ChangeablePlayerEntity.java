@@ -25,7 +25,7 @@ public class ChangeablePlayerEntity extends PlayerEntity {
     public void changeGold(int delta) {
         startUpgradeRequest(outputStream -> {
             outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
-            outputStream.writeUTF(Database.GOLD_UPGRADE);
+            outputStream.writeUTF(Database.GOLD_CHANGE);
             outputStream.writeInt(delta);
         });
     }
@@ -34,6 +34,14 @@ public class ChangeablePlayerEntity extends PlayerEntity {
         startUpgradeRequest(outputStream -> {
             outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
             outputStream.writeUTF(Database.HEALTH_UPGRADE);
+        });
+    }
+
+    public void upgradeAbility(int currentAbilityIndex) {
+        startUpgradeRequest(outputStream -> {
+            outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+            outputStream.writeUTF(Database.ABILITY_UPGRADE);
+            outputStream.writeInt(currentAbilityIndex);
         });
     }
 
