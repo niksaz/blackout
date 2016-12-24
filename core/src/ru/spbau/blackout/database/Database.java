@@ -19,5 +19,7 @@ public class Database {
     public static final String ABILITY_UPGRADE = "ability";
     public static final int ABILITY_UPGRADE_COST = 100;
 
+    public static final String SETTINGS_SYNCHRONIZE_COMMAND = "/settings";
+
     private Database() {}
 }

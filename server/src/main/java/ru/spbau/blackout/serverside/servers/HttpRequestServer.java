@@ -21,11 +21,12 @@ public class HttpRequestServer extends ServerWithLogging {
             final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             server.createContext(Database.LOAD_COMMAND, new LoadRequestHandler(this));
             server.createContext(Database.UPGRADE_COMMAND, new UpgradeRequestHandler(this));
+            server.createContext(Database.SETTINGS_SYNCHRONIZE_COMMAND, new SettingsSynchronizeHandler(this));
             server.setExecutor(null);
             server.start();
             log("Server started.");
         } catch (Exception e) {
-            log("Exception while creating HttpServer on port " + port + ":" + e.getMessage());
+            log("Exception while creating HttpServer on port " + port + ": " + e.getMessage());
         }
     }
 }

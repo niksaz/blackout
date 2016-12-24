@@ -9,6 +9,7 @@ import java.io.Serializable;
  * All getters and setters work with RPX.
  */
 public class AbilityIconSettings implements Serializable {
+
     private int abilityNum;
     public Vector2 start = new Vector2(1100, 400);  // FIXME
 

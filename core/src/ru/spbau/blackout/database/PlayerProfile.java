@@ -1,7 +1,5 @@
 package ru.spbau.blackout.database;
 
-import com.badlogic.gdx.Game;
-
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
@@ -20,7 +18,7 @@ public class PlayerProfile implements Serializable {
     private final String name;
     private int gold;
     private byte[] serializedDefinition;
-    private byte[] serializedSettings;
+    private volatile byte[] serializedSettings;
 
     /**
      * Used by Morphia to initialize objects extracted from the database.
@@ -77,5 +75,9 @@ public class PlayerProfile implements Serializable {
 
     public GameSettings getGameSettings() {
         return GameSettings.deserializeFromByteArray(serializedSettings);
+    }
+
+    public void setGameSettings(GameSettings gameSettings) {
+        serializedSettings = gameSettings.serializeToByteArray();
     }
 }

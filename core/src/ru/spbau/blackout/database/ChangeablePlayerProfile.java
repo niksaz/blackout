@@ -3,6 +3,7 @@ package ru.spbau.blackout.database;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -43,6 +44,37 @@ public class ChangeablePlayerProfile extends PlayerProfile {
             outputStream.writeUTF(Database.ABILITY_UPGRADE);
             outputStream.writeInt(currentAbilityIndex);
         });
+    }
+
+    public void synchronizeGameSettings() {
+        new Thread(() -> {
+            try {
+                final String url = "http://" +
+                        Network.SERVER_IP_ADDRESS +
+                        ':' +
+                        Network.SERVER_HTTP_PORT_NUMBER +
+                        Database.SETTINGS_SYNCHRONIZE_COMMAND;
+
+                final URL urlObject = new URL(url);
+                final HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setDoOutput(true);
+
+                connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_MS);
+                connection.setReadTimeout(HTTP_READ_TIMEOUT_MS);
+
+                try (
+                        ObjectOutputStream outputStream = new ObjectOutputStream(connection.getOutputStream())
+                ) {
+                    outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+                    outputStream.writeObject(getSerializedSettings());
+                }
+
+                connection.getResponseCode();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void startUpgradeRequest(RequestWriter requestWriter) {
