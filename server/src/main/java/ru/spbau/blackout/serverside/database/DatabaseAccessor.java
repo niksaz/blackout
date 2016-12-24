@@ -6,7 +6,7 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 import ru.spbau.blackout.database.Database;
-import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.database.PlayerProfile;
 
 public class DatabaseAccessor {
 
@@ -16,7 +16,7 @@ public class DatabaseAccessor {
 
     private DatabaseAccessor() {
         final Morphia morphia = new Morphia();
-        morphia.map(PlayerEntity.class);
+        morphia.map(PlayerProfile.class);
         datastore = morphia.createDatastore(new MongoClient(), Database.DATABASE_NAME);
         datastore.ensureIndexes();
     }

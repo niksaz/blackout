@@ -9,9 +9,7 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 
 import ru.spbau.blackout.androidfeatures.PlayServices;
 import ru.spbau.blackout.androidfeatures.PlayServicesInCore;
-import ru.spbau.blackout.database.ChangeablePlayerEntity;
-import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
-import ru.spbau.blackout.ingameui.settings.IngameUISettings;
+import ru.spbau.blackout.database.ChangeablePlayerProfile;
 import ru.spbau.blackout.network.SinglePlayerServer;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
@@ -49,7 +47,7 @@ public class BlackoutGame extends Game {
 
     // fields marked as /*final*/ must be assigned only once, but can't be assigned in constructor
 
-    private volatile ChangeablePlayerEntity playerEntity;
+    private volatile ChangeablePlayerProfile playerEntity;
     private final ScreenManager screenManager;
     private /*final*/ PlayServicesInCore playServicesInCore;
 
@@ -76,9 +74,7 @@ public class BlackoutGame extends Game {
 
 	// FIXME:  just for test
     public void startTestSinglePlayerGame() {
-        AbilityIconSettings firstIconSettings = new AbilityIconSettings(0);
-        IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
-        GameSettings settings = new GameSettings(uiSettings);  // just default settings
+        final GameSettings settings = GameSettings.createDefaultGameSettings();
         SessionSettings sessionSettings = SessionSettings.getTest();
 
         GameWorld gameWorld = new ServerGameWorld(sessionSettings);
@@ -121,11 +117,11 @@ public class BlackoutGame extends Game {
         this.spriteBatch.dispose();
     }
 
-    public ChangeablePlayerEntity getPlayerEntity() {
+    public ChangeablePlayerProfile getPlayerEntity() {
         return playerEntity;
     }
 
-    public void setPlayerEntity(ChangeablePlayerEntity playerEntity) {
+    public void setPlayerEntity(ChangeablePlayerProfile playerEntity) {
         this.playerEntity = playerEntity;
     }
 }

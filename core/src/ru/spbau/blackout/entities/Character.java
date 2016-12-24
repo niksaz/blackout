@@ -2,12 +2,6 @@ package ru.spbau.blackout.entities;
 
 import com.badlogic.gdx.physics.box2d.Shape;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.abilities.fireball.FireballAbility;
@@ -16,6 +10,7 @@ import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Creator;
+import ru.spbau.blackout.utils.Serializer;
 
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
@@ -65,31 +60,11 @@ public class Character extends GameUnit {
         }
 
         public byte[] serializeToByteArray() {
-            final byte[] result;
-            try (ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-                 ObjectOutputStream out = new ObjectOutputStream(byteOutputStream)
-            ) {
-                out.writeObject(this);
-                out.flush();
-                result = byteOutputStream.toByteArray();
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new IllegalStateException(e);
-            }
-            return result;
+            return Serializer.serializeToByteArray(this);
         }
 
         public static Definition deserializeFromByteArray(byte[] byteRepresentation) {
-            final Definition characterDefinition;
-            try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteRepresentation);
-                 ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)
-            ) {
-                characterDefinition = (Definition) objectInputStream.readObject();
-            } catch (ClassNotFoundException | IOException e) {
-                e.printStackTrace();
-                throw new IllegalStateException(e);
-            }
-            return characterDefinition;
+            return (Definition) Serializer.deserializeFromByteArray(byteRepresentation);
         }
 
         public static Definition createDefaultCharacterDefinition() {

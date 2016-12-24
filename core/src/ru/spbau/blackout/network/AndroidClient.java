@@ -132,9 +132,7 @@ public class AndroidClient implements Runnable, UIServer {
                     Gdx.app.postRunnable(() ->
                             table.getStatusLabel().setText(READY_TO_START_MS));
 
-                    AbilityIconSettings firstIconSettings = new AbilityIconSettings(0);
-                    IngameUISettings uiSettings = new IngameUISettings(new AbilityIconSettings[] { firstIconSettings });
-                    GameSettings settings = new GameSettings(uiSettings);  // just default settings
+                    final GameSettings settings = GameSettings.createDefaultGameSettings();
 
                     SessionSettings sessionSettings = (SessionSettings) in.readObject();
                     sessionSettings.setPlayerUid(in.readLong());

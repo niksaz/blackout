@@ -118,7 +118,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         FileHandle battleMusicDir = Gdx.files.internal(BATTLE_MUSIC_DIR_PATH);
         for (FileHandle file : battleMusicDir.list()) {
             Music track = Gdx.audio.newMusic(file);
-            track.setVolume(settings.battleMusicVolume * BATTLE_MUSIC_MAX_VOLUME);
+            track.setVolume(settings.musicVolume * BATTLE_MUSIC_MAX_VOLUME);
             track.setLooping(false);
             music.add(track);
         }

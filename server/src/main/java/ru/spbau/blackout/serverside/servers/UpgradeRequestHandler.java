@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.List;
 
-import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 
@@ -43,25 +43,25 @@ public class UpgradeRequestHandler implements HttpHandler {
             DataInputStream inputStream = new DataInputStream(input)
         ) {
             final String name = inputStream.readUTF();
-            final Query<PlayerEntity> query =
+            final Query<PlayerProfile> query =
                     DatabaseAccessor.getInstance().getDatastore()
-                            .createQuery(PlayerEntity.class)
+                            .createQuery(PlayerProfile.class)
                             .field("name")
                             .equal(name);
-            final List<PlayerEntity> result = query.asList();
+            final List<PlayerProfile> result = query.asList();
             if (result.size() != 1) {
                 throw new IllegalStateException();
             }
 
-            final PlayerEntity playerEntity = result.get(0);
-            final Character.Definition definition = playerEntity.getDeserializedCharacterDefinition();
+            final PlayerProfile playerProfile = result.get(0);
+            final Character.Definition definition = playerProfile.getCharacterDefinition();
 
             final String characteristic = inputStream.readUTF();
             boolean successful;
             switch (characteristic) {
                 case GOLD_CHANGE:
                     final int delta = inputStream.readInt();
-                    if (playerEntity.getGold() + delta >= 0) {
+                    if (playerProfile.getGold() + delta >= 0) {
                         performDatabaseUpdate(query, generateUpdateOperations(delta, definition));
                         successful = true;
                     } else {
@@ -70,7 +70,7 @@ public class UpgradeRequestHandler implements HttpHandler {
                     break;
 
                 case HEALTH_UPGRADE:
-                    if (playerEntity.getGold() >= HEALTH_UPGRADE_COST) {
+                    if (playerProfile.getGold() >= HEALTH_UPGRADE_COST) {
                         definition.maxHealth += HEALTH_UPGRADE_PER_LEVEL;
                         performDatabaseUpdate(query, generateUpdateOperations(-HEALTH_UPGRADE_COST, definition));
                         successful = true;
@@ -81,7 +81,7 @@ public class UpgradeRequestHandler implements HttpHandler {
 
                 case ABILITY_UPGRADE:
                     final int abilityIndex = inputStream.readInt();
-                    if (playerEntity.getGold() >= ABILITY_UPGRADE_COST) {
+                    if (playerProfile.getGold() >= ABILITY_UPGRADE_COST) {
                         definition.abilities[abilityIndex].increaseLevel();
                         performDatabaseUpdate(query, generateUpdateOperations(-ABILITY_UPGRADE_COST, definition));
                         successful = true;
@@ -107,9 +107,9 @@ public class UpgradeRequestHandler implements HttpHandler {
         }
     }
 
-    private static UpdateOperations<PlayerEntity> generateUpdateOperations(int goldCost, Character.Definition newDefinition) {
+    private static UpdateOperations<PlayerProfile> generateUpdateOperations(int goldCost, Character.Definition newDefinition) {
         return DatabaseAccessor.getInstance().getDatastore()
-                .createUpdateOperations(PlayerEntity.class)
+                .createUpdateOperations(PlayerProfile.class)
                 .inc("gold", goldCost)
                 .set("serializedDefinition", newDefinition.serializeToByteArray());
     }

@@ -28,6 +28,9 @@ import ru.spbau.blackout.BlackoutGame;
  */
 public class MenuScreen extends StageScreen {
 
+    public static final float BUTTON_HEIGHT = 50.0f;
+    public static final float BUTTON_PADDING = 10.0f;
+
     private static final String UP_ARROW_PATH = "images/menuscreen/up-arrow.png";
     private static final String DOWN_ARROW_PATH = "images/menuscreen/down-arrow.png";
     private static final String GAMES_ACHIEVEMENTS_GAMES_PATH = "images/game_services/games_achievements.png";
@@ -37,6 +40,7 @@ public class MenuScreen extends StageScreen {
 
     private static final String BLACKOUT_TEXT = "Blackout";
     private static final String BLACKOUT_LABEL_STYLE_NAME = "blackout";
+    private static final String BACK_TEXT = "Back";
 
     private static final int GOLD_COIN_FRAMES = 9;
 
@@ -45,8 +49,6 @@ public class MenuScreen extends StageScreen {
 
     private static final float BLACKOUT_LABEL_BOTTOM_PADDING = 25.0f;
     private static final float BUTTON_WIDTH = 450.0f;
-    private static final float BUTTON_HEIGHT = 50.0f;
-    private static final float BUTTON_PADDING = 10.0f;
     private static final float CORNERS_MARGIN = 20.0f;
     private static final float SETTINGS_ICON_SIZE = 110.0f;
     private static final float SETTINGS_ICON_PADDING = 10.0f;
@@ -125,12 +127,34 @@ public class MenuScreen extends StageScreen {
         stage.addActor(coinImage);
     }
 
+    public TextButton addBackToMainMenuButton(Table table) {
+        return addBackToMainMenuButton(table, 1);
+    }
+
+    public TextButton addBackToMainMenuButton(Table table, int columns) {
+        return addButton(
+                table,
+                BACK_TEXT,
+                new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        changeMiddleTable(ru.spbau.blackout.screens.tables.MainMenuTable.getTable(MenuScreen.this));
+                    }
+                },
+                columns
+        );
+    }
+
     public static TextButton addButton(Table table, String text, EventListener listener) {
+        return addButton(table, text, listener, 1);
+    }
+
+    public static TextButton addButton(Table table, String text, EventListener listener, int columns) {
         final TextButton button = new TextButton(text, BlackoutGame.get().assets().getDefaultSkin());
         if (listener != null) {
             button.addListener(listener);
         }
-        table.add(button).pad(BUTTON_PADDING).width(BUTTON_WIDTH).height(BUTTON_HEIGHT).row();
+        table.add(button).colspan(columns).pad(BUTTON_PADDING).width(BUTTON_WIDTH).height(BUTTON_HEIGHT).row();
         return button;
     }
 

@@ -9,6 +9,7 @@ import java.io.Serializable;
  * All getters and setters work with RPX.
  */
 public class StickSettings implements Serializable {
+
     private Vector2 start = new Vector2(100, 100);  // FIXME
     public void setStart(Vector2 start) { this.start = start; }
     public Vector2 getStart() { return start; }
