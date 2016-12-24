@@ -1,4 +1,4 @@
-package ru.spbau.blackout.screens;
+package ru.spbau.blackout.screens.tables;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.screens.MenuScreen;
 
 import static ru.spbau.blackout.screens.MenuScreen.addBlackoutLabel;
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
@@ -24,7 +25,6 @@ public class PlayScreenTable  {
         final Table middleTable = new Table();
 
         addBlackoutLabel(middleTable);
-
         addButton(middleTable, SINGLE_PLAYER_GAME_TEXT, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float  y) {
@@ -41,11 +41,10 @@ public class PlayScreenTable  {
         addButton(middleTable, BACK_TEXT, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                screen.changeMiddleTable(MainMenuTable.getTable(screen));
+                screen.changeMiddleTable(ru.spbau.blackout.screens.tables.MainMenuTable.getTable(screen));
             }
         });
 
-        middleTable.setFillParent(true);
         return middleTable;
     }
 

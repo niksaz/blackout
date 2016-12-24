@@ -1,4 +1,4 @@
-package ru.spbau.blackout.screens;
+package ru.spbau.blackout.screens.tables;
 
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.database.PlayerEntity;
 import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.screens.MenuScreen;
 
 import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE_COST;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
@@ -83,7 +84,7 @@ public class UpgradesTable {
         button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                screen.changeMiddleTable(MainMenuTable.getTable(screen));
+                screen.changeMiddleTable(ru.spbau.blackout.screens.tables.MainMenuTable.getTable(screen));
             }
         });
         middleTable.add(button).colspan(2).fill(true, false).pad(BUTTON_PADDING).height(BUTTON_HEIGHT);

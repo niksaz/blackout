@@ -18,13 +18,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.MenuScreen;
-import ru.spbau.blackout.screens.MultiplayerTable;
-import ru.spbau.blackout.screens.PlayScreenTable;
+import ru.spbau.blackout.screens.tables.MultiplayerTable;
+import ru.spbau.blackout.screens.tables.PlayScreenTable;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.ClientGameWorld;
 
