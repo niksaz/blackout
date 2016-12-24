@@ -41,15 +41,16 @@ public class FireballAbility extends SimpleInstantAbility {
 
 
     @Override
-    public void cast(Vector2 target) {
-        super.cast(target);
+    public void cast(Vector2 targetOffset) {
+        super.cast(targetOffset);
 
-        AbilityObject shell = (AbilityObject) shellDef.makeInstanceWithNextUid(target);
+        Vector2 unitPosition = getUnit().getPosition();
+        targetOffset.add(unitPosition);  // real target
+        AbilityObject shell = (AbilityObject) shellDef.makeInstanceWithNextUid(targetOffset);
+        targetOffset.sub(unitPosition);
 
-        Vector2 direction = target.mulAdd(getUnit().getPosition(), -1);
-        direction.scl(SHELL_START_SPEED / target.len());
-
-        shell.velocity.add(direction);
+        targetOffset.scl(SHELL_START_SPEED / targetOffset.len());  // start speed
+        shell.velocity.add(targetOffset);
     }
 
     @Override

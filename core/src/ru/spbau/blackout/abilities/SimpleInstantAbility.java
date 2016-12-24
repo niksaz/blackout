@@ -27,12 +27,8 @@ public abstract class SimpleInstantAbility extends Ability {
 
     @Override
     public final void onCastStart(UIServer server) {
-        startSound.get().play(1f /*FIXME: use sound volume from settings*/);
-
-        Vector2 target = new Vector2(CAST_DISTANCE, 0).rotateRad(getUnit().getRotation());
-        target.add(getUnit().getPosition());
-
-        server.sendAbilityCast(getUnit(), getUnit().getAbilityNum(this), target);
+        Vector2 targetOffset = new Vector2(CAST_DISTANCE, 0).rotateRad(getUnit().getRotation());
+        server.sendAbilityCast(getUnit(), getUnit().getAbilityNum(this), targetOffset);
     }
 
     @Override

@@ -69,7 +69,7 @@ public abstract class Ability implements Serializable, HasState {
     /** Called once when a touch goes up. */
     public abstract void inCast(UIServer server, float delta);
 
-    public void cast(Vector2 target) {
+    public void cast(Vector2 targetOffset) {
         chargeStart();
     }
 
