@@ -1,5 +1,7 @@
 package ru.spbau.blackout.database;
 
+import com.badlogic.gdx.Game;
+
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
@@ -69,7 +71,11 @@ public class PlayerProfile implements Serializable {
         return serializedSettings;
     }
 
-    public Character.Definition getDeserializedCharacterDefinition() {
+    public Character.Definition getCharacterDefinition() {
         return Character.Definition.deserializeFromByteArray(serializedDefinition);
+    }
+
+    public GameSettings getGameSettings() {
+        return GameSettings.deserializeFromByteArray(serializedSettings);
     }
 }

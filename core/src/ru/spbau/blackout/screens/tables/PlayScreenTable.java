@@ -19,7 +19,6 @@ public class PlayScreenTable  {
 
     private static final String SINGLE_PLAYER_GAME_TEXT = "Single player game";
     private static final String MULTIPLAYER_GAME_TEXT = "Multiplayer game";
-    private static final String BACK_TEXT = "Back";
 
     public static Table getTable(final MenuScreen screen) {
         final Table middleTable = new Table();
@@ -27,23 +26,17 @@ public class PlayScreenTable  {
         addBlackoutLabel(middleTable);
         addButton(middleTable, SINGLE_PLAYER_GAME_TEXT, new ClickListener() {
             @Override
-            public void clicked(InputEvent event, float x, float  y) {
+            public void clicked(InputEvent event, float x, float y) {
                 BlackoutGame.get().startTestSinglePlayerGame();
             }
         });
-
         addButton(middleTable, MULTIPLAYER_GAME_TEXT, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 screen.changeMiddleTable(MultiplayerTable.getTable(screen));
             }
         });
-        addButton(middleTable, BACK_TEXT, new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                screen.changeMiddleTable(ru.spbau.blackout.screens.tables.MainMenuTable.getTable(screen));
-            }
-        });
+        screen.addBackToMainMenuButton(middleTable);
 
         return middleTable;
     }

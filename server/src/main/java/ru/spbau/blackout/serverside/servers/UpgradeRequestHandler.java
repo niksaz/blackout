@@ -54,7 +54,7 @@ public class UpgradeRequestHandler implements HttpHandler {
             }
 
             final PlayerProfile playerProfile = result.get(0);
-            final Character.Definition definition = playerProfile.getDeserializedCharacterDefinition();
+            final Character.Definition definition = playerProfile.getCharacterDefinition();
 
             final String characteristic = inputStream.readUTF();
             boolean successful;

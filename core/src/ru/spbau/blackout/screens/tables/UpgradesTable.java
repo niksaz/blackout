@@ -14,19 +14,16 @@ import ru.spbau.blackout.screens.MenuScreen;
 
 import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE_COST;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
+import static ru.spbau.blackout.screens.MenuScreen.BUTTON_HEIGHT;
+import static ru.spbau.blackout.screens.MenuScreen.BUTTON_PADDING;
 import static ru.spbau.blackout.screens.MenuScreen.addBlackoutLabel;
 
 public class UpgradesTable {
-
-    private static final float BUTTON_HEIGHT = 50.0f;
-    private static final float BUTTON_PADDING = 10.0f;
 
     private static final String HEALTH_UPGRADE = "Increase health";
     private static final String HEALTH_CURRENT = "max health";
     private static final String ABILITY_UPGRADE = "Upgrade";
     private static final String ABILITY_CURRENT = "level";
-
-    private static final String BACK_TEXT = "Back";
 
     public static Table getTable(final MenuScreen screen) {
         final Table middleTable = new Table();
@@ -47,13 +44,13 @@ public class UpgradesTable {
                     @Override
                     public void act(float delta) {
                         setText(HEALTH_CURRENT + " " +
-                                BlackoutGame.get().getPlayerEntity().getDeserializedCharacterDefinition().maxHealth);
+                                BlackoutGame.get().getPlayerEntity().getCharacterDefinition().maxHealth);
                         super.act(delta);
                     }
                 });
 
         final PlayerProfile entity = BlackoutGame.get().getPlayerEntity();
-        final Character.Definition characterDefinition = entity.getDeserializedCharacterDefinition();
+        final Character.Definition characterDefinition = entity.getCharacterDefinition();
         for (int abilityIndex = 0; abilityIndex < characterDefinition.abilities.length; abilityIndex++) {
             final int currentAbilityIndex = abilityIndex;
             addRowWithButtonAndLabel(
@@ -73,23 +70,14 @@ public class UpgradesTable {
                         @Override
                         public void act(float delta) {
                             setText(ABILITY_CURRENT + " " +
-                                    BlackoutGame.get().getPlayerEntity().getDeserializedCharacterDefinition()
+                                    BlackoutGame.get().getPlayerEntity().getCharacterDefinition()
                                             .abilities[currentAbilityIndex].getLevel());
                             super.act(delta);
                         }
                     });
         }
+        screen.addBackToMainMenuButton(middleTable, 2);
 
-        final TextButton button = new TextButton(BACK_TEXT, BlackoutGame.get().assets().getDefaultSkin());
-        button.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                screen.changeMiddleTable(ru.spbau.blackout.screens.tables.MainMenuTable.getTable(screen));
-            }
-        });
-        middleTable.add(button).colspan(2).fill(true, false).pad(BUTTON_PADDING).height(BUTTON_HEIGHT);
-
-        middleTable.setFillParent(true);
         return middleTable;
     }
 
