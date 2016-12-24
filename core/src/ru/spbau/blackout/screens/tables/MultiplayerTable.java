@@ -1,4 +1,4 @@
-package ru.spbau.blackout.screens;
+package ru.spbau.blackout.screens.tables;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.network.AndroidClient;
+import ru.spbau.blackout.screens.MenuScreen;
 
 import static ru.spbau.blackout.screens.MenuScreen.addBlackoutLabel;
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
@@ -37,7 +38,7 @@ public class MultiplayerTable {
         task = new AndroidClient(this);
     }
 
-    static Table getTable(final MenuScreen screen) {
+    public static Table getTable(final MenuScreen screen) {
         final MultiplayerTable result = new MultiplayerTable(screen);
 
         addButton(result.middleTable, BACK_TEXT, new ClickListener() {
@@ -48,7 +49,6 @@ public class MultiplayerTable {
         });
 
         new Thread(result.task).start();
-        result.middleTable.setFillParent(true);
         return result.middleTable;
     }
 

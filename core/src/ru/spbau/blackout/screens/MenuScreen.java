@@ -48,7 +48,7 @@ public class MenuScreen extends StageScreen {
     private static final float BUTTON_HEIGHT = 50.0f;
     private static final float BUTTON_PADDING = 10.0f;
     private static final float CORNERS_MARGIN = 20.0f;
-    private static final float SETTINGS_ICON_SIZE = 128.0f;
+    private static final float SETTINGS_ICON_SIZE = 110.0f;
     private static final float SETTINGS_ICON_PADDING = 10.0f;
 
     // FIXME: just for testing
@@ -61,13 +61,14 @@ public class MenuScreen extends StageScreen {
 
         addLeftPaneElements();
         addRightPaneElements();
-        changeMiddleTable(MainMenuTable.getTable(this));
+        changeMiddleTable(ru.spbau.blackout.screens.tables.MainMenuTable.getTable(this));
     }
 
     public void changeMiddleTable(Table table) {
         if (middleTable != null) {
             middleTable.remove();
         }
+        table.setFillParent(true);
         middleTable = table;
         stage.addActor(middleTable);
     }
@@ -124,7 +125,7 @@ public class MenuScreen extends StageScreen {
         stage.addActor(coinImage);
     }
 
-    static TextButton addButton(Table table, String text, EventListener listener) {
+    public static TextButton addButton(Table table, String text, EventListener listener) {
         final TextButton button = new TextButton(text, BlackoutGame.get().assets().getDefaultSkin());
         if (listener != null) {
             button.addListener(listener);
@@ -133,11 +134,11 @@ public class MenuScreen extends StageScreen {
         return button;
     }
 
-    static Label addBlackoutLabel(Table table) {
+    public static Label addBlackoutLabel(Table table) {
         return addBlackoutLabel(table, 1);
     }
 
-    static Label addBlackoutLabel(Table table, int columns) {
+    public static Label addBlackoutLabel(Table table, int columns) {
         final Label label = new Label(
                 BLACKOUT_TEXT,
                 BlackoutGame.get().assets().getDefaultSkin(),
