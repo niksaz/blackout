@@ -74,7 +74,6 @@ public class Game extends Thread implements GameContext {
                 final float worldDeltaInSecs = (currentTime - lastWorldUpdateTime) / Utils.MILLIS_IN_SECOND;
                 gameWorld.updateState(worldDeltaInSecs);
                 lastWorldUpdateTime = currentTime;
-                server.log("Updating gameWorld: " + worldDeltaInSecs);
 
                 final byte[] worldInBytes = serializeWorld();
                 for (ClientThread client : clients) {

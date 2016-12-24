@@ -33,12 +33,11 @@ public class PlayScreenTable  {
         addButton(middleTable, MULTIPLAYER_GAME_TEXT, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                screen.changeMiddleTable(MultiplayerTable.getTable(screen));
+                screen.changeMiddleTable(ServerPickerTable.getTable(screen));
             }
         });
         screen.addBackToMainMenuButton(middleTable);
 
         return middleTable;
     }
-
 }

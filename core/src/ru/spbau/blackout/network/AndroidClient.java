@@ -18,8 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
-import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.tables.MultiplayerTable;
@@ -38,23 +36,25 @@ public class AndroidClient implements Runnable, UIServer {
     private static final String WAITING = "Waiting for a game.";
     private static final String READY_TO_START_MS = "Starting a game. Prepare yourself.";
 
+    private final int port;
     private final MultiplayerTable table;
     private volatile boolean isInterrupted = false;
     private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>();
     private final AtomicReference<AbilityCast> abilityToSend = new AtomicReference<>();
     private GameScreen gameScreen;
 
-    public AndroidClient(MultiplayerTable table) {
+    public AndroidClient(MultiplayerTable table, int port) {
         this.table = table;
+        this.port = port;
     }
 
     @Override
     public void run() {
         try (
-            DatagramSocket datagramSocket = new DatagramSocket();
-            Socket socket = new Socket(Network.SERVER_IP_ADDRESS, Network.SERVER_TCP_PORT_NUMBER);
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
+                DatagramSocket datagramSocket = new DatagramSocket();
+                Socket socket = new Socket(Network.SERVER_IP_ADDRESS, port);
+                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
