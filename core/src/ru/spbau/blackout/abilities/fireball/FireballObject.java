@@ -1,5 +1,6 @@
 package ru.spbau.blackout.abilities.fireball;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.physics.box2d.Shape;
 
@@ -13,10 +14,10 @@ import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.entities.GameUnit;
-import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
+import org.jetbrains.annotations.Nullable;
 
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.EXPLOSION_EFFECT_PATH;
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.FIRE_EFFECT_PATH;
@@ -25,22 +26,26 @@ import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTO
 
 public final class FireballObject extends AbilityObject {
 
+    private static final String CAST_SOUND_PATH = "sounds/fire.ogg";
+
+
     private float timeRest;
-    private final FireballObject.Definition def;
     private boolean shouldExplode = false;
 
 
     protected FireballObject(FireballObject.Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
-        this.def = def;
 
         timeRest = def.timeToLive;
 
-        def.fireEffect.ifPresent(effect ->
-            graphicEffects.add(new ParticleGraphicEffect(this, effect.copy()))
-        );
-    }
+        if (def.fireEffect != null) {
+            graphicEffects.add(new ParticleGraphicEffect(this, def.fireEffect.copy()));
+        }
 
+        if (def.castSound != null) {
+            def.castSound.play();
+        }
+    }
 
     @Override
     public void beginContact(GameObject object) {
@@ -54,12 +59,12 @@ public final class FireballObject extends AbilityObject {
         }
 
         if (object instanceof Damageable) {
-            ((Damageable) object).damage(this.def.damage);
+            ((Damageable) object).damage(((Definition) getDef()).damage);
         }
 
         shouldExplode = true;
 
-        this.kill();
+        kill();
     }
 
     @Override
@@ -67,7 +72,7 @@ public final class FireballObject extends AbilityObject {
         super.updateState(delta);
         timeRest -= delta;
         if (timeRest <= 0) {
-            this.kill();
+            kill();
         }
     }
 
@@ -87,8 +92,9 @@ public final class FireballObject extends AbilityObject {
     public void kill() {
         super.kill();
         // play explosion effect
-        if (shouldExplode && def.explosionEffect.isPresent()) {
-            ParticleSpecialEffect.create(def.explosionEffect.get().copy(), this.getChestPivot());
+        ParticleEffect explosionEffect = ((Definition) getDef()).explosionEffect;
+        if (shouldExplode && explosionEffect != null) {
+            ParticleSpecialEffect.create(explosionEffect.copy(), getChestPivot());
         }
     }
 
@@ -106,8 +112,9 @@ public final class FireballObject extends AbilityObject {
 
         public float timeToLive;
         public float damage;
-        private /*final*/ transient Optional<ParticleEffect> fireEffect;
-        private /*final*/ transient Optional<ParticleEffect> explosionEffect;
+        @Nullable private /*final*/ transient ParticleEffect fireEffect;
+        @Nullable private /*final*/ transient ParticleEffect explosionEffect;
+        @Nullable private /*final*/ transient Sound castSound;
 
 
         public Definition(String modelPath, Creator<Shape> shapeCreator, float mass) {
@@ -119,20 +126,15 @@ public final class FireballObject extends AbilityObject {
             super.load(context);
             Particles.load(context, FIRE_EFFECT_PATH);
             Particles.load(context, EXPLOSION_EFFECT_PATH);
+            context.getAssets().load(CAST_SOUND_PATH, Sound.class);
         }
 
         @Override
         public void doneLoading() {
             super.doneLoading();
-            this.fireEffect = Optional.of(Particles.getOriginal(context, FIRE_EFFECT_PATH));
-            this.explosionEffect = Optional.of(Particles.getOriginal(context, EXPLOSION_EFFECT_PATH));
-        }
-
-        @Override
-        public void initializeWithoutUi(GameContext context) {
-            super.initializeWithoutUi(context);
-            fireEffect = Optional.empty();
-            explosionEffect = Optional.empty();
+            fireEffect = Particles.getOriginal(context, FIRE_EFFECT_PATH);
+            explosionEffect = Particles.getOriginal(context, EXPLOSION_EFFECT_PATH);
+            castSound = context.getAssets().get(CAST_SOUND_PATH, Sound.class);
         }
 
         @Override

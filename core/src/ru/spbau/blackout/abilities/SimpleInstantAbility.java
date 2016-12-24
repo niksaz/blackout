@@ -13,16 +13,12 @@ import ru.spbau.blackout.network.UIServer;
  */
 public abstract class SimpleInstantAbility extends Ability {
 
-    private transient Optional<Sound> /*final*/ startSound = Optional.empty();
     public static final float CAST_DISTANCE = 1.5f;  // FIXME: use unit radius
 
 
     public SimpleInstantAbility(int level) {
         super(level);
     }
-
-
-    public abstract String castSoundPath();
 
 
     @Override
@@ -36,17 +32,4 @@ public abstract class SimpleInstantAbility extends Ability {
 
     @Override
     public final void onCastEnd(UIServer server) { /*nothing*/ }
-
-
-    @Override
-    public void load(GameContext context) {
-        super.load(context);
-        context.getAssets().load(castSoundPath(), Sound.class);
-    }
-
-    @Override
-    public void doneLoading(GameContext context) {
-        super.doneLoading(context);
-        startSound = Optional.of(context.getAssets().get(castSoundPath(), Sound.class));
-    }
 }

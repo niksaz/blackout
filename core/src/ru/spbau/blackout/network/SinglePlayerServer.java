@@ -12,11 +12,11 @@ public class SinglePlayerServer implements UIServer {
 
     @Override
     public void sendSelfVelocity(GameUnit unit, Vector2 velocity) {
-        unit.setSelfVelocity(velocity);
+        Events.setSelfVelocity(unit, velocity);
     }
 
     @Override
-    public void sendAbilityCast(GameUnit unit, int abilityNum, Vector2 target) {
-        Events.abilityCast(unit, abilityNum, target);
+    public void sendAbilityCast(GameUnit unit, int abilityNum, Vector2 targetOffset) {
+        Events.abilityCast(unit, abilityNum, targetOffset);
     }
 }

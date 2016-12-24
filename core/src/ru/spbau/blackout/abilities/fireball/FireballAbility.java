@@ -24,8 +24,6 @@ public class FireballAbility extends SimpleInstantAbility {
     public static final String FIRE_EFFECT_PATH = "abilities/fireball/particles/fireball.pfx";
     public static final String EXPLOSION_EFFECT_PATH = "effects/small_explosion/small_explosion.pfx";
 
-    public static final String CAST_SOUND = "sounds/fire.ogg";
-
 
     private final FireballObject.Definition shellDef;
 
@@ -51,11 +49,6 @@ public class FireballAbility extends SimpleInstantAbility {
 
         targetOffset.scl(SHELL_START_SPEED / targetOffset.len());  // start speed
         shell.velocity.add(targetOffset);
-    }
-
-    @Override
-    public String castSoundPath() {
-        return CAST_SOUND;
     }
 
     @Override

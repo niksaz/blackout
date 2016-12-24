@@ -62,7 +62,7 @@ public class Game extends Thread implements GameContext {
 
                     final Vector2 heroVelocity = clientThread.getVelocityFromClient();
                     if (heroVelocity != null) {
-                        clientUnit.setSelfVelocity(heroVelocity);
+                        Events.setSelfVelocity(clientUnit, heroVelocity);
                     }
                     final AbilityCast abilityCast = clientThread.getAbilityCastFromClient();
                     if (abilityCast != null) {
