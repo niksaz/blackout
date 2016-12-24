@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.screens.MenuScreen;
 
@@ -52,7 +52,7 @@ public class UpgradesTable {
                     }
                 });
 
-        final PlayerEntity entity = BlackoutGame.get().getPlayerEntity();
+        final PlayerProfile entity = BlackoutGame.get().getPlayerEntity();
         final Character.Definition characterDefinition = entity.getDeserializedCharacterDefinition();
         for (int abilityIndex = 0; abilityIndex < characterDefinition.abilities.length; abilityIndex++) {
             final int currentAbilityIndex = abilityIndex;

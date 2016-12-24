@@ -10,16 +10,16 @@ import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.network.Network;
 
 /**
- * Extended PlayerEntity which actually asks server if a query can be done and only then performs it.
+ * Extended PlayerProfile which actually asks server if a query can be done and only then performs it.
  */
-public class ChangeablePlayerEntity extends PlayerEntity {
+public class ChangeablePlayerProfile extends PlayerProfile {
 
     private static final int HTTP_CONNECT_TIMEOUT_MS = 2000;
     private static final int HTTP_READ_TIMEOUT_MS = 2000;
     private static final int LOAD_REQUEST_MAX_ATTEMPTS = 3;
 
-    public ChangeablePlayerEntity(PlayerEntity playerEntity) {
-        super(playerEntity);
+    public ChangeablePlayerProfile(PlayerProfile playerProfile) {
+        super(playerProfile);
     }
 
     public void changeGold(int delta) {
@@ -116,8 +116,8 @@ public class ChangeablePlayerEntity extends PlayerEntity {
                     }
                     final ObjectInputStream in = new ObjectInputStream(connection.getInputStream());
 
-                    final PlayerEntity playerEntity = (PlayerEntity) in.readObject();
-                    BlackoutGame.get().setPlayerEntity(new ChangeablePlayerEntity(playerEntity));
+                    final PlayerProfile playerProfile = (PlayerProfile) in.readObject();
+                    BlackoutGame.get().setPlayerEntity(new ChangeablePlayerProfile(playerProfile));
                     if (runIfSuccessful != null) {
                         runIfSuccessful.run();
                     }

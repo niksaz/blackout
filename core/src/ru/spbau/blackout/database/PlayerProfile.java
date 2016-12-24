@@ -6,23 +6,25 @@ import org.mongodb.morphia.annotations.Id;
 import java.io.Serializable;
 
 import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.settings.GameSettings;
 
 /**
  * Representation of a player profile in a database.
  */
 @Entity("players")
-public class PlayerEntity implements Serializable {
+public class PlayerProfile implements Serializable {
 
     @Id
-    protected final String name;
-    protected int gold;
-    protected byte[] serializedDefinition;
+    private final String name;
+    private int gold;
+    private byte[] serializedDefinition;
+    private byte[] serializedSettings;
 
     /**
      * Used by Morphia to initialize objects extracted from the database.
      */
-    public PlayerEntity() {
-        this("", 0, null);
+    public PlayerProfile() {
+        this("", 0, null, null);
     }
 
     /**
@@ -30,21 +32,25 @@ public class PlayerEntity implements Serializable {
      *
      * @param name name of a new player
      */
-    public PlayerEntity(String name) {
-        this(name, 0, Character.Definition.createSerializedDefaultCharacterDefinition());
+    public PlayerProfile(String name) {
+        this(name,
+             0,
+             Character.Definition.createSerializedDefaultCharacterDefinition(),
+             GameSettings.createSerializedDefaultGameSettings());
     }
 
     /**
      * Shallow copy of the object.
      */
-    public PlayerEntity(PlayerEntity other) {
-        this(other.getName(), other.getGold(), other.getSerializedDefinition());
+    public PlayerProfile(PlayerProfile other) {
+        this(other.getName(), other.getGold(), other.getSerializedDefinition(), other.getSerializedSettings());
     }
 
-    private PlayerEntity(String name, int gold, byte[] serializedDefinition) {
+    private PlayerProfile(String name, int gold, byte[] serializedDefinition, byte[] serializedSettings) {
         this.name = name;
         this.gold = gold;
         this.serializedDefinition = serializedDefinition;
+        this.serializedSettings = serializedSettings;
     }
 
     public String getName() {
@@ -57,6 +63,10 @@ public class PlayerEntity implements Serializable {
 
     public byte[] getSerializedDefinition() {
         return serializedDefinition;
+    }
+
+    public byte[] getSerializedSettings() {
+        return serializedSettings;
     }
 
     public Character.Definition getDeserializedCharacterDefinition() {

@@ -12,7 +12,7 @@ import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.util.List;
 
-import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 
 /**
@@ -35,17 +35,17 @@ public class LoadRequestHandler implements HttpHandler {
         ) {
             final String name = inputStream.readUTF();
 
-            final Query<PlayerEntity> query =
+            final Query<PlayerProfile> query =
                     DatabaseAccessor.getInstance().getDatastore()
-                            .createQuery(PlayerEntity.class)
+                            .createQuery(PlayerProfile.class)
                             .field("name")
                             .equal(name);
-            final List<PlayerEntity> result = query.asList();
+            final List<PlayerProfile> result = query.asList();
 
-            final PlayerEntity entity;
+            final PlayerProfile entity;
             switch (result.size()) {
                 case 0:
-                    entity = new PlayerEntity(name);
+                    entity = new PlayerProfile(name);
                     DatabaseAccessor.getInstance().getDatastore().save(entity);
                     break;
 
