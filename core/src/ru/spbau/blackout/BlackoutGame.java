@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 
 import ru.spbau.blackout.androidfeatures.PlayServices;
 import ru.spbau.blackout.androidfeatures.PlayServicesInCore;
-import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.database.PlayerEntityAtClient;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
 import ru.spbau.blackout.network.SinglePlayerServer;
@@ -49,7 +49,7 @@ public class BlackoutGame extends Game {
 
     // fields marked as /*final*/ must be assigned only once, but can't be assigned in constructor
 
-    private volatile PlayerEntity playerEntity;
+    private volatile PlayerEntityAtClient playerEntity;
     private final ScreenManager screenManager;
     private /*final*/ PlayServicesInCore playServicesInCore;
 
@@ -122,11 +122,11 @@ public class BlackoutGame extends Game {
         this.spriteBatch.dispose();
     }
 
-    public PlayerEntity getPlayerEntity() {
+    public PlayerEntityAtClient getPlayerEntity() {
         return playerEntity;
     }
 
-    public void setPlayerEntity(PlayerEntity playerEntity) {
+    public void setPlayerEntity(PlayerEntityAtClient playerEntity) {
         this.playerEntity = playerEntity;
     }
 }

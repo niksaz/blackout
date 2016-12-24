@@ -1,7 +1,5 @@
 package ru.spbau.blackout.database;
 
-import com.badlogic.gdx.Gdx;
-
 import java.io.DataOutputStream;
 import java.io.ObjectInputStream;
 import java.net.HttpURLConnection;
@@ -9,8 +7,6 @@ import java.net.URL;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.network.Network;
-import ru.spbau.blackout.screens.LoadScreen;
-import ru.spbau.blackout.screens.MenuScreen;
 
 /**
  * Extended PlayerEntity which actually asks server if a query can be done and only then performs it.
@@ -20,13 +16,11 @@ public class PlayerEntityAtClient extends PlayerEntity {
     private static final int HTTP_CONNECT_TIMEOUT_MS = 2000;
     private static final int HTTP_READ_TIMEOUT_MS = 2000;
     private static final int LOAD_REQUEST_MAX_ATTEMPTS = 3;
-    private static final String UNSUCCESSFUL_LOADING = "The server is unavailable.";
 
     public PlayerEntityAtClient(PlayerEntity playerEntity) {
         super(playerEntity);
     }
 
-    @Override
     public void changeGold(int delta) {
         new Thread(() -> {
             try {
@@ -48,7 +42,7 @@ public class PlayerEntityAtClient extends PlayerEntity {
                         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
                 ) {
                     outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
-                    outputStream.writeUTF(Database.GOLD_FIELD);
+                    outputStream.writeUTF(Database.GOLD_UPGRADE);
                     outputStream.writeInt(delta);
                 }
 
@@ -57,7 +51,7 @@ public class PlayerEntityAtClient extends PlayerEntity {
                 System.out.println("Response Code : " + responseCode);
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    super.changeGold(delta);
+                    loadPlayerEntity(null, null);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -65,7 +59,7 @@ public class PlayerEntityAtClient extends PlayerEntity {
         }).start();
     }
 
-    public static void loadPlayerEntity(LoadScreen loadScreen) {
+    public static void loadPlayerEntity(Runnable runIfSuccessful, Runnable runIfUnsuccessful) {
         new Thread(() -> {
             boolean loadSuccessfully = false;
             for (int attempt = 0; attempt < LOAD_REQUEST_MAX_ATTEMPTS; attempt++) {
@@ -76,7 +70,6 @@ public class PlayerEntityAtClient extends PlayerEntity {
                             Network.SERVER_HTTP_PORT_NUMBER +
                             Database.LOAD_COMMAND;
 
-
                     final URL urlObject = new URL(url);
                     final HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
                     connection.setRequestMethod("POST");
@@ -85,8 +78,7 @@ public class PlayerEntityAtClient extends PlayerEntity {
                     connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_MS);
                     connection.setReadTimeout(HTTP_READ_TIMEOUT_MS);
 
-                    try (
-                            DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
+                    try (DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
                     ) {
                         outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
                     }
@@ -104,16 +96,17 @@ public class PlayerEntityAtClient extends PlayerEntity {
 
                     final PlayerEntity playerEntity = (PlayerEntity) in.readObject();
                     BlackoutGame.get().setPlayerEntity(new PlayerEntityAtClient(playerEntity));
-                    Gdx.app.postRunnable(() ->
-                            BlackoutGame.get().screenManager().setScreen(new MenuScreen()));
+                    if (runIfSuccessful != null) {
+                        runIfSuccessful.run();
+                    }
                     loadSuccessfully = true;
                     break;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            if (!loadSuccessfully) {
-                Gdx.app.postRunnable(() -> loadScreen.showErrorDialog(UNSUCCESSFUL_LOADING));
+            if (!loadSuccessfully && runIfUnsuccessful != null) {
+                runIfUnsuccessful.run();
             }
         }).start();
     }

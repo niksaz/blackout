@@ -14,7 +14,7 @@ import ru.spbau.blackout.entities.Character;
 public class PlayerEntity implements Serializable {
 
     @Id
-    private String name;
+    private final String name;
     private int gold;
     private byte[] serializedDefinition;
 
@@ -59,7 +59,7 @@ public class PlayerEntity implements Serializable {
         return serializedDefinition;
     }
 
-    public void changeGold(int delta) {
-        gold += delta;
+    public Character.Definition getDeserializedCharacterDefinition() {
+        return Character.Definition.deserializeFromByteArray(serializedDefinition);
     }
 }

@@ -13,9 +13,13 @@ import java.net.HttpURLConnection;
 import java.util.List;
 
 import ru.spbau.blackout.database.PlayerEntity;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 
-import static ru.spbau.blackout.database.Database.GOLD_FIELD;
+import static ru.spbau.blackout.database.Database.GOLD_UPGRADE;
+import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE;
+import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
+import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_PER_LEVEL;
 
 /**
  * Handler for update queries from clients.
@@ -50,13 +54,29 @@ public class UpgradeRequestHandler implements HttpHandler {
             final String characteristic = inputStream.readUTF();
             boolean successful;
             switch (characteristic) {
-                case GOLD_FIELD:
+                case GOLD_UPGRADE:
                     final int delta = inputStream.readInt();
                     if (playerEntity.getGold() + delta >= 0) {
                         final UpdateOperations<PlayerEntity> updateOperations =
                                 DatabaseAccessor.getInstance().getDatastore()
                                         .createUpdateOperations(PlayerEntity.class)
-                                        .inc(GOLD_FIELD, delta);
+                                        .inc("gold", delta);
+                        DatabaseAccessor.getInstance().getDatastore().update(query, updateOperations);
+                        successful = true;
+                    } else {
+                        successful = false;
+                    }
+                    break;
+
+                case HEALTH_UPGRADE:
+                    if (playerEntity.getGold() >= HEALTH_UPGRADE_COST) {
+                        final Character.Definition definition = playerEntity.getDeserializedCharacterDefinition();
+                        definition.maxHealth += HEALTH_UPGRADE_PER_LEVEL;
+                        final UpdateOperations<PlayerEntity> updateOperations =
+                                DatabaseAccessor.getInstance().getDatastore()
+                                        .createUpdateOperations(PlayerEntity.class)
+                                        .inc("gold", -HEALTH_UPGRADE_COST)
+                                        .set("serializedDefinition", definition.serializeToByteArray());
                         DatabaseAccessor.getInstance().getDatastore().update(query, updateOperations);
                         successful = true;
                     } else {

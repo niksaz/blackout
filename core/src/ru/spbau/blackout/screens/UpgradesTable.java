@@ -1,5 +1,6 @@
 package ru.spbau.blackout.screens;
 
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -28,28 +29,44 @@ public class UpgradesTable {
         final Table middleTable = new Table();
 
         final PlayerEntity entity = BlackoutGame.get().getPlayerEntity();
-        final Character.Definition characterDefinition =
-                Character.Definition.deserializeFromByteArray(entity.getSerializedDefinition());
+        final Character.Definition characterDefinition = entity.getDeserializedCharacterDefinition();
 
-        final Label updatingHealthLabel = new Label("", BlackoutGame.get().assets().getDefaultSkin()) {
-            @Override
-            public void act(float delta) {
-                setText(HEALTH_CURRENT + " " + characterDefinition.maxHealth);
-            }
-        };
-        addRowWithButtonAndLabel(middleTable, HEALTH_UPGRADE, updatingHealthLabel);
+        addRowWithButtonAndLabel(
+                middleTable,
+                HEALTH_UPGRADE,
+                new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        screen.changeMiddleTable(MainMenuTable.getTable(screen));
+                        super.clicked(event, x, y);
+                    }
+                },
+                new Label("", BlackoutGame.get().assets().getDefaultSkin()) {
+                    @Override
+                    public void act(float delta) {
+                        setText(HEALTH_CURRENT + " " + characterDefinition.maxHealth);
+                        super.act(delta);
+                    }
+                });
 
         for (Ability ability : characterDefinition.abilities) {
-            final Label updatingLabel = new Label("", BlackoutGame.get().assets().getDefaultSkin()) {
-                @Override
-                public void act(float delta) {
-                    setText(ABILITY_CURRENT + " " + ability.getLevel());
-                }
-            };
             addRowWithButtonAndLabel(
                     middleTable,
                     ABILITY_UPGRADE + " " + ability.getClass().getSimpleName(),
-                    updatingLabel);
+                    new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            screen.changeMiddleTable(MainMenuTable.getTable(screen));
+                            super.clicked(event, x, y);
+                        }
+                    },
+                    new Label("", BlackoutGame.get().assets().getDefaultSkin()) {
+                        @Override
+                        public void act(float delta) {
+                            setText(ABILITY_CURRENT + " " + ability.getLevel());
+                            super.act(delta);
+                        }
+                    });
         }
 
         final TextButton button = new TextButton(BACK_TEXT, BlackoutGame.get().assets().getDefaultSkin());
@@ -65,8 +82,10 @@ public class UpgradesTable {
         return middleTable;
     }
 
-    private static void addRowWithButtonAndLabel(Table table, String buttonText, Label labelAfter) {
+    private static void addRowWithButtonAndLabel(Table table, String buttonText,
+                                                 EventListener buttonListener, Label labelAfter) {
         final TextButton button = new TextButton(buttonText, BlackoutGame.get().assets().getDefaultSkin());
+        button.addListener(buttonListener);
         table.add(button).pad(BUTTON_PADDING).width(BUTTON_WIDTH).height(BUTTON_HEIGHT);
         table.add(labelAfter).row();
     }

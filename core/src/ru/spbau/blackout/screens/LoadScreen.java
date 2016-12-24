@@ -25,6 +25,7 @@ public class LoadScreen extends StageScreen implements PlayServicesListener {
     private static final String STARTED_LOADING = "Loading your game info...";
     private static final String TRY_AGAIN = "Try again";
     private static final String UNSUCCESSFUL_MES = "Unsuccessful sign in attempt";
+    private static final String UNSUCCESSFUL_LOADING = "The server is unavailable.";
 
     private Table middleTable;
 
@@ -54,7 +55,9 @@ public class LoadScreen extends StageScreen implements PlayServicesListener {
     @Override
     public void onSignInSucceeded() {
         Gdx.app.postRunnable(() -> addLabel(STARTED_LOADING));
-        PlayerEntityAtClient.loadPlayerEntity(this);
+        PlayerEntityAtClient.loadPlayerEntity(
+                () -> Gdx.app.postRunnable(() -> BlackoutGame.get().screenManager().setScreen(new MenuScreen())),
+                () -> Gdx.app.postRunnable(() -> showErrorDialog(UNSUCCESSFUL_LOADING)));
     }
 
     @Override
