@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.Random;
 
@@ -27,9 +28,12 @@ import ru.spbau.blackout.BlackoutGame;
  */
 public class MenuScreen extends StageScreen {
 
-    private static final String SETTINGS_TEXTURE_PATH = "images/menuscreen/settings.png";
-    private static final String GAME_SERVICES_TEXTURE_PATH = "images/menuscreen/games_controller_grey.png";
+    private static final String SETTINGS_TEXTURE_PATH = "images/menuscreen/up-arrow.png";
+    private static final String GAMES_ACHIEVEMENTS_GAMES_PATH = "images/game_services/games_achievements.png";
+    private static final String GAMES_CONTROLLER_GAMES_PATH = "images/game_services/games_controller_grey.png";
+    private static final String GAMES_LEADERBOARDS_GAMES_PATH = "images/game_services/games_leaderboards.png";
     private static final String GOLD_COIN_PATH_PREFIX = "images/menuscreen/goldCoin";
+
     private static final String BLACKOUT_TEXT = "Blackout";
     private static final String BLACKOUT_LABEL_STYLE_NAME = "blackout";
 
@@ -44,7 +48,7 @@ public class MenuScreen extends StageScreen {
     private static final float BUTTON_PADDING = 10.0f;
     private static final float CORNERS_MARGIN = 20.0f;
     private static final float SETTINGS_ICON_SIZE = 128.0f;
-    private static final float SETTINGS_ICON_PADDING = 12.0f;
+    private static final float SETTINGS_ICON_PADDING = 10.0f;
 
     // FIXME: just for testing
     private static final Random generator = new Random();
@@ -73,8 +77,8 @@ public class MenuScreen extends StageScreen {
                 CORNERS_MARGIN,
                 stage.getViewport().getWorldHeight() - CORNERS_MARGIN,
                 Align.topLeft);
-        final Actor playServicesIcon = addGooglePlayGamesServicesIcon();
-        addSettingsIcon(playServicesIcon);
+        final Array<Actor> playServicesIcons = addGooglePlayGamesServicesIcons();
+        addSettingsIcon(playServicesIcons);
     }
 
     private void addRightPaneElements() {
@@ -153,14 +157,16 @@ public class MenuScreen extends StageScreen {
         return label;
     }
 
-    private Image addSettingsIcon(final Actor controlledImage) {
+    private Image addSettingsIcon(final Array<Actor> controlledImages) {
         final Texture settingsTexture = new Texture(SETTINGS_TEXTURE_PATH);
         final Image settingsImage = new Image(settingsTexture);
 
         settingsImage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                controlledImage.setVisible(!controlledImage.isVisible());
+                for (Actor actor : controlledImages) {
+                    actor.setVisible(!actor.isVisible());
+                }
             }
         });
 
@@ -173,27 +179,56 @@ public class MenuScreen extends StageScreen {
         return settingsImage;
     }
 
-    private Image addGooglePlayGamesServicesIcon() {
-        final Texture gamesServices = new Texture(GAME_SERVICES_TEXTURE_PATH);
-        final Image gamesServicesImage = new Image(gamesServices);
-        gamesServicesImage.setVisible(false);
+    private Array<Actor> addGooglePlayGamesServicesIcons() {
+        final Array<Actor> icons = new Array<>();
+        icons.add(addGooglePlayGamesServicesIcon(
+                GAMES_CONTROLLER_GAMES_PATH,
+                new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        BlackoutGame.get().playServicesInCore().getPlayServices().signOut();
+                        BlackoutGame.get().screenManager().disposeScreen();
+                    }
+                },
+                3 * (SETTINGS_ICON_SIZE - SETTINGS_ICON_PADDING))
+        );
+        icons.add(addGooglePlayGamesServicesIcon(
+                GAMES_ACHIEVEMENTS_GAMES_PATH,
+                new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        BlackoutGame.get().playServicesInCore().getPlayServices().showAchievements();
+                    }
+                },
+                2 * (SETTINGS_ICON_SIZE - SETTINGS_ICON_PADDING))
+        );
+        icons.add(addGooglePlayGamesServicesIcon(
+                GAMES_LEADERBOARDS_GAMES_PATH,
+                new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        BlackoutGame.get().playServicesInCore().getPlayServices().showLeaderboards();
+                    }
+                },
+                1 * (SETTINGS_ICON_SIZE - SETTINGS_ICON_PADDING))
+        );
+        return icons;
+    }
 
-        gamesServicesImage.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                BlackoutGame.get().playServicesInCore().getPlayServices().signOut();
-                BlackoutGame.get().screenManager().disposeScreen();
-            }
-        });
+    private Actor addGooglePlayGamesServicesIcon(String path, EventListener listener, float y) {
+        final Texture iconTexture = new Texture(path);
+        final Image iconImage = new Image(iconTexture);
+        iconImage.setVisible(false);
+        iconImage.addListener(listener);
 
-        final Container<Image> playContainer = new Container<>(gamesServicesImage);
-        playContainer.setWidth(SETTINGS_ICON_SIZE);
-        playContainer.setHeight(SETTINGS_ICON_SIZE);
-        playContainer.pad(SETTINGS_ICON_PADDING);
-        playContainer.setY(SETTINGS_ICON_SIZE);
-        stage.addActor(playContainer);
+        final Container<Image> container = new Container<>(iconImage);
+        container.setWidth(SETTINGS_ICON_SIZE);
+        container.setHeight(SETTINGS_ICON_SIZE);
+        container.pad(SETTINGS_ICON_PADDING);
+        container.setY(y);
+        stage.addActor(container);
 
-        return gamesServicesImage;
+        return iconImage;
     }
 
     @Override

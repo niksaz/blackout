@@ -6,8 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import ru.spbau.blackout.BlackoutGame;
-
 import static ru.spbau.blackout.screens.MenuScreen.addBlackoutLabel;
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
@@ -17,10 +15,7 @@ import static ru.spbau.blackout.screens.MenuScreen.addButton;
 class MainMenuTable {
 
     private static final String BUTTON_PLAY_TEXT = "Play";
-    private static final String BUTTON_SHOP_TEXT = "Try your luck!";
     private static final String BUTTON_UPGRADES_TEXT = "Upgrades";
-    private static final String BUTTON_ACHIEVEMENTS_TEXT = "Achievements";
-    private static final String BUTTON_LEADERBOARD_TEXT = "Leaderboard";
 
 
     static Table getTable(final MenuScreen screen) {
@@ -40,21 +35,8 @@ class MainMenuTable {
                 screen.changeMiddleTable(UpgradesTable.getTable(screen));
             }
         });
-        addButton(middleTable, BUTTON_ACHIEVEMENTS_TEXT, new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                BlackoutGame.get().playServicesInCore().getPlayServices().showAchievements();
-            }
-        });
-        addButton(middleTable, BUTTON_LEADERBOARD_TEXT, new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                BlackoutGame.get().playServicesInCore().getPlayServices().showLeaderboards();
-            }
-        });
 
         middleTable.setFillParent(true);
         return middleTable;
     }
-
 }
