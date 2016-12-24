@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.screens.LoadScreen;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
@@ -27,9 +28,11 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
 public class ClientGameWorld extends GameWorld {
 
     private final AtomicReference<ObjectInputStream> externalWorldStream = new AtomicReference<>();
+    private final SessionSettings sessionSettings;
 
-    public ClientGameWorld(List<GameObject.Definition> definitions) {
-        super(definitions);
+    public ClientGameWorld(SessionSettings sessionSettings) {
+        super(sessionSettings.getDefinitions());
+        this.sessionSettings = sessionSettings;
     }
 
 
@@ -54,8 +57,14 @@ public class ClientGameWorld extends GameWorld {
             for (Iterator<GameObject> it = getGameObjects().iterator(); it.hasNext();) {
                 GameObject go = it.next();
                 if (!updated.contains(go.getUid())) {
-                    go.kill();
-                    it.remove();
+//                    if (!(go instanceof Ghost)) {
+//                        if (go.getUid() == sessionSettings.getPlayerUid()) {
+//                            // create a ghost with the same uid
+//                        } else {
+                            go.kill();
+                            it.remove();
+//                        }
+//                    }
                 }
             }
         }

@@ -2,6 +2,7 @@ package ru.spbau.blackout.network;
 
 import com.badlogic.gdx.math.Vector2;
 
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 
 public class Events {
@@ -10,7 +11,7 @@ public class Events {
         unit.setSelfVelocity(velocity);
     }
 
-    public static void abilityCast(GameUnit unit, int abilityNum, Vector2 target) {
-        unit.castAbility(abilityNum, target);
+    public static void abilityCast(Character character, int abilityNum, Vector2 target) {
+        character.castAbility(abilityNum, target);
     }
 }

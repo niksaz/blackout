@@ -21,8 +21,8 @@ public abstract class SimpleInstantAbility extends Ability {
 
     @Override
     public final void onCastStart(UIServer server) {
-        Vector2 targetOffset = new Vector2(CAST_DISTANCE, 0).rotateRad(getUnit().getRotation());
-        server.sendAbilityCast(getUnit(), getUnit().getAbilityNum(this), targetOffset);
+        Vector2 targetOffset = new Vector2(CAST_DISTANCE, 0).rotateRad(getCharacter().getRotation());
+        server.sendAbilityCast(getCharacter(), getCharacter().getAbilityNum(this), targetOffset);
     }
 
     @Override

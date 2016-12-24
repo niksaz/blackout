@@ -3,6 +3,7 @@ package ru.spbau.blackout.network;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.spbau.blackout.abilities.Ability;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 
 /**
@@ -11,5 +12,5 @@ import ru.spbau.blackout.entities.GameUnit;
 public interface UIServer {
 
     void sendSelfVelocity(GameUnit unit, Vector2 velocity);
-    void sendAbilityCast(GameUnit unit, int abilityNum, Vector2 targetOffset);
+    void sendAbilityCast(Character character, int abilityNum, Vector2 targetOffset);
 }

@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
 import ru.spbau.blackout.network.Events;
@@ -58,15 +59,15 @@ public class Game extends Thread implements GameContext {
             try {
                 for (int clientIndex = 0; clientIndex < clients.size(); clientIndex++) {
                     final ClientThread clientThread = clients.get(clientIndex);
-                    final GameUnit clientUnit = (GameUnit) gameWorld.getObjectById(clientThread.getPlayerUid());
+                    final Character clientCharacter = (Character) gameWorld.getObjectById(clientThread.getPlayerUid());
 
                     final Vector2 heroVelocity = clientThread.getVelocityFromClient();
                     if (heroVelocity != null) {
-                        Events.setSelfVelocity(clientUnit, heroVelocity);
+                        Events.setSelfVelocity(clientCharacter, heroVelocity);
                     }
                     final AbilityCast abilityCast = clientThread.getAbilityCastFromClient();
                     if (abilityCast != null) {
-                        Events.abilityCast(clientUnit, abilityCast.abilityNum, abilityCast.target);
+                        Events.abilityCast(clientCharacter, abilityCast.abilityNum, abilityCast.target);
                     }
                 }
 

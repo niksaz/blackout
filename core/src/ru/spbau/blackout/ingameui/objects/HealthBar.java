@@ -23,25 +23,26 @@ public final class HealthBar extends IngameUIObject {
 
 
     private final SimpleProgressBar healthBar = new HorizontalProgressBar(PATH_EMPTY, PATH_FULL);
-    private /*final*/ GameUnit unit;
+    private /*final*/ Character character;
 
 
     @Override
     public void load(AssetManager assets) {
-        this.healthBar.load(assets);
+        healthBar.load(assets);
     }
 
     @Override
     public void doneLoading(AssetManager assets, Stage stage, Character character) {
-        this.healthBar.doneLoading(assets);
-        this.unit = character;
-        this.healthBar.setPosition(START_X, START_Y);
-        this.healthBar.setSize(WIDTH, HEIGHT);
-        stage.addActor(this.healthBar);
+        this.character = character;
+
+        healthBar.doneLoading(assets);
+        healthBar.setPosition(START_X, START_Y);
+        healthBar.setSize(WIDTH, HEIGHT);
+        stage.addActor(healthBar);
     }
 
     @Override
     public void update(float deltaTime) {
-        this.healthBar.setValue(this.unit.getHealth() / this.unit.getMaxHealth());
+        this.healthBar.setValue(character.getHealth() / character.getMaxHealth());
     }
 }

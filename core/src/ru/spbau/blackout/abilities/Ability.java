@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.utils.HasState;
@@ -16,7 +17,7 @@ import ru.spbau.blackout.utils.HasState;
 
 /**
  * Abstract class for ability in-game representation.
- * Each unit has its own instance of each its ability.
+ * Each character has its own instance of each its ability.
  */
 public abstract class Ability implements Serializable, HasState {
 
@@ -25,7 +26,7 @@ public abstract class Ability implements Serializable, HasState {
     private int level;
     private transient float chargeTime;
 
-    private transient /*final*/ GameUnit unit;
+    private transient /*final*/ Character character;
 
 
     public Ability(int level) {
@@ -57,8 +58,8 @@ public abstract class Ability implements Serializable, HasState {
     /**
      * Must be called exactly once from <code>GameUnit::new</code>.
      */
-    public void initialize(GameUnit unit) {
-        this.unit = unit;
+    public void initialize(Character character) {
+        this.character = character;
     }
 
 
@@ -78,7 +79,7 @@ public abstract class Ability implements Serializable, HasState {
 
     public abstract float getMaxChargeTime();
 
-    public GameUnit getUnit() { return unit; }
+    public Character getCharacter() { return character; }
     public float getChargeTime() { return chargeTime; }
     public int getLevel() { return level; }
     public void setChargeTime(float chargeTime) { this.chargeTime = chargeTime; }

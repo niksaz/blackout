@@ -2,6 +2,7 @@ package ru.spbau.blackout.network;
 
 import com.badlogic.gdx.math.Vector2;
 
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 
 /**
@@ -16,7 +17,7 @@ public class SinglePlayerServer implements UIServer {
     }
 
     @Override
-    public void sendAbilityCast(GameUnit unit, int abilityNum, Vector2 targetOffset) {
-        Events.abilityCast(unit, abilityNum, targetOffset);
+    public void sendAbilityCast(Character character, int abilityNum, Vector2 targetOffset) {
+        Events.abilityCast(character, abilityNum, targetOffset);
     }
 }

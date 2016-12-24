@@ -1,6 +1,13 @@
 package ru.spbau.blackout.entities;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
@@ -16,34 +23,124 @@ import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 
 
-public class Character extends GameUnit {
-    public Character(GameUnit.Definition def, long uid, float x, float y) {
+public class Character extends GameUnit implements Damageable  {
+
+    private final List<Ability> abilities;
+    private float health;
+    private float maxHealth;
+
+
+    public Character(Character.Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
+        abilities = Arrays.asList(def.abilities);
+
+        maxHealth = def.maxHealth;
+        health = maxHealth;
+
+        for (Ability ability : abilities) {
+            ability.initialize(this);
+        }
     }
+
+
+    public final Ability getAbility(int num) {
+        return abilities.get(num);
+    }
+
+    public void castAbility(int abilityNum, Vector2 target) {
+        Ability ability = getAbility(abilityNum);
+        ability.cast(target);
+        // TODO: cast animation
+    }
+
+    @Override
+    public void updateState(float delta) {
+        super.updateState(delta);
+        for (Ability ability : abilities) {
+            ability.charge(delta);
+        }
+    }
+
+    @Override
+    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        super.getState(out);
+        out.writeFloat(health);
+        for (Ability ability : abilities) {
+            ability.getState(out);
+        }
+    }
+
+    @Override
+    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        super.setState(in);
+        health = in.readFloat();
+        for (Ability ability : abilities) {
+            ability.setState(in);
+        }
+    }
+
+    public int getAbilityNum(Ability ability) {
+        for (int i = 0; i < abilities.size(); i++) {
+            if (abilities.get(i) == ability) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public void damage(float damage) {
+        health -= damage;
+        if (health <= 0) {
+            kill();
+        }
+    }
+
+    @Override
+    public float getHealth() { return health; }
+
+    public float getMaxHealth() { return maxHealth; }
+
 
 
     public static class Definition extends GameUnit.Definition {
 
         private static final long serialVersionUID = 1000000000L;
+
         private transient SimpleProgressBar healthBar;
+        public Ability[] abilities;
+        public float maxHealth;
+
 
         public Definition(String modelPath, Creator<Shape> shapeCreator, Ability[] abilities, float maxHealth) {
             super(modelPath, shapeCreator, abilities, maxHealth);
+            this.abilities = abilities;
+            this.maxHealth = maxHealth;
         }
 
         @Override
         public void load(GameContext context) {
             super.load(context);
+
             healthBar = new HorizontalProgressBar(HealthBar.PATH_EMPTY, HealthBar.PATH_FULL);
             healthBar.load(context.getAssets());
+
+            for (Ability ability : abilities) {
+                ability.load(context);
+            }
         }
 
         @Override
         public void doneLoading() {
             super.doneLoading();
+
             healthBar.doneLoading(context.getAssets());
             healthBar.setSize(HealthBar.WIDTH, HealthBar.HEIGHT);
             healthBar.toBack();
+
+            for (Ability ability : abilities) {
+                ability.doneLoading(context);
+            }
         }
 
         @Override

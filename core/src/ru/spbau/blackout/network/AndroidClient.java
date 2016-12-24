@@ -17,6 +17,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.ingameui.settings.IngameUISettings;
@@ -110,9 +111,9 @@ public class AndroidClient implements Runnable, UIServer {
     }
 
     @Override
-    public void sendAbilityCast(GameUnit unit, int abilityNum, Vector2 target) {
+    public void sendAbilityCast(Character character, int abilityNum, Vector2 targetOffset) {
         synchronized (abilityToSend) {
-            abilityToSend.set(new AbilityCast(abilityNum, target));
+            abilityToSend.set(new AbilityCast(abilityNum, targetOffset));
             abilityToSend.notify();
         }
     }
@@ -141,7 +142,7 @@ public class AndroidClient implements Runnable, UIServer {
                     // so synchronizing on server on loading
                     synchronized (this) {
                         Gdx.app.postRunnable(() -> {
-                            final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings.getDefinitions());
+                            final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings);
                             gameScreen = new GameScreen(sessionSettings, gameWorld, this, settings);
                             BlackoutGame.get().screenManager().setScreen(gameScreen);
                         });

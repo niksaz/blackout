@@ -40,7 +40,7 @@ public class FireballAbility extends SimpleInstantAbility {
     public void cast(Vector2 targetOffset) {
         super.cast(targetOffset);
 
-        Vector2 unitPosition = getUnit().getPosition();
+        Vector2 unitPosition = getCharacter().getPosition();
         targetOffset.add(unitPosition);  // real target
         AbilityObject shell = (AbilityObject) shellDef.makeInstanceWithNextUid(targetOffset);
         targetOffset.sub(unitPosition);
