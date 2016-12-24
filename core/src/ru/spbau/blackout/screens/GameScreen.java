@@ -214,7 +214,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         ui.update(delta);
 
-        // model batch rendering
+        // modelInstance batch rendering
         {
             ModelBatch modelBatch = game.modelBatch();
             ParticleSystem particleSystem = game.particleSystem();

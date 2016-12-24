@@ -1,6 +1,5 @@
 package ru.spbau.blackout.java8features;
 
-import java.io.Serializable;
 
 public final class Optional<T> /*implements Serializable */ {
     T value;

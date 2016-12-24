@@ -4,9 +4,6 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
-import java.util.Collection;
-
-import ru.spbau.blackout.java8features.Optional;
 
 import static com.badlogic.gdx.math.MathUtils.PI;
 

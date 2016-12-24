@@ -25,7 +25,6 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
     public static class UnitAnimations extends DynamicObject.Animations {
         protected UnitAnimations() {}
         public static final String WALK = "Armature|Walk";
-        public static final String STAY = "Armature|Stay";
         public static final float WALK_ANIM_SPEED_FACTOR = 3f;
     }
 
@@ -43,7 +42,6 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
     protected GameUnit(Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
         speed = def.speed;
-        animation.ifPresent(controller -> controller.setAnimation(UnitAnimations.STAY, -1));
         abilities = Arrays.asList(def.abilities);
 
         maxHealth = def.maxHealth;
@@ -169,13 +167,17 @@ public abstract class GameUnit extends DynamicObject implements Damageable  {
         if (Utils.isZeroVec(newVelocity)) {
             // on stop walking
             if (!Utils.isZeroVec(selfVelocity)) {
-                animation.ifPresent(controller -> controller.setAnimation(UnitAnimations.STAY, -1));
+                if (animation != null) {
+                    animation.setAnimation(Animations.STAY, -1);
+                }
                 animationSpeed = 1f;
             }
         } else {
             // on start walking
             if (Utils.isZeroVec(selfVelocity)) {
-                animation.ifPresent(controller -> controller.setAnimation(UnitAnimations.WALK, -1));
+                if (animation != null) {
+                    animation.setAnimation(UnitAnimations.WALK, -1);
+                }
             }
 
             animationSpeed = newVelocity.len() * UnitAnimations.WALK_ANIM_SPEED_FACTOR;

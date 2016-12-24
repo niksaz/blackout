@@ -15,6 +15,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,7 +24,6 @@ import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphiceffects.GraphicEffect;
-import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.HasState;
 import ru.spbau.blackout.worlds.ServerGameWorld;
@@ -38,7 +39,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
     private float height;
 
     /** Equals to Optional.empty() on a server or if the object is dead. */
-    protected Optional<ModelInstance> model;
+    @Nullable protected ModelInstance modelInstance;
     public final Array<GraphicEffect> graphicEffects = new Array<>();
 
     private boolean dead = false;
@@ -53,7 +54,9 @@ public abstract class GameObject implements RenderableProvider, HasState {
         this.def = def;
         this.uid = uid;
 
-        model = def.model.map(ModelInstance::new);
+        if (def.model != null) {
+            modelInstance = new ModelInstance(def.model);
+        }
 
         body = def.registerObject(def.context, this);
         body.setUserData(this);
@@ -89,10 +92,10 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
     @Override
     public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
-        model.ifPresent(model -> {
+        if (modelInstance != null) {
             updateTransform();
-            model.getRenderables(renderables, pool);
-        });
+            modelInstance.getRenderables(renderables, pool);
+        }
     }
 
 
@@ -140,7 +143,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
         // from GameWorld right here because this method can be called in process of updating physics.
         dead = true;
         // FIXME: play death animation
-        model = Optional.empty();
+        modelInstance = null;
         dispose();
     }
 
@@ -177,12 +180,12 @@ public abstract class GameObject implements RenderableProvider, HasState {
     }
 
     protected void updateTransform() {
-        model.ifPresent(model -> {
-            model.transform.setToRotationRad(Vector3.Z, body.getAngle());
-            fixTop(model);
+        if (modelInstance != null) {
+            modelInstance.transform.setToRotationRad(Vector3.Z, body.getAngle());
+            fixTop(modelInstance);
             Vector2 pos = body.getPosition();
-            model.transform.setTranslation(pos.x, pos.y, height);
-        });
+            modelInstance.transform.setTranslation(pos.x, pos.y, height);
+        }
     }
 
     // Rotation
@@ -276,12 +279,12 @@ public abstract class GameObject implements RenderableProvider, HasState {
          */
         public Creator<Shape> shapeCreator;
 
-        /** The loaded model object. Initialized by <code>initializeGameWorld</code> method. */
-        private transient Optional<Model> model;
+        /** The loaded modelInstance object. Initialized by <code>initializeGameWorld</code> method. */
+        @Nullable private transient Model model;
         protected transient GameContext context;
 
         /**
-         * Path to the model for game objects. May be null. In this case objects will not have models.
+         * Path to the modelInstance for game objects. May be null. In this case objects will not have models.
          * Must be final due to possible problems if this variable changed between calls of `load` and `initializeGameWorld`.
          */
         public final String modelPath;
@@ -315,7 +318,6 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
         public void initializeWithoutUi(GameContext context) {
             this.context = context;
-            model = Optional.empty();
         }
 
         /** When assets are loaded. */
@@ -324,10 +326,8 @@ public abstract class GameObject implements RenderableProvider, HasState {
                 throw new IllegalArgumentException("Don't use `doneLoading` method on server.");
             }
 
-            if (modelPath == null) {
-                model = Optional.empty();
-            } else {
-                model = Optional.of(context.getAssets().get(modelPath, Model.class));
+            if (modelPath != null) {
+                model = context.getAssets().get(modelPath, Model.class);
             }
         }
 

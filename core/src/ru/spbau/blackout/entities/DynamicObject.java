@@ -5,11 +5,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.utils.Creator;
 
 
@@ -17,7 +18,7 @@ public abstract class DynamicObject extends GameObject {
     /** Constant holder class to provide names for animations. */
     public static class Animations {
         protected Animations() {}
-        public static final String DEFAULT = "Armature|Stay";
+        public static final String STAY = "Armature|Stay";
     }
 
 
@@ -32,7 +33,7 @@ public abstract class DynamicObject extends GameObject {
 
     // Appearance:
     /** It is empty on server */
-    protected final Optional<AnimationController> animation;
+    @Nullable protected final AnimationController animation;
     protected float animationSpeed = 1f;
 
 
@@ -40,8 +41,12 @@ public abstract class DynamicObject extends GameObject {
     protected DynamicObject(Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
 
-        animation = this.model.map(AnimationController::new);
-        animation.ifPresent(controller -> controller.setAnimation(Animations.DEFAULT, -1));
+        if (modelInstance != null) {
+            animation = new AnimationController(modelInstance);
+            animation.setAnimation(Animations.STAY, -1);
+        } else {
+            animation = null;
+        }
     }
 
     @Override
@@ -51,36 +56,38 @@ public abstract class DynamicObject extends GameObject {
         body.setLinearVelocity(Vector2.Zero);
     }
 
-    public final Vector2 getVelocity() { return this.velocity; }
-    public final void setVelocity(float x, float y) { this.velocity.set(x, y); }
-    public final void setVelocity(Vector2 newVelocity) { this.setVelocity(newVelocity.x, newVelocity.y); }
+    public final Vector2 getVelocity() { return velocity; }
+    public final void setVelocity(float x, float y) { velocity.set(x, y); }
+    public final void setVelocity(Vector2 newVelocity) { setVelocity(newVelocity.x, newVelocity.y); }
 
     public void applyImpulse(float x, float y) {
-        float mass = this.getMass();
-        this.velocity.add(x / mass, y / mass);
+        float mass = getMass();
+        velocity.add(x / mass, y / mass);
     }
 
     public void applyImpulse(Vector2 impulse) {
-        this.applyImpulse(impulse.x, impulse.y);
+        applyImpulse(impulse.x, impulse.y);
     }
 
 
     @Override
     public void updateGraphics(float delta) {
         super.updateGraphics(delta);
-        this.animation.ifPresent(controller -> controller.update(delta * this.animationSpeed));
+        if (animation != null) {
+            animation.update(delta * animationSpeed);
+        }
     }
 
     @Override
     public void updateForFirstStep() {
-        this.body.setLinearVelocity(this.velocity);
+        body.setLinearVelocity(velocity);
         // to take into account velocity changes during the step
-        this.velocity.set(0, 0);
+        velocity.set(0, 0);
     }
 
     @Override
     public void updateForSecondStep() {
-        this.velocity.add(this.body.getLinearVelocity());
+        velocity.add(body.getLinearVelocity());
     }
 
     @Override

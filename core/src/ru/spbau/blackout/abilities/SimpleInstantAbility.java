@@ -1,12 +1,10 @@
 package ru.spbau.blackout.abilities;
 
 
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
-import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.network.UIServer;
+
 
 /**
  * Abstract class for abilities which should be casted by single tap on the icon.

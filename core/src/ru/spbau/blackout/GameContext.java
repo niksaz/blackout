@@ -2,8 +2,6 @@ package ru.spbau.blackout;
 
 import com.badlogic.gdx.assets.AssetManager;
 
-import ru.spbau.blackout.ingameui.IngameUI;
-import ru.spbau.blackout.java8features.Optional;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.GameWorld;

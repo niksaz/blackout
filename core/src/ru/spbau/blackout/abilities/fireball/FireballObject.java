@@ -19,14 +19,14 @@ import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
 import org.jetbrains.annotations.Nullable;
 
-import static ru.spbau.blackout.abilities.fireball.FireballAbility.EXPLOSION_EFFECT_PATH;
-import static ru.spbau.blackout.abilities.fireball.FireballAbility.FIRE_EFFECT_PATH;
-import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTOR;
-
 
 public final class FireballObject extends AbilityObject {
 
     private static final String CAST_SOUND_PATH = "sounds/fire.ogg";
+    private static final float IMPULSE_FACTOR = 40f;
+
+    private static final String FIRE_EFFECT_PATH = "abilities/fireball/particles/fireball.pfx";
+    private static final String EXPLOSION_EFFECT_PATH = "effects/small_explosion/small_explosion.pfx";
 
 
     private float timeRest;
