@@ -29,12 +29,12 @@ public class ServerGameWorld extends GameWorld {
 
     public ServerGameWorld(SessionSettings sessionSettings) {
         super(sessionSettings.getDefinitions());
+        lastUid = sessionSettings.getLastUid();
     }
 
     public ServerGameWorld(SessionSettings sessionSettings, GameContext context) {
         this(sessionSettings);
         foreach(getDefinitions(), def -> def.initializeWithoutUi(context));
-        lastUid = sessionSettings.getLastUid();
     }
 
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {

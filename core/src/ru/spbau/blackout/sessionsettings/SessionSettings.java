@@ -96,7 +96,10 @@ public final class SessionSettings implements Serializable {
         enemy2.overHeadPivotOffset.set(0, 0, 3.5f);
         session.addInitialObject(enemy2, -5, 5);
 
-        final GameObject.Definition stone = new Decoration.Definition("models/stone/stone.g3db", new CircleCreator(1.1f));
+        final GameObject.Definition stone = new Decoration.Definition(
+                "models/stone/stone.g3db",
+                new CircleCreator(1.1f)
+        );
         session.addInitialObject(stone, -5, 0);
 
         return session;

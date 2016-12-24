@@ -94,26 +94,26 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         this.gameWorld = gameWorld;
         this.server = server;
 
-        this.loadingScreen = new LoadingScreen(sessionSettings);
-        this.ui = new IngameUI(this.getServer(), settings.ui);
+        loadingScreen = new LoadingScreen(sessionSettings);
+        ui = new IngameUI(getServer(), settings.ui);
 
         // initializeGameWorld main camera
-        this.camera = new PerspectiveCamera();
-        this.camera.fieldOfView = CameraDefaults.FIELD_OF_VIEW;
-        this.camera.near = 1f;
-        this.camera.far = 300f;
+        camera = new PerspectiveCamera();
+        camera.fieldOfView = CameraDefaults.FIELD_OF_VIEW;
+        camera.near = 1f;
+        camera.far = 300f;
 
         // initializeGameWorld environment
-        this.environment = new Environment();
-        this.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 100f));
-        this.environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.2f, 0f, 0.2f, -1f));
+        environment = new Environment();
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 100f));
+        environment.add(new DirectionalLight().set(0.2f, 0.2f, 0.2f, 0f, 0.2f, -1f));
 
         // initializeGameWorld particles
         BillboardParticleBatch particleBatch = new BillboardParticleBatch();
-        particleBatch.setCamera(this.camera);
+        particleBatch.setCamera(camera);
         BlackoutGame.get().particleSystem().add(particleBatch);
         ParticleEffectLoader loader = new ParticleEffectLoader(new InternalFileHandleResolver());
-        this.assets.setLoader(ParticleEffect.class, loader);
+        assets.setLoader(ParticleEffect.class, loader);
 
         // initializeGameWorld music
         FileHandle battleMusicDir = Gdx.files.internal(BATTLE_MUSIC_DIR_PATH);
@@ -121,7 +121,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             Music track = Gdx.audio.newMusic(file);
             track.setVolume(settings.battleMusicVolume * BATTLE_MUSIC_MAX_VOLUME);
             track.setLooping(false);
-            this.music.add(track);
+            music.add(track);
         }
     }
 
@@ -130,15 +130,15 @@ public class GameScreen extends BlackoutScreen implements GameContext {
      * Switches current music track to a random one which isn't equal to the current.
      */
     public void switchTrack() {
-        if (this.currentTrack != null) {
-            this.currentTrack.stop();
+        if (currentTrack != null) {
+            currentTrack.stop();
         }
 
-        Music oldTrack = this.currentTrack;
-        while (this.currentTrack == oldTrack) {
-            this.currentTrack = this.music.random();
+        Music oldTrack = currentTrack;
+        while (currentTrack == oldTrack) {
+            currentTrack = music.random();
         }
-        this.currentTrack.play();
+        currentTrack.play();
     }
 
     public IngameUI getUi() { return ui; }
@@ -153,12 +153,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     // instance of GameContext
     @Override
     public AssetManager getAssets() {
-        return this.assets;
+        return assets;
     }
 
     @Override
     public GameWorld gameWorld() {
-        return this.gameWorld;
+        return gameWorld;
     }
 
     @Override
@@ -168,7 +168,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
     @Override
     public GameSettings getSettings() {
-        return this.settings;
+        return settings;
     }
 
     @Override
@@ -183,11 +183,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         super.show();
 
         // enable music
-        this.switchTrack();
+        switchTrack();
 
         // if not loaded yet
-        if (this.loadingScreen != null) {
-            BlackoutGame.get().screenManager().setScreen(this.loadingScreen);
+        if (loadingScreen != null) {
+            BlackoutGame.get().screenManager().setScreen(loadingScreen);
         }
     }
 
@@ -205,10 +205,10 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             ModelBatch modelBatch = game.modelBatch();
             ParticleSystem particleSystem = game.particleSystem();
 
-            modelBatch.begin(this.camera);
+            modelBatch.begin(camera);
 
-            modelBatch.render(this.gameWorld.getGameObjects(), this.environment);
-            modelBatch.render(this.map, this.environment);
+            modelBatch.render(gameWorld.getGameObjects(), environment);
+            modelBatch.render(map, environment);
 
             // render particles
             particleSystem.update();
@@ -224,17 +224,17 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         game.specialEffects().update(delta);
 
         // music
-        if (!this.currentTrack.isPlaying()) {
-            this.switchTrack();
+        if (!currentTrack.isPlaying()) {
+            switchTrack();
         }
 
         // world
-        this.gameWorld.update(delta);
-        this.updateCamera();
+        gameWorld.update(delta);
+        updateCamera();
 
         // ui
-        this.ui.update(delta);
-        this.ui.draw();
+        ui.update(delta);
+        ui.draw();
     }
 
     @Override
@@ -248,9 +248,10 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     @Override
     public void dispose() {
         super.dispose();
-        this.assets.dispose();
-        this.gameWorld.dispose();
-        foreach(this.music, Music::dispose);
+        assets.dispose();
+        gameWorld.dispose();
+        currentTrack.stop();
+        foreach(music, Music::dispose);
     }
 
 
@@ -308,7 +309,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         public void show() {
             super.show();
             // first of all, it loads its own resources.
-            this.progressBar.load(assets);
+            progressBar.load(assets);
             Textures.loadFast(BACKGROUND_IMAGE, assets);
         }
 
@@ -326,18 +327,18 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             if (loadingScreenLoaded) {
                 if (loaded) {
                     // end loading
-                    this.doneLoading();
+                    doneLoading();
                 } else {
                     // show loading getScreen
                     float progress = assets.getProgress();
-                    this.progressBar.setValue(progress);
-                    this.stage.act();
-                    this.stage.draw();
+                    progressBar.setValue(progress);
+                    stage.act();
+                    stage.draw();
                 }
             } else if (loaded) {
                 // initializeGameWorld loading getScreen and start loading real resources
-                this.initializeLoadingScreen();
-                this.loadRealResources();
+                initializeLoadingScreen();
+                loadRealResources();
                 loadingScreenLoaded = true;
             }
         }
@@ -356,12 +357,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             Image background = new Image(backgroundTexture);
             background.setPosition(0, 0);
             background.setSize(getWorldWidth(), getWorldHeight());
-            this.stage.addActor(background);
+            stage.addActor(background);
 
             // progress bar
-            this.progressBar.doneLoading(assets);
-            this.progressBar.toFront();
-            this.stage.addActor(this.progressBar);
+            progressBar.doneLoading(assets);
+            progressBar.toFront();
+            stage.addActor(progressBar);
 
             // label
             Label.LabelStyle style = new Label.LabelStyle(
@@ -378,7 +379,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             label.setSize(LoadingLabel.WIDTH, LoadingLabel.MAX_Y - LoadingLabel.MIN_Y);
             label.setAlignment(Align.center);
             label.setWrap(true);
-            this.stage.addActor(label);
+            stage.addActor(label);
         }
 
         private void loadRealResources() {
