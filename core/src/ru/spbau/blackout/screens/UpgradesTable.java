@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.database.PlayerEntity;
 import ru.spbau.blackout.entities.Character;
 
@@ -18,18 +17,15 @@ public class UpgradesTable {
     private static final float BUTTON_HEIGHT = 50.0f;
     private static final float BUTTON_PADDING = 10.0f;
 
-    private static final String HEALTH_UPGRADE = "Increase initial health";
-    private static final String HEALTH_CURRENT = "current health";
+    private static final String HEALTH_UPGRADE = "Increase health";
+    private static final String HEALTH_CURRENT = "max health";
     private static final String ABILITY_UPGRADE = "Upgrade";
-    private static final String ABILITY_CURRENT = "current level";
+    private static final String ABILITY_CURRENT = "level";
 
     private static final String BACK_TEXT = "Back";
 
     public static Table getTable(final MenuScreen screen) {
         final Table middleTable = new Table();
-
-        final PlayerEntity entity = BlackoutGame.get().getPlayerEntity();
-        final Character.Definition characterDefinition = entity.getDeserializedCharacterDefinition();
 
         addRowWithButtonAndLabel(
                 middleTable,
@@ -37,22 +33,27 @@ public class UpgradesTable {
                 new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
-                        screen.changeMiddleTable(MainMenuTable.getTable(screen));
+                        BlackoutGame.get().getPlayerEntity().upgradeHealth();
                         super.clicked(event, x, y);
                     }
                 },
                 new Label("", BlackoutGame.get().assets().getDefaultSkin()) {
                     @Override
                     public void act(float delta) {
-                        setText(HEALTH_CURRENT + " " + characterDefinition.maxHealth);
+                        setText(HEALTH_CURRENT + " " +
+                                BlackoutGame.get().getPlayerEntity().getDeserializedCharacterDefinition().maxHealth);
                         super.act(delta);
                     }
                 });
 
-        for (Ability ability : characterDefinition.abilities) {
+        final PlayerEntity entity = BlackoutGame.get().getPlayerEntity();
+        final Character.Definition characterDefinition = entity.getDeserializedCharacterDefinition();
+        for (int abilityIndex = 0; abilityIndex < characterDefinition.abilities.length; abilityIndex++) {
+            final int currentAbilityIndex = abilityIndex;
             addRowWithButtonAndLabel(
                     middleTable,
-                    ABILITY_UPGRADE + " " + ability.getClass().getSimpleName(),
+                    ABILITY_UPGRADE + " " +
+                            characterDefinition.abilities[currentAbilityIndex].getClass().getSimpleName(),
                     new ClickListener() {
                         @Override
                         public void clicked(InputEvent event, float x, float y) {
@@ -63,7 +64,9 @@ public class UpgradesTable {
                     new Label("", BlackoutGame.get().assets().getDefaultSkin()) {
                         @Override
                         public void act(float delta) {
-                            setText(ABILITY_CURRENT + " " + ability.getLevel());
+                            setText(ABILITY_CURRENT + " " +
+                                    BlackoutGame.get().getPlayerEntity().getDeserializedCharacterDefinition()
+                                            .abilities[currentAbilityIndex].getLevel());
                             super.act(delta);
                         }
                     });

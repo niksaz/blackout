@@ -1,6 +1,7 @@
 package ru.spbau.blackout.database;
 
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -11,17 +12,32 @@ import ru.spbau.blackout.network.Network;
 /**
  * Extended PlayerEntity which actually asks server if a query can be done and only then performs it.
  */
-public class PlayerEntityAtClient extends PlayerEntity {
+public class ChangeablePlayerEntity extends PlayerEntity {
 
     private static final int HTTP_CONNECT_TIMEOUT_MS = 2000;
     private static final int HTTP_READ_TIMEOUT_MS = 2000;
     private static final int LOAD_REQUEST_MAX_ATTEMPTS = 3;
 
-    public PlayerEntityAtClient(PlayerEntity playerEntity) {
+    public ChangeablePlayerEntity(PlayerEntity playerEntity) {
         super(playerEntity);
     }
 
     public void changeGold(int delta) {
+        startUpgradeRequest(outputStream -> {
+            outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+            outputStream.writeUTF(Database.GOLD_UPGRADE);
+            outputStream.writeInt(delta);
+        });
+    }
+
+    public void upgradeHealth() {
+        startUpgradeRequest(outputStream -> {
+            outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+            outputStream.writeUTF(Database.HEALTH_UPGRADE);
+        });
+    }
+
+    private void startUpgradeRequest(RequestWriter requestWriter) {
         new Thread(() -> {
             try {
                 final String url = "http://" +
@@ -41,9 +57,7 @@ public class PlayerEntityAtClient extends PlayerEntity {
                 try (
                         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
                 ) {
-                    outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
-                    outputStream.writeUTF(Database.GOLD_UPGRADE);
-                    outputStream.writeInt(delta);
+                    requestWriter.writeRequest(outputStream);
                 }
 
                 final int responseCode = connection.getResponseCode();
@@ -95,7 +109,7 @@ public class PlayerEntityAtClient extends PlayerEntity {
                     final ObjectInputStream in = new ObjectInputStream(connection.getInputStream());
 
                     final PlayerEntity playerEntity = (PlayerEntity) in.readObject();
-                    BlackoutGame.get().setPlayerEntity(new PlayerEntityAtClient(playerEntity));
+                    BlackoutGame.get().setPlayerEntity(new ChangeablePlayerEntity(playerEntity));
                     if (runIfSuccessful != null) {
                         runIfSuccessful.run();
                     }
@@ -109,5 +123,10 @@ public class PlayerEntityAtClient extends PlayerEntity {
                 runIfUnsuccessful.run();
             }
         }).start();
+    }
+
+    @FunctionalInterface
+    private interface RequestWriter {
+        void writeRequest(DataOutputStream outputStream) throws IOException;
     }
 }

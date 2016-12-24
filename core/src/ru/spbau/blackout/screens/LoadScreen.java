@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Align;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.androidfeatures.PlayServicesListener;
-import ru.spbau.blackout.database.PlayerEntityAtClient;
+import ru.spbau.blackout.database.ChangeablePlayerEntity;
 
 /**
  * When the app is signing-in a player and loading the profile from the server LoadScreen is showed. Also this class
@@ -55,7 +55,7 @@ public class LoadScreen extends StageScreen implements PlayServicesListener {
     @Override
     public void onSignInSucceeded() {
         Gdx.app.postRunnable(() -> addLabel(STARTED_LOADING));
-        PlayerEntityAtClient.loadPlayerEntity(
+        ChangeablePlayerEntity.loadPlayerEntity(
                 () -> Gdx.app.postRunnable(() -> BlackoutGame.get().screenManager().setScreen(new MenuScreen())),
                 () -> Gdx.app.postRunnable(() -> showErrorDialog(UNSUCCESSFUL_LOADING)));
     }

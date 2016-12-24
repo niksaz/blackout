@@ -14,9 +14,9 @@ import ru.spbau.blackout.entities.Character;
 public class PlayerEntity implements Serializable {
 
     @Id
-    private final String name;
-    private int gold;
-    private byte[] serializedDefinition;
+    protected final String name;
+    protected int gold;
+    protected byte[] serializedDefinition;
 
     /**
      * Used by Morphia to initialize objects extracted from the database.
