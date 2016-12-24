@@ -6,16 +6,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.spbau.blackout.abilities.Ability;
-import ru.spbau.blackout.abilities.fireball.FireballAbility;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Finder;
-
-import static ru.spbau.blackout.utils.ReflectUtils.findAllImpls;
 
 
 /**
@@ -27,7 +23,7 @@ import static ru.spbau.blackout.utils.ReflectUtils.findAllImpls;
  */
 public final class SessionSettings implements Serializable {
 
-    private String mapPath;
+    private final String mapPath;
     private final List<GameObject.Definition> definitions = new ArrayList<>();
     private long playerUid = 0;
     private final List<InitialState> initialStates = new ArrayList<>();
@@ -81,37 +77,22 @@ public final class SessionSettings implements Serializable {
 
     // FIXME: just for test
     public static SessionSettings getTest() {
-        SessionSettings session = new SessionSettings("maps/duel/duel.g3db");
+        final SessionSettings session = new SessionSettings("maps/duel/duel.g3db");
 
-        Character.Definition hero = new Character.Definition(
-                "models/wizard/wizard.g3db",
-                new CircleCreator(0.6f),
-                new Ability[] { new FireballAbility(7) },
-                200
-        );
+        final Character.Definition hero = Character.Definition.createDefaultCharacterDefinition();
         hero.overHeadPivotOffset.set(0, 0, 3.5f);
         session.addInitialObject(hero, 0, 0, GameUnit.Definition.getNextUid());
         session.setPlayerUid(1);
 
-        Character.Definition enemy = new Character.Definition(
-                "models/wizard/wizard.g3db",
-                new CircleCreator(0.6f),
-                new Ability[] { new FireballAbility(2) },
-                200
-        );
+        final Character.Definition enemy = Character.Definition.createDefaultCharacterDefinition();
         enemy.overHeadPivotOffset.set(0, 0, 3.5f);
         session.addInitialObject(enemy, 5, 5, GameUnit.Definition.getNextUid());
 
-        Character.Definition enemy2 = new Character.Definition(
-                "models/wizard/wizard.g3db",
-                new CircleCreator(0.6f),
-                new Ability[] { new FireballAbility(2) },
-                200
-        );
+        final Character.Definition enemy2 = Character.Definition.createDefaultCharacterDefinition();
         enemy2.overHeadPivotOffset.set(0, 0, 3.5f);
         session.addInitialObject(enemy2, -5, 5, GameUnit.Definition.getNextUid());
 
-        GameObject.Definition stone = new Decoration.Definition("models/stone/stone.g3db", new CircleCreator(1.1f));
+        final GameObject.Definition stone = new Decoration.Definition("models/stone/stone.g3db", new CircleCreator(1.1f));
         session.addInitialObject(stone, -5, 0, GameUnit.Definition.getNextUid());
 
         return session;

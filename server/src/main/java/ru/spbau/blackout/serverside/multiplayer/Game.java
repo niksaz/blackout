@@ -77,7 +77,6 @@ public class Game extends Thread implements GameContext {
                 server.log("Updating gameWorld: " + worldDeltaInSecs);
 
                 final byte[] worldInBytes = serializeWorld();
-                System.out.println("world size " + worldInBytes.length);
                 for (ClientThread client : clients) {
                     if (client.getClientGameState() == GameState.FINISHED) {
                         gameState = GameState.FINISHED;

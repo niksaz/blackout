@@ -10,9 +10,11 @@ import java.io.ObjectOutputStream;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
+import ru.spbau.blackout.abilities.fireball.FireballAbility;
 import ru.spbau.blackout.graphiceffects.HealthBarEffect;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
+import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Creator;
 
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
@@ -88,6 +90,19 @@ public class Character extends GameUnit {
                 throw new IllegalStateException(e);
             }
             return characterDefinition;
+        }
+
+        public static Definition createDefaultCharacterDefinition() {
+            return new Character.Definition(
+                    "models/wizard/wizard.g3db",
+                    new CircleCreator(0.6f),
+                    new Ability[] { new FireballAbility(1) },
+                    200
+            );
+        }
+
+        public static byte[] createSerializedDefaultCharacterDefinition() {
+            return createDefaultCharacterDefinition().serializeToByteArray();
         }
 
         private static final class HealthBar {

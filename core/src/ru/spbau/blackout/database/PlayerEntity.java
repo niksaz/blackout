@@ -5,10 +5,7 @@ import org.mongodb.morphia.annotations.Id;
 
 import java.io.Serializable;
 
-import ru.spbau.blackout.abilities.Ability;
-import ru.spbau.blackout.abilities.fireball.FireballAbility;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.shapescreators.CircleCreator;
 
 /**
  * Representation of a player profile in a database.
@@ -35,7 +32,7 @@ public class PlayerEntity implements Serializable {
      * @param name name of a new player
      */
     public PlayerEntity(String name) {
-        this(name, 0, getSerializedGrantedCharacter());
+        this(name, 0, Character.Definition.createSerializedDefaultCharacterDefinition());
         System.out.println("constructor (String) called");
     }
 
@@ -52,18 +49,6 @@ public class PlayerEntity implements Serializable {
         this.gold = gold;
         this.serializedDefinition = serializedDefinition;
     }
-
-
-    private static byte[] getSerializedGrantedCharacter() {
-        final Character.Definition grantedCharacter = new Character.Definition(
-                "models/wizard/wizard.g3db",
-                new CircleCreator(0.6f),
-                new Ability[] { new FireballAbility(1) },
-                200
-        );
-        return grantedCharacter.serializeToByteArray();
-    }
-
 
     public String getName() {
         return name;
