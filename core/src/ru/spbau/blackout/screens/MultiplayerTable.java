@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.network.AndroidClient;
 
+import static ru.spbau.blackout.screens.MenuScreen.addBlackoutLabel;
 import static ru.spbau.blackout.screens.MenuScreen.addButton;
 
 /**
@@ -26,6 +27,8 @@ public class MultiplayerTable {
         this.screen = screen;
 
         middleTable = new Table();
+
+        addBlackoutLabel(middleTable);
         final Label.LabelStyle style = new Label.LabelStyle();
         style.font = BlackoutGame.get().assets().getFont();
         status = new Label("Connecting to the server...", style);

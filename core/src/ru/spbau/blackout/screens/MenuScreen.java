@@ -28,7 +28,8 @@ import ru.spbau.blackout.BlackoutGame;
  */
 public class MenuScreen extends StageScreen {
 
-    private static final String SETTINGS_TEXTURE_PATH = "images/menuscreen/up-arrow.png";
+    private static final String UP_ARROW_PATH = "images/menuscreen/up-arrow.png";
+    private static final String DOWN_ARROW_PATH = "images/menuscreen/down-arrow.png";
     private static final String GAMES_ACHIEVEMENTS_GAMES_PATH = "images/game_services/games_achievements.png";
     private static final String GAMES_CONTROLLER_GAMES_PATH = "images/game_services/games_controller_grey.png";
     private static final String GAMES_LEADERBOARDS_GAMES_PATH = "images/game_services/games_leaderboards.png";
@@ -133,11 +134,15 @@ public class MenuScreen extends StageScreen {
     }
 
     static Label addBlackoutLabel(Table table) {
+        return addBlackoutLabel(table, 1);
+    }
+
+    static Label addBlackoutLabel(Table table, int columns) {
         final Label label = new Label(
                 BLACKOUT_TEXT,
                 BlackoutGame.get().assets().getDefaultSkin(),
                 BLACKOUT_LABEL_STYLE_NAME);
-        table.add(label).pad(BLACKOUT_LABEL_BOTTOM_PADDING).row();
+        table.add(label).colspan(columns).pad(BLACKOUT_LABEL_BOTTOM_PADDING).row();
 
         // FIXME: a way to get free gold. :)
         label.addListener(new ClickListener() {
@@ -158,14 +163,21 @@ public class MenuScreen extends StageScreen {
     }
 
     private Image addSettingsIcon(final Array<Actor> controlledImages) {
-        final Texture settingsTexture = new Texture(SETTINGS_TEXTURE_PATH);
+        final Texture settingsTexture = new Texture(UP_ARROW_PATH);
         final Image settingsImage = new Image(settingsTexture);
 
         settingsImage.addListener(new ClickListener() {
+            private boolean currentVisibility = false;
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                currentVisibility ^= true;
                 for (Actor actor : controlledImages) {
-                    actor.setVisible(!actor.isVisible());
+                    actor.setVisible(currentVisibility);
+                }
+                if (currentVisibility) {
+                    settingsImage.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture(DOWN_ARROW_PATH))));
+                } else {
+                    settingsImage.setDrawable(new TextureRegionDrawable(new TextureRegion(new Texture(UP_ARROW_PATH))));
                 }
             }
         });

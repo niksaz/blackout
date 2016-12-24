@@ -16,7 +16,7 @@ class MainMenuTable {
 
     private static final String BUTTON_PLAY_TEXT = "Play";
     private static final String BUTTON_UPGRADES_TEXT = "Upgrades";
-
+    private static final String BUTTON_SETTINGS = "Settings";
 
     static Table getTable(final MenuScreen screen) {
         final Table middleTable = new Table();
@@ -35,6 +35,7 @@ class MainMenuTable {
                 screen.changeMiddleTable(UpgradesTable.getTable(screen));
             }
         });
+        addButton(middleTable, BUTTON_SETTINGS, null);
 
         middleTable.setFillParent(true);
         return middleTable;

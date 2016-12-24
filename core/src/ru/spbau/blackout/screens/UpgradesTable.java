@@ -13,6 +13,7 @@ import ru.spbau.blackout.entities.Character;
 
 import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE_COST;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
+import static ru.spbau.blackout.screens.MenuScreen.addBlackoutLabel;
 
 public class UpgradesTable {
 
@@ -28,6 +29,8 @@ public class UpgradesTable {
 
     public static Table getTable(final MenuScreen screen) {
         final Table middleTable = new Table();
+
+        addBlackoutLabel(middleTable, 2);
 
         addRowWithButtonAndLabel(
                 middleTable,
