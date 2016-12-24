@@ -36,7 +36,7 @@ public class FireballAbility extends SimpleInstantAbility {
         this.shellDef.chestPivotOffset.set(0, 0, 1.5f);
         this.shellDef.isSensor = true;
         this.shellDef.timeToLive = TIME_TO_LIVE;
-        this.shellDef.damage = 30f;  // FIXME
+        this.shellDef.damage = 20.0f + 5.0f * level;
     }
 
 
