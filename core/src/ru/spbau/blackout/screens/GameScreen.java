@@ -51,7 +51,6 @@ import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 import static ru.spbau.blackout.java8features.Functional.foreach;
 import static ru.spbau.blackout.settings.GameSettings.MUSIC_MAX_VOLUME;
-import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
 public class GameScreen extends BlackoutScreen implements GameContext {
@@ -75,7 +74,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private LoadingScreen loadingScreen;
 
     // appearance:
-    private /*final*/ ModelInstance map;
     private final PerspectiveCamera camera;
     public final Environment environment;
 
@@ -225,6 +223,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
 
         // music
         if (!currentTrack.isPlaying()) {
@@ -253,7 +252,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             modelBatch.begin(camera);
 
             modelBatch.render(gameWorld.getGameObjects(), environment);
-            modelBatch.render(map, environment);
 
             // render particles
             particleSystem.update();
@@ -413,7 +411,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private void loadRealResources() {
             ui.load(GameScreen.this);
             gameWorld().load(GameScreen.this);
-            assets.load(sessionSettings.getMapPath(), Model.class);
         }
 
         private void doneLoading() {
@@ -427,9 +424,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             if (mainCharacter == null) {
                 throw new AssertionError("Player without mainCharacter");
             }
-
-            map = new ModelInstance(assets.get(sessionSettings.getMapPath(), Model.class));
-            fixTop(map);
 
             ui.doneLoading(GameScreen.this);
             GameScreen.this.doneLoading();

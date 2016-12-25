@@ -12,6 +12,7 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
+import ru.spbau.blackout.shapescreators.RightOctagonCreator;
 import ru.spbau.blackout.utils.Finder;
 
 
@@ -24,18 +25,13 @@ import ru.spbau.blackout.utils.Finder;
  */
 public final class SessionSettings implements Serializable {
 
-    private final String mapPath;
     private final List<GameObject.Definition> definitions = new ArrayList<>();
     private long playerUid = 0;
     private final List<InitialState> initialStates = new ArrayList<>();
     private transient Finder<GameObject.Definition> finder = new Finder<>(GameObject.Definition.class, definitions);
     private transient long lastUid = 0;
 
-    public SessionSettings(String mapPath) {
-        this.mapPath = mapPath;
-    }
 
-    public String getMapPath() { return mapPath; }
     public List<GameObject.Definition> getDefinitions() { return definitions; }
     public void setPlayerUid(long uid) { this.playerUid = uid; }
     public long getPlayerUid() { return playerUid; }
@@ -87,7 +83,7 @@ public final class SessionSettings implements Serializable {
         initialPositionsPool.add(new Vector2(5, 5));
         initialPositionsPool.add(new Vector2(0, 0));
 
-        final SessionSettings session = new SessionSettings("maps/duel/duel.g3db");
+        final SessionSettings session = new SessionSettings();
         session.setPlayerUid(1);
 
         for (Character.Definition characterDefinition : characters) {
@@ -107,6 +103,12 @@ public final class SessionSettings implements Serializable {
                 new CircleCreator(1.1f)
         );
         session.addInitialObject(stone, -5, 0);
+
+        final GameObject.Definition map = new Decoration.Definition(
+                "maps/duel/duel.g3db",
+                new RightOctagonCreator(20f)
+        );
+        session.addInitialObject(map, 0, 0);
 
         return session;
     }
