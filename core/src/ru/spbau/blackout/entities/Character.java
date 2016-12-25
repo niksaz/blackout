@@ -7,11 +7,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
+import ru.spbau.blackout.abilities.ForceBlast;
 import ru.spbau.blackout.abilities.fireball.FireballAbility;
 import ru.spbau.blackout.graphiceffects.HealthBarEffect;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
@@ -42,9 +42,12 @@ public class Character extends GameUnit implements Damageable  {
         health = maxHealth;
     }
 
-
     public final Ability getAbility(int num) {
         return abilities.get(num);
+    }
+
+    public final List<Ability> getAbilities() {
+        return abilities;
     }
 
     public void castAbility(int abilityNum, Vector2 target) {
@@ -170,7 +173,8 @@ public class Character extends GameUnit implements Damageable  {
                     "models/wizard/wizard.g3db",
                     new CircleCreator(0.6f),
                     new Ability.Definition[] {
-                        new FireballAbility.Definition(1)
+                        new FireballAbility.Definition(1),
+                        new ForceBlast.Definition(1)
                     },
                     200
             );

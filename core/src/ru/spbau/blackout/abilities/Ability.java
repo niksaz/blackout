@@ -65,28 +65,24 @@ public abstract class Ability implements HasState {
 
     public void setChargeTime(float chargeTime) { this.chargeTime = chargeTime; }
 
-    /** Sets current chargeUpdate time as <code>maxChargeTime</code>. */
-    public void chargeStart() { setChargeTime(def.maxChargeTime); }
+    /** Sets current chargeUpdate time as <code>getMaxChargeTime</code>. */
+    public void chargeStart() { setChargeTime(def.getMaxChargeTime()); }
 
 
     public static abstract class Definition implements Serializable {
 
         private static final long serialVersionUID = 1000000000L;
 
-        private String iconPath;
-        private float maxChargeTime;
         private int level;
 
-        public Definition(String iconPath, float maxChargeTime, int level) {
-            this.iconPath = iconPath;
-            this.maxChargeTime = maxChargeTime;
+        public Definition(int level) {
             setLevel(level);
         }
 
         /** Load necessary assets. */
         public void load(GameContext context) {
             // loading of icon has to be here because it isn't accessible from `AbilityIcon` class in the loading stage
-            context.getAssets().load(iconPath, Texture.class);
+            context.getAssets().load(getIconPath(), Texture.class);
         }
 
         public void doneLoading(GameContext context) {}
@@ -101,16 +97,11 @@ public abstract class Ability implements HasState {
 
         public abstract Ability makeInstance(Character character);
 
-        public String getIconPath() {
-            return iconPath;
-        }
-
-        public float getMaxChargeTime() {
-            return maxChargeTime;
-        }
-
         public final void increaseLevel() {
             setLevel(getLevel() + 1);
         }
+
+        public abstract String getIconPath();
+        public abstract float getMaxChargeTime();
     }
 }

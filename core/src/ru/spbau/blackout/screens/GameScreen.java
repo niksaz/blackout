@@ -95,7 +95,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         this.server = server;
 
         loadingScreen = new LoadingScreen(sessionSettings);
-        ui = new IngameUI(getServer(), settings.ui);
+        ui = new IngameUI(getServer());
 
         // initializeGameWorld main camera
         camera = new PerspectiveCamera();

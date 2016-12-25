@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.ingameui.IngameUIObject;
-import ru.spbau.blackout.ingameui.settings.StickSettings;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.units.Vpx;
 import ru.spbau.blackout.utils.Textures;
@@ -27,6 +26,9 @@ public final class Stick extends IngameUIObject {
     public static final float MAIN_IMAGE_CENTER = MAIN_IMAGE_SIZE / 2;  // because it is related to position
     public static final String MAIN_IMAGE_PATH = "images/stick/stick_main.png";
 
+    public static final float START_X = 100;
+    public static final float START_Y = 100;
+
     public static final float TOUCH_IMAGE_SIZE = MAIN_IMAGE_SIZE / 5;
     public static final float TOUCH_IMAGE_CENTER = TOUCH_IMAGE_SIZE / 2;
     public static final String TOUCH_IMAGE_PATH = "images/stick/stick_touch.png";
@@ -39,13 +41,11 @@ public final class Stick extends IngameUIObject {
     /** the controlled unit */
     private GameUnit unit;
     private Image touchImage;
-    private final StickSettings settings;
     private final UIServer server;
 
 
-    public Stick(UIServer server, StickSettings settings) {
+    public Stick(UIServer server) {
         this.server = server;
-        this.settings = settings;
     }
 
 
@@ -62,7 +62,7 @@ public final class Stick extends IngameUIObject {
         // main image initialization
         Image mainImg = new Image(assets.get(MAIN_IMAGE_PATH, Texture.class));
         mainImg.setSize(MAIN_IMAGE_SIZE, MAIN_IMAGE_SIZE);
-        mainImg.setPosition(settings.getStart().x, settings.getStart().y);
+        mainImg.setPosition(START_X, START_Y);
         mainImg.addListener(this.new Listener());
         stage.addActor(mainImg);
 
@@ -83,7 +83,7 @@ public final class Stick extends IngameUIObject {
 
 
     private void updateTouchPosition() {
-        Vector2 position = new Vector2(settings.getStart());
+        Vector2 position = new Vector2(START_X, START_Y);
         position.add(MAIN_IMAGE_CENTER - TOUCH_IMAGE_CENTER, MAIN_IMAGE_CENTER - TOUCH_IMAGE_CENTER)
                 .mulAdd(velocity, MAX_AT);
         touchImage.setPosition(position.x, position.y);

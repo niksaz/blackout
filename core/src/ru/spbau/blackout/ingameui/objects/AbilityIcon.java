@@ -2,15 +2,17 @@ package ru.spbau.blackout.ingameui.objects;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
+import org.jetbrains.annotations.Nullable;
+
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUIObject;
-import ru.spbau.blackout.ingameui.settings.AbilityIconSettings;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.progressbar.VerticalProgressBar;
@@ -29,17 +31,19 @@ public final class AbilityIcon extends IngameUIObject {
     public static final float ICON_SIZE = 0.8f * CELL_SIZE;
 
 
-    private final AbilityIconSettings settings;
-    private /*final*/ Ability ability;
+    @Nullable private /*final*/ Ability ability;
     private boolean isPressed = false;
     private SimpleProgressBar chargingBar = new VerticalProgressBar(EMPTY_TEXTURE_PATH, FULL_TEXTURE_PATH);
     private final UIServer server;  // TODO: use it
+    private final int abilityNum;
+    private final Vector2 startPosition;
 
 
     // I have to getOriginal unitDef here in order to getOriginal its abilityIcons
-    public AbilityIcon(UIServer server, AbilityIconSettings settings) {
+    public AbilityIcon(UIServer server, int abilityNum, Vector2 startPosition) {
         this.server = server;
-        this.settings = settings;
+        this.abilityNum = abilityNum;
+        this.startPosition = startPosition;
     }
 
 
@@ -51,12 +55,17 @@ public final class AbilityIcon extends IngameUIObject {
 
     @Override
     public void doneLoading(AssetManager assets, Stage stage, Character character) {
-        ability = character.getAbility(settings.getAbilityNum());
+        if (abilityNum >= character.getAbilities().size()) {
+            return;
+        }
+
+        ability = character.getAbility(abilityNum);
+        assert ability != null;
 
         // Charged cell image
         Image ready = new Image(assets.get(CHARGED_TEXTURE_PATH, Texture.class));
         ready.setSize(CELL_SIZE, CELL_SIZE);
-        ready.setPosition(settings.getStart().x, settings.getStart().y);
+        ready.setPosition(startPosition.x, startPosition.y);
         ready.setZIndex(0);
         stage.addActor(ready);
 
@@ -64,7 +73,7 @@ public final class AbilityIcon extends IngameUIObject {
         Image icon = new Image(assets.get(ability.getDef().getIconPath(), Texture.class));
         icon.setSize(ICON_SIZE, ICON_SIZE);
         float iconOffset = (CELL_SIZE - ICON_SIZE) / 2f;
-        icon.setPosition(settings.getStart().x + iconOffset, settings.getStart().y + iconOffset);
+        icon.setPosition(startPosition.x + iconOffset, startPosition.y + iconOffset);
 
         icon.setZIndex(1);
         stage.addActor(icon);
@@ -73,7 +82,7 @@ public final class AbilityIcon extends IngameUIObject {
         // chargingBar initialization
         chargingBar.doneLoading(assets);
         chargingBar.setSize(CELL_SIZE, CELL_SIZE);
-        chargingBar.setPosition(settings.getStart().x, settings.getStart().y);
+        chargingBar.setPosition(startPosition.x, startPosition.y);
         chargingBar.setZIndex(2);
         endCharging();
         stage.addActor(chargingBar);
@@ -81,6 +90,10 @@ public final class AbilityIcon extends IngameUIObject {
 
     @Override
     public void update(float deltaTime) {
+        if (ability == null) {
+            return;
+        }
+
         if (isPressed) {
             ability.inCast(server, deltaTime);
         }
@@ -103,10 +116,6 @@ public final class AbilityIcon extends IngameUIObject {
         }
     }
 
-
-    public Ability getAbility() { return ability; }
-
-
     public boolean isCharging() {
         return chargingBar.isVisible();
     }
@@ -121,7 +130,8 @@ public final class AbilityIcon extends IngameUIObject {
     private class Listener extends InputListener {
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-            getAbility().onCastStart(server);
+            assert ability != null;
+            ability.onCastStart(server);
             isPressed = true;
 
             // It means that I want it to receive all touchDragged and touchUp events,
@@ -131,8 +141,9 @@ public final class AbilityIcon extends IngameUIObject {
 
         @Override
         public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+            assert ability != null;
             isPressed = false;
-            getAbility().onCastEnd(server);
+            ability.onCastEnd(server);
         }
     }
 }

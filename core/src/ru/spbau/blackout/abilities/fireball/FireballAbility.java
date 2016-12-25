@@ -54,7 +54,7 @@ public class FireballAbility extends SimpleInstantAbility {
 
 
         public Definition(int level) {
-            super(ICON_PATH, MAX_CHARGE_TIME, level);
+            super(level);
             this.shellDef = new FireballObject.Definition(null, new CircleCreator(SHELL_RADIUS), SHELL_MASS);
             this.shellDef.chestPivotOffset.set(0, 0, 1.5f);
             this.shellDef.isSensor = true;
@@ -78,6 +78,16 @@ public class FireballAbility extends SimpleInstantAbility {
             // FIXME: it looks weird
             this.shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * getLevel();
             return new FireballAbility(this, character);
+        }
+
+        @Override
+        public float getMaxChargeTime() {
+            return MAX_CHARGE_TIME;
+        }
+
+        @Override
+        public String getIconPath() {
+            return ICON_PATH;
         }
     }
 }
