@@ -104,11 +104,17 @@ public final class SessionSettings implements Serializable {
         );
         session.addInitialObject(stone, -5, 0);
 
-        final GameObject.Definition map = new Decoration.Definition(
+        final GameObject.Definition mapInner = new Decoration.Definition(
                 "maps/duel/duel.g3db",
                 new RightOctagonCreator(20f)
         );
-        session.addInitialObject(map, 0, 0);
+        session.addInitialObject(mapInner, 0, 0);
+
+        final GameObject.Definition mapExternal = new Decoration.Definition(
+                null,
+                new RightOctagonCreator(22f)
+        );
+        session.addInitialObject(mapExternal, 0, 0);
 
         return session;
     }

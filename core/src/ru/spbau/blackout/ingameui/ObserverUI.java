@@ -6,12 +6,12 @@ import ru.spbau.blackout.ingameui.objects.CameraControlStick;
 import ru.spbau.blackout.ingameui.objects.ExitButton;
 import ru.spbau.blackout.network.UIServer;
 
-public class ViewerUI extends IngameUI {
+public class ObserverUI extends IngameUI {
 
     /**
      * Substitutes the previous ui by the new one. Disposes the previous ui.
      */
-    public ViewerUI(IngameUI previous, UIServer server, Camera camera) {
+    public ObserverUI(IngameUI previous, UIServer server, Camera camera) {
         super(previous.getExtraActors());
         previous.dispose();
 

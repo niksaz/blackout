@@ -12,9 +12,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
@@ -34,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.ingameui.IngameUI;
-import ru.spbau.blackout.ingameui.ViewerUI;
+import ru.spbau.blackout.ingameui.ObserverUI;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.worlds.GameWorld;
@@ -205,9 +203,9 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         }
     }
 
-    public void intoViewer() {
+    public void becomeObserver() {
         mainCharacter = null;
-        ui = new ViewerUI(ui, uiServer, camera);
+        ui = new ObserverUI(ui, uiServer, camera);
         ui.load(this);
         assets.finishLoading();
         ui.doneLoading(this);
@@ -218,7 +216,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         super.render(delta);
 
         if (mainCharacter != null && mainCharacter.isDead()) {
-            intoViewer();
+            becomeObserver();
         }
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
