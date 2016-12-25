@@ -3,6 +3,7 @@ package ru.spbau.blackout.ingameui.objects;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.ingameui.IngameUIObject;
@@ -27,15 +28,15 @@ public final class HealthBar extends IngameUIObject {
 
 
     @Override
-    public void load(AssetManager assets) {
-        healthBar.load(assets);
+    public void load(GameContext context) {
+        healthBar.load(context.getAssets());
     }
 
     @Override
-    public void doneLoading(AssetManager assets, Stage stage, Character character) {
+    public void doneLoading(GameContext context, Stage stage, Character character) {
         this.character = character;
 
-        healthBar.doneLoading(assets);
+        healthBar.doneLoading(context.getAssets());
         healthBar.setPosition(START_X, START_Y);
         healthBar.setSize(WIDTH, HEIGHT);
         stage.addActor(healthBar);

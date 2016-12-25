@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 import org.jetbrains.annotations.Nullable;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUIObject;
@@ -48,13 +49,13 @@ public final class AbilityIcon extends IngameUIObject {
 
 
     @Override
-    public void load(AssetManager assets) {
-        chargingBar.load(assets);
-        Textures.loadMipMapAA(CHARGED_TEXTURE_PATH, assets);
+    public void load(GameContext context) {
+        chargingBar.load(context.getAssets());
+        Textures.loadMipMapAA(CHARGED_TEXTURE_PATH, context.getAssets());
     }
 
     @Override
-    public void doneLoading(AssetManager assets, Stage stage, Character character) {
+    public void doneLoading(GameContext context, Stage stage, Character character) {
         if (abilityNum >= character.getAbilities().size()) {
             return;
         }
@@ -63,14 +64,14 @@ public final class AbilityIcon extends IngameUIObject {
         assert ability != null;
 
         // Charged cell image
-        Image ready = new Image(assets.get(CHARGED_TEXTURE_PATH, Texture.class));
+        Image ready = new Image(context.getAssets().get(CHARGED_TEXTURE_PATH, Texture.class));
         ready.setSize(CELL_SIZE, CELL_SIZE);
         ready.setPosition(startPosition.x, startPosition.y);
         ready.setZIndex(0);
         stage.addActor(ready);
 
         // icon initialization
-        Image icon = new Image(assets.get(ability.getDef().getIconPath(), Texture.class));
+        Image icon = new Image(context.getAssets().get(ability.getDef().getIconPath(), Texture.class));
         icon.setSize(ICON_SIZE, ICON_SIZE);
         float iconOffset = (CELL_SIZE - ICON_SIZE) / 2f;
         icon.setPosition(startPosition.x + iconOffset, startPosition.y + iconOffset);
@@ -80,7 +81,7 @@ public final class AbilityIcon extends IngameUIObject {
         icon.addListener(this.new Listener());
 
         // chargingBar initialization
-        chargingBar.doneLoading(assets);
+        chargingBar.doneLoading(context.getAssets());
         chargingBar.setSize(CELL_SIZE, CELL_SIZE);
         chargingBar.setPosition(startPosition.x, startPosition.y);
         chargingBar.setZIndex(2);

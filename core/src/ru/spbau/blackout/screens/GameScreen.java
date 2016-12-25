@@ -151,9 +151,9 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         List<Actor> extraActors = ui.getExtraActors();
         ui.dispose();
         ui = new IngameUI(server, extraActors);
-        ui.load(assets);
+        ui.load(this);
         assets.finishLoading();
-        ui.doneLoading(assets, mainCharacter);
+        ui.doneLoading(this, mainCharacter);
     }
 
     public IngameUI getUi() { return ui; }
@@ -403,7 +403,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         }
 
         private void loadRealResources() {
-            ui.load(assets);
+            ui.load(GameScreen.this);
             gameWorld().load(GameScreen.this);
             assets.load(sessionSettings.getMapPath(), Model.class);
         }
@@ -423,7 +423,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             map = new ModelInstance(assets.get(sessionSettings.getMapPath(), Model.class));
             fixTop(map);
 
-            ui.doneLoading(assets, mainCharacter);
+            ui.doneLoading(GameScreen.this, mainCharacter);
             GameScreen.this.doneLoading();
 
             BlackoutGame.get().screenManager().disposeScreen();

@@ -1,17 +1,14 @@
 package ru.spbau.blackout.ingameui.objects;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.BooleanArray;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUIObject;
 
@@ -24,14 +21,17 @@ public class ExitButton extends IngameUIObject {
     private static final float START_X = HealthBar.START_X;
     private static final float START_Y = HealthBar.START_Y - SIZE - 50;
 
+    private GameContext context;
+
     @Override
-    public void load(AssetManager assets) {
-        assets.load(TEXTURE_PATH, Texture.class);
+    public void load(GameContext context) {
+        this.context = context;
+        context.getAssets().load(TEXTURE_PATH, Texture.class);
     }
 
     @Override
-    public void doneLoading(AssetManager assets, Stage stage, Character character) {
-        Image button = new Image(assets.get(TEXTURE_PATH, Texture.class));
+    public void doneLoading(GameContext context, Stage stage, Character character) {
+        Image button = new Image(context.getAssets().get(TEXTURE_PATH, Texture.class));
         button.setSize(SIZE, SIZE);
         button.setPosition(START_X, START_Y);
         button.toFront();
@@ -52,7 +52,6 @@ public class ExitButton extends IngameUIObject {
 
     @Override
     public void dispose() {
-
     }
 
     private static class ConfirmationDialog extends Dialog {

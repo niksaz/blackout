@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.ingameui.IngameUIObject;
@@ -50,24 +51,24 @@ public final class Stick extends IngameUIObject {
 
 
     @Override
-    public void load(AssetManager assets) {
-        Textures.loadAA(MAIN_IMAGE_PATH, assets);
-        Textures.loadAA(TOUCH_IMAGE_PATH, assets);
+    public void load(GameContext context) {
+        Textures.loadAA(MAIN_IMAGE_PATH, context.getAssets());
+        Textures.loadAA(TOUCH_IMAGE_PATH, context.getAssets());
     }
 
     @Override
-    public void doneLoading(AssetManager assets, Stage stage, Character character) {
+    public void doneLoading(GameContext context, Stage stage, Character character) {
         this.unit = character;
 
         // main image initialization
-        Image mainImg = new Image(assets.get(MAIN_IMAGE_PATH, Texture.class));
+        Image mainImg = new Image(context.getAssets().get(MAIN_IMAGE_PATH, Texture.class));
         mainImg.setSize(MAIN_IMAGE_SIZE, MAIN_IMAGE_SIZE);
         mainImg.setPosition(START_X, START_Y);
         mainImg.addListener(this.new Listener());
         stage.addActor(mainImg);
 
         // touch image initialization
-        this.touchImage = new Image(assets.get(TOUCH_IMAGE_PATH, Texture.class));
+        this.touchImage = new Image(context.getAssets().get(TOUCH_IMAGE_PATH, Texture.class));
         this.touchImage.setSize(TOUCH_IMAGE_SIZE, TOUCH_IMAGE_SIZE);
         updateTouchPosition();
 

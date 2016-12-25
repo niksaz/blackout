@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.ingameui.objects.AbilityIcon;
 import ru.spbau.blackout.ingameui.objects.ExitButton;
 import ru.spbau.blackout.ingameui.objects.HealthBar;
@@ -74,15 +76,15 @@ public class IngameUI {
     /**
      * Load necessary assets.
      */
-    public void load(AssetManager assets) {
-        foreach(uiObjects, object -> object.load(assets));
+    public void load(GameContext context) {
+        foreach(uiObjects, object -> object.load(context));
     }
 
     /**
      * When assets are loaded.
      */
-    public void doneLoading(AssetManager assets, Character character) {
-        foreach(uiObjects, object -> object.doneLoading(assets, stage, character));
+    public void doneLoading(GameContext context, Character character) {
+        foreach(uiObjects, object -> object.doneLoading(context, stage, character));
     }
 
     /**
