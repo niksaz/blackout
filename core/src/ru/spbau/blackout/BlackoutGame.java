@@ -47,6 +47,9 @@ public class BlackoutGame extends Game {
         return Math.round(getWorldWidth() / getAspectRatio());
     }
 
+    public static final float DIALOG_PADDING = 15.0f;
+
+
 
     // fields marked as /*final*/ must be assigned only once, but can't be assigned in constructor
 

@@ -5,14 +5,19 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.objects.AbilityIcon;
+import ru.spbau.blackout.ingameui.objects.ExitButton;
 import ru.spbau.blackout.ingameui.objects.HealthBar;
 import ru.spbau.blackout.ingameui.objects.Stick;
 import ru.spbau.blackout.network.UIServer;
@@ -34,13 +39,14 @@ public class IngameUI {
             new Vector2(1100, 150)
     };
 
-    public final Stage stage;
+    private final Stage stage;
     private final Array<IngameUIObject> uiObjects = new Array<>();
+    private final List<Actor> extraActors;
 
     /**
      * Creates all UI elements and sets itself as input processor.
      */
-    public IngameUI(UIServer server) {
+    public IngameUI(UIServer server, List<Actor> extraActors) {
         Camera camera = new OrthographicCamera(getWorldWidth(), getWorldHeight());
         Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), camera);
         this.stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
@@ -54,6 +60,15 @@ public class IngameUI {
         }
 
         this.uiObjects.add(new HealthBar());
+
+        this.uiObjects.add(new ExitButton());
+
+        this.extraActors = extraActors;
+        foreach(extraActors, stage::addActor);
+    }
+
+    public IngameUI(UIServer server) {
+        this(server, new ArrayList<>());
     }
 
     /**
@@ -88,5 +103,14 @@ public class IngameUI {
     public void dispose() {
          stage.dispose();
          foreach(uiObjects, IngameUIObject::dispose);
+    }
+
+    public void addActor(Actor actor) {
+        extraActors.add(actor);
+        stage.addActor(actor);
+    }
+
+    public List<Actor> getExtraActors() {
+        return extraActors;
     }
 }

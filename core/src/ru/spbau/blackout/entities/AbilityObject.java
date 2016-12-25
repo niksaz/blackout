@@ -9,10 +9,10 @@ import ru.spbau.blackout.utils.Creator;
  * Class for objects created by abilities.
  */
 public abstract class AbilityObject extends DynamicObject {
+
     protected AbilityObject(Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
     }
-
 
     /** Calls when the object contacts with another object. */
     public void beginContact(GameObject object) {}

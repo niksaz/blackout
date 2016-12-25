@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleEffectLoader;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
 import com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -29,6 +30,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import java.util.List;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
@@ -144,8 +147,9 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     public void setMainCharacter(Character character) {
         mainCharacter = character;
 
+        List<Actor> extraActors = ui.getExtraActors();
         ui.dispose();
-        ui = new IngameUI(server);
+        ui = new IngameUI(server, extraActors);
         ui.load(assets);
         assets.finishLoading();
         ui.doneLoading(assets, mainCharacter);
@@ -260,11 +264,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     @Override
     public void dispose() {
         super.dispose();
-        assets.dispose();
         gameWorld.dispose();
         currentTrack.stop();
         ui.dispose();
         foreach(music, Music::dispose);
+        assets.dispose();
     }
 
 

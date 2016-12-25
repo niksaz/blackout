@@ -153,7 +153,7 @@ public class Character extends GameUnit implements Damageable  {
 
             if (context.hasUI()) {
                 SimpleProgressBar unitHb = healthBar.copy();
-                context.getScreen().getUi().stage.addActor(unitHb);
+                context.getScreen().getUi().addActor(unitHb);
                 character.graphicEffects.add(new HealthBarEffect(character, unitHb, context));
             }
 
