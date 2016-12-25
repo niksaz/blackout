@@ -28,7 +28,7 @@ public class ChangeablePlayerProfile extends PlayerProfile {
         startUpgradeRequest(
                 outputStream -> {
                     outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
-                    outputStream.writeUTF(Database.GOLD_CHANGE);
+                    outputStream.writeUTF(Database.COINS_EARNED);
                     outputStream.writeInt(delta);
                 },
                 null

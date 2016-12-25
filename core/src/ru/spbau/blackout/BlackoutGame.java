@@ -118,5 +118,6 @@ public class BlackoutGame extends Game {
 
     public void setPlayerEntity(ChangeablePlayerProfile playerEntity) {
         this.playerEntity = playerEntity;
+        //if (playerEntity.getEarnedCoins() >= )
     }
 }

@@ -21,8 +21,8 @@ public class RightOctagonCreator implements Creator<Shape> {
     public Shape create() {
         final Vector2[] vertices = new Vector2[EDGES + 1];
         for (int i = 0; i <= EDGES; i++) {
-            final float x = radius * MathUtils.cos(2 * MathUtils.PI * i / EDGES);
-            final float y = radius * MathUtils.sin(2 * MathUtils.PI * i / EDGES);
+            final float x = radius * MathUtils.cos((2 * i + 1) * MathUtils.PI / EDGES);
+            final float y = radius * MathUtils.sin((2 * i + 1) * MathUtils.PI / EDGES);
             vertices[i] = new Vector2(x, y);
         }
 
