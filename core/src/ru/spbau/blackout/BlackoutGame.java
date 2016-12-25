@@ -118,6 +118,11 @@ public class BlackoutGame extends Game {
 
     public void setPlayerEntity(ChangeablePlayerProfile playerEntity) {
         this.playerEntity = playerEntity;
-        //if (playerEntity.getEarnedCoins() >= )
+
+        final PlayServices playServices = playServicesInCore.getPlayServices();
+        playServices.submitScore(playerEntity.getEarnedCoins(), playServices.getCoinsEarnedLeaderboardID());
+        if (playerEntity.getEarnedCoins() >= playServices.getNumberOfCoinsForMinterAchievement()) {
+            playServices.unlockAchievement(playServices.getMinterAchievementID());
+        }
     }
 }

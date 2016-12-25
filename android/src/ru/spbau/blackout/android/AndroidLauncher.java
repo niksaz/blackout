@@ -172,6 +172,11 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     @Override
+    public int getNumberOfCoinsForMinterAchievement() {
+        return getResources().getInteger(R.integer.value_for_achievement_4);
+    }
+
+    @Override
     public int getCoinsEarnedLeaderboardID() {
         return R.string.leaderboard1;
     }
