@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,21 +26,20 @@ import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 
 public class Character extends GameUnit implements Damageable  {
 
-    private final List<Ability> abilities;
+    private final List<Ability> abilities = new ArrayList<>();
     private float health;
     private float maxHealth;
 
 
     public Character(Character.Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
-        abilities = Arrays.asList(def.abilities);
+
+        for (Ability.Definition abilityDef : def.abilities) {
+            abilities.add(abilityDef.makeInstance(this));
+        }
 
         maxHealth = def.maxHealth;
         health = maxHealth;
-
-        for (Ability ability : abilities) {
-            ability.initialize(this);
-        }
     }
 
 
@@ -57,7 +57,7 @@ public class Character extends GameUnit implements Damageable  {
     public void updateState(float delta) {
         super.updateState(delta);
         for (Ability ability : abilities) {
-            ability.charge(delta);
+            ability.chargeUpdate(delta);
         }
     }
 
@@ -108,12 +108,13 @@ public class Character extends GameUnit implements Damageable  {
         private static final long serialVersionUID = 1000000000L;
 
         private transient SimpleProgressBar healthBar;
-        public Ability[] abilities;
+        public Ability.Definition[] abilities;
         public float maxHealth;
 
 
-        public Definition(String modelPath, Creator<Shape> shapeCreator, Ability[] abilities, float maxHealth) {
-            super(modelPath, shapeCreator, abilities, maxHealth);
+        public Definition(String modelPath, Creator<Shape> shapeCreator,
+                          Ability.Definition[] abilities, float maxHealth) {
+            super(modelPath, shapeCreator);
             this.abilities = abilities;
             this.maxHealth = maxHealth;
         }
@@ -125,8 +126,8 @@ public class Character extends GameUnit implements Damageable  {
             healthBar = new HorizontalProgressBar(HealthBar.PATH_EMPTY, HealthBar.PATH_FULL);
             healthBar.load(context.getAssets());
 
-            for (Ability ability : abilities) {
-                ability.load(context);
+            for (Ability.Definition abilityDef : abilities) {
+                abilityDef.load(context);
             }
         }
 
@@ -138,8 +139,8 @@ public class Character extends GameUnit implements Damageable  {
             healthBar.setSize(HealthBar.WIDTH, HealthBar.HEIGHT);
             healthBar.toBack();
 
-            for (Ability ability : abilities) {
-                ability.doneLoading(context);
+            for (Ability.Definition abilityDef : abilities) {
+                abilityDef.doneLoading(context);
             }
         }
 
@@ -168,7 +169,9 @@ public class Character extends GameUnit implements Damageable  {
             return new Character.Definition(
                     "models/wizard/wizard.g3db",
                     new CircleCreator(0.6f),
-                    new Ability[] { new FireballAbility(1) },
+                    new Ability.Definition[] {
+                        new FireballAbility.Definition(1)
+                    },
                     200
             );
         }

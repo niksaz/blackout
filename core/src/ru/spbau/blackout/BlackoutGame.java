@@ -98,15 +98,6 @@ public class BlackoutGame extends Game {
         this.assets.load();
 
         this.screenManager.setScreen(new LoadScreen());
-
-        // FIXME: remove
-        /*SessionSettings sessionSettings = SessionSettings.getTest();
-        List<GameObject.Definition> l = sessionSettings.getDefinitions();
-        List<GameObject.Definition> allDefs = ReflectUtils.findAllImpls(l, GameObject.Definition.class);
-        System.out.println(allDefs.size());
-        for (GameObject.Definition def : allDefs) {
-            Gdx.app.log("QWERTY", def.getClass().getName());
-        }*/
     }
 
     @Override

@@ -51,19 +51,20 @@ public final class FireballObject extends AbilityObject {
     }
 
     @Override
-    public void beginContact(GameObject object) {
-        super.beginContact(object);
+    public void beginContact(GameObject other) {
+        super.beginContact(other);
+
         shouldExplode = true;
 
-        if (object instanceof DynamicObject) {
-            DynamicObject dynamic = (DynamicObject) object;
+        if (other instanceof DynamicObject) {
+            DynamicObject dynamic = (DynamicObject) other;
             // This object is going to dye. So, we don't care about changes of its velocity.
             velocity.add(body.getLinearVelocity()).scl(IMPULSE_FACTOR);
             dynamic.applyImpulse(velocity);
         }
 
-        if (object instanceof Damageable) {
-            ((Damageable) object).damage(((Definition) getDef()).damage);
+        if (other instanceof Damageable) {
+            ((Damageable) other).damage(((Definition) getDef()).damage);
         }
 
         kill();

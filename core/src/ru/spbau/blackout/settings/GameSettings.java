@@ -8,6 +8,8 @@ import ru.spbau.blackout.utils.Serializer;
 
 public class GameSettings implements Serializable {
 
+    private static final long serialVersionUID = 1000000000L;
+
     public static final float MUSIC_MAX_VOLUME = 0.4f;
     public static final float SOUND_MAX_VOLUME = 1.0f;
 

@@ -41,7 +41,6 @@ public final class SessionSettings implements Serializable {
 
     public void initializeGameWorld() {
         for (InitialState state : initialStates) {
-            System.out.println(state.uid);
             getDefinitions().get(state.defNum).makeInstance(state.uid, state.initialPosition);
         }
         for (int i = 0; i < definitions.size(); i++) {

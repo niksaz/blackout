@@ -3,6 +3,7 @@ package ru.spbau.blackout.abilities;
 
 import com.badlogic.gdx.math.Vector2;
 
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.network.UIServer;
 
 
@@ -13,11 +14,9 @@ public abstract class SimpleInstantAbility extends Ability {
 
     public static final float CAST_DISTANCE = 1.5f;  // FIXME: use unit radius
 
-
-    public SimpleInstantAbility(int level) {
-        super(level);
+    public SimpleInstantAbility(Definition def, Character character) {
+        super(def, character);
     }
-
 
     @Override
     public final void onCastStart(UIServer server) {

@@ -10,6 +10,7 @@ import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.utils.HasState;
 
@@ -18,20 +19,16 @@ import ru.spbau.blackout.utils.HasState;
  * Abstract class for ability in-game representation.
  * Each character has its own instance of each its ability.
  */
-public abstract class Ability implements Serializable, HasState {
+public abstract class Ability implements HasState {
 
-    private static final long serialVersionUID = 1000000000L;
+    private float chargeTime;
+    private final Character character;
+    private Ability.Definition def;
 
-    private int level;
-    private transient float chargeTime;
-
-    private transient /*final*/ Character character;
-
-
-    public Ability(int level) {
-        this.level = level;
+    protected Ability(Ability.Definition def, Character character) {
+        this.def = def;
+        this.character = character;
     }
-
 
     @Override
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
@@ -43,24 +40,9 @@ public abstract class Ability implements Serializable, HasState {
         setChargeTime(in.readFloat());
     }
 
-    /**
-     * Load necessary assets.
-     * Must be called once from <code>GameUnit.Definition::updateState</code>
-     */
-    public void load(GameContext context) {
-        // loading of icon has to be here because it isn't accessible from `AbilityIcon` class in the loading stage
-        context.getAssets().load(iconPath(), Texture.class);
+    public Ability.Definition getDef() {
+        return def;
     }
-
-    public void doneLoading(GameContext context) {}
-
-    /**
-     * Must be called exactly once from <code>GameUnit::new</code>.
-     */
-    public void initialize(Character character) {
-        this.character = character;
-    }
-
 
     /** Called once when a touch goes down on the icon. */
     public abstract void onCastStart(UIServer server);
@@ -73,20 +55,62 @@ public abstract class Ability implements Serializable, HasState {
         chargeStart();
     }
 
-    /** Path to the icon in assets directory. */
-    public abstract String iconPath();
-
-    public abstract float getMaxChargeTime();
-
-    public Character getCharacter() { return character; }
-    public float getChargeTime() { return chargeTime; }
-    public int getLevel() { return level; }
-    public void setChargeTime(float chargeTime) { this.chargeTime = chargeTime; }
-    abstract public void increaseLevel();
-    public void charge(float deltaTime) {
+    public void chargeUpdate(float deltaTime) {
         chargeTime -= Math.min(deltaTime, chargeTime);
     }
 
-    /** Sets current charge time as <code>maxChargeTime</code>. */
-    public void chargeStart() { setChargeTime(getMaxChargeTime()); }
+    public Character getCharacter() { return character; }
+
+    public float getChargeTime() { return chargeTime; }
+
+    public void setChargeTime(float chargeTime) { this.chargeTime = chargeTime; }
+
+    /** Sets current chargeUpdate time as <code>maxChargeTime</code>. */
+    public void chargeStart() { setChargeTime(def.maxChargeTime); }
+
+
+    public static abstract class Definition implements Serializable {
+
+        private static final long serialVersionUID = 1000000000L;
+
+        private String iconPath;
+        private float maxChargeTime;
+        private int level;
+
+        public Definition(String iconPath, float maxChargeTime, int level) {
+            this.iconPath = iconPath;
+            this.maxChargeTime = maxChargeTime;
+            setLevel(level);
+        }
+
+        /** Load necessary assets. */
+        public void load(GameContext context) {
+            // loading of icon has to be here because it isn't accessible from `AbilityIcon` class in the loading stage
+            context.getAssets().load(iconPath, Texture.class);
+        }
+
+        public void doneLoading(GameContext context) {}
+
+        public int getLevel() {
+            return level;
+        }
+
+        public void setLevel(int newLevel) {
+            level = newLevel;
+        }
+
+        public abstract Ability makeInstance(Character character);
+
+        public String getIconPath() {
+            return iconPath;
+        }
+
+        public float getMaxChargeTime() {
+            return maxChargeTime;
+        }
+
+        public final void increaseLevel() {
+            setLevel(getLevel() + 1);
+        }
+    }
 }

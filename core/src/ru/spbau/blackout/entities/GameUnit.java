@@ -137,7 +137,7 @@ public abstract class GameUnit extends DynamicObject {
         public float speed = DEFAULT_SPEED;
 
 
-        public Definition(String modelPath, Creator<Shape> shapeCreator, Ability[] abilities, float maxHealth) {
+        public Definition(String modelPath, Creator<Shape> shapeCreator) {
             super(modelPath, shapeCreator);
         }
     }
