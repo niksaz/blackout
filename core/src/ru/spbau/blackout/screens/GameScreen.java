@@ -46,12 +46,13 @@ import ru.spbau.blackout.utils.Textures;
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 import static ru.spbau.blackout.java8features.Functional.foreach;
+import static ru.spbau.blackout.settings.GameSettings.MUSIC_MAX_VOLUME;
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
 public class GameScreen extends BlackoutScreen implements GameContext {
+
     private static final String BATTLE_MUSIC_DIR_PATH = "music/battle";
-    private static final float BATTLE_MUSIC_MAX_VOLUME = 0.4f;
 
     public static final class CameraDefaults {
         private CameraDefaults() {}
@@ -118,7 +119,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         FileHandle battleMusicDir = Gdx.files.internal(BATTLE_MUSIC_DIR_PATH);
         for (FileHandle file : battleMusicDir.list()) {
             Music track = Gdx.audio.newMusic(file);
-            track.setVolume(settings.musicVolume * BATTLE_MUSIC_MAX_VOLUME);
+            track.setVolume(settings.musicVolume * MUSIC_MAX_VOLUME);
             track.setLooping(false);
             music.add(track);
         }

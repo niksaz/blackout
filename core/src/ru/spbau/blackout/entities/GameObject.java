@@ -316,6 +316,10 @@ public abstract class GameObject implements RenderableProvider, HasState {
             }
         }
 
+        public GameContext getContext() {
+            return context;
+        }
+
         public void initializeWithoutUi(GameContext context) {
             this.context = context;
         }
