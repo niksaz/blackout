@@ -15,7 +15,8 @@ public class Events {
         character.castAbility(abilityNum, target);
     }
 
-    public static void playerDeath(Character character) {
+    public static GameUnit playerDeath(long uid) {
+        return null;
         // TODO: create ghost
     }
 }

@@ -18,6 +18,8 @@ public class ForceBlast extends SimpleInstantAbility {
 
     public static class Definition extends Ability.Definition {
 
+        private static final long serialVersionUID = 1000000000L;
+
         private static final String ICON_PATH = "abilities/force_blast/icon.png";
         private static final String NAME = "Force Blast";
         private static final float MAX_CHARGE_TIME = 1.5f;

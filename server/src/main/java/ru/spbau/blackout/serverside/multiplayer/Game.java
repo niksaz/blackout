@@ -14,6 +14,7 @@ import java.util.List;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
 import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
@@ -26,6 +27,8 @@ import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.Utils;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.worlds.ServerGameWorld;
+
+import static com.sun.tools.doclint.Entity.isin;
 
 /**
  * Multiplayer game representation. Used for synchronizing game's state and watching for game flow, i.e. if someone
@@ -63,15 +66,21 @@ public class Game extends Thread implements GameContext {
             try {
                 for (int clientIndex = 0; clientIndex < clients.size(); clientIndex++) {
                     final ClientThread clientThread = clients.get(clientIndex);
-                    final Character clientCharacter = (Character) gameWorld.getObjectById(clientThread.getPlayerUid());
+                    GameUnit clientUnit = (GameUnit) gameWorld.getObjectById(clientThread.getPlayerUid());
+
+                    if (clientUnit == null) {
+                        clientUnit = Events.playerDeath(clientThread.getPlayerUid());
+                    }
 
                     final Vector2 heroVelocity = clientThread.getVelocityFromClient();
                     if (heroVelocity != null) {
-                        Events.setSelfVelocity(clientCharacter, heroVelocity);
+                        Events.setSelfVelocity(clientUnit, heroVelocity);
                     }
-                    final AbilityCast abilityCast = clientThread.getAbilityCastFromClient();
-                    if (abilityCast != null) {
-                        Events.abilityCast(clientCharacter, abilityCast.abilityNum, abilityCast.target);
+                    if (clientUnit instanceof Character) {
+                        final AbilityCast abilityCast = clientThread.getAbilityCastFromClient();
+                        if (abilityCast != null) {
+                            Events.abilityCast((Character) clientUnit, abilityCast.abilityNum, abilityCast.target);
+                        }
                     }
                 }
 
