@@ -289,6 +289,12 @@ public class MenuScreen extends StageScreen {
         super.render(delta);
     }
 
+    @Override
+    public void dispose() {
+        menuMusic.dispose();
+        super.dispose();
+    }
+
     public void updateMusicVolume() {
         menuMusic.setVolume(
                 GameSettings.MUSIC_MAX_VOLUME * BlackoutGame.get().getPlayerEntity().getGameSettings().musicVolume);
