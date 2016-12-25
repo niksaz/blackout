@@ -17,7 +17,7 @@ import static ru.spbau.blackout.screens.MenuScreen.addButton;
  */
 public class PlayScreenTable  {
 
-    private static final String SINGLE_PLAYER_GAME_TEXT = "Single player game";
+    private static final String SINGLE_PLAYER_GAME_TEXT = "Training";
     private static final String MULTIPLAYER_GAME_TEXT = "Multiplayer game";
 
     public static Table getTable(final MenuScreen screen) {

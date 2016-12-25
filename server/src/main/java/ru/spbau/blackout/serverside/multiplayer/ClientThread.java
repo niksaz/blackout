@@ -24,7 +24,7 @@ import static ru.spbau.blackout.network.AndroidClient.AbilityCast;
  */
 public class ClientThread extends Thread {
 
-    private static final String UNKNOWN = "UNKNOWN";
+    public static final String UNKNOWN = "UNKNOWN";
 
     private final RoomServer server;
     private final Socket socket;
@@ -53,6 +53,10 @@ public class ClientThread extends Thread {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             name = in.readUTF();
+            // name has been set up, game is waiting for name to access database
+            synchronized (this) {
+                notify();
+            }
             final int clientDatagramPort = in.readInt();
             server.log(name + " connected.");
 
@@ -214,5 +218,7 @@ public class ClientThread extends Thread {
         } while (clientGameState == GameState.WAITING);
     }
 
-    public long getPlayerUid() { return playerUid; }
+    public long getPlayerUid() {
+        return playerUid;
+    }
 }

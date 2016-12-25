@@ -2,6 +2,9 @@ package ru.spbau.blackout.serverside.multiplayer;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+
+import org.mongodb.morphia.query.Query;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,13 +12,14 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
 import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.screens.GameScreen;
+import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
@@ -133,8 +137,38 @@ public class Game extends Thread implements GameContext {
     }
 
     private void createRoomAndSendItToClients() throws IOException {
+        final Array<Character.Definition> heroes = new Array<>();
+        for (ClientThread client : clients) {
 
-        SessionSettings sessionSettings = SessionSettings.getTest();
+            if (client.getClientName().equals(ClientThread.UNKNOWN)) {
+                //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                synchronized (client) {
+                    if (client.getClientName().equals(ClientThread.UNKNOWN)) {
+                        try {
+                            client.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            interrupt();
+                        }
+                    }
+                }
+            }
+
+            final Query<PlayerProfile> query =
+                    DatabaseAccessor.getInstance().getDatastore()
+                    .createQuery(PlayerProfile.class)
+                    .field("name")
+                    .equal(client.getClientName());
+
+            final List<PlayerProfile> result = query.asList();
+            if (result.size() != 1) {
+                throw new IllegalStateException();
+            }
+            final PlayerProfile playerProfile = result.get(0);
+            heroes.add(playerProfile.getCharacterDefinition());
+        }
+
+        SessionSettings sessionSettings = SessionSettings.createDefaultSession(heroes);
         gameWorld = new ServerGameWorld(sessionSettings, this);
         sessionSettings.initializeGameWorld();
 

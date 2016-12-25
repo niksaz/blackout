@@ -1,6 +1,8 @@
 package ru.spbau.blackout.sessionsettings;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,7 +11,6 @@ import java.util.List;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Finder;
 
@@ -79,21 +80,27 @@ public final class SessionSettings implements Serializable {
     }
 
     // FIXME: just for test
-    public static SessionSettings getTest() {
-        final SessionSettings session = new SessionSettings("maps/duel/duel.g3db");
+    public static SessionSettings createDefaultSession(Array<Character.Definition> characters) {
+        final Array<Vector2> initialPositionsPool = new Array<>();
+        initialPositionsPool.add(new Vector2(0, 10));
+        initialPositionsPool.add(new Vector2(-5, 5));
+        initialPositionsPool.add(new Vector2(5, 5));
+        initialPositionsPool.add(new Vector2(0, 0));
 
-        final Character.Definition hero = Character.Definition.createDefaultCharacterDefinition();
-        hero.overHeadPivotOffset.set(0, 0, 3.5f);
-        session.addInitialObject(hero, 0, 0);
+        final SessionSettings session = new SessionSettings("maps/duel/duel.g3db");
         session.setPlayerUid(1);
 
-        final Character.Definition enemy = Character.Definition.createDefaultCharacterDefinition();
-        enemy.overHeadPivotOffset.set(0, 0, 3.5f);
-        session.addInitialObject(enemy, 5, 5);
+        for (Character.Definition characterDefinition : characters) {
+            if (initialPositionsPool.size == 0) {
+                throw new IllegalStateException("Too much characters. Extend pool to place more characters");
+            }
+            final int index = MathUtils.random(initialPositionsPool.size - 1);
+            final Vector2 position = initialPositionsPool.get(index);
+            initialPositionsPool.removeIndex(index);
 
-        final Character.Definition enemy2 = Character.Definition.createDefaultCharacterDefinition();
-        enemy2.overHeadPivotOffset.set(0, 0, 3.5f);
-        session.addInitialObject(enemy2, -5, 5);
+            characterDefinition.overHeadPivotOffset.set(0, 0, 3.5f);
+            session.addInitialObject(characterDefinition, position.x, position.y);
+        }
 
         final GameObject.Definition stone = new Decoration.Definition(
                 "models/stone/stone.g3db",
