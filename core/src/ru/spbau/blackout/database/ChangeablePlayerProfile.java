@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.androidfeatures.PlayServices;
 import ru.spbau.blackout.network.Network;
 
 /**
@@ -24,26 +25,33 @@ public class ChangeablePlayerProfile extends PlayerProfile {
     }
 
     public void changeGold(int delta) {
-        startUpgradeRequest(outputStream -> {
-            outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
-            outputStream.writeUTF(Database.GOLD_CHANGE);
-            outputStream.writeInt(delta);
-        });
+        startUpgradeRequest(
+                outputStream -> {
+                    outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+                    outputStream.writeUTF(Database.GOLD_CHANGE);
+                    outputStream.writeInt(delta);
+                },
+                null
+        );
     }
 
     public void upgradeHealth() {
-        startUpgradeRequest(outputStream -> {
-            outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
-            outputStream.writeUTF(Database.HEALTH_UPGRADE);
-        });
+        makeUpgradeRequest(
+                outputStream -> {
+                    outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+                    outputStream.writeUTF(Database.HEALTH_UPGRADE);
+                }
+        );
     }
 
     public void upgradeAbility(int currentAbilityIndex) {
-        startUpgradeRequest(outputStream -> {
-            outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
-            outputStream.writeUTF(Database.ABILITY_UPGRADE);
-            outputStream.writeInt(currentAbilityIndex);
-        });
+        makeUpgradeRequest(
+                outputStream -> {
+                    outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
+                    outputStream.writeUTF(Database.ABILITY_UPGRADE);
+                    outputStream.writeInt(currentAbilityIndex);
+                }
+        );
     }
 
     public void synchronizeGameSettings() {
@@ -77,7 +85,17 @@ public class ChangeablePlayerProfile extends PlayerProfile {
         }).start();
     }
 
-    private void startUpgradeRequest(RequestWriter requestWriter) {
+    private void makeUpgradeRequest(RequestWriter requestWriter) {
+        startUpgradeRequest(
+                requestWriter,
+                () -> {
+                    final PlayServices playServices = BlackoutGame.get().playServicesInCore().getPlayServices();
+                    playServices.incrementAchievement(playServices.getFirstUpgradesAchievementID(), 1);
+                }
+        );
+    }
+
+    private void startUpgradeRequest(RequestWriter requestWriter, Runnable ifSuccessful) {
         new Thread(() -> {
             try {
                 final String url = "http://" +
@@ -106,6 +124,9 @@ public class ChangeablePlayerProfile extends PlayerProfile {
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     loadPlayerEntity(null, null);
+                    if (ifSuccessful != null) {
+                        ifSuccessful.run();
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

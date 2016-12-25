@@ -83,7 +83,16 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     @Override
     public void unlockAchievement(int achievementId) {
         if (isSignedIn()) {
-            Games.Achievements.unlock(gameHelper.getApiClient(), getResources().getString(achievementId));
+            Games.Achievements.unlock(gameHelper.getApiClient(), getString(achievementId));
+        } else {
+            showUserIsNotSignedInDialog();
+        }
+    }
+
+    @Override
+    public void incrementAchievement(int achievementId, int steps) {
+        if (isSignedIn()) {
+            Games.Achievements.increment(gameHelper.getApiClient(), getString(achievementId), steps);
         } else {
             showUserIsNotSignedInDialog();
         }
@@ -92,8 +101,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     @Override
     public void submitScore(long highScore, int leaderboardId) {
         if (isSignedIn()) {
-            Games.Leaderboards.submitScore(gameHelper.getApiClient(),
-                                           getResources().getString(leaderboardId), highScore);
+            Games.Leaderboards.submitScore(gameHelper.getApiClient(), getString(leaderboardId), highScore);
+        } else {
+            showUserIsNotSignedInDialog();
         }
     }
 
@@ -137,39 +147,40 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     @Override
-    public int getWin1vs1DuelId() {
-        return R.string.achievement_win_1vs1_duel;
+    public int getDuelistAchievementID() {
+        return R.string.achievement1;
     }
 
     @Override
-    public int getWin2vs2FightId() {
-        return R.string.achievement_win_2vs2_fight;
+    public int getBattleOfThreeAchievementID() {
+        return R.string.achievement2;
     }
 
     @Override
-    public int getWin3vs3Battle() {
-        return R.string.achievement_win_3vs3_battle;
+    public int getStrategistAchievementID() {
+        return R.string.achievement3;
     }
 
     @Override
-    public int getEarn1000coins() {
-        return R.string.achievement_earn_1000_coins;
+    public int getFirstUpgradesAchievementID() {
+        return R.string.achievement4;
     }
 
     @Override
-    public int getBuyYourFirstItemId() {
-        return R.string.achievement_buy_your_first_item;
+    public int getMinterAchievementID() {
+        return R.string.achievement5;
     }
 
     @Override
-    public int getCoinsEarnedLeaderboardId() {
-        return R.string.leaderboard_coins_earned;
+    public int getBattlesWinLeaderboardID() {
+        return R.string.leaderboard1;
     }
 
     @Override
-    public int getHighestRatingLeaderboardId() {
-        return R.string.leaderboard_highest_rating;
+    public int getCoinsEarnedLeaderboardID() {
+        return R.string.leaderboard2;
     }
+
 
     private enum RequestCodes {
         REQUEST_ACHIEVEMENTS, REQUEST_LEADERBOARDS

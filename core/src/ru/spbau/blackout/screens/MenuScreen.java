@@ -56,9 +56,6 @@ public class MenuScreen extends StageScreen {
     private static final float SETTINGS_ICON_SIZE = 110.0f;
     private static final float SETTINGS_ICON_PADDING = 10.0f;
 
-    // FIXME: just for testing
-    private static final Random generator = new Random();
-
     private Table middleTable;
     private final Music menuMusic;
 
@@ -182,7 +179,7 @@ public class MenuScreen extends StageScreen {
         label.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                BlackoutGame.get().getPlayerEntity().changeGold(generator.nextInt(101) - 50);
+                BlackoutGame.get().getPlayerEntity().changeGold(50);
             }
         });
 

@@ -4,20 +4,21 @@ public interface PlayServices {
     void signIn();
     void signOut();
     void unlockAchievement(int achievementId);
+    void incrementAchievement(int achievementId, int steps);
     void submitScore(long highScore, int leaderboardId);
     void showAchievements();
     void showLeaderboards();
     boolean isSignedIn();
     String getPlayerName();
 
-    int getWin1vs1DuelId();
-    int getWin2vs2FightId();
-    int getWin3vs3Battle();
-    int getEarn1000coins();
-    int getBuyYourFirstItemId();
+    int getDuelistAchievementID();
+    int getBattleOfThreeAchievementID();
+    int getStrategistAchievementID();
+    int getFirstUpgradesAchievementID();
+    int getMinterAchievementID();
 
-    int getCoinsEarnedLeaderboardId();
-    int getHighestRatingLeaderboardId();
+    int getBattlesWinLeaderboardID();
+    int getCoinsEarnedLeaderboardID();
 
     void setCoreListener(PlayServicesListener coreListener);
 }

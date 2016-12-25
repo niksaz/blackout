@@ -2,11 +2,11 @@
 <resources>
     <string name="app_id">707001876354</string>
     <string name="package_name">ru.spbau.blackout.android</string>
-    <string name="achievement_win_1vs1_duel">CgkIgv_h5MkUEAIQAQ</string>
-    <string name="achievement_win_2vs2_fight">CgkIgv_h5MkUEAIQAg</string>
-    <string name="achievement_win_3vs3_battle">CgkIgv_h5MkUEAIQAw</string>
-    <string name="achievement_buy_your_first_item">CgkIgv_h5MkUEAIQBA</string>
-    <string name="achievement_earn_1000_coins">CgkIgv_h5MkUEAIQBQ</string>
-    <string name="leaderboard_highest_rating">CgkIgv_h5MkUEAIQCA</string>
-    <string name="leaderboard_coins_earned">CgkIgv_h5MkUEAIQBg</string>
+    <string name="achievement1">CgkIgv_h5MkUEAIQAQ</string>
+    <string name="achievement2">CgkIgv_h5MkUEAIQAg</string>
+    <string name="achievement3">CgkIgv_h5MkUEAIQAw</string>
+    <string name="achievement4">CgkIgv_h5MkUEAIQBA</string>
+    <string name="achievement5">CgkIgv_h5MkUEAIQBQ</string>
+    <string name="leaderboard1">CgkIgv_h5MkUEAIQCA</string>
+    <string name="leaderboard2">CgkIgv_h5MkUEAIQBg</string>
 </resources>
