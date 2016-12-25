@@ -22,6 +22,8 @@ public class FireballAbility extends SimpleInstantAbility {
     private static final float DISTANCE = 12f;
     private static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;
 
+    private static final float BASE_DAMAGE = 20.0f;
+    private static final float DAMAGE_INCREASE_PER_LEVEL = 5.0f;
 
     private final FireballObject.Definition shellDef;
 
@@ -32,7 +34,7 @@ public class FireballAbility extends SimpleInstantAbility {
         this.shellDef.chestPivotOffset.set(0, 0, 1.5f);
         this.shellDef.isSensor = true;
         this.shellDef.timeToLive = TIME_TO_LIVE;
-        this.shellDef.damage = 20.0f + 5.0f * level;
+        this.shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * level;
     }
 
 
@@ -63,6 +65,12 @@ public class FireballAbility extends SimpleInstantAbility {
 
     @Override
     public String iconPath() { return ICON_PATH; }
+
     @Override
     public float getMaxChargeTime() { return MAX_CHARGE_TIME; }
+
+    @Override
+    public void increaseLevel() {
+        shellDef.damage += DAMAGE_INCREASE_PER_LEVEL;
+    }
 }

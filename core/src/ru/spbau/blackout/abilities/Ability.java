@@ -10,7 +10,6 @@ import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.utils.HasState;
 
@@ -83,9 +82,7 @@ public abstract class Ability implements Serializable, HasState {
     public float getChargeTime() { return chargeTime; }
     public int getLevel() { return level; }
     public void setChargeTime(float chargeTime) { this.chargeTime = chargeTime; }
-    public void increaseLevel() {
-        level += 1;
-    }
+    abstract public void increaseLevel();
     public void charge(float deltaTime) {
         chargeTime -= Math.min(deltaTime, chargeTime);
     }
