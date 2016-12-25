@@ -37,7 +37,7 @@ public abstract class DynamicObject extends GameObject {
     protected float animationSpeed = 1f;
 
 
-    /** Construct DynamicObject at the giving position. */
+    /** Construct DynamicObject at the giving touchPos. */
     protected DynamicObject(Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
 

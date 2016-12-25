@@ -35,7 +35,7 @@ public class ExitButton extends IngameUIObject {
     }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage, Character character) {
+    public void doneLoading(GameContext context, Stage stage) {
         Image button = new Image(context.getAssets().get(TEXTURE_PATH, Texture.class));
         button.setSize(SIZE, SIZE);
         button.setPosition(START_X, START_Y);

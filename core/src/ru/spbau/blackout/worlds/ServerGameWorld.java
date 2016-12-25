@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.util.Iterator;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 

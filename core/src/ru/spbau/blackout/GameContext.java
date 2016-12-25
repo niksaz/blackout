@@ -3,6 +3,7 @@ package ru.spbau.blackout;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
 
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.GameWorld;
@@ -21,4 +22,5 @@ public interface GameContext {
     GameSettings getSettings();
     GameScreen getScreen();
     ParticleSystem getParticleSystem();
+    Character getMainCharacter();
 }

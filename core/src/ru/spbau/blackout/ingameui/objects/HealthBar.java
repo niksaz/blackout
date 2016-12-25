@@ -33,8 +33,8 @@ public final class HealthBar extends IngameUIObject {
     }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage, Character character) {
-        this.character = character;
+    public void doneLoading(GameContext context, Stage stage) {
+        this.character = context.getMainCharacter();
 
         healthBar.doneLoading(context.getAssets());
         healthBar.setPosition(START_X, START_Y);

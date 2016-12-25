@@ -17,7 +17,7 @@
 
     <string name="game_saved_name">GAME_SAVED_NAME</string>
 
-    <string name="default_load_message">Could not connect to the server.</string>
+    <string name="default_load_message">Could not connect to the uiServer.</string>
     <string name="status_network_error_no_data_message">
         Network error while loading game info. Check your internet connection and try again.</string>
     <string name="status_license_check_failed_message">

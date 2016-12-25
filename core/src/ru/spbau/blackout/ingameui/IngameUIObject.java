@@ -13,7 +13,7 @@ import ru.spbau.blackout.entities.Character;
 public abstract class IngameUIObject {
     /** Load assets. */
     public abstract void load(GameContext context);
-    public abstract void doneLoading(GameContext context, Stage stage, Character character);
+    public abstract void doneLoading(GameContext context, Stage stage);
     /** Update for each frame. */
     public abstract void update(float deltaTime);
     public abstract void dispose();

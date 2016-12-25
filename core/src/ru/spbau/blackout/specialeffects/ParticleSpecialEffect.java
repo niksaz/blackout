@@ -9,7 +9,7 @@ import ru.spbau.blackout.GameContext;
 
 
 /**
- * Plays the given <code>ParticleEffect</code> once at the given position.
+ * Plays the given <code>ParticleEffect</code> once at the given touchPos.
  */
 public class ParticleSpecialEffect implements SpecialEffect {
 
@@ -25,7 +25,7 @@ public class ParticleSpecialEffect implements SpecialEffect {
         this.effect.start();
         context.getParticleSystem().add(this.effect);
 
-        // set position
+        // set touchPos
         Matrix4 transform = new Matrix4();
         transform.idt();
         transform.translate(x, y, height);

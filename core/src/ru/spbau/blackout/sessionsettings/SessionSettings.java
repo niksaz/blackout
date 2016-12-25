@@ -61,7 +61,7 @@ public final class SessionSettings implements Serializable {
     }
 
     /**
-     * An instance of the definition will appear in the given position in the beginning of the game.
+     * An instance of the definition will appear in the given touchPos in the beginning of the game.
      * The definition also will be added to the list of possible definitions.
      */
     public int addInitialObject(GameObject.Definition def, float initialX, float initialY) {

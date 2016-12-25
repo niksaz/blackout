@@ -55,12 +55,12 @@ public final class AbilityIcon extends IngameUIObject {
     }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage, Character character) {
-        if (abilityNum >= character.getAbilities().size()) {
+    public void doneLoading(GameContext context, Stage stage) {
+        if (abilityNum >= context.getMainCharacter().getAbilities().size()) {
             return;
         }
 
-        ability = character.getAbility(abilityNum);
+        ability = context.getMainCharacter().getAbility(abilityNum);
         assert ability != null;
 
         // Charged cell image

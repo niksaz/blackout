@@ -49,7 +49,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
 
     /**
-     * Constructs defined object at the given position.
+     * Constructs defined object at the given touchPos.
      */
     protected GameObject(Definition def, long uid, float x, float y) {
         this.def = def;
@@ -221,7 +221,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
     }
 
     /**
-     * Returns new Vector3 (so, it's safe to change this vector without changing unit's position).
+     * Returns new Vector3 (so, it's safe to change this vector without changing unit's touchPos).
      */
     public Vector3 get3dPosition() {
         Vector2 pos = getPosition();
@@ -336,9 +336,9 @@ public abstract class GameObject implements RenderableProvider, HasState {
         }
 
 
-        /** Create an object at the giving position. */
+        /** Create an object at the giving touchPos. */
         public abstract GameObject makeInstance(long uid, float x, float y);
-        /** Create an object at the giving position. */
+        /** Create an object at the giving touchPos. */
         public GameObject makeInstance(long uid, Vector2 position) {
             return makeInstance(uid, position.x, position.y);
         }
@@ -355,7 +355,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
             return makeInstance(((ServerGameWorld) context.gameWorld()).getNextUid(), x, y);
         }
 
-        /** Create an object at the giving position. */
+        /** Create an object at the giving touchPos. */
         public GameObject makeInstanceWithNextUid(Vector2 position) {
             return makeInstanceWithNextUid(position.x, position.y);
         }

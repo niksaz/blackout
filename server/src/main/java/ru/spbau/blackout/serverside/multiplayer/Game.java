@@ -126,24 +126,14 @@ public class Game extends Thread implements GameContext {
     }
 
     @Override
-    public AssetManager getAssets() {
-        return null;
-    }
-
-    @Override
     public boolean hasUI() {
         return false;
     }
 
-    @Override
-    public GameScreen getScreen() {
-        return null;
-    }
-
-    @Override
-    public ParticleSystem getParticleSystem() {
-        return null;
-    }
+    @Override public AssetManager getAssets() { return null; }
+    @Override public GameScreen getScreen() { return null; }
+    @Override public ParticleSystem getParticleSystem() { return null; }
+    @Override public Character getMainCharacter() { return null; }
 
     GameState getGameState() {
         return gameState;

@@ -22,7 +22,6 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleEffectLoader;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
 import com.badlogic.gdx.graphics.g3d.particles.batches.BillboardParticleBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -31,7 +30,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
@@ -39,7 +38,7 @@ import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.ingameui.IngameUI;
+import ru.spbau.blackout.ingameui.PlayerUI;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.units.Vpx;
@@ -78,11 +77,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private final PerspectiveCamera camera;
     public final Environment environment;
 
-    private Character mainCharacter;
-    private IngameUI ui;
+    @Nullable private Character mainCharacter;
+    private PlayerUI ui;
 
     private final GameWorld gameWorld;
-    private final UIServer server;
+    private final UIServer uiServer;
 
     private final Array<Music> music = new Array<>();
     private Music currentTrack;
@@ -92,14 +91,14 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
     public GameScreen(SessionSettings sessionSettings,
                       GameWorld gameWorld,
-                      UIServer server,
+                      UIServer uiServer,
                       GameSettings settings) {
         this.settings = settings;
         this.gameWorld = gameWorld;
-        this.server = server;
+        this.uiServer = uiServer;
 
         loadingScreen = new LoadingScreen(sessionSettings);
-        ui = new IngameUI(getServer());
+        ui = new PlayerUI(getUiServer());
 
         // initializeGameWorld main camera
         camera = new PerspectiveCamera();
@@ -145,18 +144,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         currentTrack.play();
     }
 
-    public void setMainCharacter(Character character) {
-        mainCharacter = character;
-
-        List<Actor> extraActors = ui.getExtraActors();
-        ui.dispose();
-        ui = new IngameUI(server, extraActors);
-        ui.load(this);
-        assets.finishLoading();
-        ui.doneLoading(this, mainCharacter);
-    }
-
-    public IngameUI getUi() { return ui; }
+    public PlayerUI getUi() { return ui; }
 
     public PerspectiveCamera getCamera() { return camera; }
 
@@ -192,6 +180,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     @Override
+    @Nullable
+    public Character getMainCharacter() {
+        return mainCharacter;
+    }
+
+    @Override
     public void resume() {
         super.resume();
         assets.update();
@@ -211,9 +205,20 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         }
     }
 
+    public void intoViewer() {
+        throw new RuntimeException("WTF");
+//        mainCharacter = null;
+//        ui.dispose();
+//        ui = new ViewerUi();
+    }
+
     @Override
     public void render(float delta) {
         super.render(delta);
+
+        if (mainCharacter != null && mainCharacter.isDead()) {
+            intoViewer();
+        }
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -225,7 +230,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         // world
         gameWorld.updateState(delta);
-        updateCamera();
+
+        if (mainCharacter != null) {
+            moveCameraToPlayer();
+        }
+        camera.update();
+
         gameWorld.updateGraphic(delta);
 
         // special effects
@@ -274,16 +284,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         assets.dispose();
     }
 
-
-    public UIServer getServer() {
-        return server;
+    public UIServer getUiServer() {
+        return uiServer;
     }
 
-    public Character getMainCharacter() {
-        return mainCharacter;
-    }
-
-    private void updateCamera() {
+    private void moveCameraToPlayer() {
+        assert mainCharacter != null;
         // Must go after gameWorld.updateState to be synced.
         Vector2 charPos = mainCharacter.getPosition();
         camera.position.set(
@@ -291,7 +297,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                 CameraDefaults.Y_OFFSET + charPos.y,
                 CameraDefaults.HEIGHT + mainCharacter.getHeight());
         camera.lookAt(charPos.x, charPos.y, mainCharacter.getHeight());
-        camera.update();
     }
 
     private void doneLoading() {
@@ -423,14 +428,14 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             map = new ModelInstance(assets.get(sessionSettings.getMapPath(), Model.class));
             fixTop(map);
 
-            ui.doneLoading(GameScreen.this, mainCharacter);
+            ui.doneLoading(GameScreen.this);
             GameScreen.this.doneLoading();
 
             BlackoutGame.get().screenManager().disposeScreen();
 
-            // notifying server that loading is done
-            synchronized (server) {
-                server.notify();
+            // notifying uiServer that loading is done
+            synchronized (uiServer) {
+                uiServer.notify();
             }
         }
     }
