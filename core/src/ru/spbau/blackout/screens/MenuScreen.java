@@ -1,6 +1,7 @@
 package ru.spbau.blackout.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,6 +23,7 @@ import com.badlogic.gdx.utils.Array;
 import java.util.Random;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.settings.GameSettings;
 
 /**
  * The part of menu ui which is used throughout all middle tables.
@@ -38,6 +40,7 @@ public class MenuScreen extends StageScreen {
     private static final String GAMES_CONTROLLER_GAMES_PATH = "images/game_services/games_controller_grey.png";
     private static final String GAMES_LEADERBOARDS_GAMES_PATH = "images/game_services/games_leaderboards.png";
     private static final String GOLD_COIN_PATH_PREFIX = "images/menuscreen/goldCoin";
+    private static final String MENU_MUSIC_PATH = "music/menu/town.mp3";
 
     private static final String BLACKOUT_TEXT = "Blackout";
     private static final String BLACKOUT_LABEL_STYLE_NAME = "blackout";
@@ -57,9 +60,15 @@ public class MenuScreen extends StageScreen {
     private static final Random generator = new Random();
 
     private Table middleTable;
+    private final Music menuMusic;
 
     public MenuScreen() {
         super();
+
+        menuMusic = Gdx.audio.newMusic(Gdx.files.internal(MENU_MUSIC_PATH));
+        menuMusic.setLooping(true);
+        updateMusicVolume();
+        playMenuMusic();
 
         addLeftPaneElements();
         addRightPaneElements();
@@ -278,5 +287,18 @@ public class MenuScreen extends StageScreen {
         stage.draw();
 
         super.render(delta);
+    }
+
+    public void updateMusicVolume() {
+        menuMusic.setVolume(
+                GameSettings.MUSIC_MAX_VOLUME * BlackoutGame.get().getPlayerEntity().getGameSettings().musicVolume);
+    }
+
+    public void pauseMenuMusic() {
+        menuMusic.pause();
+    }
+
+    public void playMenuMusic() {
+        menuMusic.play();
     }
 }

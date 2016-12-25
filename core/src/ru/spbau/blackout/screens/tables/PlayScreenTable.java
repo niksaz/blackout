@@ -27,6 +27,7 @@ public class PlayScreenTable  {
         addButton(middleTable, SINGLE_PLAYER_GAME_TEXT, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                screen.pauseMenuMusic();
                 BlackoutGame.get().startTestSinglePlayerGame();
             }
         });

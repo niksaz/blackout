@@ -19,7 +19,7 @@ import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
 import org.jetbrains.annotations.Nullable;
 
-import static ru.spbau.blackout.settings.GameSettings.MAX_SOUND_VOLUME;
+import static ru.spbau.blackout.settings.GameSettings.SOUND_MAX_VOLUME;
 
 
 public final class FireballObject extends AbilityObject {
@@ -45,7 +45,7 @@ public final class FireballObject extends AbilityObject {
         }
 
         if (def.castSound != null) {
-            def.castSound.play(getDef().getContext().getSettings().soundVolume * MAX_SOUND_VOLUME);
+            def.castSound.play(getDef().getContext().getSettings().soundVolume * SOUND_MAX_VOLUME);
         }
     }
 

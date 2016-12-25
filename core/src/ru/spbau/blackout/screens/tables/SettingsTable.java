@@ -42,7 +42,7 @@ public class SettingsTable {
                 currentValue -> {
                     gameSettings.musicVolume = currentValue;
                     entity.setGameSettings(gameSettings);
-                    //FIXME: real change in volume
+                    screen.updateMusicVolume();
                 }
         );
         addRowWithLabelAndSlider(

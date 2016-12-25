@@ -142,6 +142,7 @@ public class AndroidClient implements Runnable, UIServer {
                     // so synchronizing on server on loading
                     synchronized (this) {
                         Gdx.app.postRunnable(() -> {
+                            table.getMenuScreen().pauseMenuMusic();
                             final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings);
                             gameScreen = new GameScreen(sessionSettings, gameWorld, this, settings);
                             BlackoutGame.get().screenManager().setScreen(gameScreen);
