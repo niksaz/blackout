@@ -20,8 +20,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
-import java.util.Random;
-
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.settings.GameSettings;
 
@@ -112,7 +110,7 @@ public class MenuScreen extends StageScreen {
         final Label goldLabel = new Label("0", BlackoutGame.get().assets().getDefaultSkin()) {
             @Override
             public void act(float delta) {
-                setText(String.valueOf(BlackoutGame.get().getPlayerEntity().getGold()));
+                setText(String.valueOf(BlackoutGame.get().getPlayerEntity().getCurrentCoins()));
                 setSize(getPrefWidth(), getPrefHeight());
                 setPosition(
                         coinImage.getX(),

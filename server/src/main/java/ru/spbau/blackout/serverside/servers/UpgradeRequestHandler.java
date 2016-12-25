@@ -61,7 +61,7 @@ public class UpgradeRequestHandler implements HttpHandler {
             switch (characteristic) {
                 case GOLD_CHANGE:
                     final int delta = inputStream.readInt();
-                    if (playerProfile.getGold() + delta >= 0) {
+                    if (playerProfile.getCurrentCoins() + delta >= 0) {
                         performDatabaseUpdate(query, generateUpdateOperations(delta, definition));
                         successful = true;
                     } else {
@@ -70,7 +70,7 @@ public class UpgradeRequestHandler implements HttpHandler {
                     break;
 
                 case HEALTH_UPGRADE:
-                    if (playerProfile.getGold() >= HEALTH_UPGRADE_COST) {
+                    if (playerProfile.getCurrentCoins() >= HEALTH_UPGRADE_COST) {
                         definition.maxHealth += HEALTH_UPGRADE_PER_LEVEL;
                         performDatabaseUpdate(query, generateUpdateOperations(-HEALTH_UPGRADE_COST, definition));
                         successful = true;
@@ -81,7 +81,7 @@ public class UpgradeRequestHandler implements HttpHandler {
 
                 case ABILITY_UPGRADE:
                     final int abilityIndex = inputStream.readInt();
-                    if (playerProfile.getGold() >= ABILITY_UPGRADE_COST) {
+                    if (playerProfile.getCurrentCoins() >= ABILITY_UPGRADE_COST) {
                         definition.abilities[abilityIndex].increaseLevel();
                         performDatabaseUpdate(query, generateUpdateOperations(-ABILITY_UPGRADE_COST, definition));
                         successful = true;
@@ -110,7 +110,7 @@ public class UpgradeRequestHandler implements HttpHandler {
     private static UpdateOperations<PlayerProfile> generateUpdateOperations(int goldCost, Character.Definition newDefinition) {
         return DatabaseAccessor.getInstance().getDatastore()
                 .createUpdateOperations(PlayerProfile.class)
-                .inc("gold", goldCost)
+                .inc("currentCoins", goldCost)
                 .set("serializedDefinition", newDefinition.serializeToByteArray());
     }
 
