@@ -2,6 +2,8 @@ package ru.spbau.blackout.network;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.utils.Align;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,6 +28,8 @@ import ru.spbau.blackout.screens.tables.PlayScreenTable;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.ClientGameWorld;
+
+import static ru.spbau.blackout.BlackoutGame.DIALOG_PADDING;
 
 /**
  * Task with the purpose of talking to a server: waiting in a queue, getting a game from a server,
@@ -233,8 +237,22 @@ public class AndroidClient implements Runnable, UIServer {
             while (!isInterrupted) {
                 try {
                     final String winnerName = (String) objectInputStream.readObject();
-                    // TODO: handle winnerName
-                    System.out.println(winnerName + " WON!");
+                    Gdx.app.postRunnable(() ->
+                        new Dialog("", BlackoutGame.get().assets().getDefaultSkin()) {
+                            {
+                                setMovable(false);
+                                pad(DIALOG_PADDING);
+                                getContentTable().add(winnerName + " has won");
+                                button("Ok").padBottom(DIALOG_PADDING);
+                            }
+
+                            @Override
+                            protected void result(Object object) {
+                                super.result(object);
+                                this.remove();
+                            }
+                        }.show(gameScreen.getUi().getStage())
+                    );
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();
                     isInterrupted = true;

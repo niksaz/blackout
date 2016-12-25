@@ -51,7 +51,6 @@ public class ExitButton extends IngameUIObject {
 
     @Override
     public void update(float delta) {
-
     }
 
     @Override
