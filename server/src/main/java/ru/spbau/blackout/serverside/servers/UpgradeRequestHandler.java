@@ -19,7 +19,7 @@ import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 
 import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE;
 import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE_COST;
-import static ru.spbau.blackout.database.Database.GOLD_CHANGE;
+import static ru.spbau.blackout.database.Database.COINS_EARNED;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_PER_LEVEL;
@@ -59,14 +59,15 @@ public class UpgradeRequestHandler implements HttpHandler {
             final String characteristic = inputStream.readUTF();
             boolean successful;
             switch (characteristic) {
-                case GOLD_CHANGE:
+                case COINS_EARNED:
                     final int delta = inputStream.readInt();
-                    if (playerProfile.getCurrentCoins() + delta >= 0) {
-                        performDatabaseUpdate(query, generateUpdateOperations(delta, definition));
-                        successful = true;
-                    } else {
-                        successful = false;
-                    }
+                    final UpdateOperations<PlayerProfile> updateOperations =
+                            DatabaseAccessor.getInstance().getDatastore()
+                                    .createUpdateOperations(PlayerProfile.class)
+                                    .inc("currentCoins", delta)
+                                    .inc("earnedCoins", delta);
+                    performDatabaseUpdate(query, updateOperations);
+                    successful = true;
                     break;
 
                 case HEALTH_UPGRADE:

@@ -16,6 +16,7 @@ public interface PlayServices {
     int getStrategistAchievementID();
     int getFirstUpgradesAchievementID();
     int getMinterAchievementID();
+    int getNumberOfCoinsForMinterAchievement();
 
     int getCoinsEarnedLeaderboardID();
 
