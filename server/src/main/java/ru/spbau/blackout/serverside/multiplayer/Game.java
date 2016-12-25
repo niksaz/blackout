@@ -153,6 +153,7 @@ public class Game extends Thread implements GameContext {
                     }
                 }
             }
+
             final Query<PlayerProfile> query =
                     DatabaseAccessor.getInstance().getDatastore()
                     .createQuery(PlayerProfile.class)
@@ -160,8 +161,6 @@ public class Game extends Thread implements GameContext {
                     .equal(client.getClientName());
 
             final List<PlayerProfile> result = query.asList();
-            System.out.println("Searching for " + client.getClientName());
-            System.out.println(result.size());
             if (result.size() != 1) {
                 throw new IllegalStateException();
             }

@@ -1,5 +1,6 @@
 package ru.spbau.blackout.sessionsettings;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -81,7 +82,6 @@ public final class SessionSettings implements Serializable {
 
     // FIXME: just for test
     public static SessionSettings createDefaultSession(Array<Character.Definition> characters) {
-        // TODO: random pool
         final Array<Vector2> initialPositionsPool = new Array<>();
         initialPositionsPool.add(new Vector2(0, 10));
         initialPositionsPool.add(new Vector2(-5, 5));
@@ -92,7 +92,13 @@ public final class SessionSettings implements Serializable {
         session.setPlayerUid(1);
 
         for (Character.Definition characterDefinition : characters) {
-            final Vector2 position = initialPositionsPool.pop();
+            if (initialPositionsPool.size == 0) {
+                throw new IllegalStateException("Too much characters. Extend pool to place more characters");
+            }
+            final int index = MathUtils.random(initialPositionsPool.size - 1);
+            final Vector2 position = initialPositionsPool.get(index);
+            initialPositionsPool.removeIndex(index);
+
             characterDefinition.overHeadPivotOffset.set(0, 0, 3.5f);
             session.addInitialObject(characterDefinition, position.x, position.y);
         }
