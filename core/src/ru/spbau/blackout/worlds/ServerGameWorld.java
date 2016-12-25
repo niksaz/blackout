@@ -55,11 +55,7 @@ public class ServerGameWorld extends GameWorld {
     }
 
     @Override
-    public void updateState(float delta) {
-        for (GameObject object : getGameObjects()) {
-            object.updateState(delta);
-        }
-
+    public void updatePhysics(float delta) {
         for (Iterator<GameObject> it = getGameObjects().iterator(); it.hasNext();) {
             GameObject object = it.next();
             if (object.isDead()) {
@@ -79,6 +75,10 @@ public class ServerGameWorld extends GameWorld {
 
     private void step() {
         stepNumber += 1;
+
+        for (GameObject object : getGameObjects()) {
+            object.updateState(WORLD_STEP);
+        }
 
         foreach(getGameObjects(), GameObject::updateForFirstStep);
         this.box2dWorld.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);

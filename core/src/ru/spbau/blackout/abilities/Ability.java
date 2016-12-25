@@ -74,6 +74,7 @@ public abstract class Ability implements HasState {
         private static final long serialVersionUID = 1000000000L;
 
         private int level;
+        private /*final*/ transient GameContext context;
 
         public Definition(int level) {
             setLevel(level);

@@ -11,7 +11,7 @@ public abstract class StaticObject extends GameObject {
         super(def, uid, x, y);
     }
 
-    // We don't need to updateState velocity for static objects
+    // We don't need to updatePhysics velocity for static objects
     @Override
     public void updateForSecondStep() {}
     @Override

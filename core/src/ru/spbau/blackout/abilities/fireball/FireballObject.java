@@ -14,23 +14,21 @@ import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.entities.GameUnit;
+import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
-import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
 import org.jetbrains.annotations.Nullable;
 
+import static ru.spbau.blackout.abilities.fireball.FireballAbility.CAST_SOUND_PATH;
+import static ru.spbau.blackout.abilities.fireball.FireballAbility.EXPLOSION_EFFECT_PATH;
+import static ru.spbau.blackout.abilities.fireball.FireballAbility.FIRE_EFFECT_PATH;
+import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTOR;
+import static ru.spbau.blackout.abilities.fireball.FireballAbility.SHELL_MASS;
+import static ru.spbau.blackout.abilities.fireball.FireballAbility.SHELL_RADIUS;
 import static ru.spbau.blackout.settings.GameSettings.SOUND_MAX_VOLUME;
 
 
 public final class FireballObject extends AbilityObject {
-
-    private static final String CAST_SOUND_PATH = "sounds/fire.ogg";
-    private static final float IMPULSE_FACTOR = 40f;
-
-    private static final String FIRE_EFFECT_PATH = "abilities/fireball/particles/fireball.pfx";
-    private static final String EXPLOSION_EFFECT_PATH = "effects/small_explosion/small_explosion.pfx";
-
 
     private float timeRest;
     private boolean shouldExplode = false;
@@ -43,10 +41,6 @@ public final class FireballObject extends AbilityObject {
 
         if (def.fireEffect != null) {
             graphicEffects.add(new ParticleGraphicEffect(getDef().getContext(), this, def.fireEffect.copy()));
-        }
-
-        if (def.castSound != null) {
-            def.castSound.play(getDef().getContext().getSettings().soundVolume * SOUND_MAX_VOLUME);
         }
     }
 
@@ -97,7 +91,7 @@ public final class FireballObject extends AbilityObject {
         // play explosion effect
         ParticleEffect explosionEffect = ((Definition) getDef()).explosionEffect;
         if (shouldExplode && explosionEffect != null) {
-            ParticleSpecialEffect.create(getDef().getContext(), explosionEffect, getChestPivot());
+            ParticleSpecialEffect.create(getDef().getContext(), explosionEffect.copy(), getChestPivot());
         }
     }
 
@@ -115,13 +109,15 @@ public final class FireballObject extends AbilityObject {
 
         public float timeToLive;
         public float damage;
-        @Nullable private /*final*/ transient ParticleEffect fireEffect;
-        @Nullable private /*final*/ transient ParticleEffect explosionEffect;
-        @Nullable private /*final*/ transient Sound castSound;
+        @Nullable
+        private /*final*/ transient ParticleEffect fireEffect;
+        @Nullable
+        private /*final*/ transient ParticleEffect explosionEffect;
 
 
-        public Definition(String modelPath, Creator<Shape> shapeCreator, float mass) {
-            super(modelPath, shapeCreator, mass);
+        public Definition() {
+            super(null, new CircleCreator(SHELL_RADIUS));
+            this.mass = SHELL_MASS;
         }
 
         @Override
@@ -135,14 +131,18 @@ public final class FireballObject extends AbilityObject {
         @Override
         public void doneLoading() {
             super.doneLoading();
-            fireEffect = Particles.getOriginal(context, FIRE_EFFECT_PATH);
-            explosionEffect = Particles.getOriginal(context, EXPLOSION_EFFECT_PATH);
-            castSound = context.getAssets().get(CAST_SOUND_PATH, Sound.class);
+            fireEffect = Particles.getOriginal(getContext(), FIRE_EFFECT_PATH);
+            explosionEffect = Particles.getOriginal(getContext(), EXPLOSION_EFFECT_PATH);
         }
 
         @Override
         public GameObject makeInstance(long uid, float x, float y) {
             return new FireballObject(this, uid, x, y);
+        }
+
+        @Override
+        protected String castSoundPath() {
+            return CAST_SOUND_PATH;
         }
     }
 }

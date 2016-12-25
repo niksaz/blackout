@@ -139,7 +139,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
      */
     public void kill() {
         // TODO: override
-        // It will be handled in GameWorld::updateState. It's a bad idea to try to remove body
+        // It will be handled in GameWorld::updatePhysics. It's a bad idea to try to remove body
         // from GameWorld right here because this method can be called in process of updating physics.
         dead = true;
         // FIXME: play death animation
@@ -281,7 +281,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
         /** The loaded modelInstance object. Initialized by <code>initializeGameWorld</code> method. */
         @Nullable private transient Model model;
-        protected transient GameContext context;
+        private transient GameContext context;
 
         /**
          * Path to the modelInstance for game objects. May be null. In this case objects will not have models.

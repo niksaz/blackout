@@ -11,7 +11,7 @@ import java.util.List;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
-import ru.spbau.blackout.abilities.ForceBlast;
+import ru.spbau.blackout.abilities.forceblast.ForceBlastAbility;
 import ru.spbau.blackout.abilities.fireball.FireballAbility;
 import ru.spbau.blackout.graphiceffects.HealthBarEffect;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
@@ -138,12 +138,12 @@ public class Character extends GameUnit implements Damageable  {
         public void doneLoading() {
             super.doneLoading();
 
-            healthBar.doneLoading(context.getAssets());
+            healthBar.doneLoading(getContext().getAssets());
             healthBar.setSize(HealthBar.WIDTH, HealthBar.HEIGHT);
             healthBar.toBack();
 
             for (Ability.Definition abilityDef : abilities) {
-                abilityDef.doneLoading(context);
+                abilityDef.doneLoading(getContext());
             }
         }
 
@@ -151,10 +151,10 @@ public class Character extends GameUnit implements Damageable  {
         public GameObject makeInstance(long uid, float x, float y) {
             Character character = new Character(this, uid, x, y);
 
-            if (context.hasUI()) {
+            if (getContext().hasUI()) {
                 SimpleProgressBar unitHb = healthBar.copy();
-                context.getScreen().getUi().addActor(unitHb);
-                character.graphicEffects.add(new HealthBarEffect(character, unitHb, context));
+                getContext().getScreen().getUi().addActor(unitHb);
+                character.graphicEffects.add(new HealthBarEffect(character, unitHb, getContext()));
             }
 
             return character;
@@ -174,7 +174,7 @@ public class Character extends GameUnit implements Damageable  {
                     new CircleCreator(0.6f),
                     new Ability.Definition[] {
                         new FireballAbility.Definition(1),
-                        new ForceBlast.Definition(1)
+                        new ForceBlastAbility.Definition(1)
                     },
                     200
             );

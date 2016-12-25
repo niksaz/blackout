@@ -35,7 +35,7 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  * its body's velocity and then it must put its own velocity (just like <code>selfVelocity</code> of GameUnit) instead.
  * The resulting velocity of the second step isn't important.
  *
- * <br>There is one more method called <code>updateGraphics</code>. It must updateState things which are not connected
+ * <br>There is one more method called <code>updateGraphics</code>. It must updatePhysics things which are not connected
  * with physic driver. This method called one time per frame (i.e. without fixed step).
  */
 public abstract class GameWorld {
@@ -71,7 +71,7 @@ public abstract class GameWorld {
         return gameObjectsMap.containsKey(uid);
     }
 
-    public abstract void updateState(float delta);
+    public abstract void updatePhysics(float delta);
 
     protected void updateGraphics(float delta) {
     }

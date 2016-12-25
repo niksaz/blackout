@@ -34,7 +34,8 @@ public class ParticleSpecialEffect implements SpecialEffect {
 
 
     /**
-     * This constructor will copy the <code>ParticleEffect</code> and then <code>dispose</code> it after usage.
+     * This constructor won't copy the <code>ParticleEffect</code>,
+     * but it will <code>dispose</code> the effect after usage.
      */
     public static void create(GameContext context, ParticleEffect effect, float x, float y, float height) {
         BlackoutGame.get().specialEffects().add(new ParticleSpecialEffect(context, effect.copy(), x, y, height));

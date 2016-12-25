@@ -15,7 +15,6 @@ import java.util.List;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
 import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
@@ -81,7 +80,7 @@ public class Game extends Thread implements GameContext {
 
                 long currentTime = System.currentTimeMillis();
                 final float worldDeltaInSecs = (currentTime - lastWorldUpdateTime) / Utils.MILLIS_IN_SECOND;
-                gameWorld.updateState(worldDeltaInSecs);
+                gameWorld.updatePhysics(worldDeltaInSecs);
                 lastWorldUpdateTime = currentTime;
                 server.log("Updating gameWorld: " + worldDeltaInSecs);
 

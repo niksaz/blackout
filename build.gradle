@@ -7,8 +7,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-        // there is a bug in android gradle tools 2.2.2
-        //noinspection GradleDependency
         classpath 'com.android.tools.build:gradle:2.2.3'
         classpath 'me.tatarka:gradle-retrolambda:3.2.4'
         classpath 'org.jetbrains:annotations-java5:15.0'

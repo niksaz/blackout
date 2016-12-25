@@ -17,7 +17,7 @@ public final class Utils {
     public static final double EPSILON = 1e-5f;
     public static final float MILLIS_IN_SECOND = 1000f;
 
-    public static boolean floatEq(double a, double b) {
+    public static boolean floatEq(float a, float b) {
         return Math.abs(a - b) < EPSILON;
     }
 
@@ -27,6 +27,10 @@ public final class Utils {
 
     public static boolean isZeroVec(float x, float y) {
         return floatEq(x, 0) && floatEq(y, 0);
+    }
+
+    public static boolean vecEquals(Vector2 a, Vector2 b) {
+        return floatEq(a.x, b.x) && floatEq(a.y, b.y);
     }
 
 

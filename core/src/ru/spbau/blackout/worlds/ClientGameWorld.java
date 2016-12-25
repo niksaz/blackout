@@ -62,7 +62,7 @@ public class ClientGameWorld extends GameWorld {
     }
 
     @Override
-    public void updateState(float delta) {
+    public void updatePhysics(float delta) {
         if (externalWorldStream.get() != null) {
             try {
                 setState(externalWorldStream.getAndSet(null));

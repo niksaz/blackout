@@ -229,7 +229,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         }
 
         // world
-        gameWorld.updateState(delta);
+        gameWorld.updatePhysics(delta);
 
         if (mainCharacter != null) {
             moveCameraToPlayer();
@@ -289,7 +289,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
     private void moveCameraToPlayer() {
         assert mainCharacter != null;
-        // Must go after gameWorld.updateState to be synced.
+        // Must go after gameWorld.updatePhysics to be synced.
         Vector2 charPos = mainCharacter.getPosition();
         camera.position.set(
                 CameraDefaults.X_OFFSET + charPos.x,

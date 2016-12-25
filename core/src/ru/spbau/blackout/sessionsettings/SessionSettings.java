@@ -112,7 +112,7 @@ public final class SessionSettings implements Serializable {
 
         final GameObject.Definition mapExternal = new Decoration.Definition(
                 null,
-                new RightOctagonCreator(22f)
+                new RightOctagonCreator(21f)
         );
         session.addInitialObject(mapExternal, 0, 0);
 

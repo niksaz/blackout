@@ -1,8 +1,14 @@
 package ru.spbau.blackout.entities;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.physics.box2d.Shape;
 
+import org.jetbrains.annotations.Nullable;
+
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.utils.Creator;
+
+import static ru.spbau.blackout.settings.GameSettings.SOUND_MAX_VOLUME;
 
 
 /**
@@ -12,6 +18,10 @@ public abstract class AbilityObject extends DynamicObject {
 
     protected AbilityObject(Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
+
+        if (def.getCastSound() != null) {
+            def.getCastSound().play(getDef().getContext().getSettings().soundVolume * SOUND_MAX_VOLUME);
+        }
     }
 
     /** Calls when the object contacts with another object. */
@@ -28,9 +38,30 @@ public abstract class AbilityObject extends DynamicObject {
 
         private static final long serialVersionUID = 1000000000L;
 
-        public Definition(String modelPath, Creator<Shape> shapeCreator, float mass) {
+        @Nullable
+        private  /*final*/ transient Sound castSound;
+
+        public Definition(String modelPath, Creator<Shape> shapeCreator) {
             super(modelPath, shapeCreator);
-            this.mass = mass;
         }
+
+        @Override
+        public void load(GameContext context) {
+            super.load(context);
+            context.getAssets().load(castSoundPath(), Sound.class);
+        }
+
+        @Override
+        public void doneLoading() {
+            super.doneLoading();
+            castSound = getContext().getAssets().get(castSoundPath(), Sound.class);
+        }
+
+        @Nullable
+        public final Sound getCastSound() {
+            return castSound;
+        }
+
+        protected abstract String castSoundPath();
     }
 }
