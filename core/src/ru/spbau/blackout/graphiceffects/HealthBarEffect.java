@@ -38,7 +38,7 @@ public class HealthBarEffect implements GraphicEffect {
     }
 
     @Override
-    public void remove() {
+    public void remove(GameContext context) {
         this.healthBar.remove();
     }
 }

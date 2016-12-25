@@ -60,7 +60,6 @@ public class BlackoutGame extends Game {
     private /*final*/ ModelBatch modelBatch;
     private /*final*/ SpriteBatch spriteBatch;
     private /*final*/ BlackoutAssets assets;
-    private /*final*/ ParticleSystem particleSystem;
     private final SpecialEffectsSystem specialEffects = new SpecialEffectsSystem();
 
     private BlackoutGame(ScreenManager screenManager) {
@@ -74,7 +73,6 @@ public class BlackoutGame extends Game {
     public final ScreenManager screenManager() { return this.screenManager; }
     public final PlayServicesInCore playServicesInCore() { return this.playServicesInCore; }
     public final BlackoutAssets assets() { return this.assets; }
-    public final ParticleSystem particleSystem() { return this.particleSystem; }
     public final SpecialEffectsSystem specialEffects() { return this.specialEffects; }
 
 
@@ -102,7 +100,6 @@ public class BlackoutGame extends Game {
         this.modelBatch = new ModelBatch();
         this.spriteBatch = new SpriteBatch();
         this.assets = new BlackoutAssets();
-        this.particleSystem = new ParticleSystem();
 
         this.assets.load();
 

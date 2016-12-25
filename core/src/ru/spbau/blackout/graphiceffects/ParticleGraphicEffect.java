@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Matrix4;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameObject;
 
 
@@ -17,11 +18,11 @@ public class ParticleGraphicEffect implements GraphicEffect {
     private final GameObject object;
 
 
-    public ParticleGraphicEffect(GameObject object, ParticleEffect effect) {
+    public ParticleGraphicEffect(GameContext context, GameObject object, ParticleEffect effect) {
         this.object = object;
         this.effect = effect;
         this.effect.init();
-        BlackoutGame.get().particleSystem().add(this.effect);
+        context.getParticleSystem().add(this.effect);
         this.updatePosition();
     }
 
@@ -37,8 +38,8 @@ public class ParticleGraphicEffect implements GraphicEffect {
     }
 
     @Override
-    public void remove() {
-        BlackoutGame.get().particleSystem().remove(this.effect);
+    public void remove(GameContext context) {
+        context.getParticleSystem().remove(this.effect);
         this.effect.dispose();
     }
 }

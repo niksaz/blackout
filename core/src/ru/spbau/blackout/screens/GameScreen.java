@@ -87,6 +87,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private final Array<Music> music = new Array<>();
     private Music currentTrack;
     private final GameSettings settings;
+    private final ParticleSystem particleSystem = new ParticleSystem();
 
 
     public GameScreen(SessionSettings sessionSettings,
@@ -114,7 +115,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         // initializeGameWorld particles
         BillboardParticleBatch particleBatch = new BillboardParticleBatch();
         particleBatch.setCamera(camera);
-        BlackoutGame.get().particleSystem().add(particleBatch);
+        particleSystem.add(particleBatch);
         ParticleEffectLoader loader = new ParticleEffectLoader(new InternalFileHandleResolver());
         assets.setLoader(ParticleEffect.class, loader);
 
@@ -186,6 +187,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     @Override
+    public ParticleSystem getParticleSystem() {
+        return particleSystem;
+    }
+
+    @Override
     public void resume() {
         super.resume();
         assets.update();
@@ -212,8 +218,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-        BlackoutGame game = BlackoutGame.get();
-
         // music
         if (!currentTrack.isPlaying()) {
             switchTrack();
@@ -225,14 +229,13 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         gameWorld.updateGraphic(delta);
 
         // special effects
-        game.specialEffects().update(delta);
+        BlackoutGame.get().specialEffects().update(delta);
 
         ui.update(delta);
 
         // modelInstance batch rendering
         {
-            ModelBatch modelBatch = game.modelBatch();
-            ParticleSystem particleSystem = game.particleSystem();
+            ModelBatch modelBatch = BlackoutGame.get().modelBatch();
 
             modelBatch.begin(camera);
 

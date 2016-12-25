@@ -1,6 +1,7 @@
 package ru.spbau.blackout.serverside.multiplayer;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -27,8 +28,6 @@ import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.Utils;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.worlds.ServerGameWorld;
-
-import static com.sun.tools.doclint.Entity.isin;
 
 /**
  * Multiplayer game representation. Used for synchronizing game's state and watching for game flow, i.e. if someone
@@ -138,6 +137,11 @@ public class Game extends Thread implements GameContext {
 
     @Override
     public GameScreen getScreen() {
+        return null;
+    }
+
+    @Override
+    public ParticleSystem getParticleSystem() {
         return null;
     }
 

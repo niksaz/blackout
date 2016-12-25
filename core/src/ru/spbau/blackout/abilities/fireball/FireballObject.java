@@ -42,7 +42,7 @@ public final class FireballObject extends AbilityObject {
         timeRest = def.timeToLive;
 
         if (def.fireEffect != null) {
-            graphicEffects.add(new ParticleGraphicEffect(this, def.fireEffect.copy()));
+            graphicEffects.add(new ParticleGraphicEffect(getDef().getContext(), this, def.fireEffect.copy()));
         }
 
         if (def.castSound != null) {
@@ -51,20 +51,20 @@ public final class FireballObject extends AbilityObject {
     }
 
     @Override
-    public void beginContact(GameObject other) {
-        super.beginContact(other);
+    public void beginContact(GameObject object) {
+        super.beginContact(object);
 
         shouldExplode = true;
 
-        if (other instanceof DynamicObject) {
-            DynamicObject dynamic = (DynamicObject) other;
+        if (object instanceof DynamicObject) {
+            DynamicObject dynamic = (DynamicObject) object;
             // This object is going to dye. So, we don't care about changes of its velocity.
             velocity.add(body.getLinearVelocity()).scl(IMPULSE_FACTOR);
             dynamic.applyImpulse(velocity);
         }
 
-        if (other instanceof Damageable) {
-            ((Damageable) other).damage(((Definition) getDef()).damage);
+        if (object instanceof Damageable) {
+            ((Damageable) object).damage(((Definition) getDef()).damage);
         }
 
         kill();
@@ -97,7 +97,7 @@ public final class FireballObject extends AbilityObject {
         // play explosion effect
         ParticleEffect explosionEffect = ((Definition) getDef()).explosionEffect;
         if (shouldExplode && explosionEffect != null) {
-            ParticleSpecialEffect.create(explosionEffect.copy(), getChestPivot());
+            ParticleSpecialEffect.create(getDef().getContext(), explosionEffect, getChestPivot());
         }
     }
 

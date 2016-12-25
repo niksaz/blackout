@@ -155,7 +155,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
      */
     public void dispose() {
         for (GraphicEffect effect : graphicEffects) {
-            effect.remove();
+            effect.remove(def.getContext());
         }
     }
 
@@ -371,10 +371,17 @@ public abstract class GameObject implements RenderableProvider, HasState {
             return context.gameWorld().addObject(object, bodyDef);
         }
 
+        public void dispose() {
+        }
+
         public abstract BodyDef.BodyType getBodyType();
 
-        public int getDefNumber() { return defNumber; }
+        public int getDefNumber() {
+            return defNumber;
+        }
 
-        public void setDefNumber(int defNumber) { this.defNumber = defNumber; }
+        public void setDefNumber(int defNumber) {
+            this.defNumber = defNumber;
+        }
     }
 }

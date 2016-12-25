@@ -91,7 +91,8 @@ public abstract class GameWorld {
 
     public void dispose() {
         box2dWorld.dispose();
-        foreach (getGameObjects(), GameObject::dispose);
+        foreach(getGameObjects(), GameObject::dispose);
+        foreach(getDefinitions(), GameObject.Definition::dispose);
     }
 
     public void updateGraphic(float delta) {

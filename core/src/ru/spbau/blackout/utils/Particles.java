@@ -1,12 +1,9 @@
 package ru.spbau.blackout.utils;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
-
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.java8features.Optional;
 
 import static com.badlogic.gdx.graphics.g3d.particles.ParticleEffectLoader.ParticleEffectLoadParameter;
 
@@ -16,7 +13,7 @@ public final class Particles {
 
     public static void load(GameContext context, String path) {
         ParticleEffectLoadParameter param =
-                new ParticleEffectLoadParameter(BlackoutGame.get().particleSystem().getBatches());
+                new ParticleEffectLoadParameter(context.getParticleSystem().getBatches());
         context.getAssets().load(path, ParticleEffect.class, param);
     }
 
