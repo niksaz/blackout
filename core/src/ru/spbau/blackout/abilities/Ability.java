@@ -103,5 +103,6 @@ public abstract class Ability implements HasState {
 
         public abstract String getIconPath();
         public abstract float getMaxChargeTime();
+        public abstract String getName();
     }
 }

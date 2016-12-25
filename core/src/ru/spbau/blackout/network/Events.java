@@ -14,4 +14,8 @@ public class Events {
     public static void abilityCast(Character character, int abilityNum, Vector2 target) {
         character.castAbility(abilityNum, target);
     }
+
+    public static void playerDeath(Character character) {
+        // TODO: create ghost
+    }
 }

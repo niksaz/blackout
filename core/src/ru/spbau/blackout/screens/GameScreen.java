@@ -75,8 +75,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     private final PerspectiveCamera camera;
     public final Environment environment;
 
-    private Character character;
-    private final IngameUI ui;
+    private Character mainCharacter;
+    private IngameUI ui;
 
     private final GameWorld gameWorld;
     private final UIServer server;
@@ -139,6 +139,16 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             currentTrack = music.random();
         }
         currentTrack.play();
+    }
+
+    public void setMainCharacter(Character character) {
+        mainCharacter = character;
+
+        ui.dispose();
+        ui = new IngameUI(server);
+        ui.load(assets);
+        assets.finishLoading();
+        ui.doneLoading(assets, mainCharacter);
     }
 
     public IngameUI getUi() { return ui; }
@@ -253,6 +263,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         assets.dispose();
         gameWorld.dispose();
         currentTrack.stop();
+        ui.dispose();
         foreach(music, Music::dispose);
     }
 
@@ -261,18 +272,18 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         return server;
     }
 
-    public Character getCharacter() {
-        return character;
+    public Character getMainCharacter() {
+        return mainCharacter;
     }
 
     private void updateCamera() {
         // Must go after gameWorld.updateState to be synced.
-        Vector2 charPos = character.getPosition();
+        Vector2 charPos = mainCharacter.getPosition();
         camera.position.set(
                 CameraDefaults.X_OFFSET + charPos.x,
                 CameraDefaults.Y_OFFSET + charPos.y,
-                CameraDefaults.HEIGHT + character.getHeight());
-        camera.lookAt(charPos.x, charPos.y, character.getHeight());
+                CameraDefaults.HEIGHT + mainCharacter.getHeight());
+        camera.lookAt(charPos.x, charPos.y, mainCharacter.getHeight());
         camera.update();
     }
 
@@ -396,16 +407,16 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
             System.out.println("Player uid " + sessionSettings.getPlayerUid());
 
-            character = (Character) gameWorld.getObjectById(sessionSettings.getPlayerUid());
+            mainCharacter = (Character) gameWorld.getObjectById(sessionSettings.getPlayerUid());
 
-            if (character == null) {
-                throw new AssertionError("Player without character");
+            if (mainCharacter == null) {
+                throw new AssertionError("Player without mainCharacter");
             }
 
             map = new ModelInstance(assets.get(sessionSettings.getMapPath(), Model.class));
             fixTop(map);
 
-            ui.doneLoading(assets, character);
+            ui.doneLoading(assets, mainCharacter);
             GameScreen.this.doneLoading();
 
             BlackoutGame.get().screenManager().disposeScreen();

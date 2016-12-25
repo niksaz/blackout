@@ -42,6 +42,7 @@ public class FireballAbility extends SimpleInstantAbility {
 
         private static final long serialVersionUID = 1000000000L;
 
+        private static final String NAME = "Fireball";
         private static final String ICON_PATH = "abilities/fireball/icon.png";
         private static final float MAX_CHARGE_TIME = 1f;
         private static final float SHELL_MASS = 5f;
@@ -88,6 +89,11 @@ public class FireballAbility extends SimpleInstantAbility {
         @Override
         public String getIconPath() {
             return ICON_PATH;
+        }
+
+        @Override
+        public String getName() {
+            return NAME;
         }
     }
 }

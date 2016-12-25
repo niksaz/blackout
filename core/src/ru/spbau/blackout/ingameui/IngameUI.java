@@ -32,7 +32,6 @@ public class IngameUI {
             new Vector2(1100, 450),
             new Vector2(1100, 300),
             new Vector2(1100, 150)
-
     };
 
     public final Stage stage;
@@ -84,5 +83,10 @@ public class IngameUI {
      */
     public void draw() {
         stage.draw();
+    }
+
+    public void dispose() {
+         stage.dispose();
+         foreach(uiObjects, IngameUIObject::dispose);
     }
 }

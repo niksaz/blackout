@@ -56,7 +56,7 @@ public class UpgradesTable {
             addRowWithButtonAndLabel(
                     middleTable,
                     appendPrice(
-                        ABILITY_UPGRADE + " " + characterDefinition.abilities[currentAbilityIndex].getClass().getSimpleName(),
+                        ABILITY_UPGRADE + " " + characterDefinition.abilities[currentAbilityIndex].getName(),
                         ABILITY_UPGRADE_COST
                     ),
                     new ClickListener() {

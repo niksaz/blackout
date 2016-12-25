@@ -89,6 +89,11 @@ public final class Stick extends IngameUIObject {
         touchImage.setPosition(position.x, position.y);
     }
 
+    @Override
+    public void dispose() {
+        // TODO
+    }
+
 
     private class Listener extends DragListener {
         @Override

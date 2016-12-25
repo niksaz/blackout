@@ -126,6 +126,11 @@ public final class AbilityIcon extends IngameUIObject {
         chargingBar.setValueInstant(1);
     }
 
+    @Override
+    public void dispose() {
+        // TODO
+    }
+
 
     private class Listener extends InputListener {
         @Override

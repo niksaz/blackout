@@ -45,4 +45,9 @@ public final class HealthBar extends IngameUIObject {
     public void update(float deltaTime) {
         this.healthBar.setValue(character.getHealth() / character.getMaxHealth());
     }
+
+    @Override
+    public void dispose() {
+        // TODO
+    }
 }

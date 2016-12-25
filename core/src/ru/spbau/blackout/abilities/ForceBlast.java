@@ -19,6 +19,7 @@ public class ForceBlast extends SimpleInstantAbility {
     public static class Definition extends Ability.Definition {
 
         private static final String ICON_PATH = "abilities/force_blast/icon.png";
+        private static final String NAME = "Force Blast";
         private static final float MAX_CHARGE_TIME = 1.5f;
 
         public Definition(int level) {
@@ -33,6 +34,11 @@ public class ForceBlast extends SimpleInstantAbility {
         @Override
         public String getIconPath() {
             return ICON_PATH;
+        }
+
+        @Override
+        public String getName() {
+            return NAME;
         }
 
         @Override
