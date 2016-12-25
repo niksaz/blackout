@@ -3,7 +3,6 @@ package ru.spbau.blackout.network;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.utils.Align;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -238,20 +237,20 @@ public class AndroidClient implements Runnable, UIServer {
                 try {
                     final String winnerName = (String) objectInputStream.readObject();
                     Gdx.app.postRunnable(() ->
-                        new Dialog("", BlackoutGame.get().assets().getDefaultSkin()) {
-                            {
-                                setMovable(false);
-                                pad(DIALOG_PADDING);
-                                getContentTable().add(winnerName + " has won");
-                                button("Ok").padBottom(DIALOG_PADDING);
-                            }
+                                new Dialog("", BlackoutGame.get().assets().getDefaultSkin()) {
+                                    {
+                                        setMovable(false);
+                                        pad(DIALOG_PADDING);
+                                        getContentTable().add(winnerName + " has won");
+                                        button("Ok").padBottom(DIALOG_PADDING);
+                                    }
 
-                            @Override
-                            protected void result(Object object) {
-                                super.result(object);
-                                this.remove();
-                            }
-                        }.show(gameScreen.getUi().getStage())
+                                    @Override
+                                    protected void result(Object object) {
+                                        super.result(object);
+                                        this.remove();
+                                    }
+                                }.show(gameScreen.getUi().getStage())
                     );
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();

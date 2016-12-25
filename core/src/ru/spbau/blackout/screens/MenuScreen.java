@@ -21,7 +21,11 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.database.ChangeablePlayerProfile;
+import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.settings.GameSettings;
+
+import static ru.spbau.blackout.database.Database.CYCLE_OF_PROFILE_SYNCHRONIZATION;
 
 /**
  * The part of menu ui which is used throughout all middle tables.
@@ -56,6 +60,7 @@ public class MenuScreen extends StageScreen {
 
     private Table middleTable;
     private final Music menuMusic;
+    private float timeToNextUpdate = CYCLE_OF_PROFILE_SYNCHRONIZATION;
 
     public MenuScreen() {
         super();
@@ -279,6 +284,12 @@ public class MenuScreen extends StageScreen {
 
         stage.act(delta);
         stage.draw();
+
+        timeToNextUpdate -= delta;
+        if (timeToNextUpdate <= 0) {
+            ChangeablePlayerProfile.loadPlayerEntity(null, null);
+            timeToNextUpdate = Database.CYCLE_OF_PROFILE_SYNCHRONIZATION;
+        }
 
         super.render(delta);
     }

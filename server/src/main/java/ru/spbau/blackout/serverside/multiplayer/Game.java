@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
@@ -107,8 +109,21 @@ public class Game extends Thread implements GameContext {
                     }
                 }
 
-                if (aliveCharacters == 1) {
+                if (aliveCharacters == 1 && !someoneWon) {
                     someoneWon = true;
+                    final String winnerName = clientThreadWithAliveCharacter.getClientName();
+                    // adding the winner some gold
+                    new Thread(() -> {
+                        final Query<PlayerProfile> query = DatabaseAccessor.getInstance().queryProfile(winnerName);
+
+                        final UpdateOperations<PlayerProfile> updateOperations =
+                                DatabaseAccessor.getInstance().getDatastore()
+                                .createUpdateOperations(PlayerProfile.class)
+                                .inc("currentCoins", Database.COINS_PER_WIN)
+                                .inc("earnedCoins", Database.COINS_PER_WIN);
+
+                        DatabaseAccessor.getInstance().performUpdate(query, updateOperations);
+                    }).start();
                 }
 
                 final long duration = timeLastIterationFinished - System.currentTimeMillis();
@@ -170,12 +185,7 @@ public class Game extends Thread implements GameContext {
                 }
             }
 
-            final Query<PlayerProfile> query =
-                    DatabaseAccessor.getInstance().getDatastore()
-                    .createQuery(PlayerProfile.class)
-                    .field("name")
-                    .equal(client.getClientName());
-
+            final Query<PlayerProfile> query = DatabaseAccessor.getInstance().queryProfile(client.getClientName());
             final List<PlayerProfile> result = query.asList();
             if (result.size() != 1) {
                 throw new IllegalStateException();

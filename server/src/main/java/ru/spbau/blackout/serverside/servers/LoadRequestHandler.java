@@ -35,13 +35,8 @@ public class LoadRequestHandler implements HttpHandler {
         ) {
             final String name = inputStream.readUTF();
 
-            final Query<PlayerProfile> query =
-                    DatabaseAccessor.getInstance().getDatastore()
-                            .createQuery(PlayerProfile.class)
-                            .field("name")
-                            .equal(name);
+            final Query<PlayerProfile> query = DatabaseAccessor.getInstance().queryProfile(name);
             final List<PlayerProfile> result = query.asList();
-
             final PlayerProfile entity;
             switch (result.size()) {
                 case 0:

@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpHandler;
 
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
-import org.mongodb.morphia.query.UpdateResults;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -43,11 +42,7 @@ public class UpgradeRequestHandler implements HttpHandler {
             DataInputStream inputStream = new DataInputStream(input)
         ) {
             final String name = inputStream.readUTF();
-            final Query<PlayerProfile> query =
-                    DatabaseAccessor.getInstance().getDatastore()
-                            .createQuery(PlayerProfile.class)
-                            .field("name")
-                            .equal(name);
+            final Query<PlayerProfile> query = DatabaseAccessor.getInstance().queryProfile(name);
             final List<PlayerProfile> result = query.asList();
             if (result.size() != 1) {
                 throw new IllegalStateException();
@@ -66,14 +61,16 @@ public class UpgradeRequestHandler implements HttpHandler {
                                     .createUpdateOperations(PlayerProfile.class)
                                     .inc("currentCoins", delta)
                                     .inc("earnedCoins", delta);
-                    performDatabaseUpdate(query, updateOperations);
+                    DatabaseAccessor.getInstance()
+                            .performUpdate(query, updateOperations);
                     successful = true;
                     break;
 
                 case HEALTH_UPGRADE:
                     if (playerProfile.getCurrentCoins() >= HEALTH_UPGRADE_COST) {
                         definition.maxHealth += HEALTH_UPGRADE_PER_LEVEL;
-                        performDatabaseUpdate(query, generateUpdateOperations(-HEALTH_UPGRADE_COST, definition));
+                        DatabaseAccessor.getInstance()
+                                .performUpdate(query, generateUpdateOperations(-HEALTH_UPGRADE_COST, definition));
                         successful = true;
                     } else {
                         successful = false;
@@ -84,7 +81,8 @@ public class UpgradeRequestHandler implements HttpHandler {
                     final int abilityIndex = inputStream.readInt();
                     if (playerProfile.getCurrentCoins() >= ABILITY_UPGRADE_COST) {
                         definition.abilities[abilityIndex].increaseLevel();
-                        performDatabaseUpdate(query, generateUpdateOperations(-ABILITY_UPGRADE_COST, definition));
+                        DatabaseAccessor.getInstance()
+                                .performUpdate(query, generateUpdateOperations(-ABILITY_UPGRADE_COST, definition));
                         successful = true;
                     } else {
                         successful = false;
@@ -113,9 +111,5 @@ public class UpgradeRequestHandler implements HttpHandler {
                 .createUpdateOperations(PlayerProfile.class)
                 .inc("currentCoins", goldCost)
                 .set("serializedDefinition", newDefinition.serializeToByteArray());
-    }
-
-    private static <T> UpdateResults performDatabaseUpdate(Query<T> query, UpdateOperations<T> updateOperations) {
-        return DatabaseAccessor.getInstance().getDatastore().update(query, updateOperations);
     }
 }
