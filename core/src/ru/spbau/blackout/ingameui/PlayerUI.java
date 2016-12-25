@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import ru.spbau.blackout.ingameui.objects.AbilityIcon;
@@ -42,6 +43,6 @@ public class PlayerUI extends IngameUI {
     }
 
     public PlayerUI(UIServer server) {
-        this(server, new ArrayList<>());
+        this(server, new LinkedList<>());
     }
 }

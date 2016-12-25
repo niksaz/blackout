@@ -90,13 +90,13 @@ public final class AbilityIcon extends IngameUIObject {
     }
 
     @Override
-    public void update(float deltaTime) {
+    public void update(float delta) {
         if (ability == null) {
             return;
         }
 
         if (isPressed) {
-            ability.inCast(server, deltaTime);
+            ability.inCast(server, delta);
         }
 
         float chargeTime = ability.getChargeTime();

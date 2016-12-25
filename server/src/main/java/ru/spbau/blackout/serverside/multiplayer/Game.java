@@ -65,20 +65,16 @@ public class Game extends Thread implements GameContext {
             try {
                 for (int clientIndex = 0; clientIndex < clients.size(); clientIndex++) {
                     final ClientThread clientThread = clients.get(clientIndex);
-                    GameUnit clientUnit = (GameUnit) gameWorld.getObjectById(clientThread.getPlayerUid());
+                    Character clientCharacter = (Character) gameWorld.getObjectById(clientThread.getPlayerUid());
 
-                    if (clientUnit == null) {
-                        clientUnit = Events.playerDeath(clientThread.getPlayerUid());
-                    }
-
-                    final Vector2 heroVelocity = clientThread.getVelocityFromClient();
-                    if (heroVelocity != null) {
-                        Events.setSelfVelocity(clientUnit, heroVelocity);
-                    }
-                    if (clientUnit instanceof Character) {
+                    if (clientCharacter != null) {
+                        final Vector2 characterVelocity = clientThread.getVelocityFromClient();
+                        if (characterVelocity != null) {
+                            Events.setSelfVelocity(clientCharacter, characterVelocity);
+                        }
                         final AbilityCast abilityCast = clientThread.getAbilityCastFromClient();
                         if (abilityCast != null) {
-                            Events.abilityCast((Character) clientUnit, abilityCast.abilityNum, abilityCast.target);
+                            Events.abilityCast(clientCharacter, abilityCast.abilityNum, abilityCast.target);
                         }
                     }
                 }

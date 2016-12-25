@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.util.Iterator;
 import java.util.List;
 
 import ru.spbau.blackout.BlackoutGame;
@@ -66,6 +67,12 @@ public abstract class IngameUI {
     }
 
     public List<Actor> getExtraActors() {
+        for (Iterator<Actor> it = extraActors.iterator(); it.hasNext();) {
+            Actor actor = it.next();
+            if (actor.getStage() != stage) {
+                it.remove();
+            }
+        }
         return extraActors;
     }
 

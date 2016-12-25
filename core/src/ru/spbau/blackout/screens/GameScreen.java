@@ -33,6 +33,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import org.jetbrains.annotations.Nullable;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.ingameui.IngameUI;
+import ru.spbau.blackout.ingameui.ViewerUI;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.worlds.GameWorld;
@@ -78,7 +80,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     public final Environment environment;
 
     @Nullable private Character mainCharacter;
-    private PlayerUI ui;
+    private IngameUI ui;
 
     private final GameWorld gameWorld;
     private final UIServer uiServer;
@@ -144,7 +146,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         currentTrack.play();
     }
 
-    public PlayerUI getUi() { return ui; }
+    public IngameUI getUi() { return ui; }
 
     public PerspectiveCamera getCamera() { return camera; }
 
@@ -206,10 +208,11 @@ public class GameScreen extends BlackoutScreen implements GameContext {
     }
 
     public void intoViewer() {
-        throw new RuntimeException("WTF");
-//        mainCharacter = null;
-//        ui.dispose();
-//        ui = new ViewerUi();
+        mainCharacter = null;
+        ui = new ViewerUI(ui, uiServer, camera);
+        ui.load(this);
+        assets.finishLoading();
+        ui.doneLoading(this);
     }
 
     @Override

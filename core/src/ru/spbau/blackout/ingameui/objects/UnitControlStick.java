@@ -23,6 +23,7 @@ public class UnitControlStick extends AbstractStick {
 
     @Override
     protected void onTouchMove() {
+        super.onTouchMove();
         server.sendSelfVelocity(unit, touchPos);
     }
 }

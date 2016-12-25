@@ -73,7 +73,7 @@ public abstract class AbstractStick extends IngameUIObject {
     }
 
     @Override
-    public void update(float deltaTime) { /*nothing*/ }
+    public void update(float delta) { /*nothing*/ }
 
 
     private void updateTouchPosition() {
@@ -101,7 +101,7 @@ public abstract class AbstractStick extends IngameUIObject {
         onTouchMove();
     }
 
-    protected abstract void onTouchMove();
+    protected void onTouchMove() {}
 
     private class Listener extends DragListener {
         @Override

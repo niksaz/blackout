@@ -15,6 +15,6 @@ public abstract class IngameUIObject {
     public abstract void load(GameContext context);
     public abstract void doneLoading(GameContext context, Stage stage);
     /** Update for each frame. */
-    public abstract void update(float deltaTime);
+    public abstract void update(float delta);
     public abstract void dispose();
 }
