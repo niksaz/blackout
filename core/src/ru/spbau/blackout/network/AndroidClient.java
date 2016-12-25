@@ -68,9 +68,11 @@ public class AndroidClient implements Runnable, UIServer {
             if (isInterrupted) {
                 return;
             }
+            socket.setSoTimeout(0);
 
             new Thread(new UIChangeSenderUDP(socket.getInetAddress(), serverDatagramPort, datagramSocket)).start();
             new Thread(new UIChangeSenderTCP(out)).start();
+            new Thread(new WinnerGetterTCP(in)).start();
 
             final ClientGameWorld currentWorld = (ClientGameWorld) gameScreen.gameWorld();
             final byte[] buffer = new byte[Network.DATAGRAM_WORLD_PACKET_SIZE];
@@ -209,9 +211,33 @@ public class AndroidClient implements Runnable, UIServer {
                                 }
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
+                                isInterrupted = true;
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private class WinnerGetterTCP implements Runnable {
+
+        private final ObjectInputStream objectInputStream;
+
+        WinnerGetterTCP(ObjectInputStream objectInputStream) {
+            this.objectInputStream = objectInputStream;
+        }
+
+        @Override
+        public void run() {
+            while (!isInterrupted) {
+                try {
+                    final String winnerName = (String) objectInputStream.readObject();
+                    // TODO: handle winnerName
+                    System.out.println(winnerName + " WON!");
+                } catch (ClassNotFoundException | IOException e) {
+                    e.printStackTrace();
+                    isInterrupted = true;
                 }
             }
         }
@@ -240,9 +266,10 @@ public class AndroidClient implements Runnable, UIServer {
                     synchronized (abilityToSend) {
                         if (abilityToSend.get() == null) {
                             try {
-                                abilityToSend.wait();
+                                abilityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
+                                isInterrupted = true;
                             }
                         }
                     }

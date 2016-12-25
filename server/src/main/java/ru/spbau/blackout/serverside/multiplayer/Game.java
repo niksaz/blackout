@@ -15,7 +15,6 @@ import java.util.List;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
 import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
@@ -61,22 +60,34 @@ public class Game extends Thread implements GameContext {
 
         long timeLastIterationFinished = System.currentTimeMillis();
         long lastWorldUpdateTime = System.currentTimeMillis();
+        boolean someoneWon = false;
         while (gameState != GameState.FINISHED) {
             try {
-                for (int clientIndex = 0; clientIndex < clients.size(); clientIndex++) {
-                    final ClientThread clientThread = clients.get(clientIndex);
-                    Character clientCharacter = (Character) gameWorld.getObjectById(clientThread.getPlayerUid());
-
+                ClientThread clientThreadWithAliveCharacter = null;
+                int aliveCharacters = 0;
+                for (ClientThread clientThread : clients) {
+                    final Character clientCharacter = (Character) gameWorld.getObjectById(clientThread.getPlayerUid());
                     if (clientCharacter != null) {
-                        final Vector2 characterVelocity = clientThread.getVelocityFromClient();
-                        if (characterVelocity != null) {
-                            Events.setSelfVelocity(clientCharacter, characterVelocity);
-                        }
-                        final AbilityCast abilityCast = clientThread.getAbilityCastFromClient();
-                        if (abilityCast != null) {
-                            Events.abilityCast(clientCharacter, abilityCast.abilityNum, abilityCast.target);
+                        if (clientThread.getClientGameState() == GameState.FINISHED) {
+                            clientCharacter.kill();
+                        } else {
+                            aliveCharacters++;
+                            clientThreadWithAliveCharacter = clientThread;
+                            final Vector2 characterVelocity = clientThread.getVelocityFromClient();
+                            if (characterVelocity != null) {
+                                Events.setSelfVelocity(clientCharacter, characterVelocity);
+                            }
+                            final AbilityCast abilityCast = clientThread.getAbilityCastFromClient();
+                            if (abilityCast != null) {
+                                Events.abilityCast(clientCharacter, abilityCast.abilityNum, abilityCast.target);
+                            }
                         }
                     }
+                }
+
+                if (aliveCharacters == 0) {
+                    gameState = GameState.FINISHED;
+                    break;
                 }
 
                 long currentTime = System.currentTimeMillis();
@@ -88,11 +99,16 @@ public class Game extends Thread implements GameContext {
                 final byte[] worldInBytes = serializeWorld();
                 System.out.println("World size is " + worldInBytes.length);
                 for (ClientThread client : clients) {
-                    if (client.getClientGameState() == GameState.FINISHED) {
-                        gameState = GameState.FINISHED;
-                        break;
+                    if (client.getClientGameState() != GameState.FINISHED) {
+                        client.setWorldToSend(worldInBytes);
+                        if (aliveCharacters == 1 && !someoneWon) {
+                            client.setWinnerName(clientThreadWithAliveCharacter.getClientName());
+                        }
                     }
-                    client.setWorldToSend(worldInBytes);
+                }
+
+                if (aliveCharacters == 1) {
+                    someoneWon = true;
                 }
 
                 final long duration = timeLastIterationFinished - System.currentTimeMillis();
