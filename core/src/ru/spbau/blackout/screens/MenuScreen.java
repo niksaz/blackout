@@ -65,7 +65,6 @@ public class MenuScreen extends StageScreen {
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal(MENU_MUSIC_PATH));
         menuMusic.setLooping(true);
         updateMusicVolume();
-        playMenuMusic();
 
         addLeftPaneElements();
         addRightPaneElements();
@@ -287,6 +286,18 @@ public class MenuScreen extends StageScreen {
     }
 
     @Override
+    public void show() {
+        menuMusic.setPosition(0);
+        menuMusic.play();
+        super.show();
+    }
+
+    @Override
+    public void hide() {
+        menuMusic.pause();
+    }
+
+    @Override
     public void dispose() {
         menuMusic.dispose();
         super.dispose();
@@ -295,13 +306,5 @@ public class MenuScreen extends StageScreen {
     public void updateMusicVolume() {
         menuMusic.setVolume(
                 GameSettings.MUSIC_MAX_VOLUME * BlackoutGame.get().getPlayerEntity().getGameSettings().musicVolume);
-    }
-
-    public void pauseMenuMusic() {
-        menuMusic.pause();
-    }
-
-    public void playMenuMusic() {
-        menuMusic.play();
     }
 }

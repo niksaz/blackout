@@ -1,11 +1,14 @@
 package ru.spbau.blackout.ingameui.objects;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
@@ -63,17 +66,24 @@ public class ExitButton extends IngameUIObject {
 
             getContentTable().add("Are you sure that you want to exit?");
 
-            button("Exit", true).padBottom(DIALOG_PADDING);
-            button("Cancel", false).padBottom(DIALOG_PADDING);
-        }
+            final TextButton exitButton = new TextButton("Exit", BlackoutGame.get().assets().getDefaultSkin());
+            exitButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    ConfirmationDialog.this.remove();
+                    BlackoutGame.get().screenManager().disposeScreen();
+                }
+            });
+            getButtonTable().add(exitButton).pad(DIALOG_PADDING);
 
-        @Override
-        protected void result(Object object) {
-            super.result(object);
-            this.remove();
-            if ((Boolean) object) {
-                BlackoutGame.get().screenManager().disposeScreen();
-            }
+            final TextButton cancelButton = new TextButton("Cancel", BlackoutGame.get().assets().getDefaultSkin());
+            cancelButton.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    ConfirmationDialog.this.remove();
+                }
+            });
+            getButtonTable().add(cancelButton).pad(DIALOG_PADDING);
         }
     }
 }
