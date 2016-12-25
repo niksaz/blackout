@@ -172,13 +172,8 @@ public class AndroidLauncher extends AndroidApplication implements PlayServices 
     }
 
     @Override
-    public int getBattlesWinLeaderboardID() {
-        return R.string.leaderboard1;
-    }
-
-    @Override
     public int getCoinsEarnedLeaderboardID() {
-        return R.string.leaderboard2;
+        return R.string.leaderboard1;
     }
 
 

@@ -16,7 +16,8 @@ public class PlayerProfile implements Serializable {
 
     @Id
     private final String name;
-    private int gold;
+    private int currentCoins;
+    private int earnedCoins;
     private byte[] serializedDefinition;
     private volatile byte[] serializedSettings;
 
@@ -24,7 +25,7 @@ public class PlayerProfile implements Serializable {
      * Used by Morphia to initialize objects extracted from the database.
      */
     public PlayerProfile() {
-        this("", 0, null, null);
+        this("", 0, 0, null, null);
     }
 
     /**
@@ -33,8 +34,7 @@ public class PlayerProfile implements Serializable {
      * @param name name of a new player
      */
     public PlayerProfile(String name) {
-        this(name,
-             0,
+        this(name, 0, 0,
              Character.Definition.createSerializedDefaultCharacterDefinition(),
              GameSettings.createSerializedDefaultGameSettings());
     }
@@ -43,12 +43,15 @@ public class PlayerProfile implements Serializable {
      * Shallow copy of the object.
      */
     public PlayerProfile(PlayerProfile other) {
-        this(other.getName(), other.getGold(), other.getSerializedDefinition(), other.getSerializedSettings());
+        this(other.getName(), other.getCurrentCoins(), other.getEarnedCoins(),
+             other.getSerializedDefinition(), other.getSerializedSettings());
     }
 
-    private PlayerProfile(String name, int gold, byte[] serializedDefinition, byte[] serializedSettings) {
+    private PlayerProfile(String name, int currentCoins, int earnedCoins,
+                          byte[] serializedDefinition, byte[] serializedSettings) {
         this.name = name;
-        this.gold = gold;
+        this.currentCoins = currentCoins;
+        this.earnedCoins = earnedCoins;
         this.serializedDefinition = serializedDefinition;
         this.serializedSettings = serializedSettings;
     }
@@ -57,8 +60,12 @@ public class PlayerProfile implements Serializable {
         return name;
     }
 
-    public int getGold() {
-        return gold;
+    public int getCurrentCoins() {
+        return currentCoins;
+    }
+
+    public int getEarnedCoins() {
+        return earnedCoins;
     }
 
     public byte[] getSerializedDefinition() {

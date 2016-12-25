@@ -17,7 +17,6 @@ public interface PlayServices {
     int getFirstUpgradesAchievementID();
     int getMinterAchievementID();
 
-    int getBattlesWinLeaderboardID();
     int getCoinsEarnedLeaderboardID();
 
     void setCoreListener(PlayServicesListener coreListener);
