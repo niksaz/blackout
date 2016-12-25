@@ -57,14 +57,9 @@ public class ClientGameWorld extends GameWorld {
             for (Iterator<GameObject> it = getGameObjects().iterator(); it.hasNext();) {
                 GameObject go = it.next();
                 if (!updated.contains(go.getUid())) {
-//                    if (!(go instanceof Ghost)) {
-//                        if (go.getUid() == sessionSettings.getPlayerUid()) {
-//                            // create a ghost with the same uid
-//                        } else {
-                            go.kill();
-                            it.remove();
-//                        }
-//                    }
+                    go.kill();
+                    removeDeadObject(go);
+                    it.remove();
                 }
             }
         }

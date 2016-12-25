@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
-import java.util.List;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameObject;
@@ -63,7 +62,7 @@ public class ServerGameWorld extends GameWorld {
         for (Iterator<GameObject> it = getGameObjects().iterator(); it.hasNext();) {
             GameObject object = it.next();
             if (object.isDead()) {
-                object.destroyBody(this.box2dWorld);
+                removeDeadObject(object);
                 it.remove();
             }
         }

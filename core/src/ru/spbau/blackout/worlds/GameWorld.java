@@ -97,4 +97,8 @@ public abstract class GameWorld {
     public void updateGraphic(float delta) {
         foreach(getGameObjects(), object -> object.updateGraphics(delta));
     }
+
+    protected void removeDeadObject(GameObject object) {
+        object.destroyBody(this.box2dWorld);
+    }
 }

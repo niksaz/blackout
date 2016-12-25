@@ -32,6 +32,7 @@ import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
 public abstract class GameObject implements RenderableProvider, HasState {
+
     public static final float RESTITUTION = 0.5f;
 
 
@@ -73,7 +74,6 @@ public abstract class GameObject implements RenderableProvider, HasState {
         setPosition(x, y);
         setMass(def.mass);
     }
-
 
     @Override
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {

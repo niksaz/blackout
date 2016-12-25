@@ -19,16 +19,10 @@ public class BlackoutContactListener implements ContactListener {
             return;
         }
 
-        boolean firstAbility = first instanceof AbilityObject;
-        boolean secondAbility = second instanceof AbilityObject;
-
-        if (firstAbility && secondAbility) {
-            // TODO: handle ability collisions
-            first.kill();
-            second.kill();
-        } else if (firstAbility) {
+        if (first instanceof AbilityObject) {
             ((AbilityObject) first).beginContact(second);
-        } else if (secondAbility) {
+        }
+        if (second instanceof AbilityObject) {
             ((AbilityObject) second).beginContact(first);
         }
     }

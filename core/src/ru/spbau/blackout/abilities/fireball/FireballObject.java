@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Damageable;
+import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
@@ -52,19 +53,18 @@ public final class FireballObject extends AbilityObject {
     @Override
     public void beginContact(GameObject object) {
         super.beginContact(object);
+        shouldExplode = true;
 
-        if (object instanceof GameUnit) {
-            GameUnit unit = (GameUnit) object;
+        if (object instanceof DynamicObject) {
+            DynamicObject dynamic = (DynamicObject) object;
             // This object is going to dye. So, we don't care about changes of its velocity.
             velocity.add(body.getLinearVelocity()).scl(IMPULSE_FACTOR);
-            unit.applyImpulse(velocity);
+            dynamic.applyImpulse(velocity);
         }
 
         if (object instanceof Damageable) {
             ((Damageable) object).damage(((Definition) getDef()).damage);
         }
-
-        shouldExplode = true;
 
         kill();
     }

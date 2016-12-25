@@ -11,7 +11,8 @@ import ru.spbau.blackout.entities.GameObject;
  * <code>GraphicEffect</code> which attaches a <code>ParticleEffect</code> to an object.
  */
 public class ParticleGraphicEffect implements GraphicEffect {
-    private ParticleEffect effect;
+
+    private final ParticleEffect effect;
     private final Matrix4 tmpMatrix = new Matrix4();
     private final GameObject object;
 
@@ -23,7 +24,6 @@ public class ParticleGraphicEffect implements GraphicEffect {
         BlackoutGame.get().particleSystem().add(this.effect);
         this.updatePosition();
     }
-
 
     @Override
     public void update(float deltaTime) {
