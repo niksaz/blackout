@@ -51,11 +51,10 @@ public class AndroidClient implements Runnable, UIServer {
 
     @Override
     public void run() {
-        try (
-                DatagramSocket datagramSocket = new DatagramSocket();
-                Socket socket = new Socket(Network.SERVER_IP_ADDRESS, port);
-                ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
+        try (DatagramSocket datagramSocket = new DatagramSocket();
+             Socket socket = new Socket(Network.SERVER_IP_ADDRESS, port);
+             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
@@ -92,7 +91,9 @@ public class AndroidClient implements Runnable, UIServer {
             Gdx.app.postRunnable(() -> {
                 final MenuScreen menuScreen = table.getMenuScreen();
                 menuScreen.changeMiddleTable(PlayScreenTable.getTable(menuScreen));
-                BlackoutGame.get().screenManager().setScreen(menuScreen);
+                if (gameScreen != null) {
+                    BlackoutGame.get().screenManager().disposeScreen();
+                }
             });
         }
     }
@@ -142,7 +143,7 @@ public class AndroidClient implements Runnable, UIServer {
                     // so synchronizing on server on loading
                     synchronized (this) {
                         Gdx.app.postRunnable(() -> {
-                            final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings);
+                            final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings, this);
                             gameScreen = new GameScreen(sessionSettings, gameWorld, this, settings);
                             BlackoutGame.get().screenManager().setScreen(gameScreen);
                         });

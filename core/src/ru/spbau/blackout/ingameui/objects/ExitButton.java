@@ -14,6 +14,8 @@ import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUIObject;
+import ru.spbau.blackout.worlds.ClientGameWorld;
+import ru.spbau.blackout.worlds.GameWorld;
 
 import static ru.spbau.blackout.BlackoutGame.DIALOG_PADDING;
 
@@ -57,7 +59,7 @@ public class ExitButton extends IngameUIObject {
     public void dispose() {
     }
 
-    private static class ConfirmationDialog extends Dialog {
+    private class ConfirmationDialog extends Dialog {
 
         public ConfirmationDialog() {
             super("", BlackoutGame.get().assets().getDefaultSkin());
@@ -71,7 +73,13 @@ public class ExitButton extends IngameUIObject {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     ConfirmationDialog.this.remove();
-                    BlackoutGame.get().screenManager().disposeScreen();
+                    final GameWorld gameWorld = ExitButton.this.context.gameWorld();
+                    if (gameWorld instanceof ClientGameWorld) {
+                        final ClientGameWorld clientGameWorld = (ClientGameWorld) gameWorld;
+                        clientGameWorld.interruptClientNetworkThread();
+                    } else {
+                        BlackoutGame.get().screenManager().disposeScreen();
+                    }
                 }
             });
             getButtonTable().add(exitButton).pad(DIALOG_PADDING);

@@ -1,24 +1,15 @@
 package ru.spbau.blackout.worlds;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.maps.Map;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.screens.LoadScreen;
+import ru.spbau.blackout.network.AndroidClient;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
-
-import static ru.spbau.blackout.java8features.Functional.foreach;
 
 
 /**
@@ -28,11 +19,11 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
 public class ClientGameWorld extends GameWorld {
 
     private final AtomicReference<ObjectInputStream> externalWorldStream = new AtomicReference<>();
-    private final SessionSettings sessionSettings;
+    private final AndroidClient clientNetworkThread;
 
-    public ClientGameWorld(SessionSettings sessionSettings) {
+    public ClientGameWorld(SessionSettings sessionSettings, AndroidClient clientNetworkThread) {
         super(sessionSettings.getDefinitions());
-        this.sessionSettings = sessionSettings;
+        this.clientNetworkThread = clientNetworkThread;
     }
 
 
@@ -85,5 +76,9 @@ public class ClientGameWorld extends GameWorld {
 
     public void setExternalWorldStream(ObjectInputStream externalWorldStream) {
         this.externalWorldStream.set(externalWorldStream);
+    }
+
+    public void interruptClientNetworkThread() {
+        clientNetworkThread.stop();
     }
 }
