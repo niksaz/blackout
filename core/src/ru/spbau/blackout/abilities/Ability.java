@@ -22,7 +22,7 @@ public abstract class Ability implements Serializable, HasState {
 
     private static final long serialVersionUID = 1000000000L;
 
-    private int level;
+    protected int level;
     private transient float chargeTime;
 
     private transient /*final*/ Character character;

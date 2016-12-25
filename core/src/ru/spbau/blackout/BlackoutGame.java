@@ -5,11 +5,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleSystem;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.utils.Array;
 
 import ru.spbau.blackout.androidfeatures.PlayServices;
 import ru.spbau.blackout.androidfeatures.PlayServicesInCore;
 import ru.spbau.blackout.database.ChangeablePlayerProfile;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.network.SinglePlayerServer;
 import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.LoadScreen;
@@ -75,9 +78,12 @@ public class BlackoutGame extends Game {
 	// FIXME:  just for test
     public void startTestSinglePlayerGame() {
         final GameSettings settings = BlackoutGame.get().getPlayerEntity().getGameSettings();
-        SessionSettings sessionSettings = SessionSettings.getTest();
+        final Array<Character.Definition> characters = new Array<>();
+        characters.add(BlackoutGame.get().getPlayerEntity().getCharacterDefinition());
+        characters.add(Character.Definition.createDefaultCharacterDefinition());
+        SessionSettings sessionSettings = SessionSettings.createDefaultSession(characters);
 
-        GameWorld gameWorld = new ServerGameWorld(sessionSettings);
+        final GameWorld gameWorld = new ServerGameWorld(sessionSettings);
         screenManager.setScreen(new GameScreen(sessionSettings, gameWorld, new SinglePlayerServer(), settings));
 	}
 
@@ -100,7 +106,7 @@ public class BlackoutGame extends Game {
         this.screenManager.setScreen(new LoadScreen());
 
         // FIXME: remove
-        /*SessionSettings sessionSettings = SessionSettings.getTest();
+        /*SessionSettings sessionSettings = SessionSettings.createDefaultSession();
         List<GameObject.Definition> l = sessionSettings.getDefinitions();
         List<GameObject.Definition> allDefs = ReflectUtils.findAllImpls(l, GameObject.Definition.class);
         System.out.println(allDefs.size());

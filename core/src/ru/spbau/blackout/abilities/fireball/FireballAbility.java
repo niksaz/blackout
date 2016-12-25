@@ -29,12 +29,12 @@ public class FireballAbility extends SimpleInstantAbility {
 
 
      public FireballAbility(int level) {
-        super(level);
-        this.shellDef = new FireballObject.Definition(null, new CircleCreator(SHELL_RADIUS), SHELL_MASS);
-        this.shellDef.chestPivotOffset.set(0, 0, 1.5f);
-        this.shellDef.isSensor = true;
-        this.shellDef.timeToLive = TIME_TO_LIVE;
-        this.shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * level;
+         super(level);
+         this.shellDef = new FireballObject.Definition(null, new CircleCreator(SHELL_RADIUS), SHELL_MASS);
+         this.shellDef.chestPivotOffset.set(0, 0, 1.5f);
+         this.shellDef.isSensor = true;
+         this.shellDef.timeToLive = TIME_TO_LIVE;
+         recalculateFireballDamage();
     }
 
 
@@ -71,6 +71,11 @@ public class FireballAbility extends SimpleInstantAbility {
 
     @Override
     public void increaseLevel() {
-        shellDef.damage += DAMAGE_INCREASE_PER_LEVEL;
+        level += 1;
+        recalculateFireballDamage();
+    }
+
+    private void recalculateFireballDamage() {
+        shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * level;
     }
 }
