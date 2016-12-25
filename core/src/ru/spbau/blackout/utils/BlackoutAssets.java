@@ -79,7 +79,7 @@ public class BlackoutAssets {
         parameter.size = font_size;
         parameter.borderWidth = width;
         parameter.minFilter = Texture.TextureFilter.Linear;
-        parameter.minFilter = Texture.TextureFilter.Linear;
+        parameter.magFilter = Texture.TextureFilter.Linear;
         return parameter;
     }
 }
