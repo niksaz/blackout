@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.worlds.ClientGameWorld;
 import ru.spbau.blackout.worlds.GameWorld;
@@ -52,7 +51,6 @@ public class ExitButton extends IngameUIObject {
 
     @Override
     public void update(float delta) {
-
     }
 
     @Override

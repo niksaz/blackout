@@ -2,6 +2,7 @@ package ru.spbau.blackout.network;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,6 +27,8 @@ import ru.spbau.blackout.screens.tables.PlayScreenTable;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.worlds.ClientGameWorld;
+
+import static ru.spbau.blackout.BlackoutGame.DIALOG_PADDING;
 
 /**
  * Task with the purpose of talking to a server: waiting in a queue, getting a game from a server,
@@ -68,9 +71,11 @@ public class AndroidClient implements Runnable, UIServer {
             if (isInterrupted) {
                 return;
             }
+            socket.setSoTimeout(0);
 
             new Thread(new UIChangeSenderUDP(socket.getInetAddress(), serverDatagramPort, datagramSocket)).start();
             new Thread(new UIChangeSenderTCP(out)).start();
+            new Thread(new WinnerGetterTCP(in)).start();
 
             final ClientGameWorld currentWorld = (ClientGameWorld) gameScreen.gameWorld();
             final byte[] buffer = new byte[Network.DATAGRAM_WORLD_PACKET_SIZE];
@@ -209,9 +214,47 @@ public class AndroidClient implements Runnable, UIServer {
                                 }
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
+                                isInterrupted = true;
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private class WinnerGetterTCP implements Runnable {
+
+        private final ObjectInputStream objectInputStream;
+
+        WinnerGetterTCP(ObjectInputStream objectInputStream) {
+            this.objectInputStream = objectInputStream;
+        }
+
+        @Override
+        public void run() {
+            while (!isInterrupted) {
+                try {
+                    final String winnerName = (String) objectInputStream.readObject();
+                    Gdx.app.postRunnable(() ->
+                                new Dialog("", BlackoutGame.get().assets().getDefaultSkin()) {
+                                    {
+                                        setMovable(false);
+                                        pad(DIALOG_PADDING);
+                                        getContentTable().add(winnerName + " has won");
+                                        button("Ok").padBottom(DIALOG_PADDING);
+                                    }
+
+                                    @Override
+                                    protected void result(Object object) {
+                                        super.result(object);
+                                        this.remove();
+                                    }
+                                }.show(gameScreen.getUi().getStage())
+                    );
+                } catch (ClassNotFoundException | IOException e) {
+                    e.printStackTrace();
+                    isInterrupted = true;
                 }
             }
         }
@@ -240,9 +283,10 @@ public class AndroidClient implements Runnable, UIServer {
                     synchronized (abilityToSend) {
                         if (abilityToSend.get() == null) {
                             try {
-                                abilityToSend.wait();
+                                abilityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
+                                isInterrupted = true;
                             }
                         }
                     }

@@ -37,6 +37,7 @@ public class ClientThread extends Thread {
     private final AtomicReference<byte[]> worldInBytes = new AtomicReference<>();
     private final AtomicReference<Vector2> velocityFromClient = new AtomicReference<>();
     private final AtomicReference<AbilityCast> abilityCastFromClient = new AtomicReference<>();
+    private final AtomicReference<String> winnerName = new AtomicReference<>();
 
     public ClientThread(RoomServer server, Socket socket) {
         this.server = server;
@@ -65,11 +66,11 @@ public class ClientThread extends Thread {
 
             gameStartWaiting(in, out);
 
-            // won't need the timeout later
             socket.setSoTimeout(0);
 
             new Thread(new UIChangeGetterUDP(datagramSocket)).start();
             new Thread(new UIChangeGetterTCP(in)).start();
+            new Thread(new WinnerSenderTCP(out)).start();
 
             final DatagramPacket worldDatagramPacket =
                     new DatagramPacket(new byte[0], 0, socket.getInetAddress(), clientDatagramPort);
@@ -115,6 +116,13 @@ public class ClientThread extends Thread {
     synchronized void setWorldToSend(byte[] worldInBytes) {
         this.worldInBytes.set(worldInBytes);
         notify();
+    }
+
+    public void setWinnerName(String winnerName) {
+        synchronized (this.winnerName) {
+            this.winnerName.set(winnerName);
+            this.winnerName.notify();
+        }
     }
 
     GameState getClientGameState() {
@@ -173,6 +181,41 @@ public class ClientThread extends Thread {
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();
                     clientGameState = GameState.FINISHED;
+                }
+            }
+        }
+    }
+
+    private class WinnerSenderTCP implements Runnable {
+
+        private final ObjectOutputStream objectOutputStream;
+
+        WinnerSenderTCP(ObjectOutputStream objectOutputStream) {
+            this.objectOutputStream = objectOutputStream;
+        }
+
+        @Override
+        public void run() {
+            while (clientGameState != GameState.FINISHED) {
+                if (winnerName.get() != null) {
+                    try {
+                        objectOutputStream.writeObject(winnerName.getAndSet(null));
+                        objectOutputStream.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        clientGameState = GameState.FINISHED;
+                    }
+                } else {
+                    synchronized (winnerName) {
+                        if (winnerName.get() == null) {
+                            try {
+                                winnerName.wait(Network.SOCKET_IO_TIMEOUT_MS);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                                clientGameState = GameState.FINISHED;
+                            }
+                        }
+                    }
                 }
             }
         }

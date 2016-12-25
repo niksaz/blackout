@@ -31,12 +31,7 @@ public class SettingsSynchronizeHandler implements HttpHandler {
             final String name = inputStream.readUTF();
             final byte[] newSettings = (byte[]) inputStream.readObject();
 
-            final Query<PlayerProfile> query =
-                    DatabaseAccessor.getInstance().getDatastore()
-                            .createQuery(PlayerProfile.class)
-                            .field("name")
-                            .equal(name);
-
+            final Query<PlayerProfile> query = DatabaseAccessor.getInstance().queryProfile(name);
             if (query.asList().size() != 1) {
                 throw new IllegalStateException();
             }
