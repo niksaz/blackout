@@ -57,28 +57,27 @@ public class FireballAbility extends SimpleInstantAbility {
 
         public Definition(int level) {
             super(level);
-            this.shellDef = new FireballObject.Definition();
-            this.shellDef.chestPivotOffset.set(0, 0, 1.5f);
-            this.shellDef.isSensor = true;
-            this.shellDef.timeToLive = TIME_TO_LIVE;
+            shellDef = new FireballObject.Definition();
+            shellDef.isSensor = true;
+            shellDef.timeToLive = TIME_TO_LIVE;
         }
 
         @Override
         public void load(GameContext context) {
             super.load(context);
-            this.shellDef.load(context);
+            shellDef.load(context);
         }
 
         @Override
         public void doneLoading(GameContext context) {
             super.doneLoading(context);
-            this.shellDef.doneLoading();
+            shellDef.doneLoading();
         }
 
         @Override
         public Ability makeInstance(Character character) {
             // FIXME: it looks weird
-            this.shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * getLevel();
+            shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * getLevel();
             return new FireballAbility(this, character);
         }
 

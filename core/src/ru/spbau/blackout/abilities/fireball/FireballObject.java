@@ -25,7 +25,6 @@ import static ru.spbau.blackout.abilities.fireball.FireballAbility.FIRE_EFFECT_P
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTOR;
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.SHELL_MASS;
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.SHELL_RADIUS;
-import static ru.spbau.blackout.settings.GameSettings.SOUND_MAX_VOLUME;
 
 
 public final class FireballObject extends AbilityObject {

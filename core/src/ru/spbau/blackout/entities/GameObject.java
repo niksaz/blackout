@@ -237,6 +237,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
 
     public Vector3 getChestPivot() {
+        System.out.println(def.chestPivotOffset);
         return get3dPosition().add(def.chestPivotOffset);
     }
 

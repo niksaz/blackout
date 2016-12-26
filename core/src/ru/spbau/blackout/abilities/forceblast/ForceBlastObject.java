@@ -2,12 +2,10 @@ package ru.spbau.blackout.abilities.forceblast;
 
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 
 import org.jetbrains.annotations.Nullable;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.abilities.fireball.FireballObject;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
