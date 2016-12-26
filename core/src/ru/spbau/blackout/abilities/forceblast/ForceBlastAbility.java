@@ -7,6 +7,7 @@ import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.abilities.SimpleInstantAbility;
 import ru.spbau.blackout.abilities.fireball.FireballObject;
 import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
 public class ForceBlastAbility extends SimpleInstantAbility {
@@ -29,7 +30,8 @@ public class ForceBlastAbility extends SimpleInstantAbility {
     @Override
     public void cast(Vector2 targetOffset) {
         super.cast(targetOffset);
-        ((Definition) getDef()).shellDef.makeInstanceWithNextUid(getCharacter().getPosition());
+        GameObject shell = ((Definition) getDef()).shellDef.makeInstanceWithNextUid(getCharacter().getPosition());
+        ((ForceBlastObject) shell).setCaster(getCharacter());
     }
 
     public static class Definition extends Ability.Definition {

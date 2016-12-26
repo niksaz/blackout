@@ -3,6 +3,7 @@ package ru.spbau.blackout.abilities.forceblast;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.spbau.blackout.entities.AbilityObject;
+import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameObject;
@@ -17,17 +18,22 @@ import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.RADIUS;
 
 public class ForceBlastObject extends AbilityObject {
 
-    boolean livesOnlyOneStep;
+    private boolean livesOnlyOneStep;
+    private /*final*/ Character caster;
 
     protected ForceBlastObject(Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
+    }
+
+    void setCaster(Character character) {
+        this.caster = character;
     }
 
     @Override
     public void beginContact(GameObject object) {
         super.beginContact(object);
 
-        if (Utils.vecEquals(object.getPosition(), getPosition())) {
+        if (object == caster) {
             return;
         }
 

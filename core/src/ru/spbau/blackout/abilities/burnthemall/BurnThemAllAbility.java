@@ -1,4 +1,5 @@
 /*
+
 package ru.spbau.blackout.abilities.burnthemall;
 
 import ru.spbau.blackout.abilities.Ability;
@@ -24,7 +25,7 @@ public class BurnThemAllAbility extends SimpleInstantAbility {
     public static class Definition extends Ability.Definition {
 
         public Definition(int level) {
-            super(level);
+            super(level, ICON_PATH, NAME, MAX_CHARGE_TIME);
         }
 
         @Override
