@@ -18,6 +18,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.androidfeatures.PlayServices;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.screens.GameScreen;
@@ -41,15 +42,17 @@ public class AndroidClient implements Runnable, UIServer {
     private static final String READY_TO_START_MS = "Starting a game. Prepare yourself.";
 
     private final int port;
+    private final int players;
     private final MultiplayerTable table;
     private volatile boolean isInterrupted = false;
     private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>();
     private final AtomicReference<AbilityCast> abilityToSend = new AtomicReference<>();
     private GameScreen gameScreen;
 
-    public AndroidClient(MultiplayerTable table, int port) {
+    public AndroidClient(MultiplayerTable table, int port, int players) {
         this.table = table;
         this.port = port;
+        this.players = players;
     }
 
     @Override
@@ -236,7 +239,7 @@ public class AndroidClient implements Runnable, UIServer {
             while (!isInterrupted) {
                 try {
                     final String winnerName = (String) objectInputStream.readObject();
-                    Gdx.app.postRunnable(() ->
+                    Gdx.app.postRunnable(() -> {
                                 new Dialog("", BlackoutGame.get().assets().getDefaultSkin()) {
                                     {
                                         setMovable(false);
@@ -250,7 +253,28 @@ public class AndroidClient implements Runnable, UIServer {
                                         super.result(object);
                                         this.remove();
                                     }
-                                }.show(gameScreen.getUi().getStage())
+                                }.show(gameScreen.getUi().getStage());
+
+                                final PlayServices playServices = BlackoutGame.get().playServicesInCore().getPlayServices();
+                                if (winnerName.equals(playServices.getPlayerName())) {
+                                    switch (players) {
+                                        case 2:
+                                            playServices.unlockAchievement(playServices.getDuelistAchievementID());
+                                            break;
+
+                                        case 3:
+                                            playServices.unlockAchievement(playServices.getBattleOfThreeAchievementID());
+                                            break;
+
+                                        case 4:
+                                            playServices.unlockAchievement(playServices.getStrategistAchievementID());
+                                            break;
+
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
                     );
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();
