@@ -108,8 +108,8 @@ public abstract class DynamicObject extends GameObject {
 
         private static final long serialVersionUID = 1000000000L;
 
-        public Definition(String modelPath, Creator<Shape> shapeCreator) {
-            super(modelPath, shapeCreator);
+        public Definition(@Nullable String modelPath, Creator<Shape> shapeCreator, @Nullable String deathEffectPath) {
+            super(modelPath, shapeCreator, deathEffectPath);
         }
 
         @Override

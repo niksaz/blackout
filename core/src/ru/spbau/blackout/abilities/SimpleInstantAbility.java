@@ -14,7 +14,7 @@ public abstract class SimpleInstantAbility extends Ability {
 
     public static final float CAST_DISTANCE = 1.5f;  // FIXME: use unit radius
 
-    public SimpleInstantAbility(Definition def, Character character) {
+    protected SimpleInstantAbility(Definition def, Character character) {
         super(def, character);
     }
 

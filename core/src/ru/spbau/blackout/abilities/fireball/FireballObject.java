@@ -114,7 +114,7 @@ public final class FireballObject extends AbilityObject {
 
 
         public Definition() {
-            super(null, new CircleCreator(SHELL_RADIUS));
+            super(null, new CircleCreator(SHELL_RADIUS), null, CAST_SOUND_PATH);
             mass = SHELL_MASS;
         }
 
@@ -136,16 +136,6 @@ public final class FireballObject extends AbilityObject {
         @Override
         public GameObject makeInstance(long uid, float x, float y) {
             return new FireballObject(this, uid, x, y);
-        }
-
-        @Override
-        protected String castSoundPath() {
-            return CAST_SOUND_PATH;
-        }
-
-        @Override
-        protected String deathEffectPath() {
-            return null;
         }
     }
 }

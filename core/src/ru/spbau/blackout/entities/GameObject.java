@@ -290,6 +290,8 @@ public abstract class GameObject implements RenderableProvider, HasState {
         private transient Model model;
         @Nullable
         private transient ParticleEffect deathEffect;
+        @Nullable
+        private final String deathEffectPath;
         private transient GameContext context;
 
         /**
@@ -307,9 +309,10 @@ public abstract class GameObject implements RenderableProvider, HasState {
          * <code>modelPath</code> can be <code>null</code>.
          * In this case objects created from this definition will not have models.
          */
-        public Definition(String modelPath, Creator<Shape> shapeCreator) {
+        public Definition(@Nullable String modelPath, Creator<Shape> shapeCreator, @Nullable String deathEffectPath) {
             this.modelPath = modelPath;
             this.shapeCreator = shapeCreator;
+            this.deathEffectPath = deathEffectPath;
         }
 
         /** Load necessary assets. */
@@ -322,8 +325,8 @@ public abstract class GameObject implements RenderableProvider, HasState {
             if (modelPath != null) {
                 context.getAssets().load(modelPath, Model.class);
             }
-            if (deathEffectPath() != null) {
-                Particles.load(context, deathEffectPath());
+            if (deathEffectPath != null) {
+                Particles.load(context, deathEffectPath);
             }
         }
 
@@ -344,8 +347,8 @@ public abstract class GameObject implements RenderableProvider, HasState {
             if (modelPath != null) {
                 model = context.getAssets().get(modelPath, Model.class);
             }
-            if (deathEffectPath() != null) {
-                deathEffect = Particles.getOriginal(getContext(), deathEffectPath());
+            if (deathEffectPath != null) {
+                deathEffect = Particles.getOriginal(getContext(), deathEffectPath);
             }
         }
 
@@ -397,8 +400,5 @@ public abstract class GameObject implements RenderableProvider, HasState {
         public void setDefNumber(int defNumber) {
             this.defNumber = defNumber;
         }
-
-        @Nullable
-        protected abstract String deathEffectPath();
     }
 }

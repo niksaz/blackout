@@ -19,7 +19,7 @@ public class ForceBlastObject extends AbilityObject {
 
     boolean livesOnlyOneStep;
 
-    public ForceBlastObject(Definition def, long uid, float x, float y) {
+    protected ForceBlastObject(Definition def, long uid, float x, float y) {
         super(def, uid, x, y);
     }
 
@@ -59,22 +59,12 @@ public class ForceBlastObject extends AbilityObject {
         public float damage;
 
         public Definition() {
-            super(null, new CircleCreator(RADIUS));
+            super(null, new CircleCreator(RADIUS), EXPLOSION_EFFECT_PATH, CAST_SOUND_PATH);
         }
 
         @Override
         public GameObject makeInstance(long uid, float x, float y) {
             return new ForceBlastObject(this, uid, x, y);
-        }
-
-        @Override
-        protected String castSoundPath() {
-            return CAST_SOUND_PATH;
-        }
-
-        @Override
-        protected String deathEffectPath() {
-            return EXPLOSION_EFFECT_PATH;
         }
     }
 }

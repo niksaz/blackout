@@ -39,29 +39,36 @@ public abstract class AbilityObject extends DynamicObject {
         private static final long serialVersionUID = 1000000000L;
 
         @Nullable
+        private final String castSoundPath;
+        @Nullable
         private  /*final*/ transient Sound castSound;
 
-        public Definition(String modelPath, Creator<Shape> shapeCreator) {
-            super(modelPath, shapeCreator);
+        public Definition(@Nullable String modelPath, Creator<Shape> shapeCreator,
+                          @Nullable String deathEffectPath, @Nullable String castSoundPath) {
+            super(modelPath, shapeCreator, deathEffectPath);
+            this.castSoundPath = castSoundPath;
         }
 
         @Override
         public void load(GameContext context) {
             super.load(context);
-            context.getAssets().load(castSoundPath(), Sound.class);
+            System.out.println(castSound);
+            if (castSoundPath != null) {
+                context.getAssets().load(castSoundPath, Sound.class);
+            }
         }
 
         @Override
         public void doneLoading() {
             super.doneLoading();
-            castSound = getContext().getAssets().get(castSoundPath(), Sound.class);
+            if (castSoundPath != null) {
+                castSound = getContext().getAssets().get(castSoundPath, Sound.class);
+            }
         }
 
         @Nullable
         public final Sound getCastSound() {
             return castSound;
         }
-
-        protected abstract String castSoundPath();
     }
 }

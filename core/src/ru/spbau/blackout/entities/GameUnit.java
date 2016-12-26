@@ -3,6 +3,8 @@ package ru.spbau.blackout.entities;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -137,8 +139,8 @@ public abstract class GameUnit extends DynamicObject {
         public float speed = DEFAULT_SPEED;
 
 
-        public Definition(String modelPath, Creator<Shape> shapeCreator) {
-            super(modelPath, shapeCreator);
+        public Definition(@Nullable String modelPath, Creator<Shape> shapeCreator, @Nullable String deathEffectPath) {
+            super(modelPath, shapeCreator, deathEffectPath);
         }
     }
 }

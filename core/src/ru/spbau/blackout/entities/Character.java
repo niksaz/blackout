@@ -125,7 +125,7 @@ public class Character extends GameUnit implements Damageable  {
 
         public Definition(String modelPath, Creator<Shape> shapeCreator,
                           Ability.Definition[] abilities, float maxHealth) {
-            super(modelPath, shapeCreator);
+            super(modelPath, shapeCreator, DEATH_EFFECT_PATH);
             this.abilities = abilities;
             this.maxHealth = maxHealth;
         }
@@ -200,11 +200,6 @@ public class Character extends GameUnit implements Damageable  {
 
             public static final float WIDTH = getWorldWidth() * 0.06f;
             public static final float HEIGHT = getWorldHeight() * 0.013f;
-        }
-
-        @Override
-        protected String deathEffectPath() {
-            return DEATH_EFFECT_PATH;
         }
     }
 }
