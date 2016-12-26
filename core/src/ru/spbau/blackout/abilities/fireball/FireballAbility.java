@@ -54,7 +54,6 @@ public class FireballAbility extends SimpleInstantAbility {
 
         private final FireballObject.Definition shellDef;
 
-
         public Definition(int level) {
             super(level);
             shellDef = new FireballObject.Definition();
@@ -78,7 +77,6 @@ public class FireballAbility extends SimpleInstantAbility {
 
         @Override
         public Ability makeInstance(Character character) {
-            // FIXME: it looks weird
             shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * getLevel();
             return new FireballAbility(this, character);
         }

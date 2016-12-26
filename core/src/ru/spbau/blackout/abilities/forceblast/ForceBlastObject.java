@@ -16,7 +16,6 @@ import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Utils;
 
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.CAST_SOUND_PATH;
-import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.DAMAGE;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.EXPLOSION_EFFECT_PATH;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.IMPULSE;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.RADIUS;
@@ -45,7 +44,7 @@ public class ForceBlastObject extends AbilityObject {
         }
 
         if (object instanceof Damageable) {
-            ((Damageable) object).damage(DAMAGE);
+            ((Damageable) object).damage(((Definition) getDef()).damage);
         }
     }
 
@@ -74,6 +73,7 @@ public class ForceBlastObject extends AbilityObject {
 
         @Nullable
         private /*final*/ transient ParticleEffect explosionEffect;
+        public float damage;
 
         public Definition() {
             super(null, new CircleCreator(RADIUS));

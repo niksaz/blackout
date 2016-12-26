@@ -18,7 +18,8 @@ public class ForceBlastAbility extends SimpleInstantAbility {
     static final float MAX_CHARGE_TIME = 1.5f;
     static final float RADIUS = 2.5f;
     static final float IMPULSE = 1200f;
-    static final float DAMAGE = 20f;
+    private static final float BASE_DAMAGE = 15;
+    private static final float DAMAGE_INCREASE_PER_LEVEL = 3;
 
 
     public ForceBlastAbility(Definition def, Character character) {
@@ -61,6 +62,7 @@ public class ForceBlastAbility extends SimpleInstantAbility {
 
         @Override
         public Ability makeInstance(Character character) {
+            shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * getLevel();
             return new ForceBlastAbility(this, character);
         }
     }
