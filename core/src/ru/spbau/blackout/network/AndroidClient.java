@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.androidfeatures.PlayServices;
+import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.screens.GameScreen;
@@ -239,43 +240,42 @@ public class AndroidClient implements Runnable, UIServer {
             while (!isInterrupted) {
                 try {
                     final String winnerName = (String) objectInputStream.readObject();
-                    Gdx.app.postRunnable(() -> {
-                                new Dialog("", BlackoutGame.get().assets().getDefaultSkin()) {
-                                    {
-                                        setMovable(false);
-                                        pad(DIALOG_PADDING);
-                                        getContentTable().add(winnerName + " has won");
-                                        button("Ok").padBottom(DIALOG_PADDING);
-                                    }
+                    new Dialog("", BlackoutGame.get().assets().getDefaultSkin()) {
+                        {
+                            setMovable(false);
+                            pad(DIALOG_PADDING);
+                            getContentTable().add(winnerName + " has won");
+                            button("Ok").padBottom(DIALOG_PADDING);
+                        }
 
-                                    @Override
-                                    protected void result(Object object) {
-                                        super.result(object);
-                                        this.remove();
-                                    }
-                                }.show(gameScreen.getUi().getStage());
+                        @Override
+                        protected void result(Object object) {
+                            super.result(object);
+                            this.remove();
+                        }
+                    }.show(gameScreen.getUi().getStage());
 
-                                final PlayServices playServices = BlackoutGame.get().playServicesInCore().getPlayServices();
-                                if (winnerName.equals(playServices.getPlayerName())) {
-                                    switch (players) {
-                                        case 2:
-                                            playServices.unlockAchievement(playServices.getDuelistAchievementID());
-                                            break;
+                    System.out.println(winnerName + " WON!");
+                    final PlayServices playServices = BlackoutGame.get().playServicesInCore().getPlayServices();
+                    if (winnerName.equals(playServices.getPlayerName())) {
+                        BlackoutGame.get().getPlayerEntity().changeGold(Database.COINS_PER_WIN);
+                        switch (players) {
+                            case 2:
+                                playServices.unlockAchievement(playServices.getDuelistAchievementID());
+                                break;
 
-                                        case 3:
-                                            playServices.unlockAchievement(playServices.getBattleOfThreeAchievementID());
-                                            break;
+                            case 3:
+                                playServices.unlockAchievement(playServices.getBattleOfThreeAchievementID());
+                                break;
 
-                                        case 4:
-                                            playServices.unlockAchievement(playServices.getStrategistAchievementID());
-                                            break;
+                            case 4:
+                                playServices.unlockAchievement(playServices.getStrategistAchievementID());
+                                break;
 
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
-                    );
+                            default:
+                                break;
+                        }
+                    }
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();
                     isInterrupted = true;

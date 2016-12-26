@@ -21,7 +21,5 @@ public class Database {
 
     public static final int COINS_PER_WIN = 500;
 
-    public static final float CYCLE_OF_PROFILE_SYNCHRONIZATION = 2.0f;
-
     private Database() {}
 }

@@ -66,6 +66,7 @@ public class Game extends Thread implements GameContext {
         while (gameState != GameState.FINISHED) {
             try {
                 ClientThread clientThreadWithAliveCharacter = null;
+                int aliveClients = 0;
                 int aliveCharacters = 0;
                 for (ClientThread clientThread : clients) {
                     final Character clientCharacter = (Character) gameWorld.getObjectById(clientThread.getPlayerUid());
@@ -73,7 +74,8 @@ public class Game extends Thread implements GameContext {
                         if (clientThread.getClientGameState() == GameState.FINISHED) {
                             clientCharacter.kill();
                         } else {
-                            aliveCharacters++;
+                            aliveClients += 1;
+                            aliveCharacters += 1;
                             clientThreadWithAliveCharacter = clientThread;
                             final Vector2 characterVelocity = clientThread.getVelocityFromClient();
                             if (characterVelocity != null) {
@@ -84,10 +86,14 @@ public class Game extends Thread implements GameContext {
                                 Events.abilityCast(clientCharacter, abilityCast.abilityNum, abilityCast.target);
                             }
                         }
+                    } else {
+                        if (clientThread.getClientGameState() != GameState.FINISHED) {
+                            aliveClients += 1;
+                        }
                     }
                 }
 
-                if (aliveCharacters == 0) {
+                if (aliveClients == 0) {
                     gameState = GameState.FINISHED;
                     break;
                 }
@@ -111,19 +117,6 @@ public class Game extends Thread implements GameContext {
 
                 if (aliveCharacters == 1 && !someoneWon) {
                     someoneWon = true;
-                    final String winnerName = clientThreadWithAliveCharacter.getClientName();
-                    // adding the winner some gold
-                    new Thread(() -> {
-                        final Query<PlayerProfile> query = DatabaseAccessor.getInstance().queryProfile(winnerName);
-
-                        final UpdateOperations<PlayerProfile> updateOperations =
-                                DatabaseAccessor.getInstance().getDatastore()
-                                .createUpdateOperations(PlayerProfile.class)
-                                .inc("currentCoins", Database.COINS_PER_WIN)
-                                .inc("earnedCoins", Database.COINS_PER_WIN);
-
-                        DatabaseAccessor.getInstance().performUpdate(query, updateOperations);
-                    }).start();
                 }
 
                 final long duration = timeLastIterationFinished - System.currentTimeMillis();
