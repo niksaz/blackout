@@ -267,6 +267,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
         public static final float DEFAULT_HEIGHT = 0;
 
         public static final float DEFAULT_MASS = 70f;
+        private static final float DEFAULT_CHEST_HEIGHT = 1.5f;
 
 
         // physics
@@ -289,7 +290,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
          * Must be final due to possible problems if this variable changed between calls of `load` and `initializeGameWorld`.
          */
         public final String modelPath;
-        public final Vector3 chestPivotOffset = new Vector3();
+        public final Vector3 chestPivotOffset = new Vector3(0, 0, DEFAULT_CHEST_HEIGHT);
         public final Vector3 overHeadPivotOffset = new Vector3();
         public boolean isSensor = false;
 

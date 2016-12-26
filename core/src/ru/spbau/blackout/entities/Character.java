@@ -1,7 +1,10 @@
 package ru.spbau.blackout.entities;
 
+import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,9 +20,12 @@ import ru.spbau.blackout.graphiceffects.HealthBarEffect;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.shapescreators.CircleCreator;
+import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
+import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Serializer;
 
+import static ru.spbau.blackout.BlackoutGame.get;
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 
@@ -54,6 +60,15 @@ public class Character extends GameUnit implements Damageable  {
         Ability ability = getAbility(abilityNum);
         ability.cast(target);
         // TODO: cast animation
+    }
+
+    @Override
+    public void kill() {
+        super.kill();
+        ParticleEffect deathEffect = ((Definition) getDef()).deathEffect;
+        if (deathEffect != null) {
+            ParticleSpecialEffect.create(getDef().getContext(), deathEffect, getChestPivot());
+        }
     }
 
     @Override
@@ -110,9 +125,13 @@ public class Character extends GameUnit implements Damageable  {
 
         private static final long serialVersionUID = 1000000000L;
 
+        private static final String DEATH_EFFECT_PATH = "effects/soul_flame/soul_flame.pfx";
+
         private transient SimpleProgressBar healthBar;
         public Ability.Definition[] abilities;
         public float maxHealth;
+        @Nullable
+        private /*final*/ ParticleEffect deathEffect;
 
 
         public Definition(String modelPath, Creator<Shape> shapeCreator,
@@ -132,6 +151,8 @@ public class Character extends GameUnit implements Damageable  {
             for (Ability.Definition abilityDef : abilities) {
                 abilityDef.load(context);
             }
+
+            Particles.load(context, DEATH_EFFECT_PATH);
         }
 
         @Override
@@ -145,6 +166,8 @@ public class Character extends GameUnit implements Damageable  {
             for (Ability.Definition abilityDef : abilities) {
                 abilityDef.doneLoading(getContext());
             }
+
+            deathEffect = Particles.getOriginal(getContext(), DEATH_EFFECT_PATH);
         }
 
         @Override
