@@ -1,18 +1,12 @@
 package ru.spbau.blackout.abilities.forceblast;
 
-import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
 
-import org.jetbrains.annotations.Nullable;
-
-import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.AbilityObject;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
-import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
-import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Utils;
 
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.CAST_SOUND_PATH;
@@ -49,15 +43,6 @@ public class ForceBlastObject extends AbilityObject {
     }
 
     @Override
-    public void kill() {
-        super.kill();
-        ParticleEffect explosionEffect = ((Definition) getDef()).explosionEffect;
-        if (explosionEffect != null) {
-            ParticleSpecialEffect.create(getDef().getContext(), explosionEffect, getChestPivot());
-        }
-    }
-
-    @Override
     public void updateState(float delta) {
         super.updateState(delta);
         if (livesOnlyOneStep && !isDead()) {
@@ -71,24 +56,10 @@ public class ForceBlastObject extends AbilityObject {
 
         private static final long serialVersionUID = 1000000000L;
 
-        @Nullable
-        private /*final*/ transient ParticleEffect explosionEffect;
         public float damage;
 
         public Definition() {
             super(null, new CircleCreator(RADIUS));
-        }
-
-        @Override
-        public void load(GameContext context) {
-            super.load(context);
-            Particles.load(context, EXPLOSION_EFFECT_PATH);
-        }
-
-        @Override
-        public void doneLoading() {
-            super.doneLoading();
-            explosionEffect = Particles.getOriginal(getContext(), EXPLOSION_EFFECT_PATH);
         }
 
         @Override
@@ -99,6 +70,11 @@ public class ForceBlastObject extends AbilityObject {
         @Override
         protected String castSoundPath() {
             return CAST_SOUND_PATH;
+        }
+
+        @Override
+        protected String deathEffectPath() {
+            return EXPLOSION_EFFECT_PATH;
         }
     }
 }

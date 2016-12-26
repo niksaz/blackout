@@ -2,7 +2,6 @@ package ru.spbau.blackout.abilities.fireball;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
-import com.badlogic.gdx.physics.box2d.Shape;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -142,6 +141,11 @@ public final class FireballObject extends AbilityObject {
         @Override
         protected String castSoundPath() {
             return CAST_SOUND_PATH;
+        }
+
+        @Override
+        protected String deathEffectPath() {
+            return null;
         }
     }
 }

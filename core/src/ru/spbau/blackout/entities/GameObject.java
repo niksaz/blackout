@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.RenderableProvider;
+import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -24,8 +25,10 @@ import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphiceffects.GraphicEffect;
+import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.HasState;
+import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.worlds.ServerGameWorld;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
@@ -138,12 +141,13 @@ public abstract class GameObject implements RenderableProvider, HasState {
      * Also calls <code>dispose()</code>.
      */
     public void kill() {
-        // TODO: override
         // It will be handled in GameWorld::updatePhysics. It's a bad idea to try to remove body
         // from GameWorld right here because this method can be called in process of updating physics.
         dead = true;
-        // FIXME: play death animation
         modelInstance = null;
+        if (getDef().deathEffect != null) {
+            ParticleSpecialEffect.create(getDef().getContext(), getDef().deathEffect, getChestPivot());
+        }
         dispose();
     }
 
@@ -282,7 +286,10 @@ public abstract class GameObject implements RenderableProvider, HasState {
         public Creator<Shape> shapeCreator;
 
         /** The loaded modelInstance object. Initialized by <code>initializeGameWorld</code> method. */
-        @Nullable private transient Model model;
+        @Nullable
+        private transient Model model;
+        @Nullable
+        private transient ParticleEffect deathEffect;
         private transient GameContext context;
 
         /**
@@ -293,7 +300,6 @@ public abstract class GameObject implements RenderableProvider, HasState {
         public final Vector3 chestPivotOffset = new Vector3(0, 0, DEFAULT_CHEST_HEIGHT);
         public final Vector3 overHeadPivotOffset = new Vector3();
         public boolean isSensor = false;
-
         private int defNumber;
 
 
@@ -316,6 +322,9 @@ public abstract class GameObject implements RenderableProvider, HasState {
             if (modelPath != null) {
                 context.getAssets().load(modelPath, Model.class);
             }
+            if (deathEffectPath() != null) {
+                Particles.load(context, deathEffectPath());
+            }
         }
 
         public GameContext getContext() {
@@ -334,6 +343,9 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
             if (modelPath != null) {
                 model = context.getAssets().get(modelPath, Model.class);
+            }
+            if (deathEffectPath() != null) {
+                deathEffect = Particles.getOriginal(getContext(), deathEffectPath());
             }
         }
 
@@ -385,5 +397,8 @@ public abstract class GameObject implements RenderableProvider, HasState {
         public void setDefNumber(int defNumber) {
             this.defNumber = defNumber;
         }
+
+        @Nullable
+        protected abstract String deathEffectPath();
     }
 }

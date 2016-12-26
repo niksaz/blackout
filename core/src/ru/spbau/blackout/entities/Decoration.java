@@ -24,5 +24,10 @@ public class Decoration extends StaticObject {
         public GameObject makeInstance(long uid, float x, float y) {
             return new Decoration(this, uid, x, y);
         }
+
+        @Override
+        protected String deathEffectPath() {
+            return null;
+        }
     }
 }

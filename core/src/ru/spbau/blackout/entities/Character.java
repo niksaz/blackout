@@ -63,15 +63,6 @@ public class Character extends GameUnit implements Damageable  {
     }
 
     @Override
-    public void kill() {
-        super.kill();
-        ParticleEffect deathEffect = ((Definition) getDef()).deathEffect;
-        if (deathEffect != null) {
-            ParticleSpecialEffect.create(getDef().getContext(), deathEffect, getChestPivot());
-        }
-    }
-
-    @Override
     public void updateState(float delta) {
         super.updateState(delta);
         for (Ability ability : abilities) {
@@ -130,8 +121,6 @@ public class Character extends GameUnit implements Damageable  {
         private transient SimpleProgressBar healthBar;
         public Ability.Definition[] abilities;
         public float maxHealth;
-        @Nullable
-        private /*final*/ ParticleEffect deathEffect;
 
 
         public Definition(String modelPath, Creator<Shape> shapeCreator,
@@ -166,8 +155,6 @@ public class Character extends GameUnit implements Damageable  {
             for (Ability.Definition abilityDef : abilities) {
                 abilityDef.doneLoading(getContext());
             }
-
-            deathEffect = Particles.getOriginal(getContext(), DEATH_EFFECT_PATH);
         }
 
         @Override
@@ -213,6 +200,11 @@ public class Character extends GameUnit implements Damageable  {
 
             public static final float WIDTH = getWorldWidth() * 0.06f;
             public static final float HEIGHT = getWorldHeight() * 0.013f;
+        }
+
+        @Override
+        protected String deathEffectPath() {
+            return DEATH_EFFECT_PATH;
         }
     }
 }
