@@ -25,7 +25,7 @@ public class MultiplayerTable {
     private final MenuScreen screen;
     private final AndroidClient task;
 
-    private MultiplayerTable(MenuScreen screen, int port) {
+    private MultiplayerTable(MenuScreen screen, int port, int players) {
         this.screen = screen;
 
         middleTable = new Table();
@@ -34,11 +34,11 @@ public class MultiplayerTable {
         status = new Label(CONNECTION_MESSAGE, BlackoutGame.get().assets().getDefaultSkin());
         middleTable.add(status).row();
 
-        task = new AndroidClient(this, port);
+        task = new AndroidClient(this, port, players);
     }
 
-    public static Table getTable(final MenuScreen screen, int port) {
-        final MultiplayerTable result = new MultiplayerTable(screen, port);
+    public static Table getTable(final MenuScreen screen, int port, int players) {
+        final MultiplayerTable result = new MultiplayerTable(screen, port, players);
 
         addButton(result.middleTable, BACK_TEXT, new ClickListener() {
             @Override

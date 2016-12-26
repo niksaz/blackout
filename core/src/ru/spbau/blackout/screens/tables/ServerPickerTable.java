@@ -22,7 +22,8 @@ public class ServerPickerTable  {
                     new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
-                            screen.changeMiddleTable(MultiplayerTable.getTable(screen, description.getPort()));
+                            screen.changeMiddleTable(
+                                    MultiplayerTable.getTable(screen, description.getPort(), description.getPlayersToStart()));
                         }
                     }
             );
