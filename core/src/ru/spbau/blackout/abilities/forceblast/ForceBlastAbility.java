@@ -17,7 +17,7 @@ public class ForceBlastAbility extends SimpleInstantAbility {
     static final String NAME = "Force Blast";
     static final float MAX_CHARGE_TIME = 1.5f;
     static final float RADIUS = 2.5f;
-    static final float IMPULSE = 1000f;
+    static final float IMPULSE = 1200f;
     static final float DAMAGE = 20f;
 
 
@@ -40,6 +40,7 @@ public class ForceBlastAbility extends SimpleInstantAbility {
         public Definition(int level) {
             super(level);
             shellDef = new ForceBlastObject.Definition();
+            shellDef.chestPivotOffset.set(0, 0, 1.5f);
             shellDef.isSensor = true;
         }
 

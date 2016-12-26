@@ -58,6 +58,8 @@ public class FireballAbility extends SimpleInstantAbility {
         public Definition(int level) {
             super(level);
             shellDef = new FireballObject.Definition();
+            shellDef.chestPivotOffset.set(0, 0, 1.5f);
+            System.out.println("WTF " + shellDef.chestPivotOffset);
             shellDef.isSensor = true;
             shellDef.timeToLive = TIME_TO_LIVE;
         }

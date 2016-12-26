@@ -116,7 +116,7 @@ public final class FireballObject extends AbilityObject {
 
         public Definition() {
             super(null, new CircleCreator(SHELL_RADIUS));
-            this.mass = SHELL_MASS;
+            mass = SHELL_MASS;
         }
 
         @Override
