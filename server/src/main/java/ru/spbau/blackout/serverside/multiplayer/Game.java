@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import org.mongodb.morphia.query.Query;
-import org.mongodb.morphia.query.UpdateOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,7 +13,6 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
@@ -39,11 +37,11 @@ public class Game extends Thread implements GameContext {
 
     private final int gameId;
     private final RoomServer server;
-    private final List<ClientThread> clients;
+    private final List<ClientHandler> clients;
     private ServerGameWorld gameWorld;
     private volatile GameState gameState = GameState.READY_TO_START;
 
-    public Game(RoomServer server, List<ClientThread> clients, int gameId) {
+    public Game(RoomServer server, List<ClientHandler> clients, int gameId) {
         this.gameId = gameId;
         this.server = server;
         this.clients = clients;
@@ -65,29 +63,29 @@ public class Game extends Thread implements GameContext {
         boolean someoneWon = false;
         while (gameState != GameState.FINISHED) {
             try {
-                ClientThread clientThreadWithAliveCharacter = null;
+                ClientHandler clientHandlerWithAliveCharacter = null;
                 int aliveClients = 0;
                 int aliveCharacters = 0;
-                for (ClientThread clientThread : clients) {
-                    final Character clientCharacter = (Character) gameWorld.getObjectById(clientThread.getPlayerUid());
+                for (ClientHandler clientHandler : clients) {
+                    final Character clientCharacter = (Character) gameWorld.getObjectById(clientHandler.getPlayerUid());
                     if (clientCharacter != null) {
-                        if (clientThread.getClientGameState() == GameState.FINISHED) {
+                        if (clientHandler.getClientGameState() == GameState.FINISHED) {
                             clientCharacter.kill();
                         } else {
                             aliveClients += 1;
                             aliveCharacters += 1;
-                            clientThreadWithAliveCharacter = clientThread;
-                            final Vector2 characterVelocity = clientThread.getVelocityFromClient();
+                            clientHandlerWithAliveCharacter = clientHandler;
+                            final Vector2 characterVelocity = clientHandler.getVelocityFromClient();
                             if (characterVelocity != null) {
                                 Events.setSelfVelocity(clientCharacter, characterVelocity);
                             }
-                            final AbilityCast abilityCast = clientThread.getAbilityCastFromClient();
+                            final AbilityCast abilityCast = clientHandler.getAbilityCastFromClient();
                             if (abilityCast != null) {
                                 Events.abilityCast(clientCharacter, abilityCast.abilityNum, abilityCast.target);
                             }
                         }
                     } else {
-                        if (clientThread.getClientGameState() != GameState.FINISHED) {
+                        if (clientHandler.getClientGameState() != GameState.FINISHED) {
                             aliveClients += 1;
                         }
                     }
@@ -106,11 +104,11 @@ public class Game extends Thread implements GameContext {
 
                 final byte[] worldInBytes = serializeWorld();
                 System.out.println("World size is " + worldInBytes.length);
-                for (ClientThread client : clients) {
+                for (ClientHandler client : clients) {
                     if (client.getClientGameState() != GameState.FINISHED) {
                         client.setWorldToSend(worldInBytes);
                         if (aliveCharacters == 1 && !someoneWon) {
-                            client.setWinnerName(clientThreadWithAliveCharacter.getClientName());
+                            client.setWinnerName(clientHandlerWithAliveCharacter.getClientName());
                         }
                     }
                 }
@@ -162,12 +160,12 @@ public class Game extends Thread implements GameContext {
 
     private void createRoomAndSendItToClients() throws IOException {
         final Array<Character.Definition> heroes = new Array<>();
-        for (ClientThread client : clients) {
+        for (ClientHandler client : clients) {
 
-            if (client.getClientName().equals(ClientThread.UNKNOWN)) {
+            if (client.getClientName().equals(ClientHandler.UNKNOWN)) {
                 //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (client) {
-                    if (client.getClientName().equals(ClientThread.UNKNOWN)) {
+                    if (client.getClientName().equals(ClientHandler.UNKNOWN)) {
                         try {
                             client.wait();
                         } catch (InterruptedException e) {
@@ -192,7 +190,7 @@ public class Game extends Thread implements GameContext {
         sessionSettings.initializeGameWorld();
 
         for (int i = 0; i < clients.size(); i++) {
-            final ClientThread client = clients.get(i);
+            final ClientHandler client = clients.get(i);
             client.setGame(this, sessionSettings, i + 1);
         }
     }
@@ -215,7 +213,7 @@ public class Game extends Thread implements GameContext {
             boolean everyoneIsReady;
             do {
                 everyoneIsReady = true;
-                for (ClientThread thread : clients) {
+                for (ClientHandler thread : clients) {
                     final GameState currentClientGameState = thread.getClientGameState();
                     if (currentClientGameState == GameState.WAITING) {
                         everyoneIsReady = false;

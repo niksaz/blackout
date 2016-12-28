@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import ru.spbau.blackout.serverside.multiplayer.ClientThread;
+import ru.spbau.blackout.serverside.multiplayer.ClientHandler;
 import ru.spbau.blackout.serverside.multiplayer.Game;
 
 /**
- * Accepts incoming connections, creates a thread for each accepted connection (ClientThread),
+ * Accepts incoming connections, creates a thread for each accepted connection (ClientHandler),
  * stored them and match them to create Games.
  */
 public class RoomServer extends ServerWithLogging {
 
     private final int playersToStartGame;
-    private final Deque<ClientThread> clientThreads = new ConcurrentLinkedDeque<>();
-    private final AtomicInteger playersNumber = new AtomicInteger();
+    private final Deque<ClientHandler> clientHandlers = new ConcurrentLinkedDeque<>();
+    private final AtomicInteger numberOfPlayers = new AtomicInteger();
     private int gamesCreated;
 
     public RoomServer(int port, int playersToStartGame, PrintStream logger, String tag) {
@@ -33,22 +33,24 @@ public class RoomServer extends ServerWithLogging {
         new Thread(this::run).start();
     }
 
-    public void discard(ClientThread clientThread) {
-        playersNumber.decrementAndGet();
-        clientThreads.remove(clientThread);
-        log("Client named " + clientThread.getClientName() + " disconnected.");
+    public void discard(ClientHandler clientHandler) {
+        numberOfPlayers.decrementAndGet();
+        clientHandlers.remove(clientHandler);
+        log("Client named " + clientHandler.getClientName() + " disconnected.");
     }
 
     private void run() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             log("Server started.");
+            //noinspection InfiniteLoopStatement
             do {
                 final Socket nextSocket = serverSocket.accept();
-                final ClientThread nextThread = new ClientThread(this, nextSocket);
+                final ClientHandler clientHandler = new ClientHandler(this, nextSocket);
+                final Thread clientThread = new Thread(clientHandler);
                 log("New thread for a connection is created.");
-                clientThreads.add(nextThread);
-                playersNumber.addAndGet(1);
-                nextThread.start();
+                clientHandlers.add(clientHandler);
+                numberOfPlayers.addAndGet(1);
+                clientThread.start();
                 maybePlayGame(playersToStartGame);
             } while (true);
         } catch (IOException e) {
@@ -58,11 +60,11 @@ public class RoomServer extends ServerWithLogging {
     }
 
     private synchronized void maybePlayGame(int playersForGame) {
-        if (playersNumber.get() >= playersForGame) {
-            playersNumber.addAndGet(-playersForGame);
-            final List<ClientThread> clients = new ArrayList<>(playersForGame);
+        if (numberOfPlayers.get() >= playersForGame) {
+            numberOfPlayers.addAndGet(-playersForGame);
+            final List<ClientHandler> clients = new ArrayList<>(playersForGame);
             for (int playerIndex = 0; playerIndex < playersForGame; playerIndex++) {
-                clients.add(clientThreads.removeFirst());
+                clients.add(clientHandlers.removeFirst());
             }
             final Thread newGameThread = new Game(this, clients, gamesCreated++);
             newGameThread.start();

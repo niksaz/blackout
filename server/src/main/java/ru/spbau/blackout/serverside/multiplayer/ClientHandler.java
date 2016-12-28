@@ -16,13 +16,14 @@ import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 
+import static java.lang.Thread.sleep;
 import static ru.spbau.blackout.network.AndroidClient.AbilityCast;
 
 /**
  * A thread allocated for each client connected to the server. Initially it is waiting to be matched
  * and later acting as the representative of the client in the game.
  */
-public class ClientThread extends Thread {
+public class ClientHandler implements Runnable {
 
     public static final String UNKNOWN = "UNKNOWN";
 
@@ -39,17 +40,16 @@ public class ClientThread extends Thread {
     private final AtomicReference<AbilityCast> abilityCastFromClient = new AtomicReference<>();
     private final AtomicReference<String> winnerName = new AtomicReference<>();
 
-    public ClientThread(RoomServer server, Socket socket) {
+    public ClientHandler(RoomServer server, Socket socket) {
         this.server = server;
         this.socket = socket;
     }
 
     public void run() {
-        try (
-            Socket socket = this.socket;
-            DatagramSocket datagramSocket = new DatagramSocket();
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
+        try (Socket socket = this.socket;
+             DatagramSocket datagramSocket = new DatagramSocket();
+             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);

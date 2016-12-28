@@ -1,4 +1,4 @@
-package ru.spbau.blackout.serverside.servers;
+package ru.spbau.blackout.serverside.servers.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
+import ru.spbau.blackout.serverside.servers.HttpRequestServer;
 
 public class SettingsSynchronizeHandler implements HttpHandler {
 
@@ -24,9 +25,8 @@ public class SettingsSynchronizeHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) {
-        try (
-                InputStream input = exchange.getRequestBody();
-                ObjectInputStream inputStream = new ObjectInputStream(input)
+        try (InputStream input = exchange.getRequestBody();
+             ObjectInputStream inputStream = new ObjectInputStream(input)
         ) {
             final String name = inputStream.readUTF();
             final byte[] newSettings = (byte[]) inputStream.readObject();
@@ -40,8 +40,7 @@ public class SettingsSynchronizeHandler implements HttpHandler {
                     DatabaseAccessor.getInstance().getDatastore()
                         .createUpdateOperations(PlayerProfile.class)
                         .set("serializedSettings", newSettings);
-            DatabaseAccessor.getInstance().getDatastore().update(query, updateOperations);
-
+            DatabaseAccessor.getInstance().performUpdate(query, updateOperations);
 
             exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
             server.log("Synchronized settings for " + name);

@@ -1,4 +1,4 @@
-package ru.spbau.blackout.serverside.servers;
+package ru.spbau.blackout.serverside.servers.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -15,6 +15,7 @@ import java.util.List;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
+import ru.spbau.blackout.serverside.servers.HttpRequestServer;
 
 import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE;
 import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE_COST;
@@ -37,9 +38,8 @@ public class UpgradeRequestHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) {
-        try (
-            InputStream input = exchange.getRequestBody();
-            DataInputStream inputStream = new DataInputStream(input)
+        try (InputStream input = exchange.getRequestBody();
+             DataInputStream inputStream = new DataInputStream(input)
         ) {
             final String name = inputStream.readUTF();
             final Query<PlayerProfile> query = DatabaseAccessor.getInstance().queryProfile(name);

@@ -1,4 +1,4 @@
-package ru.spbau.blackout.serverside.servers;
+package ru.spbau.blackout.serverside.servers.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -14,6 +14,7 @@ import java.util.List;
 
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
+import ru.spbau.blackout.serverside.servers.HttpRequestServer;
 
 /**
  * Handler for load queries from clients.
@@ -29,9 +30,8 @@ public class LoadRequestHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) {
-        try (
-            InputStream input = exchange.getRequestBody();
-            DataInputStream inputStream = new DataInputStream(input)
+        try (InputStream input = exchange.getRequestBody();
+             DataInputStream inputStream = new DataInputStream(input)
         ) {
             final String name = inputStream.readUTF();
 
