@@ -9,7 +9,7 @@ import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.serverside.servers.handlers.UpgradeRequestHandler;
 
 /**
- * Server for responding of loading and updatePhysics of player's information. Stores connection to MongoDB database.
+ * Creates handlers for different HTTP requests.
  */
 public class HttpRequestServer extends ServerWithLogging {
 

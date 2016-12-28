@@ -11,6 +11,9 @@ import org.mongodb.morphia.query.UpdateResults;
 import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.database.PlayerProfile;
 
+/**
+ * Unified access to MongoDB database from the server module.
+ */
 public class DatabaseAccessor {
 
     private static final DatabaseAccessor instance = new DatabaseAccessor();
@@ -32,7 +35,7 @@ public class DatabaseAccessor {
         return datastore;
     }
 
-    public <T> Query<PlayerProfile> queryProfile(String name) {
+    public Query<PlayerProfile> queryProfile(String name) {
         return instance
                 .getDatastore()
                 .createQuery(PlayerProfile.class)

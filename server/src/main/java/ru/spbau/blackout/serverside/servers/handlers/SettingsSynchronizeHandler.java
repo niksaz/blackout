@@ -15,6 +15,9 @@ import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 import ru.spbau.blackout.serverside.servers.HttpRequestServer;
 
+/**
+ * A client sends this type of requests when he needs to synchronize settings because of local changes.
+ */
 public class SettingsSynchronizeHandler implements HttpHandler {
 
     private final HttpRequestServer server;
