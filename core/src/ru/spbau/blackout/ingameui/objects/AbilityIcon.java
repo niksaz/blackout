@@ -41,7 +41,9 @@ public final class AbilityIcon extends IngameUIObject {
 
 
     // I have to getOriginal unitDef here in order to getOriginal its abilityIcons
-    public AbilityIcon(UIServer server, int abilityNum, Vector2 startPosition) {
+    public AbilityIcon(Stage stage, UIServer server, int abilityNum, Vector2 startPosition) {
+        super(stage);
+
         this.server = server;
         this.abilityNum = abilityNum;
         this.startPosition = startPosition;
@@ -55,7 +57,7 @@ public final class AbilityIcon extends IngameUIObject {
     }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage) {
+    public void doneLoading(GameContext context) {
         if (abilityNum >= context.getMainCharacter().getAbilities().size()) {
             return;
         }
@@ -68,7 +70,7 @@ public final class AbilityIcon extends IngameUIObject {
         ready.setSize(CELL_SIZE, CELL_SIZE);
         ready.setPosition(startPosition.x, startPosition.y);
         ready.setZIndex(0);
-        stage.addActor(ready);
+        addActor(ready);
 
         // icon initialization
         Image icon = new Image(context.getAssets().get(ability.getDef().getIconPath(), Texture.class));
@@ -77,7 +79,7 @@ public final class AbilityIcon extends IngameUIObject {
         icon.setPosition(startPosition.x + iconOffset, startPosition.y + iconOffset);
 
         icon.setZIndex(1);
-        stage.addActor(icon);
+        addActor(icon);
         icon.addListener(this.new Listener());
 
         // chargingBar initialization
@@ -86,7 +88,7 @@ public final class AbilityIcon extends IngameUIObject {
         chargingBar.setPosition(startPosition.x, startPosition.y);
         chargingBar.setZIndex(2);
         endCharging();
-        stage.addActor(chargingBar);
+        addActor(chargingBar);
     }
 
     @Override

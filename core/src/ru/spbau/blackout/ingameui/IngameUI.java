@@ -9,7 +9,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import ru.spbau.blackout.BlackoutGame;
@@ -21,18 +23,20 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
 
 public abstract class IngameUI {
 
-    private final List<Actor> extraActors;
     private final Stage stage;
     private final Array<IngameUIObject> uiObjects = new Array<>();
 
-    public IngameUI(List<Actor> extraActors) {
+    public IngameUI() {
         Camera camera = new OrthographicCamera(getWorldWidth(), getWorldHeight());
         Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), camera);
-        this.stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
+        stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
         Gdx.input.setInputProcessor(getStage());
+    }
 
-        this.extraActors = extraActors;
-        foreach(extraActors, stage::addActor);
+    public IngameUI(IngameUI previous) {
+        this();
+        foreach(previous.uiObjects, IngameUIObject::removeFromStage);
+        foreach(previous.stage.getActors(), this::addActor);
     }
 
     /**
@@ -46,34 +50,19 @@ public abstract class IngameUI {
      * When assets are loaded.
      */
     public void doneLoading(GameContext context) {
-        foreach(uiObjects, object -> object.doneLoading(context, getStage()));
+        foreach(uiObjects, object -> object.doneLoading(context));
     }
 
     /**
      * Update for each frame.
      */
     public void update(float delta) {
-        this.stage.act(delta);
+        stage.act(delta);
         foreach(uiObjects, object -> object.update(delta));
     }
 
-    public Stage getStage() {
-        return stage;
-    }
-
     public void addActor(Actor actor) {
-        extraActors.add(actor);
         stage.addActor(actor);
-    }
-
-    public List<Actor> getExtraActors() {
-        for (Iterator<Actor> it = extraActors.iterator(); it.hasNext();) {
-            Actor actor = it.next();
-            if (actor.getStage() != stage) {
-                it.remove();
-            }
-        }
-        return extraActors;
     }
 
     /**
@@ -90,5 +79,9 @@ public abstract class IngameUI {
 
     public void addUiObject(IngameUIObject uiObject) {
         this.uiObjects.add(uiObject);
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 }

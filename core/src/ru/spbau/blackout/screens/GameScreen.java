@@ -205,7 +205,9 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
     public void becomeObserver() {
         mainCharacter = null;
-        ui = new ObserverUI(ui, uiServer, camera);
+        IngameUI previousUi = ui;
+        ui = new ObserverUI(previousUi, uiServer, camera);
+        previousUi.dispose();
         ui.load(this);
         assets.finishLoading();
         ui.doneLoading(this);

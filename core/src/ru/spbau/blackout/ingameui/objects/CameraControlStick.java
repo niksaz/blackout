@@ -1,6 +1,8 @@
 package ru.spbau.blackout.ingameui.objects;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+
 import ru.spbau.blackout.network.UIServer;
 
 public class CameraControlStick extends AbstractStick {
@@ -8,8 +10,8 @@ public class CameraControlStick extends AbstractStick {
     private static final float SPEED = 0.3f;
     private final Camera camera;
 
-    public CameraControlStick(UIServer server, Camera camera) {
-        super(server);
+    public CameraControlStick(Stage stage, UIServer server, Camera camera) {
+        super(stage, server);
         this.camera = camera;
     }
 

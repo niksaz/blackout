@@ -27,6 +27,10 @@ public class ExitButton extends IngameUIObject {
 
     private GameContext context;
 
+    public ExitButton(Stage stage) {
+        super(stage);
+    }
+
     @Override
     public void load(GameContext context) {
         this.context = context;
@@ -34,16 +38,16 @@ public class ExitButton extends IngameUIObject {
     }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage) {
+    public void doneLoading(GameContext context) {
         Image button = new Image(context.getAssets().get(TEXTURE_PATH, Texture.class));
         button.setSize(SIZE, SIZE);
         button.setPosition(START_X, START_Y);
         button.toFront();
-        stage.addActor(button);
+        addActor(button);
         button.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                new ConfirmationDialog().show(stage);
+                new ConfirmationDialog().show(getStage());
                 return true;
             }
         });

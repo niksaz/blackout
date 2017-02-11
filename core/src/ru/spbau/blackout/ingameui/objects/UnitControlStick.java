@@ -11,13 +11,13 @@ public class UnitControlStick extends AbstractStick {
     /** the controlled unit */
     private /*final*/ GameUnit unit;
 
-    public UnitControlStick(UIServer server) {
-        super(server);
+    public UnitControlStick(Stage stage, UIServer server) {
+        super(stage, server);
     }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage) {
-        super.doneLoading(context, stage);
+    public void doneLoading(GameContext context) {
+        super.doneLoading(context);
         this.unit = context.getMainCharacter();
     }
 

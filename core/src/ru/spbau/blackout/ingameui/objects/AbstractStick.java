@@ -40,7 +40,8 @@ public abstract class AbstractStick extends IngameUIObject {
     protected final UIServer server;
 
 
-    public AbstractStick(UIServer server) {
+    public AbstractStick(Stage stage, UIServer server) {
+        super(stage);
         this.server = server;
     }
 
@@ -52,20 +53,20 @@ public abstract class AbstractStick extends IngameUIObject {
     }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage) {
+    public void doneLoading(GameContext context) {
         // main image initialization
         Image mainImg = new Image(context.getAssets().get(MAIN_IMAGE_PATH, Texture.class));
         mainImg.setSize(MAIN_IMAGE_SIZE, MAIN_IMAGE_SIZE);
         mainImg.setPosition(START_X, START_Y);
         mainImg.addListener(this.new Listener());
-        stage.addActor(mainImg);
+        addActor(mainImg);
 
         // touch image initialization
         this.touchImage = new Image(context.getAssets().get(TOUCH_IMAGE_PATH, Texture.class));
         this.touchImage.setSize(TOUCH_IMAGE_SIZE, TOUCH_IMAGE_SIZE);
         updateTouchPosition();
 
-        stage.addActor(this.touchImage);
+        addActor(this.touchImage);
 
         // in order to be able to handle input by main image
         this.touchImage.toBack();

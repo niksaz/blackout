@@ -30,19 +30,13 @@ public class PlayerUI extends IngameUI {
     /**
      * Creates all UI elements and sets itself as input processor.
      */
-    public PlayerUI(UIServer server, List<Actor> extraActors) {
-        super(extraActors);
-
-        addUiObject(new UnitControlStick(server));
-        addUiObject(new HealthBar());
-        addUiObject(new ExitButton());
+    public PlayerUI(UIServer server) {
+        addUiObject(new UnitControlStick(getStage(), server));
+        addUiObject(new HealthBar(getStage()));
+        addUiObject(new ExitButton(getStage()));
 
         for (int i = 0; i < ABILITY_ICONS_POS.length; i++) {
-            addUiObject(new AbilityIcon(server, i, ABILITY_ICONS_POS[i]));
+            addUiObject(new AbilityIcon(getStage(), server, i, ABILITY_ICONS_POS[i]));
         }
-    }
-
-    public PlayerUI(UIServer server) {
-        this(server, new LinkedList<>());
     }
 }

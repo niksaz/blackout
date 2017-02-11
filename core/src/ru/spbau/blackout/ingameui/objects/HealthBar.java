@@ -26,6 +26,9 @@ public final class HealthBar extends IngameUIObject {
     private final SimpleProgressBar healthBar = new HorizontalProgressBar(PATH_EMPTY, PATH_FULL);
     private /*final*/ Character character;
 
+    public HealthBar(Stage stage) {
+        super(stage);
+    }
 
     @Override
     public void load(GameContext context) {
@@ -33,13 +36,13 @@ public final class HealthBar extends IngameUIObject {
     }
 
     @Override
-    public void doneLoading(GameContext context, Stage stage) {
+    public void doneLoading(GameContext context) {
         this.character = context.getMainCharacter();
 
         healthBar.doneLoading(context.getAssets());
         healthBar.setPosition(START_X, START_Y);
         healthBar.setSize(WIDTH, HEIGHT);
-        stage.addActor(healthBar);
+        addActor(healthBar);
     }
 
     @Override
