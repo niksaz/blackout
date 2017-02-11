@@ -2,10 +2,9 @@ package ru.spbau.blackout.abilities.fireball;
 
 import com.badlogic.gdx.math.Vector2;
 
-import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.abilities.SimpleInstantAbility;
-import ru.spbau.blackout.entities.AbilityObject;
+import ru.spbau.blackout.abilities.AbilityObject;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
 

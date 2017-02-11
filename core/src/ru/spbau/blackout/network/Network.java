@@ -10,13 +10,13 @@ public class Network {
 
     public static final long TIME_SHOULD_BE_SPENT_IN_ITERATION = 30;
 
-    public static final String SERVER_IP_ADDRESS = "192.168.1.34";
+    public static final String SERVER_IP_ADDRESS = "192.168.1.49";
     public static final int SERVER_HTTP_PORT_NUMBER = 48800;
     public static final List<RoomServerDescription> ROOM_SERVERS = new ArrayList<RoomServerDescription>() {
         {
-            add(new RoomServerDescription(48801, 2));
-            add(new RoomServerDescription(48802, 3));
-            add(new RoomServerDescription(48803, 4));
+            add(new RoomServerDescription(48801, 1));
+            add(new RoomServerDescription(48802, 2));
+            add(new RoomServerDescription(48803, 3));
         }
     };
     public static final int DATAGRAM_WORLD_PACKET_SIZE = 1024;

@@ -11,6 +11,8 @@ import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
+import ru.spbau.blackout.utils.Uid;
+import ru.spbau.blackout.utils.UidGenerator;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
@@ -24,12 +26,12 @@ public class ServerGameWorld extends GameWorld {
     private static final float WORLD_STEP = 1 / 58f;
 
     private float accumulator = 0;
-    private long lastUid;
+    public final UidGenerator uidGenerator;
 
 
     public ServerGameWorld(SessionSettings sessionSettings) {
         super(sessionSettings.getDefinitions());
-        lastUid = sessionSettings.getLastUid();
+        uidGenerator = sessionSettings.getUidGenerator();
     }
 
     public ServerGameWorld(SessionSettings sessionSettings, GameContext context) {
@@ -43,15 +45,10 @@ public class ServerGameWorld extends GameWorld {
         out.writeInt(getGameObjects().size());
 
         for (GameObject go : getGameObjects()) {
-            out.writeLong(go.getUid());
+            out.writeObject(go.getUid());
             out.writeInt(go.getDef().getDefNumber());
             go.getState(out);
         }
-    }
-
-    public long getNextUid() {
-        lastUid += 1;
-        return lastUid;
     }
 
     @Override

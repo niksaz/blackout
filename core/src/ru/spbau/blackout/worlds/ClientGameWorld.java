@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.network.AndroidClient;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
+import ru.spbau.blackout.utils.Uid;
 
 
 /**
@@ -33,10 +34,10 @@ public class ClientGameWorld extends GameWorld {
         if (newStepNumber > stepNumber) {
             stepNumber = newStepNumber;
 
-            Set<Long> updated = new HashSet<>();
+            Set<Uid> updated = new HashSet<>();
             int length = in.readInt();
             for (int i = 0; i < length; i++) {
-                long uid = in.readLong();
+                Uid uid = (Uid) in.readObject();
                 int defNumber = in.readInt();
                 updated.add(uid);
                 if (!hasObjectWithId(uid)) {

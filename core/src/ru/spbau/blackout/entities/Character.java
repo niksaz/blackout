@@ -1,10 +1,7 @@
 package ru.spbau.blackout.entities;
 
-import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
-
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -20,12 +17,11 @@ import ru.spbau.blackout.graphiceffects.HealthBarEffect;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.shapescreators.CircleCreator;
-import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Serializer;
+import ru.spbau.blackout.utils.Uid;
 
-import static ru.spbau.blackout.BlackoutGame.get;
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
 
@@ -37,7 +33,7 @@ public class Character extends GameUnit implements Damageable  {
     private float maxHealth;
 
 
-    public Character(Character.Definition def, long uid, float x, float y) {
+    public Character(Character.Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
 
         for (Ability.Definition abilityDef : def.abilities) {
@@ -158,7 +154,7 @@ public class Character extends GameUnit implements Damageable  {
         }
 
         @Override
-        public GameObject makeInstance(long uid, float x, float y) {
+        public GameObject makeInstance(Uid uid, float x, float y) {
             Character character = new Character(this, uid, x, y);
 
             if (getContext().hasUI()) {

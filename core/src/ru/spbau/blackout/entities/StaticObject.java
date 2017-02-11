@@ -4,10 +4,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.utils.Creator;
+import ru.spbau.blackout.utils.Uid;
 
 
 public abstract class StaticObject extends GameObject {
-    public StaticObject(GameObject.Definition def, long uid, float x, float y) {
+    public StaticObject(GameObject.Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
     }
 

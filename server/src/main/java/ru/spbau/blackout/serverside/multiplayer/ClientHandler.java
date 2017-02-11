@@ -15,6 +15,7 @@ import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
+import ru.spbau.blackout.utils.Uid;
 
 import static java.lang.Thread.sleep;
 import static ru.spbau.blackout.network.AndroidClient.AbilityCast;
@@ -32,7 +33,7 @@ public class ClientHandler implements Runnable {
 
     private volatile String name = UNKNOWN;
     private volatile SessionSettings session;
-    private volatile long playerUid;
+    private volatile Uid playerUid;
     private volatile Game game;
     private volatile GameState clientGameState = GameState.WAITING;
     private final AtomicReference<byte[]> worldInBytes = new AtomicReference<>();
@@ -107,7 +108,7 @@ public class ClientHandler implements Runnable {
         return name;
     }
 
-    void setGame(Game game, SessionSettings session, long playerUid) {
+    void setGame(Game game, SessionSettings session, Uid playerUid) {
         this.session = session;
         this.playerUid = playerUid;
         this.game = game;
@@ -232,7 +233,7 @@ public class ClientHandler implements Runnable {
             out.writeObject(currentState);
             if (currentState == GameState.READY_TO_START) {
                 out.writeObject(session);
-                out.writeLong(playerUid);
+                out.writeObject(playerUid);
                 out.flush();
 
                 // loading may take a long time
@@ -261,7 +262,7 @@ public class ClientHandler implements Runnable {
         } while (clientGameState == GameState.WAITING);
     }
 
-    public long getPlayerUid() {
+    public Uid getPlayerUid() {
         return playerUid;
     }
 }

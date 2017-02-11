@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import ru.spbau.blackout.utils.Creator;
+import ru.spbau.blackout.utils.Uid;
 
 
 public abstract class DynamicObject extends GameObject {
@@ -38,7 +39,7 @@ public abstract class DynamicObject extends GameObject {
 
 
     /** Construct DynamicObject at the giving touchPos. */
-    protected DynamicObject(Definition def, long uid, float x, float y) {
+    protected DynamicObject(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
 
         if (modelInstance != null) {

@@ -14,6 +14,8 @@ import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.shapescreators.RightOctagonCreator;
 import ru.spbau.blackout.utils.Finder;
+import ru.spbau.blackout.utils.Uid;
+import ru.spbau.blackout.utils.UidGenerator;
 
 
 /**
@@ -26,15 +28,15 @@ import ru.spbau.blackout.utils.Finder;
 public final class SessionSettings implements Serializable {
 
     private final List<GameObject.Definition> definitions = new ArrayList<>();
-    private long playerUid = 0;
+    private Uid playerUid;
     private final List<InitialState> initialStates = new ArrayList<>();
     private transient Finder<GameObject.Definition> finder = new Finder<>(GameObject.Definition.class, definitions);
-    private transient long lastUid = 0;
+    private transient UidGenerator uidGenerator = new UidGenerator();
 
 
     public List<GameObject.Definition> getDefinitions() { return definitions; }
-    public void setPlayerUid(long uid) { this.playerUid = uid; }
-    public long getPlayerUid() { return playerUid; }
+    public void setPlayerUid(Uid uid) { this.playerUid = uid; }
+    public Uid getPlayerUid() { return playerUid; }
 
     public void initializeGameWorld() {
         for (InitialState state : initialStates) {
@@ -66,14 +68,11 @@ public final class SessionSettings implements Serializable {
         }
 
         int num = addDefinition(def);
-        initialStates.add(new InitialState(num, initialX, initialY, getNextUid()));
+        initialStates.add(new InitialState(num, initialX, initialY, uidGenerator));
         return num;
     }
 
-    private long getNextUid() {
-        lastUid += 1;
-        return lastUid;
-    }
+    public final UidGenerator getUidGenerator() { return uidGenerator; }
 
     // FIXME: just for test
     public static SessionSettings createDefaultSession(Array<Character.Definition> characters) {
@@ -84,7 +83,7 @@ public final class SessionSettings implements Serializable {
         initialPositionsPool.add(new Vector2(0, 0));
 
         final SessionSettings session = new SessionSettings();
-        session.setPlayerUid(1);
+        session.setPlayerUid(new Uid(1));
 
         for (Character.Definition characterDefinition : characters) {
             if (initialPositionsPool.size == 0) {
@@ -119,19 +118,16 @@ public final class SessionSettings implements Serializable {
         return session;
     }
 
-    public long getLastUid() {
-        return lastUid;
-    }
 
-    private static class InitialState implements Serializable {
+    private static final class InitialState implements Serializable {
         int defNum;
         final Vector2 initialPosition = new Vector2();
-        long uid;
+        Uid uid;
 
-        public InitialState(int defNum, float initialX, float initialY, long uid) {
+        public InitialState(int defNum, float initialX, float initialY, UidGenerator uidGenerator) {
             this.defNum = defNum;
             this.initialPosition.set(initialX, initialY);
-            this.uid = uid;
+            this.uid = uidGenerator.next();
         }
     }
 }

@@ -28,6 +28,7 @@ import ru.spbau.blackout.screens.tables.MultiplayerTable;
 import ru.spbau.blackout.screens.tables.PlayScreenTable;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
+import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.worlds.ClientGameWorld;
 
 import static ru.spbau.blackout.BlackoutGame.DIALOG_PADDING;
@@ -146,7 +147,7 @@ public class AndroidClient implements Runnable, UIServer {
                     final GameSettings settings = BlackoutGame.get().getPlayerEntity().getGameSettings();
 
                     SessionSettings sessionSettings = (SessionSettings) in.readObject();
-                    sessionSettings.setPlayerUid(in.readLong());
+                    sessionSettings.setPlayerUid((Uid) in.readObject());
 
                     // using the fact that AndroidClient is UIServer itself.
                     // so synchronizing on server on loading

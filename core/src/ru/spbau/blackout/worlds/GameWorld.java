@@ -6,13 +6,16 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import ru.spbau.blackout.BlackoutContactListener;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.utils.Uid;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
 
@@ -43,7 +46,7 @@ public abstract class GameWorld {
     public static final int VELOCITY_ITERATIONS = 1;
     public static final int POSITION_ITERATIONS = 2;
 
-    private final SortedMap<Long, GameObject> gameObjectsMap = new TreeMap<>();
+    private final Map<Uid, GameObject> gameObjectsMap = new HashMap<>();
     protected long stepNumber = 0;
     transient protected final World box2dWorld;  // FIXME: should be only on server
     private final List<GameObject.Definition> definitions;
@@ -63,11 +66,11 @@ public abstract class GameWorld {
 
     public final List<GameObject.Definition> getDefinitions() { return definitions; }
 
-    public final GameObject getObjectById(long uid) {
+    public final GameObject getObjectById(Uid uid) {
         return gameObjectsMap.get(uid);
     }
 
-    public final boolean hasObjectWithId(long uid) {
+    public final boolean hasObjectWithId(Uid uid) {
         return gameObjectsMap.containsKey(uid);
     }
 

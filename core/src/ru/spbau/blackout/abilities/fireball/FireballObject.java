@@ -11,11 +11,13 @@ import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
-import ru.spbau.blackout.entities.AbilityObject;
+import ru.spbau.blackout.abilities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Particles;
+import ru.spbau.blackout.utils.Uid;
+
 import org.jetbrains.annotations.Nullable;
 
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.CAST_SOUND_PATH;
@@ -32,7 +34,7 @@ public final class FireballObject extends AbilityObject {
     private boolean shouldExplode = false;
 
 
-    protected FireballObject(FireballObject.Definition def, long uid, float x, float y) {
+    protected FireballObject(FireballObject.Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
 
         timeRest = def.timeToLive;
@@ -134,7 +136,7 @@ public final class FireballObject extends AbilityObject {
         }
 
         @Override
-        public GameObject makeInstance(long uid, float x, float y) {
+        public GameObject makeInstance(Uid uid, float x, float y) {
             return new FireballObject(this, uid, x, y);
         }
     }

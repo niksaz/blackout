@@ -29,6 +29,7 @@ import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.HasState;
 import ru.spbau.blackout.utils.Particles;
+import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.worlds.ServerGameWorld;
 
 import static ru.spbau.blackout.utils.Utils.fixTop;
@@ -48,13 +49,13 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
     private boolean dead = false;
     private final GameObject.Definition def;
-    private final long uid;
+    private final Uid uid;
 
 
     /**
      * Constructs defined object at the given touchPos.
      */
-    protected GameObject(Definition def, long uid, float x, float y) {
+    protected GameObject(Definition def, Uid uid, float x, float y) {
         this.def = def;
         this.uid = uid;
 
@@ -210,7 +211,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
         setRotation(direction.angleRad());
     }
 
-    public long getUid() { return uid; }
+    public Uid getUid() { return uid; }
 
     public Vector2 getPosition() {
         return body.getPosition();
@@ -354,13 +355,13 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
 
         /** Create an object at the giving touchPos. */
-        public abstract GameObject makeInstance(long uid, float x, float y);
+        public abstract GameObject makeInstance(Uid uid, float x, float y);
         /** Create an object at the giving touchPos. */
-        public GameObject makeInstance(long uid, Vector2 position) {
+        public GameObject makeInstance(Uid uid, Vector2 position) {
             return makeInstance(uid, position.x, position.y);
         }
         /** Create an object at (0, 0). */
-        public GameObject makeInstance(long uid) {
+        public GameObject makeInstance(Uid uid) {
             return makeInstance(uid, 0, 0);
         }
 
@@ -369,7 +370,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
          * Must be called only on <code>ServerGameWorld</code>
          */
         public GameObject makeInstanceWithNextUid(float x, float y) {
-            return makeInstance(((ServerGameWorld) context.gameWorld()).getNextUid(), x, y);
+            return makeInstance(((ServerGameWorld) context.gameWorld()).uidGenerator.next(), x, y);
         }
 
         /** Create an object at the giving touchPos. */

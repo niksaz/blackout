@@ -24,6 +24,7 @@ import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
+import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.utils.Utils;
 import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.worlds.ServerGameWorld;
@@ -191,7 +192,7 @@ public class Game extends Thread implements GameContext {
 
         for (int i = 0; i < clients.size(); i++) {
             final ClientHandler client = clients.get(i);
-            client.setGame(this, sessionSettings, i + 1);
+            client.setGame(this, sessionSettings, new Uid(i + 1));
         }
     }
 

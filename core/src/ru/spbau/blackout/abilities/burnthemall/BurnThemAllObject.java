@@ -1,7 +1,7 @@
 /*
 package ru.spbau.blackout.abilities.burnthemall;
 
-import ru.spbau.blackout.entities.AbilityObject;
+import ru.spbau.blackout.abilities.AbilityObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 

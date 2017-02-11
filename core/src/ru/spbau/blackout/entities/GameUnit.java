@@ -14,6 +14,7 @@ import java.util.List;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
+import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.utils.Utils;
 
 
@@ -38,7 +39,7 @@ public abstract class GameUnit extends DynamicObject {
     private float speed;
 
 
-    protected GameUnit(Definition def, long uid, float x, float y) {
+    protected GameUnit(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
         speed = def.speed;
     }

@@ -3,10 +3,11 @@ package ru.spbau.blackout.entities;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.utils.Creator;
+import ru.spbau.blackout.utils.Uid;
 
 
 public class Decoration extends StaticObject {
-    protected Decoration(Definition def, long uid, float x, float y) {
+    protected Decoration(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
     }
 
@@ -21,7 +22,7 @@ public class Decoration extends StaticObject {
 
 
         @Override
-        public GameObject makeInstance(long uid, float x, float y) {
+        public GameObject makeInstance(Uid uid, float x, float y) {
             return new Decoration(this, uid, x, y);
         }
     }

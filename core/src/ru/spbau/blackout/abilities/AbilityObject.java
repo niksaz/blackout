@@ -1,4 +1,4 @@
-package ru.spbau.blackout.entities;
+package ru.spbau.blackout.abilities;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -6,7 +6,10 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import org.jetbrains.annotations.Nullable;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.entities.DynamicObject;
+import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.utils.Creator;
+import ru.spbau.blackout.utils.Uid;
 
 import static ru.spbau.blackout.settings.GameSettings.SOUND_MAX_VOLUME;
 
@@ -16,7 +19,7 @@ import static ru.spbau.blackout.settings.GameSettings.SOUND_MAX_VOLUME;
  */
 public abstract class AbilityObject extends DynamicObject {
 
-    protected AbilityObject(Definition def, long uid, float x, float y) {
+    protected AbilityObject(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
 
         if (def.getCastSound() != null) {
