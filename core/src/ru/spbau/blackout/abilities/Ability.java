@@ -10,7 +10,6 @@ import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.utils.HasState;
 
@@ -40,7 +39,7 @@ public abstract class Ability implements HasState {
         setChargeTime(in.readFloat());
     }
 
-    public Ability.Definition getDef() {
+    public final Ability.Definition getDef() {
         return def;
     }
 
@@ -66,10 +65,10 @@ public abstract class Ability implements HasState {
     public void setChargeTime(float chargeTime) { this.chargeTime = chargeTime; }
 
     /**
-     * Sets current chargeUpdate time as <code>getMaxChargeTime</code>.
+     * Sets current chargeUpdate time as <code>maxChargeTime</code>.
      */
     public void chargeStart() {
-        setChargeTime(def.getMaxChargeTime());
+        setChargeTime(def.maxChargeTime());
     }
 
 
@@ -79,30 +78,24 @@ public abstract class Ability implements HasState {
 
         private int level;
         private /*final*/ transient GameContext context;
-        private final String iconPath;
-        private final String name;
-        private final float maxChargeTime;
 
-        public Definition(int level, String iconPath, String name, float maxChargeTime) {
+        public Definition(int level) {
             setLevel(level);
-            this.iconPath = iconPath;
-            this.name = name;
-            this.maxChargeTime = maxChargeTime;
         }
 
         /** Load necessary assets. */
         public void load(GameContext context) {
             // loading of icon has to be here because it isn't accessible from `AbilityIcon` class in the loading stage
-            context.getAssets().load(iconPath, Texture.class);
+            context.getAssets().load(iconPath(), Texture.class);
         }
 
         public void doneLoading(GameContext context) {}
 
-        public int getLevel() {
+        public final int getLevel() {
             return level;
         }
 
-        public void setLevel(int newLevel) {
+        public final void setLevel(int newLevel) {
             level = newLevel;
         }
 
@@ -112,16 +105,8 @@ public abstract class Ability implements HasState {
             setLevel(getLevel() + 1);
         }
 
-        public final float getMaxChargeTime() {
-            return maxChargeTime;
-        }
-
-        public final String getName() {
-            return name;
-        }
-
-        public final String getIconPath() {
-            return iconPath;
-        }
+        public abstract float maxChargeTime();
+        public abstract String name();
+        public abstract String iconPath();
     }
 }

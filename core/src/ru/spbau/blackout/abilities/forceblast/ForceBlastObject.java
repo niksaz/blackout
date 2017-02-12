@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.abilities.DynamicAbilityObject;
 import ru.spbau.blackout.abilities.StaticAbilityObject;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Damageable;
@@ -70,7 +69,7 @@ public final class ForceBlastObject extends StaticAbilityObject {
         }
     }
 
-    public static class Definition extends StaticAbilityObject.Definition {
+    public final static class Definition extends StaticAbilityObject.Definition {
 
         private static final long serialVersionUID = 1000000000L;
 

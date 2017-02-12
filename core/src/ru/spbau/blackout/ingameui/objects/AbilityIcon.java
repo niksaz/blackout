@@ -1,6 +1,5 @@
 package ru.spbau.blackout.ingameui.objects;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
-import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.ingameui.IngameUIObject;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
@@ -73,7 +71,7 @@ public final class AbilityIcon extends IngameUIObject {
         addActor(ready);
 
         // icon initialization
-        Image icon = new Image(context.getAssets().get(ability.getDef().getIconPath(), Texture.class));
+        Image icon = new Image(context.getAssets().get(ability.getDef().iconPath(), Texture.class));
         icon.setSize(ICON_SIZE, ICON_SIZE);
         float iconOffset = (CELL_SIZE - ICON_SIZE) / 2f;
         icon.setPosition(startPosition.x + iconOffset, startPosition.y + iconOffset);
@@ -110,10 +108,10 @@ public final class AbilityIcon extends IngameUIObject {
         } else {
             if (isCharging()) {
                 // updatePhysics charging
-                chargingBar.setValue(chargeTime / ability.getDef().getMaxChargeTime());
+                chargingBar.setValue(chargeTime / ability.getDef().maxChargeTime());
             } else {
                 // start charging
-                chargingBar.setValueInstant(chargeTime / ability.getDef().getMaxChargeTime());
+                chargingBar.setValueInstant(chargeTime / ability.getDef().maxChargeTime());
                 chargingBar.setVisible(true);
             }
         }

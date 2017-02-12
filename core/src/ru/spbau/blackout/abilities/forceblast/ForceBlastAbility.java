@@ -10,7 +10,7 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
-public class ForceBlastAbility extends SimpleInstantAbility {
+public final class ForceBlastAbility extends SimpleInstantAbility {
 
     static final String CAST_SOUND_PATH = "sounds/fire.ogg";
     static final String EXPLOSION_EFFECT_PATH = "effects/force_blast/force_blast.pfx";
@@ -36,14 +36,14 @@ public class ForceBlastAbility extends SimpleInstantAbility {
         shell.setCaster(getCharacter());
     }
 
-    public static class Definition extends Ability.Definition {
+    public final static class Definition extends Ability.Definition {
 
         private static final long serialVersionUID = 1000000000L;
 
         private final ForceBlastObject.Definition shellDef;
 
         public Definition(int level) {
-            super(level, ICON_PATH, NAME, MAX_CHARGE_TIME);
+            super(level);
             shellDef = new ForceBlastObject.Definition();
             shellDef.chestPivotOffset.set(0, 0, 1.5f);
             shellDef.isSensor = true;
@@ -54,5 +54,12 @@ public class ForceBlastAbility extends SimpleInstantAbility {
             shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * getLevel();
             return new ForceBlastAbility(this, character);
         }
+
+        @Override
+        public float maxChargeTime() { return MAX_CHARGE_TIME; }
+        @Override
+        public String name() { return NAME; }
+        @Override
+        public String iconPath() { return ICON_PATH; }
     }
 }
