@@ -34,6 +34,7 @@ public class MenuScreen extends StageScreen {
 
     private static final String UP_ARROW_PATH = "images/menuscreen/up-arrow.png";
     private static final String DOWN_ARROW_PATH = "images/menuscreen/down-arrow.png";
+    private static final String RATING_ICON_PATH = "images/menuscreen/ratingIcon.png";
     private static final String GAMES_ACHIEVEMENTS_GAMES_PATH = "images/game_services/games_achievements.png";
     private static final String GAMES_CONTROLLER_GAMES_PATH = "images/game_services/games_controller_grey.png";
     private static final String GAMES_LEADERBOARDS_GAMES_PATH = "images/game_services/games_leaderboards.png";
@@ -45,7 +46,7 @@ public class MenuScreen extends StageScreen {
 
     private static final int GOLD_COIN_FRAMES = 9;
 
-    private static final float COIN_IMAGE_SIZE_EXTENSION = 5.0f;
+    private static final float ICON_IMAGE_SIZE_EXTENSION = 5.0f;
     private static final float ANIMATION_FRAME_DURATION = 0.25f;
 
     private static final float BLACKOUT_LABEL_BOTTOM_PADDING = 25.0f;
@@ -79,11 +80,28 @@ public class MenuScreen extends StageScreen {
     }
 
     private void addLeftPaneElements() {
-        addLabelWithTextAt(
+        final Label greetingsLabel = addLabelWithTextAt(
                 "Greetings, " + BlackoutGame.get().getPlayerEntity().getName(),
                 CORNERS_MARGIN,
                 stage.getViewport().getWorldHeight() - CORNERS_MARGIN,
                 Align.topLeft);
+
+        final float squareIconSize = greetingsLabel.getHeight() + ICON_IMAGE_SIZE_EXTENSION;
+        final Image ratingImage = new Image(new Texture(RATING_ICON_PATH));
+        ratingImage.setSize(squareIconSize, squareIconSize);
+        ratingImage.setPosition(
+                CORNERS_MARGIN,
+                stage.getViewport().getWorldHeight() - 2 * CORNERS_MARGIN - greetingsLabel.getHeight(),
+                Align.topLeft);
+        stage.addActor(ratingImage);
+
+        final Label ratingLabel = addLabelWithTextAt(
+                String.valueOf(BlackoutGame.get().getPlayerEntity().getRating()),
+                CORNERS_MARGIN + squareIconSize + CORNERS_MARGIN,
+                stage.getViewport().getWorldHeight() - 2 * CORNERS_MARGIN - greetingsLabel.getHeight(),
+                Align.topLeft);
+        stage.addActor(ratingLabel);
+
         final Array<Actor> playServicesIcons = addGooglePlayGamesServicesIcons();
         addSettingsIcon(playServicesIcons);
     }
@@ -121,7 +139,7 @@ public class MenuScreen extends StageScreen {
         };
         stage.addActor(goldLabel);
 
-        final float square = goldLabel.getHeight() + COIN_IMAGE_SIZE_EXTENSION;
+        final float square = goldLabel.getHeight() + ICON_IMAGE_SIZE_EXTENSION;
         coinImage.setSize(square, square);
         coinImage.setPosition(
                 stage.getViewport().getWorldWidth() - CORNERS_MARGIN,

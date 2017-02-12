@@ -18,6 +18,7 @@ public class PlayerProfile implements Serializable {
     private final String name;
     private int currentCoins;
     private int earnedCoins;
+    private int rating;
     private byte[] serializedDefinition;
     private volatile byte[] serializedSettings;
 
@@ -25,7 +26,7 @@ public class PlayerProfile implements Serializable {
      * Used by Morphia to initialize objects extracted from the database.
      */
     public PlayerProfile() {
-        this("", 0, 0, null, null);
+        this("", 0, 0, 0, null, null);
     }
 
     /**
@@ -34,7 +35,7 @@ public class PlayerProfile implements Serializable {
      * @param name name of a new player
      */
     public PlayerProfile(String name) {
-        this(name, 0, 0,
+        this(name, 0, 0, 1000,
              Character.Definition.createSerializedDefaultCharacterDefinition(),
              GameSettings.createSerializedDefaultGameSettings());
     }
@@ -43,15 +44,16 @@ public class PlayerProfile implements Serializable {
      * Shallow copy of the object.
      */
     public PlayerProfile(PlayerProfile other) {
-        this(other.getName(), other.getCurrentCoins(), other.getEarnedCoins(),
+        this(other.getName(), other.getCurrentCoins(), other.getEarnedCoins(), other.getRating(),
              other.getSerializedDefinition(), other.getSerializedSettings());
     }
 
-    private PlayerProfile(String name, int currentCoins, int earnedCoins,
+    private PlayerProfile(String name, int currentCoins, int earnedCoins, int rating,
                           byte[] serializedDefinition, byte[] serializedSettings) {
         this.name = name;
         this.currentCoins = currentCoins;
         this.earnedCoins = earnedCoins;
+        this.rating = rating;
         this.serializedDefinition = serializedDefinition;
         this.serializedSettings = serializedSettings;
     }
@@ -62,6 +64,10 @@ public class PlayerProfile implements Serializable {
 
     public int getCurrentCoins() {
         return currentCoins;
+    }
+
+    public int getRating() {
+        return rating;
     }
 
     public int getEarnedCoins() {

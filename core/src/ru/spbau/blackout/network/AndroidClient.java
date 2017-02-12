@@ -242,25 +242,29 @@ public class AndroidClient implements Runnable, UIServer {
             while (!isInterrupted) {
                 try {
                     final String winnerName = (String) objectInputStream.readObject();
-                    new Dialog("", BlackoutGame.get().assets().getDefaultSkin()) {
-                        {
-                            setMovable(false);
-                            pad(DIALOG_PADDING);
-                            getContentTable().add(winnerName + " has won");
-                            button("Ok").padBottom(DIALOG_PADDING);
-                        }
-
+                    Gdx.app.postRunnable(new Runnable() {
                         @Override
-                        protected void result(Object object) {
-                            super.result(object);
-                            this.remove();
-                        }
-                    }.show(gameScreen.getUi().getStage());
+                        public void run() {
+                            new Dialog("", BlackoutGame.get().assets().getDefaultSkin()) {
+                                {
+                                    setMovable(false);
+                                    pad(DIALOG_PADDING);
+                                    getContentTable().add(winnerName + " has won");
+                                    button("Ok").padBottom(DIALOG_PADDING);
+                                }
 
-                    System.out.println(winnerName + " WON!");
+                                @Override
+                                protected void result(Object object) {
+                                    super.result(object);
+                                    this.remove();
+                                }
+                            }.show(gameScreen.getUi().getStage());
+                        }
+                    });
+
                     final PlayServices playServices = BlackoutGame.get().playServicesInCore().getPlayServices();
+                    ChangeablePlayerProfile.loadPlayerEntity(null, null);
                     if (winnerName.equals(playServices.getPlayerName())) {
-                        ChangeablePlayerProfile.loadPlayerEntity(null, null);
                         switch (players) {
                             case 2:
                                 playServices.unlockAchievement(playServices.getDuelistAchievementID());
