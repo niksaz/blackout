@@ -1,9 +1,5 @@
 package ru.spbau.blackout.abilities.fireball;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 import ru.spbau.blackout.abilities.simpleshell.SimpleShellObject;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
@@ -39,11 +35,6 @@ public final class FireballObject extends SimpleShellObject {
         }
 
         kill();
-    }
-
-    @Override
-    public void updateForSecondStep() {
-        super.updateForSecondStep();
     }
 
     /**

@@ -22,7 +22,7 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  */
 public class ServerGameWorld extends GameWorld {
 
-    /** The fixed physic driver's step. */
+    /** The fixed step for physic engine. */
     private static final float WORLD_STEP = 1 / 58f;
 
     private float accumulator = 0;

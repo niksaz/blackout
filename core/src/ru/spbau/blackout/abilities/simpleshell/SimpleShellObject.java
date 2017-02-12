@@ -40,6 +40,7 @@ public abstract class SimpleShellObject extends DynamicAbilityObject {
     @Override
     public void updateForSecondStep() {
         super.updateForSecondStep();
+
     }
 
     /**

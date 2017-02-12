@@ -30,7 +30,19 @@ public class BlackoutContactListener implements ContactListener {
 
     @Override
     public void endContact(Contact contact) {
-        // TODO
+        GameObject first = (GameObject) contact.getFixtureA().getBody().getUserData();
+        GameObject second = (GameObject) contact.getFixtureB().getBody().getUserData();
+
+        if (first.isDead() || second.isDead()) {
+            return;
+        }
+
+        if (first instanceof AbilityObject) {
+            ((AbilityObject) first).endContact(second);
+        }
+        if (second instanceof AbilityObject) {
+            ((AbilityObject) second).endContact(first);
+        }
     }
 
     @Override

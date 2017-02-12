@@ -22,7 +22,6 @@ public abstract class DynamicObject extends GameObject {
         public static final String STAY = "Armature|Stay";
     }
 
-
     /**
      * It is public because it's safe to updatePhysics in almost any time.
      * And it allows to do stuff like <code>object.velocity.mulAdd(...)</code>.
@@ -31,10 +30,10 @@ public abstract class DynamicObject extends GameObject {
      */
     public final Vector2 velocity = new Vector2();
 
-
     // Appearance:
-    /** It is empty on server */
-    @Nullable protected final AnimationController animation;
+    /** It is null on server */
+    @Nullable
+    protected final AnimationController animation;
     protected float animationSpeed = 1f;
 
 
@@ -61,15 +60,14 @@ public abstract class DynamicObject extends GameObject {
     public final void setVelocity(float x, float y) { velocity.set(x, y); }
     public final void setVelocity(Vector2 newVelocity) { setVelocity(newVelocity.x, newVelocity.y); }
 
-    public void applyImpulse(float x, float y) {
+    public final void applyImpulse(float x, float y) {
         float mass = getMass();
         velocity.add(x / mass, y / mass);
     }
 
-    public void applyImpulse(Vector2 impulse) {
+    public final void applyImpulse(Vector2 impulse) {
         applyImpulse(impulse.x, impulse.y);
     }
-
 
     @Override
     public void updateGraphics(float delta) {
@@ -114,7 +112,7 @@ public abstract class DynamicObject extends GameObject {
         }
 
         @Override
-        public BodyDef.BodyType getBodyType() {
+        public final BodyDef.BodyType getBodyType() {
             return BodyDef.BodyType.DynamicBody;
         }
     }

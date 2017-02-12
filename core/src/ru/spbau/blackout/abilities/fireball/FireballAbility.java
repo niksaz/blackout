@@ -19,8 +19,8 @@ public final class FireballAbility extends SimpleShellAbility {
     static final float IMPULSE_FACTOR = 40f;
     static final float SHELL_RADIUS = 0.5f;
     static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;
-    static final float DAMAGE_INCREASE_PER_LEVEL = 10.0f;
-    static final float BASE_DAMAGE = 15.0f;
+    static final float DAMAGE_PER_LEVEL = 10.0f;
+    static final float BASE_DAMAGE = 25.0f;
 
     protected FireballAbility(Definition def, Character character) {
         super(def, character);
@@ -36,7 +36,6 @@ public final class FireballAbility extends SimpleShellAbility {
 
         @Override
         public Ability makeInstance(Character character) {
-            shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * getLevel();
             return new FireballAbility(this, character);
         }
 
@@ -48,5 +47,9 @@ public final class FireballAbility extends SimpleShellAbility {
         public String iconPath() { return ICON_PATH; }
         @Override
         protected float startSpeed() { return SHELL_START_SPEED; }
+        @Override
+        protected float baseDamage() { return BASE_DAMAGE; }
+        @Override
+        protected float damagePerLevel() { return DAMAGE_PER_LEVEL; }
     }
 }

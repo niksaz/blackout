@@ -33,6 +33,11 @@ public abstract class DynamicAbilityObject extends DynamicObject implements Abil
         body.setLinearVelocity(0, 0);
     }
 
+    @Override
+    public void beginContact(GameObject object) {}
+
+    @Override
+    public void endContact(GameObject object) {}
 
     public static abstract class Definition extends DynamicObject.Definition {
 

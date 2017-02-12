@@ -95,7 +95,7 @@ public abstract class Ability implements HasState {
             return level;
         }
 
-        public final void setLevel(int newLevel) {
+        public void setLevel(int newLevel) {
             level = newLevel;
         }
 

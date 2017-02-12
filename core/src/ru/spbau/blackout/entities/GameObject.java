@@ -39,7 +39,6 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
     public static final float RESTITUTION = 0.5f;
 
-
     protected final Body body;
     private float height;
 
@@ -95,7 +94,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
     }
 
     @Override
-    public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
+    public final void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
         if (modelInstance != null) {
             updateTransform();
             modelInstance.getRenderables(renderables, pool);
@@ -114,7 +113,6 @@ public abstract class GameObject implements RenderableProvider, HasState {
      * See <code>GameWorld</code> documentation.
      */
     public void updateState(float delta) {
-
     }
 
     /** See <code>GameWorld</code> documentation. */
@@ -127,7 +125,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
      * the mass is higher, the harder to move object by applying external force.
      * One thing which can be unexpected is that velocity itself isn't connected with mass.
      */
-    public void setMass(float newMass) {
+    public final void setMass(float newMass) {
         MassData massData = body.getMassData();
 
         float scaleFactor = newMass / massData.mass;
@@ -152,7 +150,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
         dispose();
     }
 
-    public boolean isDead() { return dead; }
+    public final boolean isDead() { return dead; }
 
     /**
      * Disposes all non-shared resources (like graphicEffects).
@@ -164,27 +162,26 @@ public abstract class GameObject implements RenderableProvider, HasState {
         }
     }
 
-
     /**
      * This function is necessary for better encapsulation.
      * I don't want anyone to access object's <code>Body</code> directly as well as I don't want anyone
      * to access <code>World</code> (which is a part of <code>GameWorld</code> class) directly.
      */
-    public void destroyBody(World world) {
+    public final void destroyBody(World world) {
         world.destroyBody(body);
     }
 
     // Transform:
 
-    public void setTransform(float x, float y, float angle) {
+    public final void setTransform(float x, float y, float angle) {
         body.setTransform(x, y, angle);
     }
 
-    public void setTransform(Vector2 position, float angle) {
+    public final void setTransform(Vector2 position, float angle) {
         body.setTransform(position, angle);
     }
 
-    protected void updateTransform() {
+    protected final void updateTransform() {
         if (modelInstance != null) {
             modelInstance.transform.setToRotationRad(Vector3.Z, body.getAngle());
             fixTop(modelInstance);
@@ -196,44 +193,44 @@ public abstract class GameObject implements RenderableProvider, HasState {
     // Rotation
 
     /** Set rotation in radians. */
-    public void setRotation(float angle) {
+    public final void setRotation(float angle) {
         Vector2 pos = getPosition();
         setTransform(pos.x, pos.y, angle);
     }
 
     /** Returns the current rotation in radians. */
-    public float getRotation() {
+    public final float getRotation() {
         return body.getAngle();
     }
 
     /** Rotates object to the given direction. */
-    public void setDirection(Vector2 direction) {
+    public final void setDirection(Vector2 direction) {
         setRotation(direction.angleRad());
     }
 
-    public Uid getUid() { return uid; }
+    public final Uid getUid() { return uid; }
 
-    public Vector2 getPosition() {
+    public final Vector2 getPosition() {
         return body.getPosition();
     }
 
-    public void setPosition(Vector2 position) {
+    public final void setPosition(Vector2 position) {
         setTransform(position, getRotation());
     }
 
-    public void setPosition(float x, float y) {
+    public final void setPosition(float x, float y) {
         setTransform(x, y, getRotation());
     }
 
     /**
      * Returns new Vector3 (so, it's safe to change this vector without changing unit's touchPos).
      */
-    public Vector3 get3dPosition() {
+    public final Vector3 get3dPosition() {
         Vector2 pos = getPosition();
         return new Vector3(pos.x, pos.y, getHeight());
     }
 
-    public void setHeight(float height) { this.height = height; }
+    public final void setHeight(float height) { this.height = height; }
     public final float getHeight() { return height; }
 
     public final float getMass() {
@@ -241,15 +238,15 @@ public abstract class GameObject implements RenderableProvider, HasState {
     }
 
 
-    public Vector3 getChestPivot() {
+    public final Vector3 getChestPivot() {
         return get3dPosition().add(def.chestPivotOffset);
     }
 
-    public Vector3 getOverHeadPivot() {
+    public final Vector3 getOverHeadPivot() {
         return get3dPosition().add(def.overHeadPivotOffset);
     }
 
-    public Definition getDef() {
+    public final Definition getDef() {
         return def;
     }
 
@@ -330,7 +327,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
             }
         }
 
-        public GameContext getContext() {
+        public final GameContext getContext() {
             return context;
         }
 
@@ -356,11 +353,11 @@ public abstract class GameObject implements RenderableProvider, HasState {
         /** Create an object at the giving touchPos. */
         public abstract GameObject makeInstance(Uid uid, float x, float y);
         /** Create an object at the giving touchPos. */
-        public GameObject makeInstance(Uid uid, Vector2 position) {
+        public final GameObject makeInstance(Uid uid, Vector2 position) {
             return makeInstance(uid, position.x, position.y);
         }
         /** Create an object at (0, 0). */
-        public GameObject makeInstance(Uid uid) {
+        public final GameObject makeInstance(Uid uid) {
             return makeInstance(uid, 0, 0);
         }
 
@@ -368,12 +365,12 @@ public abstract class GameObject implements RenderableProvider, HasState {
          * Creates new instance of the unit with nextUid.
          * Must be called only on <code>ServerGameWorld</code>
          */
-        public GameObject makeInstanceWithNextUid(float x, float y) {
+        public final GameObject makeInstanceWithNextUid(float x, float y) {
             return makeInstance(((ServerGameWorld) context.gameWorld()).uidGenerator.next(), x, y);
         }
 
         /** Create an object at the giving touchPos. */
-        public GameObject makeInstanceWithNextUid(Vector2 position) {
+        public final GameObject makeInstanceWithNextUid(Vector2 position) {
             return makeInstanceWithNextUid(position.x, position.y);
         }
 
@@ -393,11 +390,11 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
         public abstract BodyDef.BodyType getBodyType();
 
-        public int getDefNumber() {
+        public final int getDefNumber() {
             return defNumber;
         }
 
-        public void setDefNumber(int defNumber) {
+        public final void setDefNumber(int defNumber) {
             this.defNumber = defNumber;
         }
     }
