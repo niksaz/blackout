@@ -17,7 +17,7 @@ public class Decoration extends StaticObject {
         private static final long serialVersionUID = 1000000000L;
 
         public Definition(String modelPath, Creator<Shape> shapeCreator) {
-            super(modelPath, shapeCreator);
+            super(modelPath, shapeCreator, null);
         }
 
 

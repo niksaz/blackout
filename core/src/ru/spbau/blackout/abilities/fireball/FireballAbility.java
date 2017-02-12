@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.abilities.SimpleInstantAbility;
-import ru.spbau.blackout.abilities.AbilityObject;
+import ru.spbau.blackout.abilities.DynamicAbilityObject;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
 
@@ -39,7 +39,7 @@ public class FireballAbility extends SimpleInstantAbility {
         Vector2 unitPosition = getCharacter().getPosition();
         targetOffset.add(unitPosition);  // real target
         GameObject.Definition shellDef = ((Definition) getDef()).shellDef;
-        AbilityObject shell = (AbilityObject) shellDef.makeInstanceWithNextUid(targetOffset);
+        DynamicAbilityObject shell = (DynamicAbilityObject) shellDef.makeInstanceWithNextUid(targetOffset);
         targetOffset.sub(unitPosition);
 
         targetOffset.scl(SHELL_START_SPEED / targetOffset.len());  // start speed
@@ -51,15 +51,10 @@ public class FireballAbility extends SimpleInstantAbility {
 
         private static final long serialVersionUID = 1000000000L;
 
-        private final FireballObject.Definition shellDef;
+        private final FireballObject.Definition shellDef = new FireballObject.Definition();
 
         public Definition(int level) {
             super(level, ICON_PATH, NAME, MAX_CHARGE_TIME);
-            shellDef = new FireballObject.Definition();
-            shellDef.chestPivotOffset.set(0, 0, 1.5f);
-            System.out.println("WTF " + shellDef.chestPivotOffset);
-            shellDef.isSensor = true;
-            shellDef.timeToLive = TIME_TO_LIVE;
         }
 
         @Override

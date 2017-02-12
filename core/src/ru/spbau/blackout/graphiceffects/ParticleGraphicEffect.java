@@ -22,6 +22,7 @@ public class ParticleGraphicEffect implements GraphicEffect {
         this.object = object;
         this.effect = effect;
         this.effect.init();
+        this.effect.start();
         context.getParticleSystem().add(this.effect);
         this.updatePosition();
     }

@@ -21,6 +21,7 @@ public class ForceBlastAbility extends SimpleInstantAbility {
     static final float IMPULSE = 1200f;
     static final float BASE_DAMAGE = 15;
     static final float DAMAGE_INCREASE_PER_LEVEL = 3;
+    static final float EXPLOSION_TIME = 0.2f;
 
 
     protected ForceBlastAbility(Definition def, Character character) {
@@ -30,8 +31,9 @@ public class ForceBlastAbility extends SimpleInstantAbility {
     @Override
     public void cast(Vector2 targetOffset) {
         super.cast(targetOffset);
-        GameObject shell = ((Definition) getDef()).shellDef.makeInstanceWithNextUid(getCharacter().getPosition());
-        ((ForceBlastObject) shell).setCaster(getCharacter());
+        ForceBlastObject shell = (ForceBlastObject)
+                ((Definition) getDef()).shellDef.makeInstanceWithNextUid(getCharacter().getPosition());
+        shell.setCaster(getCharacter());
     }
 
     public static class Definition extends Ability.Definition {

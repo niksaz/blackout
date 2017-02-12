@@ -1,6 +1,5 @@
 package ru.spbau.blackout.abilities.fireball;
 
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 
 import java.io.IOException;
@@ -11,7 +10,7 @@ import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
-import ru.spbau.blackout.abilities.AbilityObject;
+import ru.spbau.blackout.abilities.DynamicAbilityObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
@@ -26,18 +25,19 @@ import static ru.spbau.blackout.abilities.fireball.FireballAbility.FIRE_EFFECT_P
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.IMPULSE_FACTOR;
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.SHELL_MASS;
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.SHELL_RADIUS;
+import static ru.spbau.blackout.abilities.fireball.FireballAbility.TIME_TO_LIVE;
 
 
-public final class FireballObject extends AbilityObject {
+public final class FireballObject extends DynamicAbilityObject {
 
-    private float timeRest;
+    private float timeToLive;
     private boolean shouldExplode = false;
 
 
     protected FireballObject(FireballObject.Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
 
-        timeRest = def.timeToLive;
+        timeToLive = def.timeToLive;
 
         if (def.fireEffect != null) {
             graphicEffects.add(new ParticleGraphicEffect(getDef().getContext(), this, def.fireEffect.copy()));
@@ -46,8 +46,6 @@ public final class FireballObject extends AbilityObject {
 
     @Override
     public void beginContact(GameObject object) {
-        super.beginContact(object);
-
         shouldExplode = true;
 
         if (object instanceof DynamicObject) {
@@ -67,8 +65,8 @@ public final class FireballObject extends AbilityObject {
     @Override
     public void updateState(float delta) {
         super.updateState(delta);
-        timeRest -= delta;
-        if (timeRest <= 0) {
+        timeToLive -= delta;
+        if (timeToLive <= 0) {
             kill();
         }
     }
@@ -103,7 +101,7 @@ public final class FireballObject extends AbilityObject {
     /**
      * Additionally defines timeToLive for an object.
      */
-    public static class Definition extends AbilityObject.Definition {
+    public static class Definition extends DynamicAbilityObject.Definition {
 
         private static final long serialVersionUID = 1000000000L;
 
@@ -118,6 +116,9 @@ public final class FireballObject extends AbilityObject {
         public Definition() {
             super(null, new CircleCreator(SHELL_RADIUS), null, CAST_SOUND_PATH);
             mass = SHELL_MASS;
+            chestPivotOffset.set(0, 0, 1.5f);
+            isSensor = true;
+            timeToLive = TIME_TO_LIVE;
         }
 
         @Override
@@ -125,7 +126,6 @@ public final class FireballObject extends AbilityObject {
             super.load(context);
             Particles.load(context, FIRE_EFFECT_PATH);
             Particles.load(context, EXPLOSION_EFFECT_PATH);
-            context.getAssets().load(CAST_SOUND_PATH, Sound.class);
         }
 
         @Override
