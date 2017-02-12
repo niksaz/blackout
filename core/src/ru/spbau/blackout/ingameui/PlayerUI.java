@@ -2,6 +2,7 @@ package ru.spbau.blackout.ingameui;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -27,10 +28,9 @@ public class PlayerUI extends IngameUI {
             new Vector2(1100, 150)
     };
 
-    /**
-     * Creates all UI elements and sets itself as input processor.
-     */
-    public PlayerUI(UIServer server) {
+    public PlayerUI(Stage stage, UIServer server) {
+        super(stage);
+
         addUiObject(new UnitControlStick(getStage(), server));
         addUiObject(new HealthBar(getStage()));
         addUiObject(new ExitButton(getStage()));

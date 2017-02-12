@@ -96,7 +96,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         this.uiServer = uiServer;
 
         loadingScreen = new LoadingScreen(sessionSettings);
-        ui = new PlayerUI(getUiServer());
+
+        Camera uiCamera = new OrthographicCamera(getWorldWidth(), getWorldHeight());
+        Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), uiCamera);
+        Stage stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
+        Gdx.input.setInputProcessor(stage);
+        ui = new PlayerUI(stage, getUiServer());
 
         // initializeGameWorld main camera
         camera = new PerspectiveCamera();
@@ -205,9 +210,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
     public void becomeObserver() {
         mainCharacter = null;
-        IngameUI previousUi = ui;
-        ui = new ObserverUI(previousUi, uiServer, camera);
-        previousUi.dispose();
+        ui.dispose();
+        ui = new ObserverUI(ui.getStage(), uiServer, camera);
         ui.load(this);
         assets.finishLoading();
         ui.doneLoading(this);

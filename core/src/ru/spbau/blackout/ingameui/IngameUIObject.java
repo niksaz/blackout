@@ -11,12 +11,14 @@ import java.util.Set;
 
 import ru.spbau.blackout.GameContext;
 
+import static ru.spbau.blackout.java8features.Functional.foreach;
+
 
 /**
  * Abstract class for all elements of in-game user interface.
  */
 public abstract class IngameUIObject {
-    private final Set<Actor> actors = new HashSet<>();
+    private final List<Actor> actors = new ArrayList<>();
     private final Stage stage;
 
     public IngameUIObject(Stage stage) {
@@ -39,12 +41,8 @@ public abstract class IngameUIObject {
     public void dispose() {
     }
 
-    public final void removeFromStage() {
-        for (Iterator<Actor> it = stage.getActors().iterator(); it.hasNext();) {
-            if (actors.contains(it.next())) {
-                it.remove();
-            }
-        }
+    public final void remove() {
+        foreach(actors, Actor::remove);
     }
 
     public Stage getStage() {

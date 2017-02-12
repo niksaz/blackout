@@ -120,27 +120,28 @@ public class Game extends Thread implements GameContext {
                             new DataInputStream(new ByteArrayInputStream(byteOutput.toByteArray()));
                     DatabaseAccessor.getInstance().handleUpdateFromInputStream(dataInput);
 
-                    double sum = 0.0;
                     int numberOfPlayers = clients.size();
 
                     // for testing purposes
                     if (numberOfPlayers > 1) {
-                        for (ClientHandler client : clients) {
-                            sum += client.getPlayerProfile().getRating();
+                        double[] rating = new double[numberOfPlayers];
+                        double[] q = new double[numberOfPlayers];
+                        double sum = 0;
+                        for (int i = 0; i < numberOfPlayers; i++) {
+                            rating[i] = clients.get(i).getPlayerProfile().getRating();
+                            q[i] = Math.pow(10.0, rating[i] / 400);
+                            sum += q[i];
                         }
 
-                        for (ClientHandler client : clients) {
-                            final double clientRating = client.getPlayerProfile().getRating();
-                            final double sumWithoutClient = sum - clientRating;
-                            final double averageRating = sumWithoutClient / (numberOfPlayers - 1);
-
+                        for (int i = 0; i < numberOfPlayers; i++) {
+                            final ClientHandler client = clients.get(i);
                             // Elo rating formula
-                            final double expectedScore =
-                                    1.0 / (1.0 + Math.pow(10.0, (averageRating - clientRating) / 400));
+                            final double expectedScore = q[i] / sum;
                             final double actualScore =
                                     clientHandlerWithAliveCharacter.getClientName().equals(client.getClientName())
                                             ? 1.0
                                             : 0.0;
+
                             final double clientRatingsChange = 40 * (actualScore - expectedScore);
 
                             final Query<PlayerProfile> playerProfileQuery =
