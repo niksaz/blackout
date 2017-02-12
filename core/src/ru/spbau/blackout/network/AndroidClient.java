@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.androidfeatures.PlayServices;
+import ru.spbau.blackout.database.ChangeablePlayerProfile;
 import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
@@ -259,7 +260,7 @@ public class AndroidClient implements Runnable, UIServer {
                     System.out.println(winnerName + " WON!");
                     final PlayServices playServices = BlackoutGame.get().playServicesInCore().getPlayServices();
                     if (winnerName.equals(playServices.getPlayerName())) {
-                        BlackoutGame.get().getPlayerEntity().changeGold(Database.COINS_PER_WIN);
+                        ChangeablePlayerProfile.loadPlayerEntity(null, null);
                         switch (players) {
                             case 2:
                                 playServices.unlockAchievement(playServices.getDuelistAchievementID());

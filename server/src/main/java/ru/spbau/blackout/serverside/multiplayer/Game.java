@@ -7,12 +7,16 @@ import com.badlogic.gdx.utils.Array;
 
 import org.mongodb.morphia.query.Query;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.network.AndroidClient.AbilityCast;
@@ -102,6 +106,19 @@ public class Game extends Thread implements GameContext {
                 gameWorld.updatePhysics(worldDeltaInSecs);
                 lastWorldUpdateTime = currentTime;
                 server.log("Updating gameWorld: " + worldDeltaInSecs);
+
+                if (aliveCharacters == 1 && !someoneWon) {
+                    final ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+                    final DataOutputStream dataOutput = new DataOutputStream(byteOutput);
+                    dataOutput.writeUTF(clientHandlerWithAliveCharacter.getClientName());
+                    dataOutput.writeUTF(Database.COINS_EARNED);
+                    dataOutput.writeInt(Database.COINS_PER_WIN);
+                    dataOutput.flush();
+
+                    final DataInputStream dataInput =
+                            new DataInputStream(new ByteArrayInputStream(byteOutput.toByteArray()));
+                    DatabaseAccessor.getInstance().handleUpdateFromInputStream(dataInput);
+                }
 
                 final byte[] worldInBytes = serializeWorld();
                 System.out.println("World size is " + worldInBytes.length);
