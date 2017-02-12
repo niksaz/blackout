@@ -37,6 +37,7 @@ public abstract class IngameUI {
         this();
         foreach(previous.uiObjects, IngameUIObject::removeFromStage);
         foreach(previous.stage.getActors(), this::addActor);
+        previous.stage.getActors().clear();
     }
 
     /**
@@ -73,8 +74,8 @@ public abstract class IngameUI {
     }
 
     public void dispose() {
-        stage.dispose();
         foreach(uiObjects, IngameUIObject::dispose);
+        stage.dispose();
     }
 
     public void addUiObject(IngameUIObject uiObject) {
