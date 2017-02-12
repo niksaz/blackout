@@ -11,6 +11,7 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicReference;
 
+import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.serverside.servers.RoomServer;
@@ -36,6 +37,7 @@ public class ClientHandler implements Runnable {
     private volatile Uid playerUid;
     private volatile Game game;
     private volatile GameState clientGameState = GameState.WAITING;
+    private volatile PlayerProfile playerProfile;
     private final AtomicReference<byte[]> worldInBytes = new AtomicReference<>();
     private final AtomicReference<Vector2> velocityFromClient = new AtomicReference<>();
     private final AtomicReference<AbilityCast> abilityCastFromClient = new AtomicReference<>();
@@ -112,6 +114,14 @@ public class ClientHandler implements Runnable {
         this.session = session;
         this.playerUid = playerUid;
         this.game = game;
+    }
+
+    void setPlayerProfile(PlayerProfile playerProfile) {
+        this.playerProfile = playerProfile;
+    }
+
+    PlayerProfile getPlayerProfile() {
+        return playerProfile;
     }
 
     synchronized void setWorldToSend(byte[] worldInBytes) {

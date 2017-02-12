@@ -18,7 +18,7 @@ public class PlayerProfile implements Serializable {
     private final String name;
     private int currentCoins;
     private int earnedCoins;
-    private int rating;
+    private double rating;
     private byte[] serializedDefinition;
     private volatile byte[] serializedSettings;
 
@@ -48,7 +48,7 @@ public class PlayerProfile implements Serializable {
              other.getSerializedDefinition(), other.getSerializedSettings());
     }
 
-    private PlayerProfile(String name, int currentCoins, int earnedCoins, int rating,
+    private PlayerProfile(String name, int currentCoins, int earnedCoins, double rating,
                           byte[] serializedDefinition, byte[] serializedSettings) {
         this.name = name;
         this.currentCoins = currentCoins;
@@ -66,7 +66,7 @@ public class PlayerProfile implements Serializable {
         return currentCoins;
     }
 
-    public int getRating() {
+    public double getRating() {
         return rating;
     }
 

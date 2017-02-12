@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -118,6 +119,46 @@ public class Game extends Thread implements GameContext {
                     final DataInputStream dataInput =
                             new DataInputStream(new ByteArrayInputStream(byteOutput.toByteArray()));
                     DatabaseAccessor.getInstance().handleUpdateFromInputStream(dataInput);
+
+                    double sum = 0.0;
+                    int numberOfPlayers = clients.size();
+
+                    // for testing purposes
+                    if (numberOfPlayers > 1) {
+                        for (ClientHandler client : clients) {
+                            sum += client.getPlayerProfile().getRating();
+                        }
+
+                        for (ClientHandler client : clients) {
+                            final double clientRating = client.getPlayerProfile().getRating();
+                            final double sumWithoutClient = sum - clientRating;
+                            final double averageRating = sumWithoutClient / (numberOfPlayers - 1);
+
+                            // Elo rating formula
+                            final double expectedScore =
+                                    1.0 / (1.0 + Math.pow(10.0, (averageRating - clientRating) / 400));
+                            final double actualScore =
+                                    clientHandlerWithAliveCharacter.getClientName().equals(client.getClientName())
+                                            ? 1.0
+                                            : 0.0;
+                            final double clientRatingsChange = 40 * (actualScore - expectedScore);
+
+                            final Query<PlayerProfile> playerProfileQuery =
+                                    DatabaseAccessor.getInstance().queryProfile(client.getClientName());
+                            final UpdateOperations<PlayerProfile> updateOperations =
+                                    DatabaseAccessor.getInstance().getDatastore()
+                                            .createUpdateOperations(PlayerProfile.class)
+                                            .inc("rating", clientRatingsChange);
+                            DatabaseAccessor.getInstance().performUpdate(playerProfileQuery, updateOperations);
+                        }
+                    }
+
+                    for (ClientHandler client : clients) {
+                        if (client.getClientGameState() != GameState.FINISHED) {
+                            client.setWinnerName(clientHandlerWithAliveCharacter.getClientName());
+                        }
+                    }
+                    someoneWon = true;
                 }
 
                 final byte[] worldInBytes = serializeWorld();
@@ -125,14 +166,7 @@ public class Game extends Thread implements GameContext {
                 for (ClientHandler client : clients) {
                     if (client.getClientGameState() != GameState.FINISHED) {
                         client.setWorldToSend(worldInBytes);
-                        if (aliveCharacters == 1 && !someoneWon) {
-                            client.setWinnerName(clientHandlerWithAliveCharacter.getClientName());
-                        }
                     }
-                }
-
-                if (aliveCharacters == 1 && !someoneWon) {
-                    someoneWon = true;
                 }
 
                 final long duration = timeLastIterationFinished - System.currentTimeMillis();
@@ -200,6 +234,7 @@ public class Game extends Thread implements GameContext {
                 throw new IllegalStateException();
             }
             final PlayerProfile playerProfile = result.get(0);
+            client.setPlayerProfile(playerProfile);
             heroes.add(playerProfile.getCharacterDefinition());
         }
 

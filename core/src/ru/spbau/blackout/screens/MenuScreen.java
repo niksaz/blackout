@@ -95,11 +95,18 @@ public class MenuScreen extends StageScreen {
                 Align.topLeft);
         stage.addActor(ratingImage);
 
-        final Label ratingLabel = addLabelWithTextAt(
-                String.valueOf(BlackoutGame.get().getPlayerEntity().getRating()),
-                CORNERS_MARGIN + squareIconSize + CORNERS_MARGIN,
-                stage.getViewport().getWorldHeight() - 2 * CORNERS_MARGIN - greetingsLabel.getHeight(),
-                Align.topLeft);
+        final Label ratingLabel = new Label("0", BlackoutGame.get().assets().getDefaultSkin()) {
+            @Override
+            public void act(float delta) {
+                setText(String.valueOf((int) BlackoutGame.get().getPlayerEntity().getRating()));
+                setSize(getPrefWidth(), getPrefHeight());
+                setPosition(
+                        CORNERS_MARGIN + squareIconSize + CORNERS_MARGIN,
+                        stage.getViewport().getWorldHeight() - 2 * CORNERS_MARGIN - greetingsLabel.getHeight(),
+                        Align.topLeft);
+                super.act(delta);
+            }
+        };
         stage.addActor(ratingLabel);
 
         final Array<Actor> playServicesIcons = addGooglePlayGamesServicesIcons();
