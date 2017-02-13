@@ -320,6 +320,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private final SimpleProgressBar progressBar =
                 new HorizontalProgressBar(LoadingProgressBar.PATH_EMPTY, LoadingProgressBar.PATH_FULL);
         private boolean loadingScreenLoaded = false;
+        private boolean waitingForOtherPlayers = false;
         private final SessionSettings sessionSettings;
 
         public LoadingScreen(SessionSettings sessionSettings) {
@@ -351,25 +352,27 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-            // do loading
-            boolean loaded = assets.update();
+            if (!waitingForOtherPlayers) {
+                // update loading
+                boolean loaded = assets.update();
 
-            if (loadingScreenLoaded) {
-                if (loaded) {
-                    // end loading
-                    doneLoading();
-                } else {
-                    // show loading getScreen
-                    float progress = assets.getProgress();
-                    progressBar.setValue(progress);
-                    stage.act();
-                    stage.draw();
+                if (loadingScreenLoaded) {
+                    if (loaded) {
+                        // end loading
+                        doneLoading();
+                    } else {
+                        // show loading screen
+                        float progress = assets.getProgress();
+                        progressBar.setValue(progress);
+                        stage.act();
+                        stage.draw();
+                    }
+                } else if (loaded) {
+                    // initialize loading screen and start loading real resources
+                    initializeLoadingScreen();
+                    loadRealResources();
+                    loadingScreenLoaded = true;
                 }
-            } else if (loaded) {
-                // initializeGameWorld loading getScreen and start loading real resources
-                initializeLoadingScreen();
-                loadRealResources();
-                loadingScreenLoaded = true;
             }
         }
 
@@ -432,13 +435,12 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             ui.doneLoading(GameScreen.this);
             GameScreen.this.doneLoading();
 
-            System.out.println("HELLO!!!!");
             // notifying uiServer that loading is done
             synchronized (uiServer) {
                 uiServer.notify();
             }
 
-            System.out.println("HELLO1111!!!!");
+            waitingForOtherPlayers = true;
         }
     }
 
