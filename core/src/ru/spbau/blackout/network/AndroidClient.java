@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.androidfeatures.PlayServices;
 import ru.spbau.blackout.database.ChangeablePlayerProfile;
-import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameUnit;
 import ru.spbau.blackout.screens.GameScreen;
@@ -166,6 +165,9 @@ public class AndroidClient implements Runnable, UIServer {
                     }
                     out.writeBoolean(!isInterrupted);
                     out.flush();
+
+                    isInterrupted = in.readBoolean();
+                    BlackoutGame.get().screenManager().disposeScreen();
 
                     break;
                 default:

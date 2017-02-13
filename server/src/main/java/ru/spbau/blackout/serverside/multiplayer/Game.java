@@ -283,6 +283,10 @@ public class Game extends Thread implements GameContext {
             } while (!everyoneIsReady);
         }
 
+        for (ClientHandler clientHandler : clients) {
+            clientHandler.notify();
+        }
+
         if (gameState != GameState.FINISHED) {
             gameState = GameState.IN_PROCESS;
         }

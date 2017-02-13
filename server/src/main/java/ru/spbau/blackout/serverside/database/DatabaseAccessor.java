@@ -54,7 +54,7 @@ public class DatabaseAccessor {
                 .equal(name);
     }
 
-        public <T> UpdateResults performUpdate(Query<T> query, UpdateOperations<T> updateOperations) {
+    public <T> UpdateResults performUpdate(Query<T> query, UpdateOperations<T> updateOperations) {
         return getDatastore()
                 .update(query, updateOperations);
     }

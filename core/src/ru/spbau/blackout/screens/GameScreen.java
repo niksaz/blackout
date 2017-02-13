@@ -432,12 +432,13 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             ui.doneLoading(GameScreen.this);
             GameScreen.this.doneLoading();
 
-            BlackoutGame.get().screenManager().disposeScreen();
-
+            System.out.println("HELLO!!!!");
             // notifying uiServer that loading is done
             synchronized (uiServer) {
                 uiServer.notify();
             }
+
+            System.out.println("HELLO1111!!!!");
         }
     }
 
