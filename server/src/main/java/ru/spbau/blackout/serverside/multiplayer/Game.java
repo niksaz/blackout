@@ -284,7 +284,10 @@ public class Game extends Thread implements GameContext {
         }
 
         for (ClientHandler clientHandler : clients) {
-            clientHandler.notify();
+            //noinspection SynchronizationOnLocalVariableOrMethodParameter
+            synchronized (clientHandler) {
+                clientHandler.notify();
+            }
         }
 
         if (gameState != GameState.FINISHED) {

@@ -166,7 +166,10 @@ public class AndroidClient implements Runnable, UIServer {
                     out.writeBoolean(!isInterrupted);
                     out.flush();
 
-                    isInterrupted = in.readBoolean();
+                    final boolean gameSuccessfullyStarted = in.readBoolean();
+                    if (!gameSuccessfullyStarted) {
+                        isInterrupted = true;
+                    }
                     BlackoutGame.get().screenManager().disposeScreen();
 
                     break;
