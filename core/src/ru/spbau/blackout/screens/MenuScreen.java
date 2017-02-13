@@ -196,15 +196,6 @@ public class MenuScreen extends StageScreen {
                 BlackoutGame.get().assets().getDefaultSkin(),
                 BLACKOUT_LABEL_STYLE_NAME);
         table.add(label).colspan(columns).pad(BLACKOUT_LABEL_BOTTOM_PADDING).row();
-
-        // FIXME: a way to get free gold. :)
-        label.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                BlackoutGame.get().getPlayerEntity().changeGold(50);
-            }
-        });
-
         return label;
     }
 

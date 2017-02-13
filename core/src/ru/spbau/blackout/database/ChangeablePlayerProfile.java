@@ -24,17 +24,6 @@ public class ChangeablePlayerProfile extends PlayerProfile {
         super(playerProfile);
     }
 
-    public void changeGold(int delta) {
-        startUpgradeRequest(
-                outputStream -> {
-                    outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
-                    outputStream.writeUTF(Database.COINS_EARNED);
-                    outputStream.writeInt(delta);
-                },
-                null
-        );
-    }
-
     public void upgradeHealth() {
         makeUpgradeRequest(
                 outputStream -> {
@@ -57,22 +46,10 @@ public class ChangeablePlayerProfile extends PlayerProfile {
     public void synchronizeGameSettings() {
         new Thread(() -> {
             try {
-                final String url = "http://" +
-                        Network.SERVER_IP_ADDRESS +
-                        ':' +
-                        Network.SERVER_HTTP_PORT_NUMBER +
-                        Database.SETTINGS_SYNCHRONIZE_COMMAND;
+                final HttpURLConnection connection =
+                        openHttpURLConnectionForServerCommand(Database.SETTINGS_SYNCHRONIZE_COMMAND);
 
-                final URL urlObject = new URL(url);
-                final HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
-
-                connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_MS);
-                connection.setReadTimeout(HTTP_READ_TIMEOUT_MS);
-
-                try (
-                        ObjectOutputStream outputStream = new ObjectOutputStream(connection.getOutputStream())
+                try (ObjectOutputStream outputStream = new ObjectOutputStream(connection.getOutputStream())
                 ) {
                     outputStream.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
                     outputStream.writeObject(getSerializedSettings());
@@ -98,28 +75,17 @@ public class ChangeablePlayerProfile extends PlayerProfile {
     private void startUpgradeRequest(RequestWriter requestWriter, Runnable ifSuccessful) {
         new Thread(() -> {
             try {
-                final String url = "http://" +
-                        Network.SERVER_IP_ADDRESS +
-                        ':' +
-                        Network.SERVER_HTTP_PORT_NUMBER +
-                        Database.UPGRADE_COMMAND;
+                final HttpURLConnection connection =
+                        openHttpURLConnectionForServerCommand(Database.UPGRADE_COMMAND);
 
-                final URL urlObject = new URL(url);
-                final HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
-
-                connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_MS);
-                connection.setReadTimeout(HTTP_READ_TIMEOUT_MS);
-
-                try (
-                        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
+                try (DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
                 ) {
                     requestWriter.writeRequest(outputStream);
                 }
 
                 final int responseCode = connection.getResponseCode();
-                System.out.println("Updating. " + connection.getRequestMethod() + " request to URL : " + url);
+                System.out.println(
+                        "Updating. " + connection.getRequestMethod() + " request to URL : " + connection.getURL());
                 System.out.println("Response Code : " + responseCode);
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -139,19 +105,8 @@ public class ChangeablePlayerProfile extends PlayerProfile {
             boolean loadSuccessfully = false;
             for (int attempt = 0; attempt < LOAD_REQUEST_MAX_ATTEMPTS; attempt++) {
                 try {
-                    final String url = "http://" +
-                            Network.SERVER_IP_ADDRESS +
-                            ':' +
-                            Network.SERVER_HTTP_PORT_NUMBER +
-                            Database.LOAD_COMMAND;
-
-                    final URL urlObject = new URL(url);
-                    final HttpURLConnection connection = (HttpURLConnection) urlObject.openConnection();
-                    connection.setRequestMethod("POST");
-                    connection.setDoOutput(true);
-
-                    connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_MS);
-                    connection.setReadTimeout(HTTP_READ_TIMEOUT_MS);
+                    final HttpURLConnection connection =
+                            openHttpURLConnectionForServerCommand(Database.LOAD_COMMAND);
 
                     try (DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream())
                     ) {
@@ -160,7 +115,8 @@ public class ChangeablePlayerProfile extends PlayerProfile {
 
                     final int responseCode = connection.getResponseCode();
                     final int responseLength = connection.getContentLength();
-                    System.out.println("Loading. " + connection.getRequestMethod() + " request to URL : " + url);
+                    System.out.println(
+                            "Loading. " + connection.getRequestMethod() + " request to URL : " + connection.getURL());
                     System.out.println("Response Code : " + responseCode);
                     System.out.println("Response Length : " + responseLength);
 
@@ -184,6 +140,25 @@ public class ChangeablePlayerProfile extends PlayerProfile {
                 runIfUnsuccessful.run();
             }
         }).start();
+    }
+
+    private static HttpURLConnection openHttpURLConnectionForServerCommand(String command) throws IOException {
+        final String urlString =
+                "http://" +
+                Network.SERVER_IP_ADDRESS +
+                ':' +
+                Network.SERVER_HTTP_PORT_NUMBER +
+                command;
+
+        final URL url = new URL(urlString);
+
+        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+        connection.setConnectTimeout(HTTP_CONNECT_TIMEOUT_MS);
+        connection.setReadTimeout(HTTP_READ_TIMEOUT_MS);
+
+        return connection;
     }
 
     @FunctionalInterface
