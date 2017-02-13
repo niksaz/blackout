@@ -319,7 +319,6 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         private final Stage stage;
         private final SimpleProgressBar progressBar =
                 new HorizontalProgressBar(LoadingProgressBar.PATH_EMPTY, LoadingProgressBar.PATH_FULL);
-        private boolean loadingScreenLoaded = false;
         private boolean waitingForOtherPlayers = false;
         private final SessionSettings sessionSettings;
 
@@ -339,52 +338,16 @@ public class GameScreen extends BlackoutScreen implements GameContext {
         @Override
         public void show() {
             super.show();
+
             // first of all, it loads its own resources.
             progressBar.load(assets);
             Textures.loadFast(BACKGROUND_IMAGE, assets);
-        }
+            assets.finishLoading(); // this part of loading is pretty fast
 
-        @Override
-        public void render(float delta) {
-            super.render(delta);
+            // start loading real resources
+            ui.load(GameScreen.this);
+            gameWorld().load(GameScreen.this);
 
-            // fill getScreen by gray color
-            Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-            if (!waitingForOtherPlayers) {
-                // update loading
-                boolean loaded = assets.update();
-
-                if (loadingScreenLoaded) {
-                    if (loaded) {
-                        // end loading
-                        doneLoading();
-                    } else {
-                        // show loading screen
-                        float progress = assets.getProgress();
-                        progressBar.setValue(progress);
-                        stage.act();
-                        stage.draw();
-                    }
-                } else if (loaded) {
-                    // initialize loading screen and start loading real resources
-                    initializeLoadingScreen();
-                    loadRealResources();
-                    loadingScreenLoaded = true;
-                }
-            }
-        }
-
-        @Override
-        public void dispose() {
-            super.dispose();
-            assets.unload(BACKGROUND_IMAGE);
-            assets.unload(LoadingProgressBar.PATH_EMPTY);
-            assets.unload(LoadingProgressBar.PATH_FULL);
-        }
-
-        private void initializeLoadingScreen() {
             // background image
             Texture backgroundTexture = assets.get(BACKGROUND_IMAGE, Texture.class);
             Image background = new Image(backgroundTexture);
@@ -402,12 +365,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                     BlackoutGame.get().assets().getFont(),
                     LoadingLabel.COLOR
             );
-            Label label = new Label(
-                    "Test: The pen name, Max Frei, was invented by Martynchik and Steopin for their works on" +
-                            "comic fantasy series Labyrinths of Echo (\"ЛабиринтыEхо\"). The plot follows the eponymous" +
-                            "narrator, sir Max, as he leaves our \"real\" world...",
-                    style
-            );
+            Label label = new Label("TODO: tips and tricks.", style);
             label.setPosition(LoadingLabel.MIN_X, LoadingLabel.MIN_Y);
             label.setSize(LoadingLabel.WIDTH, LoadingLabel.MAX_Y - LoadingLabel.MIN_Y);
             label.setAlignment(Align.center);
@@ -415,9 +373,32 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             stage.addActor(label);
         }
 
-        private void loadRealResources() {
-            ui.load(GameScreen.this);
-            gameWorld().load(GameScreen.this);
+        @Override
+        public void render(float delta) {
+            super.render(delta);
+
+            // fill getScreen by gray color
+            Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+            stage.act();
+            stage.draw();
+
+            if (!waitingForOtherPlayers) {
+                if (assets.update()) {
+                    doneLoading();
+                } else {
+                    progressBar.setValue(assets.getProgress());
+                }
+            }
+        }
+
+        @Override
+        public void dispose() {
+            super.dispose();
+            assets.unload(BACKGROUND_IMAGE);
+            assets.unload(LoadingProgressBar.PATH_EMPTY);
+            assets.unload(LoadingProgressBar.PATH_FULL);
         }
 
         private void doneLoading() {
