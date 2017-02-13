@@ -1,11 +1,10 @@
 package ru.spbau.blackout.utils;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 public class Uid implements Serializable {
 
-    private /*final*/ int uid;
+    private final int uid;
 
     public Uid(int uid) {
         this.uid = uid;
@@ -21,10 +20,8 @@ public class Uid implements Serializable {
         return uid;
     }
 
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-        out.writeInt(uid);
-    }
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        uid = in.readInt();
+    @Override
+    public String toString() {
+        return "#" + uid;
     }
 }

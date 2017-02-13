@@ -65,14 +65,16 @@ public abstract class GameObject implements RenderableProvider, HasState {
         body = def.registerObject(def.context, this);
         body.setUserData(this);
 
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = def.shapeCreator.create();
-        fixtureDef.density = 1f;
-        fixtureDef.friction = 0;
-        fixtureDef.restitution = RESTITUTION;
-        fixtureDef.isSensor = def.isSensor;
-        body.createFixture(fixtureDef);
-        fixtureDef.shape.dispose();
+        if (def.shapeCreator != null) {
+            FixtureDef fixtureDef = new FixtureDef();
+            fixtureDef.shape = def.shapeCreator.create();
+            fixtureDef.density = 1f;
+            fixtureDef.friction = 0;
+            fixtureDef.restitution = RESTITUTION;
+            fixtureDef.isSensor = def.isSensor;
+            body.createFixture(fixtureDef);
+            fixtureDef.shape.dispose();
+        }
 
         setPosition(x, y);
         setMass(def.mass);
@@ -276,11 +278,13 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
         /** Mass of an object in kg */
         public float mass = DEFAULT_MASS;
+
         /**
          * As far as Shape itself isn't serializable,
          * supplier will be sent instead.
          */
-        public Creator<Shape> shapeCreator;
+        @Nullable
+        private final Creator<Shape> shapeCreator;
 
         /** The loaded modelInstance object. Initialized by <code>initializeGameWorld</code> method. */
         @Nullable
@@ -306,7 +310,8 @@ public abstract class GameObject implements RenderableProvider, HasState {
          * <code>modelPath</code> can be <code>null</code>.
          * In this case objects created from this definition will not have models.
          */
-        public Definition(@Nullable String modelPath, Creator<Shape> shapeCreator, @Nullable String deathEffectPath) {
+        public Definition(@Nullable String modelPath, @Nullable Creator<Shape> shapeCreator,
+                          @Nullable String deathEffectPath) {
             this.modelPath = modelPath;
             this.shapeCreator = shapeCreator;
             this.deathEffectPath = deathEffectPath;

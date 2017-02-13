@@ -50,6 +50,12 @@ public abstract class SimpleShellAbility extends SimpleInstantAbility {
             this.shellDef = shellDef;
         }
 
+        @Override
+        public void updateLevel() {
+            super.updateLevel();
+            this.shellDef.damage = baseDamage() + damagePerLevel() * (getLevel() - 1);
+        }
+
         @Contract(pure = true)
         protected abstract float startSpeed();
         @Contract(pure = true)

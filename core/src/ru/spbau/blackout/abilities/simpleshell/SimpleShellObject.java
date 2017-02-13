@@ -1,11 +1,13 @@
 package ru.spbau.blackout.abilities.simpleshell;
 
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
+import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
 import ru.spbau.blackout.abilities.DynamicAbilityObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
+import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Uid;
 
@@ -54,8 +56,9 @@ public abstract class SimpleShellObject extends DynamicAbilityObject {
         private /*final*/ transient ParticleEffect liveEffect;
         public float damage;
 
-        public Definition(String modelPath, float radius, String deathEffect, String castSoundPath, float mass) {
-            super(modelPath, new CircleCreator(radius), deathEffect, castSoundPath);
+        public Definition(@Nullable String modelPath, @Nullable Creator<Shape> shapeCreator,
+                          @Nullable String deathEffect, @Nullable String castSoundPath, float mass) {
+            super(modelPath, shapeCreator, deathEffect, castSoundPath);
             this.mass = mass;
             chestPivotOffset.set(0, 0, 1.5f);
             isSensor = true;

@@ -50,8 +50,13 @@ public final class ForceBlastAbility extends SimpleInstantAbility {
         }
 
         @Override
-        public Ability makeInstance(Character character) {
-            shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * getLevel();
+        public void updateLevel() {
+            super.updateLevel();
+            shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * (getLevel() - 1);
+        }
+
+        @Override
+        protected Ability makeInstanceImpl(Character character) {
             return new ForceBlastAbility(this, character);
         }
 

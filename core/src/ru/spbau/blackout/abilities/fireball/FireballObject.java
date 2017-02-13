@@ -4,6 +4,7 @@ import ru.spbau.blackout.abilities.simpleshell.SimpleShellObject;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Uid;
 
 import static ru.spbau.blackout.abilities.fireball.FireballAbility.CAST_SOUND_PATH;
@@ -45,7 +46,7 @@ public final class FireballObject extends SimpleShellObject {
         private static final long serialVersionUID = 1000000000L;
 
         public Definition() {
-            super(null, SHELL_RADIUS, EXPLOSION_EFFECT_PATH, CAST_SOUND_PATH, SHELL_MASS);
+            super(null, new CircleCreator(SHELL_RADIUS), EXPLOSION_EFFECT_PATH, CAST_SOUND_PATH, SHELL_MASS);
         }
 
         @Override

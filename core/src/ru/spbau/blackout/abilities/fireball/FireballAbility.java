@@ -35,7 +35,11 @@ public final class FireballAbility extends SimpleShellAbility {
         }
 
         @Override
+<<<<<<< HEAD
+        protected Ability makeInstanceImpl(Character character) {
+=======
         public Ability makeInstance(Character character) {
+>>>>>>> 3749634... Gravity first version implemented
             return new FireballAbility(this, character);
         }
 

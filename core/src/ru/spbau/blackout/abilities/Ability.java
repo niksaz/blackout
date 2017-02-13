@@ -80,7 +80,7 @@ public abstract class Ability implements HasState {
         private /*final*/ transient GameContext context;
 
         public Definition(int level) {
-            setLevel(level);
+            this.level = level;
         }
 
         /** Load necessary assets. */
@@ -99,7 +99,17 @@ public abstract class Ability implements HasState {
             level = newLevel;
         }
 
-        public abstract Ability makeInstance(Character character);
+        /**
+         * Update all the stuff which is related with the level of the ability.
+         */
+        public void updateLevel() {}
+
+        protected abstract Ability makeInstanceImpl(Character character);
+
+        public final Ability makeInstance(Character character) {
+            updateLevel();
+            return makeInstanceImpl(character);
+        }
 
         public final void increaseLevel() {
             setLevel(getLevel() + 1);
