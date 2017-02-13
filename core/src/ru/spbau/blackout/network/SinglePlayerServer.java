@@ -20,4 +20,8 @@ public class SinglePlayerServer implements UIServer {
     public void sendAbilityCast(Character character, int abilityNum, Vector2 targetOffset) {
         Events.abilityCast(character, abilityNum, targetOffset);
     }
+
+    @Override
+    public void waitForOtherPlayers() {
+    }
 }

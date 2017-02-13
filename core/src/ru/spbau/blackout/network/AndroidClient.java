@@ -49,7 +49,10 @@ public class AndroidClient implements Runnable, UIServer {
     private volatile boolean isInterrupted = false;
     private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>();
     private final AtomicReference<AbilityCast> abilityToSend = new AtomicReference<>();
-    private GameScreen gameScreen;
+    private volatile GameScreen gameScreen;
+    private volatile ObjectInputStream in;
+    private volatile ObjectOutputStream out;
+
 
     public AndroidClient(MultiplayerTable table, int port, int players) {
         this.table = table;
@@ -64,6 +67,8 @@ public class AndroidClient implements Runnable, UIServer {
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
+            this.in = in;
+            this.out = out;
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             out.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
@@ -129,6 +134,26 @@ public class AndroidClient implements Runnable, UIServer {
         }
     }
 
+    @Override
+    public void waitForOtherPlayers() {
+        try {
+            out.writeBoolean(!isInterrupted);
+            out.flush();
+
+            final boolean gameSuccessfullyStarted = in.readBoolean();
+            if (!gameSuccessfullyStarted) {
+                isInterrupted = true;
+            }
+        } catch (IOException ignored) {
+            isInterrupted = true;
+        } finally {
+            // notifying uiServer that loading is done
+            synchronized (this) {
+                this.notify();
+            }
+        }
+    }
+
     private void gameStartWaiting(ObjectInputStream in, ObjectOutputStream out)
             throws IOException, ClassNotFoundException {
         GameState gameState;
@@ -149,8 +174,6 @@ public class AndroidClient implements Runnable, UIServer {
                     SessionSettings sessionSettings = (SessionSettings) in.readObject();
                     sessionSettings.setPlayerUid((Uid) in.readObject());
 
-                    // using the fact that AndroidClient is UIServer itself.
-                    // so synchronizing on server on loading
                     synchronized (this) {
                         Gdx.app.postRunnable(() -> {
                             final ClientGameWorld gameWorld = new ClientGameWorld(sessionSettings, this);
@@ -163,15 +186,6 @@ public class AndroidClient implements Runnable, UIServer {
                             isInterrupted = true;
                         }
                     }
-                    out.writeBoolean(!isInterrupted);
-                    out.flush();
-
-                    final boolean gameSuccessfullyStarted = in.readBoolean();
-                    if (!gameSuccessfullyStarted) {
-                        isInterrupted = true;
-                    }
-                    BlackoutGame.get().screenManager().disposeScreen();
-
                     break;
                 default:
                     break;
