@@ -15,7 +15,7 @@ public final class FireballAbility extends SimpleShellAbility {
     static final String NAME = "Fireball";
     static final String ICON_PATH = "abilities/fireball/icon.png";
     static final float MAX_CHARGE_TIME = 1f;
-    static final float SHELL_MASS = 5f;
+    static final float SHELL_MASS = 50f;
     static final float IMPULSE_FACTOR = 40f;
     static final float SHELL_RADIUS = 0.5f;
     static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;
@@ -35,11 +35,7 @@ public final class FireballAbility extends SimpleShellAbility {
         }
 
         @Override
-<<<<<<< HEAD
         protected Ability makeInstanceImpl(Character character) {
-=======
-        public Ability makeInstance(Character character) {
->>>>>>> 3749634... Gravity first version implemented
             return new FireballAbility(this, character);
         }
 

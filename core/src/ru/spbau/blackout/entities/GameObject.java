@@ -114,13 +114,12 @@ public abstract class GameObject implements RenderableProvider, HasState {
      * Update things which are not connected with physics and don't require fixed step.
      * See <code>GameWorld</code> documentation.
      */
-    public void updateState(float delta) {
-    }
+    public void updateState(float delta) {}
 
     /** See <code>GameWorld</code> documentation. */
-    public abstract void updateForFirstStep();
+    public void updateBeforeFirstStep() {}
     /** See <code>GameWorld</code> documentation. */
-    public abstract void updateForSecondStep();
+    public void updateBeforeSecondStep() {}
 
     /**
      * Sets mass of the object. It mainly works just like expected:

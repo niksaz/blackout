@@ -8,10 +8,9 @@ import java.io.ObjectOutputStream;
 import java.util.Iterator;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
-import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.utils.UidGenerator;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
@@ -53,14 +52,6 @@ public class ServerGameWorld extends GameWorld {
 
     @Override
     public void updatePhysics(float delta) {
-        for (Iterator<GameObject> it = getGameObjects().iterator(); it.hasNext();) {
-            GameObject object = it.next();
-            if (object.isDead()) {
-                removeDeadObject(object);
-                it.remove();
-            }
-        }
-
         accumulator += delta;
         while (accumulator >= WORLD_STEP) {
             step();
@@ -77,10 +68,28 @@ public class ServerGameWorld extends GameWorld {
             object.updateState(WORLD_STEP);
         }
 
-        foreach(getGameObjects(), GameObject::updateForFirstStep);
+        for (Iterator<GameObject> it = getGameObjects().iterator(); it.hasNext();) {
+            GameObject object = it.next();
+            if (object.isDead()) {
+                removeDeadObject(object);
+                it.remove();
+            }
+        }
+
+        for (GameObject go : getGameObjects()) {
+            go.updateBeforeFirstStep();
+            if (go instanceof DynamicObject) {
+                ((DynamicObject) go).prepareForFirstStep();
+            }
+        }
         this.box2dWorld.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 
-        foreach(getGameObjects(), GameObject::updateForSecondStep);
+        for (GameObject go : getGameObjects()) {
+            go.updateBeforeSecondStep();
+            if (go instanceof DynamicObject) {
+                ((DynamicObject) go).prepareForSecondStep();
+            }
+        }
         this.box2dWorld.step(WORLD_STEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
     }
 

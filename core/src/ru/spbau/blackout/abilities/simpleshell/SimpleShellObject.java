@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
 import ru.spbau.blackout.abilities.DynamicAbilityObject;
-import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Uid;
@@ -36,13 +35,6 @@ public abstract class SimpleShellObject extends DynamicAbilityObject {
         if (timeToLive <= 0) {
             kill();
         }
-    }
-
-
-    @Override
-    public void updateForSecondStep() {
-        super.updateForSecondStep();
-
     }
 
     /**

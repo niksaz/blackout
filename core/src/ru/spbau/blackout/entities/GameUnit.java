@@ -8,11 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Arrays;
-import java.util.List;
 
-import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.utils.Utils;
@@ -52,20 +48,19 @@ public abstract class GameUnit extends DynamicObject {
     }
 
     @Override
-    public void updateForFirstStep() {
+    public void updateBeforeFirstStep() {
         // apply friction
         if (!Utils.isZeroVec(velocity)){
             float k = 1f - (getMass() * LINEAR_FRICTION) / velocity.len();
             if (k < 0) k = 0;
             velocity.scl(k);
         }
-        super.updateForFirstStep();
     }
 
     /** See <code>GameWorld</code> documentation */
     @Override
-    public void updateForSecondStep() {
-        super.updateForSecondStep();
+    public void updateBeforeSecondStep() {
+        super.updateBeforeSecondStep();
 
         // Resistance to external velocity by unit (selfVelocity)
         if (!Utils.isZeroVec(velocity)) {
@@ -80,7 +75,7 @@ public abstract class GameUnit extends DynamicObject {
             velocity.mulAdd(velocity, k);
         }
 
-        body.setLinearVelocity(selfVelocity.x * speed, selfVelocity.y * speed);
+        temporaryVelocity.add(selfVelocity.x * speed, selfVelocity.y * speed);
     }
 
     public final synchronized Vector2 getSelfVelocity() {

@@ -29,6 +29,7 @@ public abstract class DynamicObject extends GameObject {
      * <code>selfVelocity</code> from <code>GameUnit</code>.
      */
     public final Vector2 velocity = new Vector2();
+    public final Vector2 temporaryVelocity = new Vector2();
 
     // Appearance:
     /** It is null on server */
@@ -56,9 +57,9 @@ public abstract class DynamicObject extends GameObject {
         body.setLinearVelocity(Vector2.Zero);
     }
 
-    public final Vector2 getVelocity() { return velocity; }
-    public final void setVelocity(float x, float y) { velocity.set(x, y); }
-    public final void setVelocity(Vector2 newVelocity) { setVelocity(newVelocity.x, newVelocity.y); }
+//    public final Vector2 getVelocity() { return new Vector2(velocity); }
+//    public final void setVelocity(float x, float y) { velocity.set(x, y); }
+//    public final void setVelocity(Vector2 newVelocity) { setVelocity(newVelocity.x, newVelocity.y); }
 
     public final void applyImpulse(float x, float y) {
         float mass = getMass();
@@ -69,6 +70,15 @@ public abstract class DynamicObject extends GameObject {
         applyImpulse(impulse.x, impulse.y);
     }
 
+    public final void applyTemporaryImpulse(float x, float y) {
+        float mass = getMass();
+        temporaryVelocity.add(x / mass, y / mass);
+    }
+
+    public final void applyTemporaryImpulse(Vector2 impulse) {
+        applyTemporaryImpulse(impulse.x, impulse.y);
+    }
+
     @Override
     public void updateGraphics(float delta) {
         super.updateGraphics(delta);
@@ -77,16 +87,16 @@ public abstract class DynamicObject extends GameObject {
         }
     }
 
-    @Override
-    public void updateForFirstStep() {
+    public final void prepareForFirstStep() {
         body.setLinearVelocity(velocity);
         // to take into account velocity changes during the step
         velocity.set(0, 0);
     }
 
-    @Override
-    public void updateForSecondStep() {
+    public final void prepareForSecondStep() {
         velocity.add(body.getLinearVelocity());
+        body.setLinearVelocity(temporaryVelocity);
+        temporaryVelocity.set(0, 0);
     }
 
     @Override
