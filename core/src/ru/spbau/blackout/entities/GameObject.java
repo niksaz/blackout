@@ -49,7 +49,8 @@ public abstract class GameObject implements RenderableProvider, HasState {
     private boolean dead = false;
     private final GameObject.Definition def;
     private final Uid uid;
-
+    /** Is used to rotate modelInstance inside <code>updateModelPosition</code> method; */
+    private float lastRotation = 0;
 
     /**
      * Constructs defined object at the given touchPos.
@@ -59,7 +60,8 @@ public abstract class GameObject implements RenderableProvider, HasState {
         this.uid = uid;
 
         if (def.model != null) {
-            modelInstance = new ModelInstance(def.model);
+            modelInstance = new ModelInstance(def.model);;
+            fixTop(modelInstance);
         }
 
         body = def.registerObject(def.context, this);
@@ -80,6 +82,11 @@ public abstract class GameObject implements RenderableProvider, HasState {
         setMass(def.mass);
     }
 
+    @Nullable
+    public final ModelInstance getModelInstance() {
+        return modelInstance;
+    }
+
     @Override
     public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeFloat(height);
@@ -98,7 +105,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
     @Override
     public final void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
         if (modelInstance != null) {
-            updateTransform();
+            updateModelPosition();
             modelInstance.getRenderables(renderables, pool);
         }
     }
@@ -182,11 +189,12 @@ public abstract class GameObject implements RenderableProvider, HasState {
         body.setTransform(position, angle);
     }
 
-    protected final void updateTransform() {
+    private void updateModelPosition() {
         if (modelInstance != null) {
-            modelInstance.transform.setToRotationRad(Vector3.Z, body.getAngle());
-            fixTop(modelInstance);
-            Vector2 pos = body.getPosition();
+            float newRotation = getRotation();
+            modelInstance.transform.rotateRad(Vector3.Y, newRotation - lastRotation);
+            lastRotation = newRotation;
+            Vector2 pos = getPosition();
             modelInstance.transform.setTranslation(pos.x, pos.y, height);
         }
     }

@@ -1,5 +1,6 @@
 package ru.spbau.blackout.graphiceffects;
 
+import com.badlogic.gdx.graphics.g3d.particles.ParticleController;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Matrix4;
 
@@ -24,23 +25,23 @@ public class ParticleGraphicEffect implements GraphicEffect {
         this.effect.init();
         this.effect.start();
         context.getParticleSystem().add(this.effect);
-        this.updatePosition();
+        updatePosition();
     }
 
     @Override
     public void update(float deltaTime) {
-        this.updatePosition();
+        updatePosition();
     }
 
     public void updatePosition() {
-        this.tmpMatrix.idt();
-        this.tmpMatrix.translate(this.object.getChestPivot());
-        this.effect.setTransform(this.tmpMatrix);
+        tmpMatrix.idt();
+        tmpMatrix.translate(object.getChestPivot());
+        effect.setTransform(this.tmpMatrix);
     }
 
     @Override
     public void remove(GameContext context) {
-        context.getParticleSystem().remove(this.effect);
-        this.effect.dispose();
+        context.getParticleSystem().remove(effect);
+        effect.dispose();
     }
 }

@@ -1,5 +1,6 @@
 package ru.spbau.blackout.abilities.forceblast;
 
+import com.badlogic.gdx.graphics.g3d.particles.ParticleController;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
 

@@ -7,15 +7,15 @@ import ru.spbau.blackout.entities.Character;
 public final class FireballAbility extends SimpleShellAbility {
 
     static final String CAST_SOUND_PATH = "sounds/fire.ogg";
-    static final String FIRE_EFFECT_PATH = "abilities/fireball/particles/fireball.pfx";
+    static final String FIRE_EFFECT_PATH = "effects/fireball/fireball.pfx";
     static final String EXPLOSION_EFFECT_PATH = "effects/small_explosion/small_explosion.pfx";
     /** The estimated distance of the ability in case of no external force. */
     static final float DISTANCE = 12f;
-    static final float SHELL_START_SPEED = 30f;
+    static final float SHELL_START_SPEED = 25f;
     static final String NAME = "Fireball";
     static final String ICON_PATH = "abilities/fireball/icon.png";
     static final float MAX_CHARGE_TIME = 1f;
-    static final float SHELL_MASS = 50f;
+    static final float SHELL_MASS = 20f;
     static final float IMPULSE_FACTOR = 40f;
     static final float SHELL_RADIUS = 0.5f;
     static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;

@@ -2,8 +2,6 @@ package ru.spbau.blackout.abilities.gravity;
 
 import com.badlogic.gdx.math.Vector2;
 
-import java.io.Serializable;
-
 import ru.spbau.blackout.abilities.simpleshell.SimpleShellObject;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
@@ -61,7 +59,7 @@ public final class GravityObject extends SimpleShellObject {
         return Math.max(0f, 1f - distance / RADIUS);
     }
 
-    public static final class Definition extends SimpleShellObject.Definition implements Serializable {
+    public static final class Definition extends SimpleShellObject.Definition {
 
         public float maxForce;
         public transient GameObject caster;
