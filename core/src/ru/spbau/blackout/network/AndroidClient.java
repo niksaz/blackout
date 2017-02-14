@@ -31,6 +31,7 @@ import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.worlds.ClientGameWorld;
 
+import static java.lang.Thread.sleep;
 import static ru.spbau.blackout.BlackoutGame.DIALOG_PADDING;
 
 /**
@@ -222,6 +223,14 @@ public class AndroidClient implements Runnable, UIServer {
                         velocityDatagram.setData(byteArray);
                         velocityDatagram.setLength(byteArray.length);
                         datagramSocket.send(velocityDatagram);
+
+                        try {
+                            sleep(Network.TIME_SHOULD_BE_SPENT_IN_ITERATION);
+                        } catch (InterruptedException e) {
+                            isInterrupted = true;
+                            e.printStackTrace();
+                        }
+
                     } catch (IOException e) {
                         e.printStackTrace();
                         isInterrupted = true;
