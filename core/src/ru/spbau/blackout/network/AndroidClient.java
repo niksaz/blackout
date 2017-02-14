@@ -212,10 +212,9 @@ public class AndroidClient implements Runnable, UIServer {
 
             while (!isInterrupted) {
                 if (velocityToSend.get() != null) {
-                    try (
-                            ByteArrayOutputStream velocityByteStream =
-                                    new ByteArrayOutputStream(Network.DATAGRAM_VELOCITY_PACKET_SIZE);
-                            ObjectOutputStream velocityObjectStream = new ObjectOutputStream(velocityByteStream)
+                    try (ByteArrayOutputStream velocityByteStream =
+                                 new ByteArrayOutputStream(Network.DATAGRAM_VELOCITY_PACKET_SIZE);
+                         ObjectOutputStream velocityObjectStream = new ObjectOutputStream(velocityByteStream)
                     ) {
                         velocityObjectStream.writeObject(velocityToSend.getAndSet(null));
                         velocityObjectStream.flush();
@@ -231,9 +230,9 @@ public class AndroidClient implements Runnable, UIServer {
                     synchronized (velocityToSend) {
                         if (velocityToSend.get() == null) {
                             try {
-                                // setting timeout because if client not responding in SOCKET_IO_TIMEOUT_MS
+                                // setting timeout because if a client not responding in SOCKET_IO_TIMEOUT_MS
                                 // he will be disconnected
-                                velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 2);
+                                velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 8);
                                 if (velocityToSend.get() == null) {
                                     velocityToSend.set(new Vector2());
                                 }
