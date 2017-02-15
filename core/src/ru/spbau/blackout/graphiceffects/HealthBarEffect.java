@@ -13,32 +13,38 @@ import ru.spbau.blackout.units.Vpx;
  * A small red health bar under the head of the character.
  * This effect needs to be loaded.
  */
-public class HealthBarEffect implements GraphicEffect {
+public final class HealthBarEffect extends GraphicEffect {
+
     private final Character character;
     private final SimpleProgressBar healthBar;
     private final Camera camera;
 
+    public static void create(Character character, SimpleProgressBar healthBar, GameContext context) {
+        character.addGraphicEffect(new HealthBarEffect(character, healthBar, context));
+    }
 
-    public HealthBarEffect(Character character, SimpleProgressBar healthBar, GameContext context) {
+    private HealthBarEffect(Character character, SimpleProgressBar healthBar, GameContext context) {
+        super(character);
         this.character = character;
         this.healthBar = healthBar;
-        this.camera = context.getScreen().getCamera();
+        camera = context.getScreen().getCamera();
     }
 
     @Override
     public void update(float deltaTime) {
-        this.healthBar.setValue(this.character.getHealth() / this.character.getMaxHealth());
+        healthBar.setValue(character.getHealth() / character.getMaxHealth());
 
-        Vector3 realPos = camera.project(this.character.getOverHeadPivot());
+        Vector3 realPos = camera.project(character.getOverHeadPivot());
 
-        this.healthBar.setPosition(
-                Vpx.fromRpx(realPos.x) - this.healthBar.getWidth() / 2,
+        healthBar.setPosition(
+                Vpx.fromRpx(realPos.x) - healthBar.getWidth() / 2,
                 Vpx.fromRpx(realPos.y)
         );
     }
 
     @Override
-    public void remove(GameContext context) {
-        this.healthBar.remove();
+    public void dispose(GameContext context) {
+        super.remove(context);
+        healthBar.remove();
     }
 }

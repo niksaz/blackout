@@ -1,10 +1,8 @@
 package ru.spbau.blackout.graphiceffects;
 
-import com.badlogic.gdx.graphics.g3d.particles.ParticleController;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Matrix4;
 
-import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.GameObject;
 
@@ -12,15 +10,17 @@ import ru.spbau.blackout.entities.GameObject;
 /**
  * <code>GraphicEffect</code> which attaches a <code>ParticleEffect</code> to an object.
  */
-public class ParticleGraphicEffect implements GraphicEffect {
+public final class ParticleGraphicEffect extends GraphicEffect {
 
     private final ParticleEffect effect;
     private final Matrix4 tmpMatrix = new Matrix4();
-    private final GameObject object;
 
+    public static void create(GameObject object, ParticleEffect effect, GameContext context) {
+        object.addGraphicEffect(new ParticleGraphicEffect(object, effect, context));
+    }
 
-    public ParticleGraphicEffect(GameContext context, GameObject object, ParticleEffect effect) {
-        this.object = object;
+    private ParticleGraphicEffect(GameObject gameObject, ParticleEffect effect, GameContext context) {
+        super(gameObject);
         this.effect = effect;
         this.effect.init();
         this.effect.start();
@@ -35,13 +35,14 @@ public class ParticleGraphicEffect implements GraphicEffect {
 
     public void updatePosition() {
         tmpMatrix.idt();
-        tmpMatrix.translate(object.getChestPivot());
+        tmpMatrix.translate(gameObject.getChestPivot());
         effect.setTransform(this.tmpMatrix);
     }
 
     @Override
-    public void remove(GameContext context) {
-        context.getParticleSystem().remove(effect);
+    public void dispose(GameContext context) {
+        super.dispose(context);
         effect.dispose();
+        context.getParticleSystem().remove(effect);
     }
 }

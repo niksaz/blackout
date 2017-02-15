@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphiceffects.GraphicEffect;
@@ -44,7 +46,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
     /** Equals to Optional.empty() on a server or if the object is dead. */
     @Nullable protected ModelInstance modelInstance;
-    public final Array<GraphicEffect> graphicEffects = new Array<>();
+    private final Set<GraphicEffect> graphicEffects = new HashSet<>();
 
     private boolean dead = false;
     private final GameObject.Definition def;
@@ -166,7 +168,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
      */
     public void dispose() {
         for (GraphicEffect effect : graphicEffects) {
-            effect.remove(def.getContext());
+            effect.dispose(def.getContext());
         }
     }
 
@@ -196,6 +198,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
             lastRotation = newRotation;
             Vector2 pos = getPosition();
             modelInstance.transform.setTranslation(pos.x, pos.y, height);
+            modelInstance.calculateTransforms();
         }
     }
 
@@ -259,6 +262,13 @@ public abstract class GameObject implements RenderableProvider, HasState {
         return def;
     }
 
+    public final void addGraphicEffect(GraphicEffect effect) {
+        graphicEffects.add(effect);
+    }
+
+    public final Set<GraphicEffect> getGraphicEffects() {
+        return graphicEffects;
+    }
 
     /**
      * Used to send via network a definition of an object to create.

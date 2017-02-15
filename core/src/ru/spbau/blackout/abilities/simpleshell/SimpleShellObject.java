@@ -24,7 +24,7 @@ public abstract class SimpleShellObject extends DynamicAbilityObject {
         timeToLive = def.timeToLive();
 
         if (def.liveEffect != null) {
-            graphicEffects.add(new ParticleGraphicEffect(getDef().getContext(), this, def.liveEffect.copy()));
+            ParticleGraphicEffect.create(this, def.liveEffect.copy(), getDef().getContext());
         }
     }
 

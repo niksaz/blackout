@@ -16,12 +16,17 @@ public final class ForceBlastAbility extends SimpleInstantAbility {
     static final String EXPLOSION_EFFECT_PATH = "effects/small_explosion/small_explosion.pfx";
     static final String ICON_PATH = "abilities/force_blast/icon.png";
     static final String NAME = "Force Blast";
+    static final String MODEL_PATH = "models/force_blast/force_blast.g3db";
     static final float MAX_CHARGE_TIME = 1.5f;
     static final float RADIUS = 2.5f;
     static final float IMPULSE = 1200f;
     static final float BASE_DAMAGE = 15;
     static final float DAMAGE_INCREASE_PER_LEVEL = 3;
+    static final float MIN_SCALE = 0.1f;
+    static final float MAX_SCALE = 1f;
+    static final float SCALE_TIME = 0.1f;
     static final float EXPLOSION_TIME = 0.2f;
+
 
 
     protected ForceBlastAbility(Definition def, Character character) {

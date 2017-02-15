@@ -1,6 +1,5 @@
 package ru.spbau.blackout.abilities.forceblast;
 
-import com.badlogic.gdx.graphics.g3d.particles.ParticleController;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Vector2;
 
@@ -15,7 +14,7 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
+import ru.spbau.blackout.graphiceffects.GradualScaleEffect;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Uid;
@@ -24,7 +23,11 @@ import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.CAST_SOUN
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.EXPLOSION_EFFECT_PATH;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.EXPLOSION_TIME;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.IMPULSE;
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.MAX_SCALE;
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.MIN_SCALE;
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.MODEL_PATH;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.RADIUS;
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.SCALE_TIME;
 
 
 public final class ForceBlastObject extends StaticAbilityObject {
@@ -35,12 +38,11 @@ public final class ForceBlastObject extends StaticAbilityObject {
     protected ForceBlastObject(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
 
-        if (def.explosionEffect != null) {
-            graphicEffects.add(new ParticleGraphicEffect(getDef().getContext(), this, def.explosionEffect.copy()));
-        }
+        GradualScaleEffect.create(this, MIN_SCALE, MAX_SCALE, SCALE_TIME);
     }
 
     void setCaster(Character caster) {
+        setHeight(caster.getChestPivot().z);
         damaged.add(caster);  // do not damage caster
     }
 
@@ -80,7 +82,7 @@ public final class ForceBlastObject extends StaticAbilityObject {
 
 
         public Definition() {
-            super(null, new CircleCreator(RADIUS), null, CAST_SOUND_PATH);
+            super(MODEL_PATH, new CircleCreator(RADIUS), null, CAST_SOUND_PATH);
         }
 
         public void load(GameContext context) {
