@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.utils.Utils;
 
 public final class GradualScaleEffect extends GraphicEffect {
 
@@ -29,8 +30,10 @@ public final class GradualScaleEffect extends GraphicEffect {
 
     @Override
     public void update(float deltaTime) {
-        time = Math.min(time + deltaTime, duration);
-        updateScale();
+        if (!Utils.floatEq(time, duration)) {
+            time = Math.min(time + deltaTime, duration);
+            updateScale();
+        }
     }
 
     private void updateScale() {

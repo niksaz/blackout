@@ -24,10 +24,10 @@ public final class ForceBlastAbility extends SimpleInstantAbility {
     static final float DAMAGE_INCREASE_PER_LEVEL = 3;
     static final float MIN_SCALE = 0.1f;
     static final float MAX_SCALE = 1f;
-    static final float SCALE_TIME = 0.1f;
-    static final float EXPLOSION_TIME = 0.2f;
-
-
+    static final float SCALE_TIME = 0.15f;
+    static final float EXPLOSION_TIME = 0.25f;
+    static final float BACK_SCALE_TIME = 0.05f;
+    static final float ROTATION_SPEED = 10f;
 
     protected ForceBlastAbility(Definition def, Character character) {
         super(def, character);

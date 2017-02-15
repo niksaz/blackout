@@ -20,7 +20,7 @@ public final class HealthBarEffect extends GraphicEffect {
     private final Camera camera;
 
     public static void create(Character character, SimpleProgressBar healthBar, GameContext context) {
-        character.addGraphicEffect(new HealthBarEffect(character, healthBar, context));
+        character.getGraphicEffects().add(new HealthBarEffect(character, healthBar, context));
     }
 
     private HealthBarEffect(Character character, SimpleProgressBar healthBar, GameContext context) {
@@ -43,8 +43,8 @@ public final class HealthBarEffect extends GraphicEffect {
     }
 
     @Override
-    public void dispose(GameContext context) {
-        super.remove(context);
+    public void dispose() {
+        super.remove();
         healthBar.remove();
     }
 }

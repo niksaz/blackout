@@ -12,16 +12,16 @@ public abstract class GraphicEffect {
 
     protected final GameObject gameObject;
 
-    public GraphicEffect(GameObject gameObject) {
+    protected GraphicEffect(GameObject gameObject) {
         this.gameObject = gameObject;
     }
 
-    public final void remove(GameContext context) {
+    public final void remove() {
         gameObject.getGraphicEffects().remove(this);
-        dispose(context);
+        dispose();
     }
 
-    public void dispose(GameContext context) {}
+    public void dispose() {}
 
     public abstract void update(float deltaTime);
 }

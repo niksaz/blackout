@@ -168,7 +168,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
      */
     public void dispose() {
         for (GraphicEffect effect : graphicEffects) {
-            effect.dispose(def.getContext());
+            effect.dispose();
         }
     }
 
@@ -208,6 +208,10 @@ public abstract class GameObject implements RenderableProvider, HasState {
     public final void setRotation(float angle) {
         Vector2 pos = getPosition();
         setTransform(pos.x, pos.y, angle);
+    }
+
+    public final void rotate(float angle) {
+        setRotation(getRotation() + angle);
     }
 
     /** Returns the current rotation in radians. */
@@ -260,10 +264,6 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
     public final Definition getDef() {
         return def;
-    }
-
-    public final void addGraphicEffect(GraphicEffect effect) {
-        graphicEffects.add(effect);
     }
 
     public final Set<GraphicEffect> getGraphicEffects() {

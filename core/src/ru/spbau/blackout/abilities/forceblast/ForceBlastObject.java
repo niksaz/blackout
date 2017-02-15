@@ -15,10 +15,12 @@ import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.graphiceffects.GradualScaleEffect;
+import ru.spbau.blackout.graphiceffects.RotationEffect;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Uid;
 
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.BACK_SCALE_TIME;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.CAST_SOUND_PATH;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.EXPLOSION_EFFECT_PATH;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.EXPLOSION_TIME;
@@ -27,6 +29,7 @@ import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.MAX_SCALE
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.MIN_SCALE;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.MODEL_PATH;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.RADIUS;
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.ROTATION_SPEED;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.SCALE_TIME;
 
 
@@ -34,11 +37,13 @@ public final class ForceBlastObject extends StaticAbilityObject {
 
     private final Set<GameObject> damaged = new HashSet<>();
     private float timeToLive = EXPLOSION_TIME;
+    private boolean done = false;
 
     protected ForceBlastObject(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
 
         GradualScaleEffect.create(this, MIN_SCALE, MAX_SCALE, SCALE_TIME);
+        RotationEffect.create(this, ROTATION_SPEED);
     }
 
     void setCaster(Character caster) {
@@ -48,7 +53,7 @@ public final class ForceBlastObject extends StaticAbilityObject {
 
     @Override
     public void beginContact(GameObject go) {
-        if (!damaged.contains(go)) {
+        if (!done && !damaged.contains(go)) {
             damaged.add(go);
 
             if (go instanceof DynamicObject) {
@@ -68,7 +73,13 @@ public final class ForceBlastObject extends StaticAbilityObject {
         super.updateState(delta);
         timeToLive -= delta;
         if (timeToLive <= 0) {
-            kill();
+            if (!done) {
+                done = true;
+                GradualScaleEffect.create(this, MAX_SCALE, MIN_SCALE, BACK_SCALE_TIME);
+                timeToLive = BACK_SCALE_TIME;
+            } else {
+                kill();
+            }
         }
     }
 

@@ -16,7 +16,7 @@ public final class ParticleGraphicEffect extends GraphicEffect {
     private final Matrix4 tmpMatrix = new Matrix4();
 
     public static void create(GameObject object, ParticleEffect effect, GameContext context) {
-        object.addGraphicEffect(new ParticleGraphicEffect(object, effect, context));
+        object.getGraphicEffects().add(new ParticleGraphicEffect(object, effect, context));
     }
 
     private ParticleGraphicEffect(GameObject gameObject, ParticleEffect effect, GameContext context) {
@@ -40,9 +40,9 @@ public final class ParticleGraphicEffect extends GraphicEffect {
     }
 
     @Override
-    public void dispose(GameContext context) {
-        super.dispose(context);
+    public void dispose() {
+        super.dispose();
         effect.dispose();
-        context.getParticleSystem().remove(effect);
+        gameObject.getDef().getContext().getParticleSystem().remove(effect);
     }
 }
