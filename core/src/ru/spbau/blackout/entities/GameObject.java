@@ -26,7 +26,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.graphiceffects.GraphicEffect;
+import ru.spbau.blackout.effects.Effect;
+import ru.spbau.blackout.effects.GraphicEffect;
+import ru.spbau.blackout.effects.PhysicEffect;
 import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.HasState;
@@ -34,6 +36,7 @@ import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.worlds.ServerGameWorld;
 
+import static ru.spbau.blackout.java8features.Functional.foreach;
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
@@ -46,6 +49,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
     /** Equals to Optional.empty() on a server or if the object is dead. */
     @Nullable protected ModelInstance modelInstance;
+    private final Set<PhysicEffect> physicEffects = new HashSet<>();
     private final Set<GraphicEffect> graphicEffects = new HashSet<>();
 
     private boolean dead = false;
@@ -114,16 +118,16 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
 
     public void updateGraphics(float delta) {
-        for (GraphicEffect effect : graphicEffects) {
+        for (Effect effect : getGraphicEffects()) {
             effect.update(delta);
         }
     }
 
-    /**
-     * Update things which are not connected with physics and don't require fixed step.
-     * See <code>GameWorld</code> documentation.
-     */
-    public void updateState(float delta) {}
+    public void updateState(float delta) {
+        for (Effect effect : getPhysicEffects()) {
+            effect.update(delta);
+        }
+    }
 
     /** See <code>GameWorld</code> documentation. */
     public void updateBeforeFirstStep() {}
@@ -167,9 +171,8 @@ public abstract class GameObject implements RenderableProvider, HasState {
      * Shared resources (like models) will be disposed by AssetManager.
      */
     public void dispose() {
-        for (GraphicEffect effect : graphicEffects) {
-            effect.dispose();
-        }
+        foreach(getGraphicEffects(), Effect::dispose);
+        foreach(getPhysicEffects(), Effect::dispose);
     }
 
     /**
@@ -268,6 +271,10 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
     public final Set<GraphicEffect> getGraphicEffects() {
         return graphicEffects;
+    }
+
+    public final Set<PhysicEffect> getPhysicEffects() {
+        return physicEffects;
     }
 
     /**

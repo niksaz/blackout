@@ -1,4 +1,4 @@
-package ru.spbau.blackout.graphiceffects;
+package ru.spbau.blackout.effects;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
@@ -19,11 +19,7 @@ public final class HealthBarEffect extends GraphicEffect {
     private final SimpleProgressBar healthBar;
     private final Camera camera;
 
-    public static void create(Character character, SimpleProgressBar healthBar, GameContext context) {
-        character.getGraphicEffects().add(new HealthBarEffect(character, healthBar, context));
-    }
-
-    private HealthBarEffect(Character character, SimpleProgressBar healthBar, GameContext context) {
+    public HealthBarEffect(Character character, SimpleProgressBar healthBar, GameContext context) {
         super(character);
         this.character = character;
         this.healthBar = healthBar;
@@ -32,6 +28,7 @@ public final class HealthBarEffect extends GraphicEffect {
 
     @Override
     public void update(float deltaTime) {
+        super.update(deltaTime);
         healthBar.setValue(character.getHealth() / character.getMaxHealth());
 
         Vector3 realPos = camera.project(character.getOverHeadPivot());

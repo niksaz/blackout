@@ -1,4 +1,4 @@
-package ru.spbau.blackout.graphiceffects;
+package ru.spbau.blackout.effects;
 
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.math.Matrix4;
@@ -15,11 +15,7 @@ public final class ParticleGraphicEffect extends GraphicEffect {
     private final ParticleEffect effect;
     private final Matrix4 tmpMatrix = new Matrix4();
 
-    public static void create(GameObject object, ParticleEffect effect, GameContext context) {
-        object.getGraphicEffects().add(new ParticleGraphicEffect(object, effect, context));
-    }
-
-    private ParticleGraphicEffect(GameObject gameObject, ParticleEffect effect, GameContext context) {
+    public ParticleGraphicEffect(GameObject gameObject, ParticleEffect effect, GameContext context) {
         super(gameObject);
         this.effect = effect;
         this.effect.init();
@@ -30,6 +26,7 @@ public final class ParticleGraphicEffect extends GraphicEffect {
 
     @Override
     public void update(float deltaTime) {
+        super.update(deltaTime);
         updatePosition();
     }
 

@@ -21,8 +21,10 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  */
 public class ServerGameWorld extends GameWorld {
 
+    private static final int VELOCITY_ITERATIONS = 1;
+    private static final int POSITION_ITERATIONS = 1;
     /** The fixed step for physic engine. */
-    private static final float WORLD_STEP = 1 / 58f;
+    public static final float WORLD_STEP = 1 / 58f;
 
     private float accumulator = 0;
     public final UidGenerator uidGenerator;

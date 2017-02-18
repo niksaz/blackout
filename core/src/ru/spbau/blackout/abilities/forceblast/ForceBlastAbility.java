@@ -27,7 +27,7 @@ public final class ForceBlastAbility extends SimpleInstantAbility {
     static final float SCALE_TIME = 0.15f;
     static final float EXPLOSION_TIME = 0.25f;
     static final float BACK_SCALE_TIME = 0.05f;
-    static final float ROTATION_SPEED = 10f;
+    static final float ROTATION_SPEED = 6f;
 
     protected ForceBlastAbility(Definition def, Character character) {
         super(def, character);

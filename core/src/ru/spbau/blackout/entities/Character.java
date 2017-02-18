@@ -14,7 +14,7 @@ import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.abilities.forceblast.ForceBlastAbility;
 import ru.spbau.blackout.abilities.fireball.FireballAbility;
 import ru.spbau.blackout.abilities.gravity.GravityAbility;
-import ru.spbau.blackout.graphiceffects.HealthBarEffect;
+import ru.spbau.blackout.effects.HealthBarEffect;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.shapescreators.CircleCreator;
@@ -161,7 +161,7 @@ public class Character extends GameUnit implements Damageable  {
             if (getContext().hasUI()) {
                 SimpleProgressBar unitHb = healthBar.copy();
                 getContext().getScreen().getUi().addActor(unitHb);
-                HealthBarEffect.create(character, unitHb, getContext());
+                new HealthBarEffect(character, unitHb, getContext());
             }
 
             return character;

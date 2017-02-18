@@ -1,4 +1,4 @@
-package ru.spbau.blackout.graphiceffects;
+package ru.spbau.blackout.effects;
 
 
 import ru.spbau.blackout.GameContext;
@@ -8,20 +8,15 @@ import ru.spbau.blackout.entities.GameObject;
  * Ideologically <code>GraphicEffect</code> is something visual attached to something else
  * (most likely to a <code>GameObject</code>).
  */
-public abstract class GraphicEffect {
+public abstract class GraphicEffect extends Effect {
 
-    protected final GameObject gameObject;
-
-    protected GraphicEffect(GameObject gameObject) {
-        this.gameObject = gameObject;
+    public GraphicEffect(GameObject gameObject) {
+        super(gameObject);
+        gameObject.getGraphicEffects().add(this);
     }
 
     public final void remove() {
         gameObject.getGraphicEffects().remove(this);
         dispose();
     }
-
-    public void dispose() {}
-
-    public abstract void update(float deltaTime);
 }

@@ -43,9 +43,6 @@ import static ru.spbau.blackout.java8features.Functional.foreach;
  */
 public abstract class GameWorld {
 
-    public static final int VELOCITY_ITERATIONS = 1;
-    public static final int POSITION_ITERATIONS = 2;
-
     private final Map<Uid, GameObject> gameObjectsMap = new HashMap<>();
     protected long stepNumber = 0;
     transient protected final World box2dWorld;  // FIXME: should be only on server

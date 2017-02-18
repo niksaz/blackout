@@ -1,4 +1,4 @@
-package ru.spbau.blackout.graphiceffects;
+package ru.spbau.blackout.effects;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
@@ -15,11 +15,7 @@ public final class GradualScaleEffect extends GraphicEffect {
     // to avoid redundant allocations
     private final Vector3 tmpScale = new Vector3();
 
-    public static void create(GameObject gameObject, float scaleFrom, float scaleTo, float duration) {
-        gameObject.getGraphicEffects().add(new GradualScaleEffect(gameObject, scaleFrom, scaleTo, duration));
-    }
-
-    private GradualScaleEffect(GameObject gameObject, float scaleFrom, float scaleTo, float duration) {
+    public GradualScaleEffect(GameObject gameObject, float scaleFrom, float scaleTo, float duration) {
         super(gameObject);
         this.duration = duration;
         // it can't be zero due to some Matrix4 limitations
@@ -30,6 +26,7 @@ public final class GradualScaleEffect extends GraphicEffect {
 
     @Override
     public void update(float deltaTime) {
+        super.update(deltaTime);
         if (!Utils.floatEq(time, duration)) {
             time = Math.min(time + deltaTime, duration);
             updateScale();

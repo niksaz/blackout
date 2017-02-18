@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
+import ru.spbau.blackout.effects.ParticleGraphicEffect;
 import ru.spbau.blackout.abilities.DynamicAbilityObject;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
@@ -24,7 +24,7 @@ public abstract class SimpleShellObject extends DynamicAbilityObject {
         timeToLive = def.timeToLive();
 
         if (def.liveEffect != null) {
-            ParticleGraphicEffect.create(this, def.liveEffect.copy(), getDef().getContext());
+            new ParticleGraphicEffect(this, def.liveEffect.copy(), getDef().getContext());
         }
     }
 

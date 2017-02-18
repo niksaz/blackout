@@ -7,6 +7,7 @@ import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.utils.Uid;
+import ru.spbau.blackout.worlds.ServerGameWorld;
 
 import static ru.spbau.blackout.abilities.gravity.GravityAbility.CAST_SOUND_PATH;
 import static ru.spbau.blackout.abilities.gravity.GravityAbility.EFFECT_PATH;
@@ -33,7 +34,7 @@ public final class GravityObject extends SimpleShellObject {
         super.updateState(delta);
         for (GameObject go : getDef().getContext().gameWorld().getGameObjects()) {
             if (go != caster && !go.isDead() && go instanceof Damageable) {
-                ((Damageable) go).damage(maxDamage * powerFactor(go));
+                ((Damageable) go).damage(maxDamage * powerFactor(go.getPosition().dst(getPosition())));
             }
         }
     }
@@ -45,17 +46,19 @@ public final class GravityObject extends SimpleShellObject {
             if (go != caster && go instanceof DynamicObject) {
                 Vector2 offset = getPosition().cpy().sub(go.getPosition());
                 if (!isZeroVec(offset)) {
-                    ((DynamicObject) go).applyTemporaryImpulse(offset.scl(maxForce * powerFactor(go) / offset.len()));
+                    float distance = offset.len();
+                    float impulse = Math.min(maxForce * powerFactor(distance),
+                                            distance * go.getMass() / ServerGameWorld.WORLD_STEP);
+                    ((DynamicObject) go).applyTemporaryImpulse(offset.scl(impulse / distance));
                 }
             }
         }
     }
 
-    private float powerFactor(GameObject go) {
+    private float powerFactor(float distance) {
         // f is linear
         // f(0) = 1
         // f(>= RADIUS) = 0
-        float distance = getPosition().dst(go.getPosition());
         return Math.max(0f, 1f - distance / RADIUS);
     }
 

@@ -14,8 +14,8 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.graphiceffects.GradualScaleEffect;
-import ru.spbau.blackout.graphiceffects.RotationEffect;
+import ru.spbau.blackout.effects.GradualScaleEffect;
+import ru.spbau.blackout.effects.RotationEffect;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Uid;
@@ -42,8 +42,8 @@ public final class ForceBlastObject extends StaticAbilityObject {
     protected ForceBlastObject(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
 
-        GradualScaleEffect.create(this, MIN_SCALE, MAX_SCALE, SCALE_TIME);
-        RotationEffect.create(this, ROTATION_SPEED);
+        new GradualScaleEffect(this, MIN_SCALE, MAX_SCALE, SCALE_TIME);
+        new RotationEffect(this, ROTATION_SPEED);
     }
 
     void setCaster(Character caster) {
@@ -75,7 +75,7 @@ public final class ForceBlastObject extends StaticAbilityObject {
         if (timeToLive <= 0) {
             if (!done) {
                 done = true;
-                GradualScaleEffect.create(this, MAX_SCALE, MIN_SCALE, BACK_SCALE_TIME);
+                new GradualScaleEffect(this, MAX_SCALE, MIN_SCALE, BACK_SCALE_TIME);
                 timeToLive = BACK_SCALE_TIME;
             } else {
                 kill();

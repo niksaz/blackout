@@ -15,8 +15,8 @@ public class GravityAbility extends SimpleShellAbility {
     static final float DISTANCE = 12f;
     static final float SHELL_START_SPEED = 15;
     static final float TIME_TO_LIVE = DISTANCE / SHELL_START_SPEED;
-    static final float MAX_DAMAGE_BASE = 0.5f;
-    static final float MAX_DAMAGE_PER_LEVEL = 0.2f;
+    static final float MAX_DAMAGE_BASE = 0.3f;
+    static final float MAX_DAMAGE_PER_LEVEL = 0.12f;
     static final float MAX_FORCE_BASE = 750;
     static final float MAX_FORCE_PER_LEVEL = 300;
     static final float RADIUS = 7;
