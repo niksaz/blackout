@@ -48,12 +48,11 @@ public class AndroidClient implements Runnable, UIServer {
     private final int players;
     private final MultiplayerTable table;
     private volatile boolean isInterrupted = false;
-    private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>();
+    private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>(new Vector2());
     private final AtomicReference<AbilityCast> abilityToSend = new AtomicReference<>();
     private volatile GameScreen gameScreen;
     private volatile ObjectInputStream in;
     private volatile ObjectOutputStream out;
-
 
     public AndroidClient(MultiplayerTable table, int port, int players) {
         this.table = table;
@@ -75,7 +74,6 @@ public class AndroidClient implements Runnable, UIServer {
             out.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
             out.writeInt(datagramSocket.getLocalPort());
             out.flush();
-
             final int serverDatagramPort = in.readInt();
 
             gameStartWaiting(in, out);
@@ -84,15 +82,31 @@ public class AndroidClient implements Runnable, UIServer {
             }
             socket.setSoTimeout(0);
 
-            new Thread(new UIChangeSenderUDP(socket.getInetAddress(), serverDatagramPort, datagramSocket)).start();
             new Thread(new UIChangeSenderTCP(out)).start();
             new Thread(new WinnerGetterTCP(in)).start();
 
             final ClientGameWorld currentWorld = (ClientGameWorld) gameScreen.gameWorld();
             final byte[] buffer = new byte[Network.DATAGRAM_WORLD_PACKET_SIZE];
             final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
+            final DatagramPacket velocityDatagram =
+                    new DatagramPacket(new byte[0], 0, socket.getInetAddress(), serverDatagramPort);
 
             while (!isInterrupted) {
+                try (ByteArrayOutputStream velocityByteStream =
+                             new ByteArrayOutputStream(Network.DATAGRAM_VELOCITY_PACKET_SIZE);
+                     ObjectOutputStream velocityObjectStream = new ObjectOutputStream(velocityByteStream)
+                ) {
+                    velocityObjectStream.writeObject(velocityToSend.getAndSet(new Vector2()));
+                    velocityObjectStream.flush();
+                    final byte[] byteArray = velocityByteStream.toByteArray();
+                    velocityDatagram.setData(byteArray);
+                    velocityDatagram.setLength(byteArray.length);
+                    datagramSocket.send(velocityDatagram);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    isInterrupted = true;
+                }
+
                 datagramSocket.receive(receivedPacket);
                 final ObjectInputStream serverWorldStream =
                         new ObjectInputStream(new ByteArrayInputStream(receivedPacket.getData()));
