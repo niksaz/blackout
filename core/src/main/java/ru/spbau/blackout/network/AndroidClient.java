@@ -51,7 +51,7 @@ public class AndroidClient implements Runnable, UIServer {
     private final int players;
     private final MultiplayerTable table;
     private volatile boolean isInterrupted = false;
-    private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>(new Vector2());
+    private volatile Vector2 velocityToSend = new Vector2();
     private final AtomicReference<AbilityCast> abilityToSend = new AtomicReference<>();
     private volatile GameScreen gameScreen;
     private volatile ObjectInputStream in;
@@ -98,7 +98,7 @@ public class AndroidClient implements Runnable, UIServer {
                 try (ByteArrayOutputStream velocityByteStream = new ByteArrayOutputStream();
                      EffectiveOutputStream velocityObjectStream = new EffectiveOutputStream(velocityByteStream)
                 ) {
-                    velocityObjectStream.writeVector2(velocityToSend.getAndSet(new Vector2()));
+                    velocityObjectStream.writeVector2(velocityToSend);
                     final byte[] byteArray = velocityByteStream.toByteArray();
                     velocityDatagram.setData(byteArray);
                     velocityDatagram.setLength(byteArray.length);
@@ -136,7 +136,7 @@ public class AndroidClient implements Runnable, UIServer {
 
     @Override
     public void sendSelfVelocity(GameUnit unit, Vector2 velocity) {
-        velocityToSend.set(new Vector2(velocity));
+        velocityToSend = new Vector2(velocity);
     }
 
     @Override
