@@ -24,7 +24,7 @@ import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_PER_LEVEL;
 
 /**
- * Unified access to MongoDB database from the server module.
+ * Unified access to MongoDB database from the server module. Also provides methods to handle some requests from users.
  */
 public class DatabaseAccessor {
 
