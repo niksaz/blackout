@@ -51,12 +51,11 @@ public class AndroidClient implements Runnable, UIServer {
     private final int players;
     private final MultiplayerTable table;
     private volatile boolean isInterrupted = false;
-    private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>();
+    private final AtomicReference<Vector2> velocityToSend = new AtomicReference<>(new Vector2());
     private final AtomicReference<AbilityCast> abilityToSend = new AtomicReference<>();
     private volatile GameScreen gameScreen;
     private volatile ObjectInputStream in;
     private volatile ObjectOutputStream out;
-
 
     public AndroidClient(MultiplayerTable table, int port, int players) {
         this.table = table;
@@ -78,7 +77,6 @@ public class AndroidClient implements Runnable, UIServer {
             out.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
             out.writeInt(datagramSocket.getLocalPort());
             out.flush();
-
             final int serverDatagramPort = in.readInt();
 
             gameStartWaiting(in, out);
@@ -87,15 +85,29 @@ public class AndroidClient implements Runnable, UIServer {
             }
             socket.setSoTimeout(0);
 
-            new Thread(new UIChangeSenderUDP(socket.getInetAddress(), serverDatagramPort, datagramSocket)).start();
             new Thread(new UIChangeSenderTCP(out)).start();
             new Thread(new WinnerGetterTCP(in)).start();
 
             final ClientGameWorld currentWorld = (ClientGameWorld) gameScreen.gameWorld();
             final byte[] buffer = new byte[Network.DATAGRAM_WORLD_PACKET_SIZE];
             final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
+            final DatagramPacket velocityDatagram =
+                    new DatagramPacket(new byte[0], 0, socket.getInetAddress(), serverDatagramPort);
 
             while (!isInterrupted) {
+                try (ByteArrayOutputStream velocityByteStream = new ByteArrayOutputStream();
+                     EffectiveOutputStream velocityObjectStream = new EffectiveOutputStream(velocityByteStream)
+                ) {
+                    velocityObjectStream.writeVector2(velocityToSend.getAndSet(new Vector2()));
+                    final byte[] byteArray = velocityByteStream.toByteArray();
+                    velocityDatagram.setData(byteArray);
+                    velocityDatagram.setLength(byteArray.length);
+                    datagramSocket.send(velocityDatagram);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    isInterrupted = true;
+                }
+
                 datagramSocket.receive(receivedPacket);
                 final EffectiveInputStream serverWorldStream = new EffectiveInputStream(
                         new InflaterInputStream(new ByteArrayInputStream(receivedPacket.getData())));
@@ -124,10 +136,7 @@ public class AndroidClient implements Runnable, UIServer {
 
     @Override
     public void sendSelfVelocity(GameUnit unit, Vector2 velocity) {
-        synchronized (velocityToSend) {
-            velocityToSend.set(new Vector2(velocity));
-            velocityToSend.notify();
-        }
+        velocityToSend.set(new Vector2(velocity));
     }
 
     @Override
@@ -195,65 +204,6 @@ public class AndroidClient implements Runnable, UIServer {
                     break;
             }
         } while (gameState == GameState.WAITING && !isInterrupted);
-    }
-
-    private class UIChangeSenderUDP implements Runnable {
-
-        private final InetAddress serverInetAddress;
-        private final int serverDatagramPort;
-        private final DatagramSocket datagramSocket;
-
-        public UIChangeSenderUDP(InetAddress serverInetAddress, int serverDatagramPort, DatagramSocket datagramSocket) {
-            this.serverInetAddress = serverInetAddress;
-            this.serverDatagramPort = serverDatagramPort;
-            this.datagramSocket = datagramSocket;
-        }
-
-        @Override
-        public void run() {
-            final DatagramPacket velocityDatagram =
-                    new DatagramPacket(new byte[0], 0, serverInetAddress, serverDatagramPort);
-
-            while (!isInterrupted) {
-                if (velocityToSend.get() != null) {
-                    try (ByteArrayOutputStream velocityByteStream = new ByteArrayOutputStream();
-                         EffectiveOutputStream velocityStream = new EffectiveOutputStream(velocityByteStream)) {
-                        velocityStream.writeVector2(velocityToSend.getAndSet(null));
-                        final byte[] byteArray = velocityByteStream.toByteArray();
-                        velocityDatagram.setData(byteArray);
-                        velocityDatagram.setLength(byteArray.length);
-                        datagramSocket.send(velocityDatagram);
-
-                        try {
-                            sleep(Network.TIME_SHOULD_BE_SPENT_IN_ITERATION);
-                        } catch (InterruptedException e) {
-                            isInterrupted = true;
-                            e.printStackTrace();
-                        }
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        isInterrupted = true;
-                    }
-                } else {
-                    synchronized (velocityToSend) {
-                        if (velocityToSend.get() == null) {
-                            try {
-                                // setting timeout because if a client not responding in SOCKET_IO_TIMEOUT_MS
-                                // he will be disconnected
-                                velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 8);
-                                if (velocityToSend.get() == null) {
-                                    velocityToSend.set(new Vector2());
-                                }
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                                isInterrupted = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private class WinnerGetterTCP implements Runnable {
