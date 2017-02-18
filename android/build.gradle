@@ -1,6 +1,9 @@
 android {
     buildToolsVersion '24.0.3'
     compileSdkVersion 23
+    lintOptions {
+        abortOnError false
+    }
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'

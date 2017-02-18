@@ -37,6 +37,10 @@ android {
         ext.android_version = '23'
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
     compileSdkVersion android_compile_version
     buildToolsVersion android_version
     buildToolsVersion '24.0.3'
