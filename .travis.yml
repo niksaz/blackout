@@ -1,6 +1,6 @@
 language: android
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 android:
   components:
     - tools
@@ -9,3 +9,7 @@ android:
     - extra-android-m2repository
     - extra-google-m2repository
     - extra-google-google_play_services
+addons:
+  apt:
+    packages:
+      - oracle-java6-installer
