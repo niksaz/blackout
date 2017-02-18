@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-public class EffectiveInputStream {
+public class EffectiveInputStream extends InputStream {
 
     private final InputStream in;
 
@@ -17,19 +17,23 @@ public class EffectiveInputStream {
         this.in = in;
     }
 
+    @Override
+    public int read() throws IOException {
+        return in.read();
+    }
 
     public synchronized boolean readBoolean() throws IOException {
-        return in.read() == 1;
+        return read() == 1;
     }
 
     public synchronized byte readByte() throws IOException {
-        return (byte) in.read();
+        return (byte) read();
     }
 
     public synchronized char readChar() throws IOException {
         final int size = Character.SIZE / Byte.SIZE;
         byte[] bytes = new byte[size];
-        if (in.read(bytes) != size) {
+        if (read(bytes) != size) {
             throw new IOException();
         }
         return ByteBuffer.wrap(bytes).getChar();
@@ -38,7 +42,7 @@ public class EffectiveInputStream {
     public synchronized short readShort() throws IOException {
         final int size = Short.SIZE / Byte.SIZE;
         byte[] bytes = new byte[size];
-        if (in.read(bytes) != size) {
+        if (read(bytes) != size) {
             throw new IOException();
         }
         return ByteBuffer.wrap(bytes).getShort();
@@ -47,7 +51,7 @@ public class EffectiveInputStream {
     public synchronized float readFloat() throws IOException {
         final int size = Float.SIZE / Byte.SIZE;
         byte[] bytes = new byte[size];
-        if (in.read(bytes) != size) {
+        if (read(bytes) != size) {
             throw new IOException();
         }
         return ByteBuffer.wrap(bytes).getFloat();
@@ -56,7 +60,7 @@ public class EffectiveInputStream {
     public synchronized double readDouble() throws IOException {
         final int size = Double.SIZE / Byte.SIZE;
         byte[] bytes = new byte[size];
-        if (in.read(bytes) != size) {
+        if (read(bytes) != size) {
             throw new IOException();
         }
         return ByteBuffer.wrap(bytes).getDouble();
@@ -65,7 +69,7 @@ public class EffectiveInputStream {
     public synchronized int readInt() throws IOException {
         final int size = Integer.SIZE / Byte.SIZE;
         byte[] bytes = new byte[size];
-        if (in.read(bytes) != size) {
+        if (read(bytes) != size) {
             throw new IOException();
         }
         return ByteBuffer.wrap(bytes).getInt();
@@ -74,7 +78,7 @@ public class EffectiveInputStream {
     public synchronized long readLong() throws IOException {
         final int size = Long.SIZE / Byte.SIZE;
         byte[] bytes = new byte[size];
-        if (in.read(bytes) != size) {
+        if (read(bytes) != size) {
             throw new IOException();
         }
         return ByteBuffer.wrap(bytes).getLong();
@@ -85,7 +89,7 @@ public class EffectiveInputStream {
         if (isPresent) {
             int size = readInt();
             byte[] bytes = new byte[size];
-            if (in.read(bytes) != size) {
+            if (read(bytes) != size) {
                 throw new IOException();
             }
             return new String(bytes);
