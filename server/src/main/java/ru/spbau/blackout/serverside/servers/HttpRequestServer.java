@@ -20,9 +20,12 @@ public class HttpRequestServer extends ServerWithLogging {
     public void start() {
         try {
             final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-            server.createContext(Database.LOAD_COMMAND, new ru.spbau.blackout.serverside.servers.handlers.LoadRequestHandler(this));
-            server.createContext(Database.UPGRADE_COMMAND, new UpgradeRequestHandler(this));
-            server.createContext(Database.SETTINGS_SYNCHRONIZE_COMMAND, new ru.spbau.blackout.serverside.servers.handlers.SettingsSynchronizeHandler(this));
+            server.createContext(Database.LOAD_COMMAND,
+                    new ru.spbau.blackout.serverside.servers.handlers.LoadRequestHandler(this));
+            server.createContext(Database.UPGRADE_COMMAND,
+                    new UpgradeRequestHandler(this));
+            server.createContext(Database.SETTINGS_SYNCHRONIZE_COMMAND,
+                    new ru.spbau.blackout.serverside.servers.handlers.SettingsSynchronizeHandler(this));
             server.setExecutor(null);
             server.start();
             log("Server started.");
