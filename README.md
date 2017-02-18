@@ -1,5 +1,7 @@
-# blackout
+# Blackout
 
-2D-fighting.
+3D-fighting.
 
-Authors: Andrey Tonkikh, Nikita Sazanovich
+Demo video: https://www.youtube.com/watch?v=HYnNYYEYuck.
+
+Authors: Andrey Tonkikh, Nikita Sazanovich.
