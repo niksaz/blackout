@@ -6,9 +6,6 @@ android:
     - tools
     - build-tools-24.0.3
     - android-23
-    - SDK Patch Applier v4
-    - Android Support Repository
-    - Google Repository
     - extra-android-m2repository
     - extra-google-m2repository
     - extra-android-support
