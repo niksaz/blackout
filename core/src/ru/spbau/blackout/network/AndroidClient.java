@@ -223,14 +223,6 @@ public class AndroidClient implements Runnable, UIServer {
                         velocityDatagram.setData(byteArray);
                         velocityDatagram.setLength(byteArray.length);
                         datagramSocket.send(velocityDatagram);
-
-                        try {
-                            sleep(Network.TIME_SHOULD_BE_SPENT_IN_ITERATION);
-                        } catch (InterruptedException e) {
-                            isInterrupted = true;
-                            e.printStackTrace();
-                        }
-
                     } catch (IOException e) {
                         e.printStackTrace();
                         isInterrupted = true;
