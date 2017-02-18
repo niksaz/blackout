@@ -18,8 +18,6 @@ import ru.spbau.blackout.utils.Utils;
 
 public abstract class DynamicObject extends GameObject {
 
-    private static final float LINEAR_FRICTION = 0.002f;
-
     /** Constant holder class to provide names for animations. */
     protected static class Animations {
         protected Animations() {}
@@ -82,17 +80,6 @@ public abstract class DynamicObject extends GameObject {
         super.updateGraphics(delta);
         if (animation != null) {
             animation.update(delta * animationSpeed);
-        }
-    }
-
-    @Override
-    public void updateBeforeFirstStep() {
-        super.updateBeforeFirstStep();
-        // apply friction
-        if (!Utils.isZeroVec(velocity)){
-            float k = 1f - (getMass() * LINEAR_FRICTION) / velocity.len();
-            if (k < 0) k = 0;
-            velocity.scl(k);
         }
     }
 

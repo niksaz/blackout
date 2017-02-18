@@ -66,7 +66,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
         this.uid = uid;
 
         if (def.model != null) {
-            modelInstance = new ModelInstance(def.model);;
+            modelInstance = new ModelInstance(def.model);
             fixTop(modelInstance);
         }
 

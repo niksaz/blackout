@@ -19,6 +19,8 @@ import ru.spbau.blackout.utils.Utils;
  */
 public abstract class GameUnit extends DynamicObject {
 
+    private static final float LINEAR_FRICTION = 0.002f;
+
     /** Constant holder class to provide names for animations. */
     protected static class UnitAnimations extends DynamicObject.Animations {
         protected UnitAnimations() {}
@@ -46,6 +48,14 @@ public abstract class GameUnit extends DynamicObject {
     @Override
     public void updateBeforeFirstStep() {
         super.updateBeforeFirstStep();
+
+        // apply friction
+        if (!Utils.isZeroVec(velocity)){
+            float k = 1f - (getMass() * LINEAR_FRICTION) / velocity.len();
+            if (k < 0) k = 0;
+            velocity.scl(k);
+        }
+
         // Resistance to external velocity by unit (selfVelocity)
         if (!Utils.isZeroVec(velocity)) {
             // some inefficient, but clear pseudocode in comments:

@@ -39,12 +39,6 @@ public abstract class SimpleShellAbility extends SimpleInstantAbility {
 
         protected final SimpleShellObject.Definition shellDef;
 
-        @Override
-        public void setLevel(int newLevel) {
-            super.setLevel(newLevel);
-            shellDef.damage = baseDamage() + damagePerLevel() * getLevel();
-        }
-
         public Definition(int level, SimpleShellObject.Definition shellDef) {
             super(level);
             this.shellDef = shellDef;

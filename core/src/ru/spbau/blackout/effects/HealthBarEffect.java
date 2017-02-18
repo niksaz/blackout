@@ -23,7 +23,7 @@ public final class HealthBarEffect extends GraphicEffect {
         super(character);
         this.character = character;
         this.healthBar = healthBar;
-        camera = context.getScreen().getCamera();
+        this.camera = context.getScreen().getCamera();
     }
 
     @Override

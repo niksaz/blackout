@@ -7,6 +7,7 @@ import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.utils.Uid;
+import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.worlds.ServerGameWorld;
 
 import static ru.spbau.blackout.abilities.gravity.GravityAbility.CAST_SOUND_PATH;
@@ -21,18 +22,20 @@ public final class GravityObject extends SimpleShellObject {
     private final GameObject caster;
     private final float maxForce;
     private final float maxDamage;
+    private final GameWorld gameWorld;
 
     protected GravityObject(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
         caster = def.caster;
         maxForce = def.maxForce;
         maxDamage = def.damage;
+        gameWorld = def.getContext().gameWorld();
     }
 
     @Override
     public void updateState(float delta) {
         super.updateState(delta);
-        for (GameObject go : getDef().getContext().gameWorld().getGameObjects()) {
+        for (GameObject go : gameWorld.getGameObjects()) {
             if (go != caster && !go.isDead() && go instanceof Damageable) {
                 ((Damageable) go).damage(maxDamage * powerFactor(go.getPosition().dst(getPosition())));
             }
@@ -42,15 +45,16 @@ public final class GravityObject extends SimpleShellObject {
     @Override
     public void updateBeforeSecondStep() {
         super.updateBeforeSecondStep();
-        for (GameObject go : getDef().getContext().gameWorld().getGameObjects()) {
-            if (go != caster && go instanceof DynamicObject) {
-                Vector2 offset = getPosition().cpy().sub(go.getPosition());
-                if (!isZeroVec(offset)) {
-                    float distance = offset.len();
-                    float impulse = Math.min(maxForce * powerFactor(distance),
-                                            distance * go.getMass() / ServerGameWorld.WORLD_STEP);
-                    ((DynamicObject) go).applyTemporaryImpulse(offset.scl(impulse / distance));
-                }
+        for (GameObject go : gameWorld.getGameObjects()) {
+            if (go == caster || !(go instanceof DynamicObject) || go.isDead()) {
+                continue;
+            }
+            Vector2 offset = getPosition().cpy().sub(go.getPosition());
+            if (!isZeroVec(offset)) {
+                float distance = offset.len();
+                float impulse = Math.min(maxForce * powerFactor(distance),
+                                        distance * go.getMass() / ServerGameWorld.WORLD_STEP);
+                ((DynamicObject) go).applyTemporaryImpulse(offset.scl(impulse / distance));
             }
         }
     }
