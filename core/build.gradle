@@ -4,6 +4,10 @@ sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
+retrolambda {
+    oldJdk System.getenv("JAVA7_HOME")
+}
+
 eclipse.project {
     name = appName + "-core"
 }
