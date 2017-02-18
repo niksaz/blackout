@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -95,7 +96,8 @@ public class AndroidClient implements Runnable, UIServer {
 
             while (!isInterrupted) {
                 datagramSocket.receive(receivedPacket);
-                final EffectiveInputStream serverWorldStream = new EffectiveInputStream(receivedPacket.getData());
+                final EffectiveInputStream serverWorldStream =
+                        new EffectiveInputStream(new ByteArrayInputStream(receivedPacket.getData()));
                 currentWorld.setExternalWorldStream(serverWorldStream);
             }
         } catch (UnknownHostException e) {
@@ -213,9 +215,10 @@ public class AndroidClient implements Runnable, UIServer {
 
             while (!isInterrupted) {
                 if (velocityToSend.get() != null) {
-                    try (EffectiveOutputStream velocityOutputStream = new EffectiveOutputStream()) {
-                        velocityOutputStream.writeVector2(velocityToSend.getAndSet(null));
-                        final byte[] byteArray = velocityOutputStream.toByteArray();
+                    try (ByteArrayOutputStream velocityByteStream = new ByteArrayOutputStream();
+                         EffectiveOutputStream velocityStream = new EffectiveOutputStream(velocityByteStream)) {
+                        velocityStream.writeVector2(velocityToSend.getAndSet(null));
+                        final byte[] byteArray = velocityByteStream.toByteArray();
                         velocityDatagram.setData(byteArray);
                         velocityDatagram.setLength(byteArray.length);
                         datagramSocket.send(velocityDatagram);

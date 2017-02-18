@@ -4,9 +4,21 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-public class EffectiveOutputStream extends ByteArrayOutputStream {
+public class EffectiveOutputStream extends OutputStream {
+
+    private final OutputStream out;
+
+    public EffectiveOutputStream(OutputStream out) {
+        this.out = out;
+    }
+
+    @Override
+    public void write(int b) throws IOException {
+        out.write(b);
+    }
 
     public synchronized void writeBoolean(boolean source) throws IOException {
         write(source ? 1 : 0);

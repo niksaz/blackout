@@ -256,9 +256,10 @@ public class Game extends Thread implements GameContext {
     }
 
     private byte[] serializeWorld() throws IOException {
-        final EffectiveOutputStream worldOutputStream = new EffectiveOutputStream();
-        gameWorld.getState(worldOutputStream);
-        return worldOutputStream.toByteArray();
+        final ByteArrayOutputStream worldByteStream = new ByteArrayOutputStream();
+        final EffectiveOutputStream worldStream = new EffectiveOutputStream(worldByteStream);
+        gameWorld.getState(worldStream);
+        return worldByteStream.toByteArray();
     }
 
     private void waitWhileEveryoneIsReady() {

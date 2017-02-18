@@ -165,7 +165,7 @@ public class ClientHandler implements Runnable {
                 try {
                     datagramSocket.receive(receivedPacket);
                     final EffectiveInputStream clientsVelocityStream =
-                            new EffectiveInputStream(receivedPacket.getData());
+                            new EffectiveInputStream(new ByteArrayInputStream(receivedPacket.getData()));
                     final Vector2 velocity = clientsVelocityStream.readVector2();
                     velocityFromClient.set(velocity);
                 } catch (IOException e) {
