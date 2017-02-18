@@ -9,7 +9,5 @@ android:
     - extra-android-m2repository
     - extra-google-m2repository
     - extra-google-google_play_services
-install:
-  - ./gradlew assemble
-script:
-  - ./gradlew check
+env:
+ - JAVA7_HOME=/usr/lib/jvm/java-7-oracle/jre

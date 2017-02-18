@@ -6,6 +6,7 @@ targetCompatibility = "1.8"
 
 retrolambda {
     oldJdk System.getenv("JAVA7_HOME")
+    println("oldJdk : " + oldJdk)
 }
 
 eclipse.project {
