@@ -26,7 +26,7 @@ public final class ReflectUtils {  // FIXME: create tests
     }
 
     /**
-     * {@see #getAllFields(Class, Collection)}
+     * Returns all fields including inherited.
      */
     public static List<Field> getAllFields(Class<?> type) {
         List<Field> store = new ArrayList<>();
@@ -45,7 +45,8 @@ public final class ReflectUtils {  // FIXME: create tests
     }
 
     /**
-     * {@see #getAllImpls(Object, Class, Collection)}
+     * Recursively finds all fields or containing elements which are instances of <code>baseClass</code>.
+     * Finds only in collections, arrays and classes in this project.
      */
     public static <T> List<T> findAllImpls(Object root, Class<T> baseClass) {
         List<T> store = new ArrayList<>();
