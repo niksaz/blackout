@@ -44,7 +44,7 @@ public final class HealthBarEffect extends GraphicEffect {
 
     @Override
     public void dispose() {
-        super.remove();
+        super.dispose();
         healthBar.remove();
     }
 }
