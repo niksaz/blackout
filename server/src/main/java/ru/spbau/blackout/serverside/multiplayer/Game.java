@@ -25,6 +25,7 @@ import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.screens.GameScreen;
+import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
@@ -250,21 +251,14 @@ public class Game extends Thread implements GameContext {
 
         for (int i = 0; i < clients.size(); i++) {
             final ClientHandler client = clients.get(i);
-            client.setGame(this, sessionSettings, new Uid(i + 1));
+            client.setGame(this, sessionSettings, Uid.get(i + 1));
         }
     }
 
     private byte[] serializeWorld() throws IOException {
-        final ByteArrayOutputStream serializedVersionOfWorld = new ByteArrayOutputStream();
-        final ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld);
-        try {
-            gameWorld.getState(objectOutputStreamForWorld);
-            objectOutputStreamForWorld.flush();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            gameState = GameState.FINISHED;
-        }
-        return serializedVersionOfWorld.toByteArray();
+        final EffectiveOutputStream worldOutputStream = new EffectiveOutputStream();
+        gameWorld.getState(worldOutputStream);
+        return worldOutputStream.toByteArray();
     }
 
     private void waitWhileEveryoneIsReady() {

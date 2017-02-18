@@ -16,6 +16,8 @@ import ru.spbau.blackout.abilities.fireball.FireballAbility;
 import ru.spbau.blackout.graphiceffects.HealthBarEffect;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
+import ru.spbau.blackout.serializationutils.EffectiveInputStream;
+import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
@@ -67,7 +69,7 @@ public class Character extends GameUnit implements Damageable  {
     }
 
     @Override
-    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void getState(EffectiveOutputStream out) throws IOException {
         super.getState(out);
         out.writeFloat(health);
         for (Ability ability : abilities) {
@@ -76,7 +78,7 @@ public class Character extends GameUnit implements Damageable  {
     }
 
     @Override
-    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public void setState(EffectiveInputStream in) throws IOException {
         super.setState(in);
         health = in.readFloat();
         for (Ability ability : abilities) {

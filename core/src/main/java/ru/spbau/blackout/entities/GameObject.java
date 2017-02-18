@@ -25,9 +25,11 @@ import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphiceffects.GraphicEffect;
+import ru.spbau.blackout.serializationutils.EffectiveInputStream;
+import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
 import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
-import ru.spbau.blackout.utils.HasState;
+import ru.spbau.blackout.serializationutils.HasState;
 import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.worlds.ServerGameWorld;
@@ -80,16 +82,16 @@ public abstract class GameObject implements RenderableProvider, HasState {
     }
 
     @Override
-    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void getState(EffectiveOutputStream out) throws IOException {
         out.writeFloat(height);
-        out.writeObject(getPosition());
+        out.writeVector2(getPosition());
         out.writeFloat(getRotation());
     }
 
     @Override
-    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public void setState(EffectiveInputStream in) throws IOException {
         height = in.readFloat();
-        Vector2 position = (Vector2) in.readObject();
+        Vector2 position = in.readVector2();
         float rotation = in.readFloat();
         setTransform(position, rotation);
     }

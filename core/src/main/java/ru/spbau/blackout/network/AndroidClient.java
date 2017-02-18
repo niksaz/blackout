@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -26,6 +25,8 @@ import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.tables.MultiplayerTable;
 import ru.spbau.blackout.screens.tables.PlayScreenTable;
+import ru.spbau.blackout.serializationutils.EffectiveInputStream;
+import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.Uid;
@@ -94,8 +95,7 @@ public class AndroidClient implements Runnable, UIServer {
 
             while (!isInterrupted) {
                 datagramSocket.receive(receivedPacket);
-                final ObjectInputStream serverWorldStream =
-                        new ObjectInputStream(new ByteArrayInputStream(receivedPacket.getData()));
+                final EffectiveInputStream serverWorldStream = new EffectiveInputStream(receivedPacket.getData());
                 currentWorld.setExternalWorldStream(serverWorldStream);
             }
         } catch (UnknownHostException e) {
@@ -213,13 +213,9 @@ public class AndroidClient implements Runnable, UIServer {
 
             while (!isInterrupted) {
                 if (velocityToSend.get() != null) {
-                    try (ByteArrayOutputStream velocityByteStream =
-                                 new ByteArrayOutputStream(Network.DATAGRAM_VELOCITY_PACKET_SIZE);
-                         ObjectOutputStream velocityObjectStream = new ObjectOutputStream(velocityByteStream)
-                    ) {
-                        velocityObjectStream.writeObject(velocityToSend.getAndSet(null));
-                        velocityObjectStream.flush();
-                        final byte[] byteArray = velocityByteStream.toByteArray();
+                    try (EffectiveOutputStream velocityOutputStream = new EffectiveOutputStream()) {
+                        velocityOutputStream.writeVector2(velocityToSend.getAndSet(null));
+                        final byte[] byteArray = velocityOutputStream.toByteArray();
                         velocityDatagram.setData(byteArray);
                         velocityDatagram.setLength(byteArray.length);
                         datagramSocket.send(velocityDatagram);

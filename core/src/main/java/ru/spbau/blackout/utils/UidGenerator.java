@@ -6,6 +6,6 @@ public class UidGenerator {
 
     public Uid next() {
         lastUid += 1;
-        return new Uid(lastUid);
+        return Uid.get(lastUid);
     }
 }

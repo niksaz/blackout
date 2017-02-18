@@ -13,6 +13,8 @@ import java.util.List;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.abilities.Ability;
+import ru.spbau.blackout.serializationutils.EffectiveInputStream;
+import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.utils.Utils;
@@ -89,17 +91,17 @@ public abstract class GameUnit extends DynamicObject {
     }
 
     @Override
-    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void getState(EffectiveOutputStream out) throws IOException {
         super.getState(out);
         out.writeFloat(speed);
-        out.writeObject(getSelfVelocity());
+        out.writeVector2(getSelfVelocity());
     }
 
     @Override
-    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public void setState(EffectiveInputStream in) throws IOException {
         super.setState(in);
         speed = in.readFloat();
-        setSelfVelocity((Vector2) in.readObject());
+        setSelfVelocity(in.readVector2());
     }
 
     public void setSelfVelocity(Vector2 newVelocity) {

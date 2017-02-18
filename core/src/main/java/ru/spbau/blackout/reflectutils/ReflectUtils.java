@@ -1,4 +1,4 @@
-package ru.spbau.blackout.utils;
+package ru.spbau.blackout.reflectutils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -12,7 +12,6 @@ import java.util.List;
  */
 public final class ReflectUtils {  // FIXME: create tests
     private ReflectUtils() {}
-
 
     /**
      * Returns all fields including inherited.
@@ -34,13 +33,12 @@ public final class ReflectUtils {  // FIXME: create tests
         return store;
     }
 
-
     /**
      * Recursively finds all fields or containing elements which are instances of <code>baseClass</code>.
      * Finds only in collections, arrays and classes in this project.
      */
     public static <T> void findAllImpls(Object root, Class<T> baseClass, Collection<T> store) {
-        Finder<T> finder = new Finder<>(baseClass, store);
+        ru.spbau.blackout.reflectutils.Finder<T> finder = new ru.spbau.blackout.reflectutils.Finder<>(baseClass, store);
         finder.add(root);
     }
 

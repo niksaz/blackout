@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.network.AndroidClient;
+import ru.spbau.blackout.serializationutils.EffectiveInputStream;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.utils.Uid;
 
@@ -19,7 +20,7 @@ import ru.spbau.blackout.utils.Uid;
  */
 public class ClientGameWorld extends GameWorld {
 
-    private final AtomicReference<ObjectInputStream> externalWorldStream = new AtomicReference<>();
+    private final AtomicReference<EffectiveInputStream> externalWorldStream = new AtomicReference<>();
     private final AndroidClient clientNetworkThread;
 
     public ClientGameWorld(SessionSettings sessionSettings, AndroidClient clientNetworkThread) {
@@ -28,7 +29,7 @@ public class ClientGameWorld extends GameWorld {
     }
 
 
-    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public void setState(EffectiveInputStream in) throws IOException, ClassNotFoundException {
         long newStepNumber = in.readLong();
 
         if (newStepNumber > stepNumber) {
@@ -37,7 +38,7 @@ public class ClientGameWorld extends GameWorld {
             Set<Uid> updated = new HashSet<>();
             int length = in.readInt();
             for (int i = 0; i < length; i++) {
-                Uid uid = (Uid) in.readObject();
+                Uid uid = in.readObject(Uid.class);
                 int defNumber = in.readInt();
                 updated.add(uid);
                 if (!hasObjectWithId(uid)) {
@@ -75,7 +76,7 @@ public class ClientGameWorld extends GameWorld {
         updateGraphics(delta);
     }
 
-    public void setExternalWorldStream(ObjectInputStream externalWorldStream) {
+    public void setExternalWorldStream(EffectiveInputStream externalWorldStream) {
         this.externalWorldStream.set(externalWorldStream);
     }
 

@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import ru.spbau.blackout.serializationutils.EffectiveInputStream;
+import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Uid;
 
@@ -92,13 +94,13 @@ public abstract class DynamicObject extends GameObject {
     }
 
     @Override
-    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void getState(EffectiveOutputStream out) throws IOException {
         super.getState(out);
         out.writeFloat(animationSpeed);
     }
 
     @Override
-    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public void setState(EffectiveInputStream in) throws IOException {
         super.setState(in);
         animationSpeed = in.readFloat();
     }

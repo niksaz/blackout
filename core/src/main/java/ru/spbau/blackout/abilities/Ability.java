@@ -4,15 +4,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
-import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.network.UIServer;
-import ru.spbau.blackout.utils.HasState;
+import ru.spbau.blackout.serializationutils.EffectiveInputStream;
+import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
+import ru.spbau.blackout.serializationutils.HasState;
 
 
 /**
@@ -31,12 +30,12 @@ public abstract class Ability implements HasState {
     }
 
     @Override
-    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void getState(EffectiveOutputStream out) throws IOException {
         out.writeFloat(chargeTime);
     }
 
     @Override
-    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public void setState(EffectiveInputStream in) throws IOException {
         setChargeTime(in.readFloat());
     }
 
@@ -96,7 +95,13 @@ public abstract class Ability implements HasState {
             context.getAssets().load(iconPath, Texture.class);
         }
 
-        public void doneLoading(GameContext context) {}
+        public void doneLoading(GameContext context) {
+            this.context = context;
+        }
+
+        public final GameContext getContext() {
+            return context;
+        }
 
         public int getLevel() {
             return level;

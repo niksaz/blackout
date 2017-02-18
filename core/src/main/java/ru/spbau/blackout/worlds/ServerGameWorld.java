@@ -10,6 +10,7 @@ import java.util.Iterator;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.utils.UidGenerator;
@@ -39,7 +40,7 @@ public class ServerGameWorld extends GameWorld {
         foreach(getDefinitions(), def -> def.initializeWithoutUi(context));
     }
 
-    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void getState(EffectiveOutputStream out) throws IOException {
         out.writeLong(stepNumber);
 
         out.writeInt(getGameObjects().size());

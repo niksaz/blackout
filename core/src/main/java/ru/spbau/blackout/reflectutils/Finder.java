@@ -1,4 +1,4 @@
-package ru.spbau.blackout.utils;
+package ru.spbau.blackout.reflectutils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -7,17 +7,15 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
-import static ru.spbau.blackout.utils.ReflectUtils.getAllFields;
-
+import static ru.spbau.blackout.reflectutils.ReflectUtils.getAllFields;
 
 public class Finder<T> {
-    private static final String PROJECT_PACKAGE_PREFIX = "ru.spbau.blackout";
 
+    private static final String PROJECT_PACKAGE_PREFIX = "ru.spbau.blackout";
 
     private final Class<T> baseClass;
     private final Collection<T> store;
     private final Set<Object> visited = Collections.newSetFromMap(new IdentityHashMap<>());
-
 
     public Finder(Class<T> baseClass, Collection<T> store) {
         this.baseClass = baseClass;
@@ -27,7 +25,6 @@ public class Finder<T> {
     public Finder(Class<T> baseClass) {
         this(baseClass, new ArrayList<>());
     }
-
 
     public Collection<T> getStore() { return store; }
     public Set<Object> getVisited() { return visited; }

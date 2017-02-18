@@ -12,6 +12,8 @@ import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
 import ru.spbau.blackout.abilities.DynamicAbilityObject;
 import ru.spbau.blackout.entities.GameObject;
+import ru.spbau.blackout.serializationutils.EffectiveInputStream;
+import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Particles;
@@ -72,13 +74,13 @@ public final class FireballObject extends DynamicAbilityObject {
     }
 
     @Override
-    public void getState(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void getState(EffectiveOutputStream out) throws IOException {
         super.getState(out);
         out.writeBoolean(shouldExplode);
     }
 
     @Override
-    public void setState(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    public void setState(EffectiveInputStream in) throws IOException {
         super.setState(in);
         shouldExplode = in.readBoolean();
     }

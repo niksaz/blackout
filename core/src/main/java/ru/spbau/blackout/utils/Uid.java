@@ -1,15 +1,30 @@
 package ru.spbau.blackout.utils;
 
-import java.io.Externalizable;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.Serializable;
 
-public class Uid implements Externalizable {
+import ru.spbau.blackout.serializationutils.EffectiveInputStream;
+import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
+import ru.spbau.blackout.serializationutils.EffectiveSerializable;
 
-    private /*final*/ int uid;
+public final class Uid implements EffectiveSerializable, Serializable {
 
-    public Uid(int uid) {
+    private static final int CACHE_SIZE = 256;
+
+    private final int uid;
+    private static Uid[] CACHE = new Uid[CACHE_SIZE];
+
+    static {
+        for (int i = 0; i < CACHE_SIZE; i++) {
+            CACHE[i] = new Uid(i);
+        }
+    }
+
+    public static Uid get(int uid) {
+        return 0 <= uid && uid < CACHE_SIZE ? CACHE[uid] : new Uid(uid);
+    }
+
+    private Uid(int uid) {
         this.uid = uid;
     }
 
@@ -24,12 +39,11 @@ public class Uid implements Externalizable {
     }
 
     @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
+    public void effectiveWriteObject(EffectiveOutputStream out) throws IOException {
         out.writeInt(uid);
     }
 
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        uid = in.readInt();
+    public static Uid effectiveReadObject(EffectiveInputStream in) throws IOException {
+        return new Uid(in.readInt());
     }
 }

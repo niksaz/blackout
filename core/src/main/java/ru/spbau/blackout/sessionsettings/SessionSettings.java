@@ -13,7 +13,7 @@ import ru.spbau.blackout.entities.Decoration;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.shapescreators.RightOctagonCreator;
-import ru.spbau.blackout.utils.Finder;
+import ru.spbau.blackout.reflectutils.Finder;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.utils.UidGenerator;
 
@@ -83,7 +83,7 @@ public final class SessionSettings implements Serializable {
         initialPositionsPool.add(new Vector2(0, 0));
 
         final SessionSettings session = new SessionSettings();
-        session.setPlayerUid(new Uid(1));
+        session.setPlayerUid(Uid.get(1));
 
         for (Character.Definition characterDefinition : characters) {
             if (initialPositionsPool.size == 0) {
