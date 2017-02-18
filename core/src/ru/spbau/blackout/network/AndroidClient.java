@@ -135,10 +135,7 @@ public class AndroidClient implements Runnable, UIServer {
 
     @Override
     public void sendSelfVelocity(GameUnit unit, Vector2 velocity) {
-        synchronized (velocityToSend) {
-            velocityToSend.set(new Vector2(velocity));
-            velocityToSend.notify();
-        }
+        velocityToSend.set(new Vector2(velocity));
     }
 
     @Override
@@ -206,60 +203,6 @@ public class AndroidClient implements Runnable, UIServer {
                     break;
             }
         } while (gameState == GameState.WAITING && !isInterrupted);
-    }
-
-    private class UIChangeSenderUDP implements Runnable {
-
-        private final InetAddress serverInetAddress;
-        private final int serverDatagramPort;
-        private final DatagramSocket datagramSocket;
-
-        public UIChangeSenderUDP(InetAddress serverInetAddress, int serverDatagramPort, DatagramSocket datagramSocket) {
-            this.serverInetAddress = serverInetAddress;
-            this.serverDatagramPort = serverDatagramPort;
-            this.datagramSocket = datagramSocket;
-        }
-
-        @Override
-        public void run() {
-            final DatagramPacket velocityDatagram =
-                    new DatagramPacket(new byte[0], 0, serverInetAddress, serverDatagramPort);
-
-            while (!isInterrupted) {
-                if (velocityToSend.get() != null) {
-                    try (ByteArrayOutputStream velocityByteStream =
-                                 new ByteArrayOutputStream(Network.DATAGRAM_VELOCITY_PACKET_SIZE);
-                         ObjectOutputStream velocityObjectStream = new ObjectOutputStream(velocityByteStream)
-                    ) {
-                        velocityObjectStream.writeObject(velocityToSend.getAndSet(null));
-                        velocityObjectStream.flush();
-                        final byte[] byteArray = velocityByteStream.toByteArray();
-                        velocityDatagram.setData(byteArray);
-                        velocityDatagram.setLength(byteArray.length);
-                        datagramSocket.send(velocityDatagram);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        isInterrupted = true;
-                    }
-                } else {
-                    synchronized (velocityToSend) {
-                        if (velocityToSend.get() == null) {
-                            try {
-                                // setting timeout because if a client not responding in SOCKET_IO_TIMEOUT_MS
-                                // he will be disconnected
-                                velocityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS / 8);
-                                if (velocityToSend.get() == null) {
-                                    velocityToSend.set(new Vector2());
-                                }
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                                isInterrupted = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private class WinnerGetterTCP implements Runnable {
