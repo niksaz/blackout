@@ -1,7 +1,11 @@
-language: java
+language: android
 jdk:
   - oraclejdk8
-install:
-  - ./gradlew :core:assemble :server:assemble
-script:
-  - ./gradlew :core:check :server:check
+android:
+  components:
+    - tools
+    - build-tools-24.0.3
+    - android-23
+    - extra-android-m2repository
+    - extra-google-m2repository
+    - extra-google-google_play_services
