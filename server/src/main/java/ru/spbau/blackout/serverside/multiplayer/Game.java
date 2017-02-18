@@ -13,10 +13,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.List;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.DeflaterOutputStream;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.database.Database;
@@ -259,11 +257,11 @@ public class Game extends Thread implements GameContext {
 
     private byte[] serializeWorld() throws IOException {
         final ByteArrayOutputStream worldByteStream = new ByteArrayOutputStream();
-        final GZIPOutputStream worldGzipStream = new GZIPOutputStream(worldByteStream);
-        final EffectiveOutputStream worldStream = new EffectiveOutputStream(worldGzipStream);
+        final DeflaterOutputStream worldDeflaterStream = new DeflaterOutputStream(worldByteStream);
+        final EffectiveOutputStream worldStream = new EffectiveOutputStream(worldDeflaterStream);
         gameWorld.getState(worldStream);
-        worldGzipStream.finish();
-        worldGzipStream.flush();
+        worldDeflaterStream.finish();
+        worldDeflaterStream.flush();
         return worldByteStream.toByteArray();
     }
 

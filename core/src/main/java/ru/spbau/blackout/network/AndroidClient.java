@@ -16,7 +16,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.zip.GZIPInputStream;
+import java.util.zip.InflaterInputStream;
 
 import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.androidfeatures.PlayServices;
@@ -98,7 +98,7 @@ public class AndroidClient implements Runnable, UIServer {
             while (!isInterrupted) {
                 datagramSocket.receive(receivedPacket);
                 final EffectiveInputStream serverWorldStream = new EffectiveInputStream(
-                        new GZIPInputStream(new ByteArrayInputStream(receivedPacket.getData())));
+                        new InflaterInputStream(new ByteArrayInputStream(receivedPacket.getData())));
                 currentWorld.setExternalWorldStream(serverWorldStream);
             }
         } catch (UnknownHostException e) {
