@@ -13,28 +13,29 @@ import java.io.ObjectOutputStream;
 
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Uid;
+import ru.spbau.blackout.utils.Utils;
 
 
 public abstract class DynamicObject extends GameObject {
+
+    private static final float LINEAR_FRICTION = 0.002f;
+
     /** Constant holder class to provide names for animations. */
-    public static class Animations {
+    protected static class Animations {
         protected Animations() {}
         public static final String STAY = "Armature|Stay";
     }
 
     /**
-     * It is public because it's safe to updatePhysics in almost any time.
-     * And it allows to do stuff like <code>object.velocity.mulAdd(...)</code>.
-     * It also has getter and setter to have similar interface to
-     * <code>selfVelocity</code> from <code>GameUnit</code>.
+     * Object's natural velocity.
+     * @see ru.spbau.blackout.worlds.GameWorld
      */
     public final Vector2 velocity = new Vector2();
+    /** @see ru.spbau.blackout.worlds.GameWorld */
     public final Vector2 temporaryVelocity = new Vector2();
 
     // Appearance:
-    /** It is null on server */
-    @Nullable
-    protected final AnimationController animation;
+    @Nullable protected final AnimationController animation;
     protected float animationSpeed = 1f;
 
 
@@ -54,12 +55,9 @@ public abstract class DynamicObject extends GameObject {
     public void kill() {
         super.kill();
         velocity.setZero();
+        temporaryVelocity.setZero();
         body.setLinearVelocity(Vector2.Zero);
     }
-
-//    public final Vector2 getVelocity() { return new Vector2(velocity); }
-//    public final void setVelocity(float x, float y) { velocity.set(x, y); }
-//    public final void setVelocity(Vector2 newVelocity) { setVelocity(newVelocity.x, newVelocity.y); }
 
     public final void applyImpulse(float x, float y) {
         float mass = getMass();
@@ -87,16 +85,35 @@ public abstract class DynamicObject extends GameObject {
         }
     }
 
+    @Override
+    public void updateBeforeFirstStep() {
+        super.updateBeforeFirstStep();
+        // apply friction
+        if (!Utils.isZeroVec(velocity)){
+            float k = 1f - (getMass() * LINEAR_FRICTION) / velocity.len();
+            if (k < 0) k = 0;
+            velocity.scl(k);
+        }
+    }
+
+    /**
+     * Must be called only by {@link ru.spbau.blackout.worlds.ServerGameWorld} before
+     * the first step processing.
+     */
     public final void prepareForFirstStep() {
         body.setLinearVelocity(velocity);
         // to take into account velocity changes during the step
-        velocity.set(0, 0);
+        velocity.setZero();
     }
 
+    /**
+     * Must be called only by {@link ru.spbau.blackout.worlds.ServerGameWorld} before
+     * the second step processing.
+     */
     public final void prepareForSecondStep() {
         velocity.add(body.getLinearVelocity());
         body.setLinearVelocity(temporaryVelocity);
-        temporaryVelocity.set(0, 0);
+        temporaryVelocity.setZero();
     }
 
     @Override

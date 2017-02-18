@@ -13,7 +13,6 @@ import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.utils.Utils;
 
-
 /**
  * Unit is a dynamic object which can move by itself and cast abilities.
  * Also it has friction.
@@ -21,19 +20,16 @@ import ru.spbau.blackout.utils.Utils;
 public abstract class GameUnit extends DynamicObject {
 
     /** Constant holder class to provide names for animations. */
-    public static class UnitAnimations extends DynamicObject.Animations {
+    protected static class UnitAnimations extends DynamicObject.Animations {
         protected UnitAnimations() {}
         public static final String WALK = "Armature|Walk";
         public static final float WALK_ANIM_SPEED_FACTOR = 3f;
     }
 
-    public static final float SELF_RESISTANCE_FACTOR = 0.02f;
-    public static final float LINEAR_FRICTION = 0.002f;
-
+    private static final float SELF_RESISTANCE_FACTOR = 0.02f;
 
     private final Vector2 selfVelocity = new Vector2();
     private float speed;
-
 
     protected GameUnit(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
@@ -49,19 +45,7 @@ public abstract class GameUnit extends DynamicObject {
 
     @Override
     public void updateBeforeFirstStep() {
-        // apply friction
-        if (!Utils.isZeroVec(velocity)){
-            float k = 1f - (getMass() * LINEAR_FRICTION) / velocity.len();
-            if (k < 0) k = 0;
-            velocity.scl(k);
-        }
-    }
-
-    /** See <code>GameWorld</code> documentation */
-    @Override
-    public void updateBeforeSecondStep() {
-        super.updateBeforeSecondStep();
-
+        super.updateBeforeFirstStep();
         // Resistance to external velocity by unit (selfVelocity)
         if (!Utils.isZeroVec(velocity)) {
             // some inefficient, but clear pseudocode in comments:
@@ -74,7 +58,12 @@ public abstract class GameUnit extends DynamicObject {
             if (k < -1) k = -1;
             velocity.mulAdd(velocity, k);
         }
+    }
 
+    /** See <code>GameWorld</code> documentation */
+    @Override
+    public void updateBeforeSecondStep() {
+        super.updateBeforeSecondStep();
         temporaryVelocity.add(selfVelocity.x * speed, selfVelocity.y * speed);
     }
 
@@ -120,9 +109,6 @@ public abstract class GameUnit extends DynamicObject {
 
         selfVelocity.set(newVelocity.x, newVelocity.y);
     }
-
-    public void setSelfVelocity(float x, float y) { setSelfVelocity(new Vector2(x, y)); }
-
 
     /** Definition for units. Loads abilities. */
     public static abstract class Definition extends DynamicObject.Definition {
