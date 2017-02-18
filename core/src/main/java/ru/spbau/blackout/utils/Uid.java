@@ -1,9 +1,11 @@
 package ru.spbau.blackout.utils;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-public class Uid implements Serializable {
+public class Uid implements Externalizable {
 
     private /*final*/ int uid;
 
@@ -21,10 +23,13 @@ public class Uid implements Serializable {
         return uid;
     }
 
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(uid);
     }
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         uid = in.readInt();
     }
 }
