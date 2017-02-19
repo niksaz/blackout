@@ -99,7 +99,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         Camera uiCamera = new OrthographicCamera(getWorldWidth(), getWorldHeight());
         Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), uiCamera);
-        Stage stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
+        Stage stage = new GameStage(viewport, BlackoutGame.get().spriteBatch(), this);
         Gdx.input.setInputProcessor(stage);
         ui = new PlayerUI(stage, getUiServer());
 
