@@ -9,7 +9,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Socket;
@@ -28,12 +27,12 @@ import ru.spbau.blackout.screens.tables.MultiplayerTable;
 import ru.spbau.blackout.screens.tables.PlayScreenTable;
 import ru.spbau.blackout.serializationutils.EfficientInputStream;
 import ru.spbau.blackout.serializationutils.EfficientOutputStream;
+import ru.spbau.blackout.serializationutils.EfficientSerializable;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.worlds.ClientGameWorld;
 
-import static java.lang.Thread.sleep;
 import static ru.spbau.blackout.BlackoutGame.DIALOG_PADDING;
 
 /**
@@ -76,7 +75,8 @@ public class AndroidClient implements Runnable, UIServer {
             out.writeUTF(BlackoutGame.get().playServicesInCore().getPlayServices().getPlayerName());
             out.writeInt(datagramSocket.getLocalPort());
             out.flush();
-            final int serverDatagramPort = in.readInt();
+            final int serverDatagramPortForVelocity = in.readInt();
+            final int serverDatagramPortForAbilities = in.readInt();
 
             gameStartWaiting(in, out);
             if (isInterrupted) {
@@ -84,14 +84,17 @@ public class AndroidClient implements Runnable, UIServer {
             }
             socket.setSoTimeout(0);
 
-            new Thread(new UIChangeSenderTCP(out)).start();
-            new Thread(new WinnerGetterTCP(in)).start();
+            final DatagramPacket abilityDatagram =
+                    new DatagramPacket(new byte[0], 0, socket.getInetAddress(), serverDatagramPortForAbilities);
+            new Thread(new AbilityCastSender(datagramSocket, abilityDatagram)).start();
+
+            new Thread(new WinnerGetter(in)).start();
 
             final ClientGameWorld currentWorld = (ClientGameWorld) gameScreen.gameWorld();
             final byte[] buffer = new byte[Network.DATAGRAM_WORLD_PACKET_SIZE];
             final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
             final DatagramPacket velocityDatagram =
-                    new DatagramPacket(new byte[0], 0, socket.getInetAddress(), serverDatagramPort);
+                    new DatagramPacket(new byte[0], 0, socket.getInetAddress(), serverDatagramPortForVelocity);
 
             while (!isInterrupted) {
                 try (ByteArrayOutputStream velocityByteStream = new ByteArrayOutputStream();
@@ -101,6 +104,7 @@ public class AndroidClient implements Runnable, UIServer {
                     final byte[] byteArray = velocityByteStream.toByteArray();
                     velocityDatagram.setData(byteArray);
                     velocityDatagram.setLength(byteArray.length);
+                    System.out.println("VELOCTIY SIZE IS " + byteArray.length);
                     datagramSocket.send(velocityDatagram);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -205,11 +209,11 @@ public class AndroidClient implements Runnable, UIServer {
         } while (gameState == GameState.WAITING && !isInterrupted);
     }
 
-    private class WinnerGetterTCP implements Runnable {
+    private class WinnerGetter implements Runnable {
 
         private final ObjectInputStream objectInputStream;
 
-        WinnerGetterTCP(ObjectInputStream objectInputStream) {
+        WinnerGetter(ObjectInputStream objectInputStream) {
             this.objectInputStream = objectInputStream;
         }
 
@@ -266,48 +270,74 @@ public class AndroidClient implements Runnable, UIServer {
         }
     }
 
-    private class UIChangeSenderTCP implements Runnable {
+    private class AbilityCastSender implements Runnable {
 
-        private final ObjectOutputStream objectOutputStream;
+        private final DatagramSocket datagramSocket;
+        private final DatagramPacket abilityDatagram;
 
-        public UIChangeSenderTCP(ObjectOutputStream objectOutputStream) {
-            this.objectOutputStream = objectOutputStream;
+        public AbilityCastSender(DatagramSocket datagramSocket, DatagramPacket abilityDatagram) {
+            this.datagramSocket = datagramSocket;
+            this.abilityDatagram = abilityDatagram;
         }
 
         @Override
         public void run() {
             while (!isInterrupted) {
                 if (abilityToSend.get() != null) {
-                    try {
-                        objectOutputStream.writeObject(abilityToSend.getAndSet(null));
-                        objectOutputStream.flush();
+                    try (ByteArrayOutputStream abilityByteStream = new ByteArrayOutputStream();
+                         EfficientOutputStream efficientOutputStream = new EfficientOutputStream(abilityByteStream)
+                    ) {
+                        efficientOutputStream.writeObject(abilityToSend.getAndSet(null));
+                        efficientOutputStream.flush();
+                        final byte[] arrayToSend = abilityByteStream.toByteArray();
+                        abilityDatagram.setData(arrayToSend);
+                        abilityDatagram.setLength(arrayToSend.length);
+                        datagramSocket.send(abilityDatagram);
                     } catch (IOException e) {
                         e.printStackTrace();
                         isInterrupted = true;
                     }
                 } else {
-                    synchronized (abilityToSend) {
-                        if (abilityToSend.get() == null) {
-                            try {
-                                abilityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                                isInterrupted = true;
-                            }
-                        }
+                    waitForAbility();
+                }
+            }
+        }
+
+        private void waitForAbility() {
+            synchronized (abilityToSend) {
+                if (abilityToSend.get() == null) {
+                    try {
+                        abilityToSend.wait(Network.SOCKET_IO_TIMEOUT_MS);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        isInterrupted = true;
                     }
                 }
             }
         }
     }
 
-    public static class AbilityCast implements Serializable {
+
+    public static class AbilityCast implements EfficientSerializable {
+
         public int abilityNum;
         public Vector2 target;
 
         AbilityCast(int abilityNum, Vector2 target) {
             this.abilityNum = abilityNum;
             this.target = target;
+        }
+
+        @Override
+        public void effectiveWriteObject(EfficientOutputStream out) throws IOException {
+            out.writeInt(abilityNum);
+            out.writeVector2(target);
+        }
+
+        public static AbilityCast effectiveReadObject(EfficientInputStream in) throws IOException {
+            final int abilityNum = in.readInt();
+            final Vector2 target = in.readVector2();
+            return new AbilityCast(abilityNum, target);
         }
     }
 }

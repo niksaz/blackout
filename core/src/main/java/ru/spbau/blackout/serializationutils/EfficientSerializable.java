@@ -7,5 +7,5 @@ public interface EfficientSerializable {
     String readObjectMethodName = "effectiveReadObject";
 
     void effectiveWriteObject(EfficientOutputStream out) throws IOException;
-    // static void effectiveReadObject(EfficientInputStream in) throws IOException;
+    // public static Object effectiveReadObject(EfficientInputStream in) throws IOException;
 }

@@ -51,12 +51,13 @@ public class ClientHandler implements Runnable {
 
     public void run() {
         try (Socket socket = this.socket;
-             DatagramSocket datagramSocket = new DatagramSocket();
+             DatagramSocket datagramSocketVelocity = new DatagramSocket();
+             DatagramSocket datagramSocketAbilities = new DatagramSocket();
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream in = new ObjectInputStream(socket.getInputStream())
         ) {
             socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
-            datagramSocket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
+            datagramSocketVelocity.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
             name = in.readUTF();
             // name has been set up, game is waiting for name to access database
             synchronized (this) {
@@ -65,16 +66,17 @@ public class ClientHandler implements Runnable {
             final int clientDatagramPort = in.readInt();
             server.log(name + " connected.");
 
-            out.writeInt(datagramSocket.getLocalPort());
+            out.writeInt(datagramSocketVelocity.getLocalPort());
+            out.writeInt(datagramSocketAbilities.getLocalPort());
             out.flush();
 
             gameStartWaiting(in, out);
 
             socket.setSoTimeout(0);
 
-            new Thread(new UIChangeGetterUDP(datagramSocket)).start();
-            new Thread(new UIChangeGetterTCP(in)).start();
-            new Thread(new WinnerSenderTCP(out)).start();
+            new Thread(new VelocityGetter(datagramSocketVelocity)).start();
+            new Thread(new AbilityCastGetter(datagramSocketAbilities)).start();
+            new Thread(new WinnerSender(out)).start();
 
             final DatagramPacket worldDatagramPacket =
                     new DatagramPacket(new byte[0], 0, socket.getInetAddress(), clientDatagramPort);
@@ -84,7 +86,7 @@ public class ClientHandler implements Runnable {
                     final byte[] worldToSend = worldInBytes.getAndSet(null);
                     worldDatagramPacket.setData(worldToSend);
                     worldDatagramPacket.setLength(worldToSend.length);
-                    datagramSocket.send(worldDatagramPacket);
+                    datagramSocketVelocity.send(worldDatagramPacket);
                 } else {
                     synchronized (this) {
                         if (worldInBytes.get() == null) {
@@ -149,11 +151,11 @@ public class ClientHandler implements Runnable {
         return abilityCastFromClient.getAndSet(null);
     }
 
-    private class UIChangeGetterUDP implements Runnable {
+    private class VelocityGetter implements Runnable {
 
         private final DatagramSocket datagramSocket;
 
-        UIChangeGetterUDP(DatagramSocket datagramSocket) {
+        VelocityGetter(DatagramSocket datagramSocket) {
             this.datagramSocket = datagramSocket;
         }
 
@@ -176,21 +178,27 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private class UIChangeGetterTCP implements Runnable {
+    private class AbilityCastGetter implements Runnable {
 
-        private final ObjectInputStream objectInputStream;
+        private final DatagramSocket datagramSocket;
 
-        UIChangeGetterTCP(ObjectInputStream objectInputStream) {
-            this.objectInputStream = objectInputStream;
+        AbilityCastGetter(DatagramSocket datagramSocket) {
+            this.datagramSocket = datagramSocket;
         }
 
         @Override
         public void run() {
+            final byte[] buffer = new byte[Network.DATAGRAM_VELOCITY_PACKET_SIZE];
+            final DatagramPacket receivedPacket = new DatagramPacket(buffer, buffer.length);
             while (clientGameState != GameState.FINISHED) {
                 try {
-                    final AbilityCast abilityCast = (AbilityCast) objectInputStream.readObject();
+                    datagramSocket.receive(receivedPacket);
+                    System.out.println("ABILITY CAST SIZE IS " + receivedPacket.getLength());
+                    final EfficientInputStream efficientInputStream =
+                            new EfficientInputStream(new ByteArrayInputStream(receivedPacket.getData()));
+                    final AbilityCast abilityCast = efficientInputStream.readObject(AbilityCast.class);
                     abilityCastFromClient.set(abilityCast);
-                } catch (ClassNotFoundException | IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                     clientGameState = GameState.FINISHED;
                 }
@@ -198,11 +206,11 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private class WinnerSenderTCP implements Runnable {
+    private class WinnerSender implements Runnable {
 
         private final ObjectOutputStream objectOutputStream;
 
-        WinnerSenderTCP(ObjectOutputStream objectOutputStream) {
+        WinnerSender(ObjectOutputStream objectOutputStream) {
             this.objectOutputStream = objectOutputStream;
         }
 
