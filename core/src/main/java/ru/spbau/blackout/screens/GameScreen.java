@@ -31,19 +31,19 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import org.jetbrains.annotations.Nullable;
 
 import ru.spbau.blackout.BlackoutGame;
-import ru.spbau.blackout.ingameui.IngameUI;
-import ru.spbau.blackout.ingameui.ObserverUI;
-import ru.spbau.blackout.sessionsettings.SessionSettings;
-import ru.spbau.blackout.network.UIServer;
-import ru.spbau.blackout.worlds.GameWorld;
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Character;
+import ru.spbau.blackout.ingameui.IngameUI;
+import ru.spbau.blackout.ingameui.ObserverUI;
 import ru.spbau.blackout.ingameui.PlayerUI;
+import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
+import ru.spbau.blackout.progressbar.SimpleProgressBar;
+import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.units.Vpx;
-import ru.spbau.blackout.progressbar.SimpleProgressBar;
 import ru.spbau.blackout.utils.Textures;
+import ru.spbau.blackout.worlds.GameWorld;
 
 import static ru.spbau.blackout.BlackoutGame.getWorldHeight;
 import static ru.spbau.blackout.BlackoutGame.getWorldWidth;
@@ -99,7 +99,7 @@ public class GameScreen extends BlackoutScreen implements GameContext {
 
         Camera uiCamera = new OrthographicCamera(getWorldWidth(), getWorldHeight());
         Viewport viewport = new StretchViewport(getWorldWidth(), getWorldHeight(), uiCamera);
-        Stage stage = new Stage(viewport, BlackoutGame.get().spriteBatch());
+        Stage stage = new GameStage(viewport, BlackoutGame.get().spriteBatch(), this);
         Gdx.input.setInputProcessor(stage);
         ui = new PlayerUI(stage, getUiServer());
 
@@ -313,8 +313,9 @@ public class GameScreen extends BlackoutScreen implements GameContext {
      * Screen with progress bar which is showed during loading assets.
      */
     private class LoadingScreen extends BlackoutScreen {
-        public static final String BACKGROUND_IMAGE = "images/loading_screen.png";
 
+        public static final String BACKGROUND_IMAGE = "images/loading_screen.png";
+        private static final String TIP = "Use Force Blast to repel enemy spells.";
 
         private final Stage stage;
         private final SimpleProgressBar progressBar =
@@ -365,7 +366,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
                     BlackoutGame.get().assets().getFont(),
                     LoadingLabel.COLOR
             );
-            Label label = new Label("TODO: tips and tricks.", style);
+            //TODO: add more tips
+            Label label = new Label(TIP, style);
             label.setPosition(LoadingLabel.MIN_X, LoadingLabel.MIN_Y);
             label.setSize(LoadingLabel.WIDTH, LoadingLabel.MAX_Y - LoadingLabel.MIN_Y);
             label.setAlignment(Align.center);

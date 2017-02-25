@@ -35,5 +35,6 @@ public class ScreenManager {
 
     public void dispose() {
         foreach(screens, BlackoutScreen::dispose);
+        screens.clear();
     }
 }

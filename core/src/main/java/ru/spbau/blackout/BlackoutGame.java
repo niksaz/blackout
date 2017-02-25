@@ -102,6 +102,8 @@ public class BlackoutGame extends Game {
         this.assets.load();
 
         this.screenManager.setScreen(new LoadScreen());
+
+        Gdx.input.setCatchBackKey(true);
     }
 
     @Override

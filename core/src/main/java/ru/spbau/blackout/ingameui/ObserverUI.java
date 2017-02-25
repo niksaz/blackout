@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import ru.spbau.blackout.ingameui.objects.CameraControlStick;
-import ru.spbau.blackout.ingameui.objects.ExitButton;
 import ru.spbau.blackout.network.UIServer;
 
 public class ObserverUI extends IngameUI {
@@ -12,6 +11,5 @@ public class ObserverUI extends IngameUI {
         super(stage);
 
         addUiObject(new CameraControlStick(getStage(), server, camera));
-        addUiObject(new ExitButton(getStage()));
     }
 }
