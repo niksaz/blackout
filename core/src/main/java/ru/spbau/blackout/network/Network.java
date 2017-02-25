@@ -8,7 +8,7 @@ public class Network {
     public static final int STATE_UPDATE_CYCLE_MS = 250;
     public static final int SOCKET_IO_TIMEOUT_MS = 5000;
 
-    public static final long TIME_SHOULD_BE_SPENT_IN_ITERATION = 30;
+    public static final long TIME_SHOULD_BE_SPENT_IN_ITERATION = 16;
 
     public static final String SERVER_IP_ADDRESS = "93.92.205.63";
     public static final int SERVER_HTTP_PORT_NUMBER = 48800;
