@@ -8,11 +8,9 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
-import ru.spbau.blackout.serializationutils.EffectiveInputStream;
-import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
+import ru.spbau.blackout.serializationutils.EfficientInputStream;
+import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Uid;
 
@@ -94,13 +92,13 @@ public abstract class DynamicObject extends GameObject {
     }
 
     @Override
-    public void getState(EffectiveOutputStream out) throws IOException {
+    public void getState(EfficientOutputStream out) throws IOException {
         super.getState(out);
         out.writeFloat(animationSpeed);
     }
 
     @Override
-    public void setState(EffectiveInputStream in) throws IOException {
+    public void setState(EfficientInputStream in) throws IOException {
         super.setState(in);
         animationSpeed = in.readFloat();
     }

@@ -3,8 +3,6 @@ package ru.spbau.blackout.abilities.fireball;
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.entities.Damageable;
@@ -12,8 +10,8 @@ import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
 import ru.spbau.blackout.abilities.DynamicAbilityObject;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.serializationutils.EffectiveInputStream;
-import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
+import ru.spbau.blackout.serializationutils.EfficientInputStream;
+import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Particles;
@@ -74,13 +72,13 @@ public final class FireballObject extends DynamicAbilityObject {
     }
 
     @Override
-    public void getState(EffectiveOutputStream out) throws IOException {
+    public void getState(EfficientOutputStream out) throws IOException {
         super.getState(out);
         out.writeBoolean(shouldExplode);
     }
 
     @Override
-    public void setState(EffectiveInputStream in) throws IOException {
+    public void setState(EfficientInputStream in) throws IOException {
         super.setState(in);
         shouldExplode = in.readBoolean();
     }

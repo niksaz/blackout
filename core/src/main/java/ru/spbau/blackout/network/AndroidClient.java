@@ -12,7 +12,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,8 +26,8 @@ import ru.spbau.blackout.screens.GameScreen;
 import ru.spbau.blackout.screens.MenuScreen;
 import ru.spbau.blackout.screens.tables.MultiplayerTable;
 import ru.spbau.blackout.screens.tables.PlayScreenTable;
-import ru.spbau.blackout.serializationutils.EffectiveInputStream;
-import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
+import ru.spbau.blackout.serializationutils.EfficientInputStream;
+import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.settings.GameSettings;
 import ru.spbau.blackout.utils.Uid;
@@ -96,7 +95,7 @@ public class AndroidClient implements Runnable, UIServer {
 
             while (!isInterrupted) {
                 try (ByteArrayOutputStream velocityByteStream = new ByteArrayOutputStream();
-                     EffectiveOutputStream velocityObjectStream = new EffectiveOutputStream(velocityByteStream)
+                     EfficientOutputStream velocityObjectStream = new EfficientOutputStream(velocityByteStream)
                 ) {
                     velocityObjectStream.writeVector2(velocityToSend);
                     final byte[] byteArray = velocityByteStream.toByteArray();
@@ -109,7 +108,7 @@ public class AndroidClient implements Runnable, UIServer {
                 }
 
                 datagramSocket.receive(receivedPacket);
-                final EffectiveInputStream serverWorldStream = new EffectiveInputStream(
+                final EfficientInputStream serverWorldStream = new EfficientInputStream(
                         new InflaterInputStream(new ByteArrayInputStream(receivedPacket.getData())));
                 currentWorld.setExternalWorldStream(serverWorldStream);
             }

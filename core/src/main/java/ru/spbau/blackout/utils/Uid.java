@@ -3,11 +3,11 @@ package ru.spbau.blackout.utils;
 import java.io.IOException;
 import java.io.Serializable;
 
-import ru.spbau.blackout.serializationutils.EffectiveInputStream;
-import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
-import ru.spbau.blackout.serializationutils.EffectiveSerializable;
+import ru.spbau.blackout.serializationutils.EfficientInputStream;
+import ru.spbau.blackout.serializationutils.EfficientOutputStream;
+import ru.spbau.blackout.serializationutils.EfficientSerializable;
 
-public final class Uid implements EffectiveSerializable, Serializable {
+public final class Uid implements EfficientSerializable, Serializable {
 
     private static final int CACHE_SIZE = 256;
 
@@ -30,7 +30,7 @@ public final class Uid implements EffectiveSerializable, Serializable {
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof Uid && ((Uid) other).uid == uid;
+        return other != null && other instanceof Uid && ((Uid) other).uid == uid;
     }
 
     @Override
@@ -39,11 +39,11 @@ public final class Uid implements EffectiveSerializable, Serializable {
     }
 
     @Override
-    public void effectiveWriteObject(EffectiveOutputStream out) throws IOException {
+    public void effectiveWriteObject(EfficientOutputStream out) throws IOException {
         out.writeInt(uid);
     }
 
-    public static Uid effectiveReadObject(EffectiveInputStream in) throws IOException {
+    public static Uid effectiveReadObject(EfficientInputStream in) throws IOException {
         return new Uid(in.readInt());
     }
 }

@@ -4,15 +4,12 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Iterator;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
+import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
-import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.utils.UidGenerator;
 
 import static ru.spbau.blackout.java8features.Functional.foreach;
@@ -40,7 +37,7 @@ public class ServerGameWorld extends GameWorld {
         foreach(getDefinitions(), def -> def.initializeWithoutUi(context));
     }
 
-    public void getState(EffectiveOutputStream out) throws IOException {
+    public void getState(EfficientOutputStream out) throws IOException {
         out.writeLong(stepNumber);
 
         out.writeInt(getGameObjects().size());

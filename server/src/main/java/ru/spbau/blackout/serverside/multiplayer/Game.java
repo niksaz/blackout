@@ -25,7 +25,7 @@ import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.screens.GameScreen;
-import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
+import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
@@ -258,7 +258,7 @@ public class Game extends Thread implements GameContext {
     private byte[] serializeWorld() throws IOException {
         final ByteArrayOutputStream worldByteStream = new ByteArrayOutputStream();
         final DeflaterOutputStream worldDeflaterStream = new DeflaterOutputStream(worldByteStream);
-        final EffectiveOutputStream worldStream = new EffectiveOutputStream(worldDeflaterStream);
+        final EfficientOutputStream worldStream = new EfficientOutputStream(worldDeflaterStream);
         gameWorld.getState(worldStream);
         worldDeflaterStream.finish();
         worldDeflaterStream.flush();

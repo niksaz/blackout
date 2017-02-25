@@ -19,14 +19,12 @@ import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.graphiceffects.GraphicEffect;
-import ru.spbau.blackout.serializationutils.EffectiveInputStream;
-import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
+import ru.spbau.blackout.serializationutils.EfficientInputStream;
+import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.serializationutils.HasState;
@@ -82,14 +80,14 @@ public abstract class GameObject implements RenderableProvider, HasState {
     }
 
     @Override
-    public void getState(EffectiveOutputStream out) throws IOException {
+    public void getState(EfficientOutputStream out) throws IOException {
         out.writeFloat(height);
         out.writeVector2(getPosition());
         out.writeFloat(getRotation());
     }
 
     @Override
-    public void setState(EffectiveInputStream in) throws IOException {
+    public void setState(EfficientInputStream in) throws IOException {
         height = in.readFloat();
         Vector2 position = in.readVector2();
         float rotation = in.readFloat();

@@ -2,16 +2,15 @@ package ru.spbau.blackout.serializationutils;
 
 import com.badlogic.gdx.math.Vector2;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-public class EffectiveOutputStream extends OutputStream {
+public class EfficientOutputStream extends OutputStream {
 
     private final OutputStream out;
 
-    public EffectiveOutputStream(OutputStream out) {
+    public EfficientOutputStream(OutputStream out) {
         this.out = out;
     }
 
@@ -53,12 +52,11 @@ public class EffectiveOutputStream extends OutputStream {
     }
 
     public synchronized void writeString(String source) throws IOException {
-        if (source != null) {
-            writeBoolean(true);
+        if (source == null) {
+            writeInt(-1);
+        } else {
             writeInt(source.length());
             write(source.getBytes());
-        } else {
-            writeBoolean(false);
         }
     }
 
@@ -67,7 +65,7 @@ public class EffectiveOutputStream extends OutputStream {
         writeFloat(source.y);
     }
 
-    public synchronized void writeObject(EffectiveSerializable source) throws IOException {
+    public synchronized void writeObject(EfficientSerializable source) throws IOException {
         source.effectiveWriteObject(this);
     }
 }

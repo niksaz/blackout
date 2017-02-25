@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
-import ru.spbau.blackout.serializationutils.EffectiveInputStream;
+import ru.spbau.blackout.serializationutils.EfficientInputStream;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.utils.Uid;
@@ -164,8 +164,8 @@ public class ClientHandler implements Runnable {
             while (clientGameState != GameState.FINISHED) {
                 try {
                     datagramSocket.receive(receivedPacket);
-                    final EffectiveInputStream clientsVelocityStream =
-                            new EffectiveInputStream(new ByteArrayInputStream(receivedPacket.getData()));
+                    final EfficientInputStream clientsVelocityStream =
+                            new EfficientInputStream(new ByteArrayInputStream(receivedPacket.getData()));
                     final Vector2 velocity = clientsVelocityStream.readVector2();
                     velocityFromClient.set(velocity);
                 } catch (IOException e) {

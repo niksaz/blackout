@@ -4,8 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Shape;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +14,8 @@ import ru.spbau.blackout.abilities.fireball.FireballAbility;
 import ru.spbau.blackout.graphiceffects.HealthBarEffect;
 import ru.spbau.blackout.progressbar.HorizontalProgressBar;
 import ru.spbau.blackout.progressbar.SimpleProgressBar;
-import ru.spbau.blackout.serializationutils.EffectiveInputStream;
-import ru.spbau.blackout.serializationutils.EffectiveOutputStream;
+import ru.spbau.blackout.serializationutils.EfficientInputStream;
+import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Particles;
@@ -69,7 +67,7 @@ public class Character extends GameUnit implements Damageable  {
     }
 
     @Override
-    public void getState(EffectiveOutputStream out) throws IOException {
+    public void getState(EfficientOutputStream out) throws IOException {
         super.getState(out);
         out.writeFloat(health);
         for (Ability ability : abilities) {
@@ -78,7 +76,7 @@ public class Character extends GameUnit implements Damageable  {
     }
 
     @Override
-    public void setState(EffectiveInputStream in) throws IOException {
+    public void setState(EfficientInputStream in) throws IOException {
         super.setState(in);
         health = in.readFloat();
         for (Ability ability : abilities) {
