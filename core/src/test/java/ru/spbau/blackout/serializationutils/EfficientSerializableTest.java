@@ -1,5 +1,7 @@
 package ru.spbau.blackout.serializationutils;
 
+import com.badlogic.gdx.math.Vector2;
+
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -208,6 +210,31 @@ public class EfficientSerializableTest {
              EfficientInputStream is = new EfficientInputStream(bytesIS)) {
             for (int i = 0; i < n; i++) {
                 Utils.floatEq(arr[i], is.readDouble());
+            }
+        }
+    }
+
+
+    @Test
+    public void serializeVector2Test() throws Exception {
+        final int n = 10;
+        final Random random = new Random();
+        final Vector2[] arr = new Vector2[n];
+        byte[] encoded;
+
+        try (ByteArrayOutputStream bytesOS = new ByteArrayOutputStream();
+             EfficientOutputStream os = new EfficientOutputStream(bytesOS)) {
+            for (int i = 0; i < n; i++) {
+                arr[i] = new Vector2(random.nextFloat(), random.nextFloat());
+                os.writeVector2(arr[i]);
+            }
+            encoded = bytesOS.toByteArray();
+        }
+
+        try (InputStream bytesIS = new ByteArrayInputStream(encoded);
+             EfficientInputStream is = new EfficientInputStream(bytesIS)) {
+            for (int i = 0; i < n; i++) {
+                assertEquals(arr[i], is.readVector2());
             }
         }
     }

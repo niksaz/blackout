@@ -1,7 +1,10 @@
 
 from string import Template
 
-def generate(type):
+def generate(type, generator = "default", equals = "assertEquals"):
+    if generator == "default":
+        generator = Template("random.next${Type}()").substitute(Type=type.title())
+
     template = """
     @Test
     public void serialize${Type}Test() throws Exception {
@@ -13,7 +16,7 @@ def generate(type):
         try (ByteArrayOutputStream bytesOS = new ByteArrayOutputStream();
              EfficientOutputStream os = new EfficientOutputStream(bytesOS)) {
             for (int i = 0; i < n; i++) {
-                arr[i] = random.next${Type}();
+                arr[i] = ${generator};
                 os.write${Type}(arr[i]);
             }
             encoded = bytesOS.toByteArray();
@@ -22,24 +25,25 @@ def generate(type):
         try (InputStream bytesIS = new ByteArrayInputStream(encoded);
              EfficientInputStream is = new EfficientInputStream(bytesIS)) {
             for (int i = 0; i < n; i++) {
-                assertEquals(arr[i], is.read${Type}());
+                ${equals}(arr[i], is.read${Type}());
             }
         }
     }
     """
 
-    return Template(template).substitute(type=type, Type=type.title())
+    return Template(template).substitute(type=type, Type=type.title(), generator=generator, equals=equals)
 
 
 def main():
     print(generate("boolean"))
-    print(generate("byte"))
-    print(generate("char"))
-    print(generate("short"))
+    print(generate("byte", "(byte) random.nextInt()"))
+    print(generate("char", "(char) random.nextInt()"))
+    print(generate("short", "(short) random.nextInt()"))
     print(generate("int"))
     print(generate("long"))
-    print(generate("float"))
-    print(generate("double"))
+    print(generate("float", equals="Utils.floatEq"))
+    print(generate("double", equals="Utils.floatEq"))
+    print(generate("Vector2", "new Vector2(random.nextFloat(), random.nextFloat())"))
 
 
 if __name__ == "__main__":

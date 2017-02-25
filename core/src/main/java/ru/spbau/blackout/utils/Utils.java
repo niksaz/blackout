@@ -9,6 +9,7 @@ import static com.badlogic.gdx.math.MathUtils.PI;
 
 
 public final class Utils {
+
     private Utils() {}
 
     /** Just a transparent texture 64x64 pixels. */
