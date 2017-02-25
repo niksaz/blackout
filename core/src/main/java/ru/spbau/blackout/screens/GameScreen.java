@@ -258,9 +258,8 @@ public class GameScreen extends BlackoutScreen implements GameContext {
             modelBatch.render(gameWorld.getGameObjects(), environment);
 
             // render particles
-            particleSystem.update();
             particleSystem.begin();
-            particleSystem.draw();
+            particleSystem.updateAndDraw();
             particleSystem.end();
             modelBatch.render(particleSystem);
 

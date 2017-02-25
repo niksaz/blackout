@@ -28,11 +28,10 @@ public abstract class DynamicAbilityObject extends DynamicObject implements Abil
     }
 
     @Override
-    public void updateForSecondStep() {
-        super.updateForSecondStep();
-        body.setLinearVelocity(0, 0);
-    }
+    public void beginContact(GameObject object) {}
 
+    @Override
+    public void endContact(GameObject object) {}
 
     public static abstract class Definition extends DynamicObject.Definition {
 

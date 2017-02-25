@@ -10,19 +10,24 @@ import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.GameObject;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 
-public class ForceBlastAbility extends SimpleInstantAbility {
+public final class ForceBlastAbility extends SimpleInstantAbility {
 
     static final String CAST_SOUND_PATH = "sounds/fire.ogg";
-    static final String EXPLOSION_EFFECT_PATH = "effects/force_blast/force_blast.pfx";
+    static final String EXPLOSION_EFFECT_PATH = "effects/small_explosion/small_explosion.pfx";
     static final String ICON_PATH = "abilities/force_blast/icon.png";
     static final String NAME = "Force Blast";
+    static final String MODEL_PATH = "models/force_blast/force_blast.g3db";
     static final float MAX_CHARGE_TIME = 1.5f;
     static final float RADIUS = 2.5f;
     static final float IMPULSE = 1200f;
     static final float BASE_DAMAGE = 15;
     static final float DAMAGE_INCREASE_PER_LEVEL = 3;
-    static final float EXPLOSION_TIME = 0.2f;
-
+    static final float MIN_SCALE = 0.1f;
+    static final float MAX_SCALE = 1f;
+    static final float SCALE_TIME = 0.15f;
+    static final float EXPLOSION_TIME = 0.25f;
+    static final float BACK_SCALE_TIME = 0.05f;
+    static final float ROTATION_SPEED = 6f;
 
     protected ForceBlastAbility(Definition def, Character character) {
         super(def, character);
@@ -36,23 +41,35 @@ public class ForceBlastAbility extends SimpleInstantAbility {
         shell.setCaster(getCharacter());
     }
 
-    public static class Definition extends Ability.Definition {
+    public final static class Definition extends Ability.Definition {
 
         private static final long serialVersionUID = 1000000000L;
 
         private final ForceBlastObject.Definition shellDef;
 
         public Definition(int level) {
-            super(level, ICON_PATH, NAME, MAX_CHARGE_TIME);
+            super(level);
             shellDef = new ForceBlastObject.Definition();
             shellDef.chestPivotOffset.set(0, 0, 1.5f);
             shellDef.isSensor = true;
         }
 
         @Override
-        public Ability makeInstance(Character character) {
-            shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * getLevel();
+        public void updateLevel() {
+            super.updateLevel();
+            shellDef.damage = BASE_DAMAGE + DAMAGE_INCREASE_PER_LEVEL * (getLevel() - 1);
+        }
+
+        @Override
+        protected Ability makeInstanceImpl(Character character) {
             return new ForceBlastAbility(this, character);
         }
+
+        @Override
+        public float maxChargeTime() { return MAX_CHARGE_TIME; }
+        @Override
+        public String name() { return NAME; }
+        @Override
+        public String iconPath() { return ICON_PATH; }
     }
 }

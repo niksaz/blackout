@@ -20,9 +20,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.graphiceffects.GraphicEffect;
+import ru.spbau.blackout.effects.Effect;
+import ru.spbau.blackout.effects.GraphicEffect;
+import ru.spbau.blackout.effects.PhysicEffect;
 import ru.spbau.blackout.serializationutils.EfficientInputStream;
 import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.specialeffects.ParticleSpecialEffect;
@@ -32,6 +36,7 @@ import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.worlds.ServerGameWorld;
 
+import static ru.spbau.blackout.java8features.Functional.foreach;
 import static ru.spbau.blackout.utils.Utils.fixTop;
 
 
@@ -39,18 +44,19 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
     public static final float RESTITUTION = 0.5f;
 
-
     protected final Body body;
     private float height;
 
     /** Equals to Optional.empty() on a server or if the object is dead. */
     @Nullable protected ModelInstance modelInstance;
-    public final Array<GraphicEffect> graphicEffects = new Array<>();
+    private final Set<PhysicEffect> physicEffects = new HashSet<>();
+    private final Set<GraphicEffect> graphicEffects = new HashSet<>();
 
     private boolean dead = false;
     private final GameObject.Definition def;
     private final Uid uid;
-
+    /** Is used to rotate modelInstance inside <code>updateModelPosition</code> method; */
+    private float lastRotation = 0;
 
     /**
      * Constructs defined object at the given touchPos.
@@ -61,22 +67,30 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
         if (def.model != null) {
             modelInstance = new ModelInstance(def.model);
+            fixTop(modelInstance);
         }
 
         body = def.registerObject(def.context, this);
         body.setUserData(this);
 
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = def.shapeCreator.create();
-        fixtureDef.density = 1f;
-        fixtureDef.friction = 0;
-        fixtureDef.restitution = RESTITUTION;
-        fixtureDef.isSensor = def.isSensor;
-        body.createFixture(fixtureDef);
-        fixtureDef.shape.dispose();
+        if (def.shapeCreator != null) {
+            FixtureDef fixtureDef = new FixtureDef();
+            fixtureDef.shape = def.shapeCreator.create();
+            fixtureDef.density = 1f;
+            fixtureDef.friction = 0;
+            fixtureDef.restitution = RESTITUTION;
+            fixtureDef.isSensor = def.isSensor;
+            body.createFixture(fixtureDef);
+            fixtureDef.shape.dispose();
+        }
 
         setPosition(x, y);
         setMass(def.mass);
+    }
+
+    @Nullable
+    public final ModelInstance getModelInstance() {
+        return modelInstance;
     }
 
     @Override
@@ -95,39 +109,37 @@ public abstract class GameObject implements RenderableProvider, HasState {
     }
 
     @Override
-    public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
+    public final void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
         if (modelInstance != null) {
-            updateTransform();
+            updateModelPosition();
             modelInstance.getRenderables(renderables, pool);
         }
     }
 
 
     public void updateGraphics(float delta) {
-        for (GraphicEffect effect : graphicEffects) {
+        for (Effect effect : getGraphicEffects()) {
             effect.update(delta);
         }
     }
 
-    /**
-     * Update things which are not connected with physics and don't require fixed step.
-     * See <code>GameWorld</code> documentation.
-     */
     public void updateState(float delta) {
-
+        for (Effect effect : getPhysicEffects()) {
+            effect.update(delta);
+        }
     }
 
     /** See <code>GameWorld</code> documentation. */
-    public abstract void updateForFirstStep();
+    public void updateBeforeFirstStep() {}
     /** See <code>GameWorld</code> documentation. */
-    public abstract void updateForSecondStep();
+    public void updateBeforeSecondStep() {}
 
     /**
      * Sets mass of the object. It mainly works just like expected:
      * the mass is higher, the harder to move object by applying external force.
      * One thing which can be unexpected is that velocity itself isn't connected with mass.
      */
-    public void setMass(float newMass) {
+    public final void setMass(float newMass) {
         MassData massData = body.getMassData();
 
         float scaleFactor = newMass / massData.mass;
@@ -152,88 +164,92 @@ public abstract class GameObject implements RenderableProvider, HasState {
         dispose();
     }
 
-    public boolean isDead() { return dead; }
+    public final boolean isDead() { return dead; }
 
     /**
      * Disposes all non-shared resources (like graphicEffects).
      * Shared resources (like models) will be disposed by AssetManager.
      */
     public void dispose() {
-        for (GraphicEffect effect : graphicEffects) {
-            effect.remove(def.getContext());
-        }
+        foreach(getGraphicEffects(), Effect::dispose);
+        foreach(getPhysicEffects(), Effect::dispose);
     }
-
 
     /**
      * This function is necessary for better encapsulation.
      * I don't want anyone to access object's <code>Body</code> directly as well as I don't want anyone
      * to access <code>World</code> (which is a part of <code>GameWorld</code> class) directly.
      */
-    public void destroyBody(World world) {
+    public final void destroyBody(World world) {
         world.destroyBody(body);
     }
 
     // Transform:
 
-    public void setTransform(float x, float y, float angle) {
+    public final void setTransform(float x, float y, float angle) {
         body.setTransform(x, y, angle);
     }
 
-    public void setTransform(Vector2 position, float angle) {
+    public final void setTransform(Vector2 position, float angle) {
         body.setTransform(position, angle);
     }
 
-    protected void updateTransform() {
+    private void updateModelPosition() {
         if (modelInstance != null) {
-            modelInstance.transform.setToRotationRad(Vector3.Z, body.getAngle());
-            fixTop(modelInstance);
-            Vector2 pos = body.getPosition();
+            float newRotation = getRotation();
+            modelInstance.transform.rotateRad(Vector3.Y, newRotation - lastRotation);
+            lastRotation = newRotation;
+            Vector2 pos = getPosition();
             modelInstance.transform.setTranslation(pos.x, pos.y, height);
+            modelInstance.calculateTransforms();
         }
     }
 
     // Rotation
 
     /** Set rotation in radians. */
-    public void setRotation(float angle) {
+    public final void setRotation(float angle) {
         Vector2 pos = getPosition();
         setTransform(pos.x, pos.y, angle);
     }
 
+    public final void rotate(float angle) {
+        setRotation(getRotation() + angle);
+    }
+
     /** Returns the current rotation in radians. */
-    public float getRotation() {
+    public final float getRotation() {
         return body.getAngle();
     }
 
     /** Rotates object to the given direction. */
-    public void setDirection(Vector2 direction) {
+    public final void setDirection(Vector2 direction) {
         setRotation(direction.angleRad());
     }
 
-    public Uid getUid() { return uid; }
+    public final Uid getUid() { return uid; }
 
-    public Vector2 getPosition() {
+    public final Vector2 getPosition() {
         return body.getPosition();
     }
 
-    public void setPosition(Vector2 position) {
+    public final void setPosition(Vector2 position) {
         setTransform(position, getRotation());
     }
 
-    public void setPosition(float x, float y) {
+    public final void setPosition(float x, float y) {
         setTransform(x, y, getRotation());
     }
 
     /**
      * Returns new Vector3 (so, it's safe to change this vector without changing unit's touchPos).
      */
-    public Vector3 get3dPosition() {
+    public final Vector3 get3dPosition() {
         Vector2 pos = getPosition();
         return new Vector3(pos.x, pos.y, getHeight());
     }
 
-    public void setHeight(float height) { this.height = height; }
+    public final void setHeight(float height) { this.height = height; }
     public final float getHeight() { return height; }
 
     public final float getMass() {
@@ -241,18 +257,25 @@ public abstract class GameObject implements RenderableProvider, HasState {
     }
 
 
-    public Vector3 getChestPivot() {
+    public final Vector3 getChestPivot() {
         return get3dPosition().add(def.chestPivotOffset);
     }
 
-    public Vector3 getOverHeadPivot() {
+    public final Vector3 getOverHeadPivot() {
         return get3dPosition().add(def.overHeadPivotOffset);
     }
 
-    public Definition getDef() {
+    public final Definition getDef() {
         return def;
     }
 
+    public final Set<GraphicEffect> getGraphicEffects() {
+        return graphicEffects;
+    }
+
+    public final Set<PhysicEffect> getPhysicEffects() {
+        return physicEffects;
+    }
 
     /**
      * Used to send via network a definition of an object to create.
@@ -279,11 +302,13 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
         /** Mass of an object in kg */
         public float mass = DEFAULT_MASS;
+
         /**
          * As far as Shape itself isn't serializable,
          * supplier will be sent instead.
          */
-        public Creator<Shape> shapeCreator;
+        @Nullable
+        private final Creator<Shape> shapeCreator;
 
         /** The loaded modelInstance object. Initialized by <code>initializeGameWorld</code> method. */
         @Nullable
@@ -309,7 +334,8 @@ public abstract class GameObject implements RenderableProvider, HasState {
          * <code>modelPath</code> can be <code>null</code>.
          * In this case objects created from this definition will not have models.
          */
-        public Definition(@Nullable String modelPath, Creator<Shape> shapeCreator, @Nullable String deathEffectPath) {
+        public Definition(@Nullable String modelPath, @Nullable Creator<Shape> shapeCreator,
+                          @Nullable String deathEffectPath) {
             this.modelPath = modelPath;
             this.shapeCreator = shapeCreator;
             this.deathEffectPath = deathEffectPath;
@@ -330,7 +356,7 @@ public abstract class GameObject implements RenderableProvider, HasState {
             }
         }
 
-        public GameContext getContext() {
+        public final GameContext getContext() {
             return context;
         }
 
@@ -356,11 +382,11 @@ public abstract class GameObject implements RenderableProvider, HasState {
         /** Create an object at the giving touchPos. */
         public abstract GameObject makeInstance(Uid uid, float x, float y);
         /** Create an object at the giving touchPos. */
-        public GameObject makeInstance(Uid uid, Vector2 position) {
+        public final GameObject makeInstance(Uid uid, Vector2 position) {
             return makeInstance(uid, position.x, position.y);
         }
         /** Create an object at (0, 0). */
-        public GameObject makeInstance(Uid uid) {
+        public final GameObject makeInstance(Uid uid) {
             return makeInstance(uid, 0, 0);
         }
 
@@ -368,12 +394,12 @@ public abstract class GameObject implements RenderableProvider, HasState {
          * Creates new instance of the unit with nextUid.
          * Must be called only on <code>ServerGameWorld</code>
          */
-        public GameObject makeInstanceWithNextUid(float x, float y) {
+        public final GameObject makeInstanceWithNextUid(float x, float y) {
             return makeInstance(((ServerGameWorld) context.gameWorld()).uidGenerator.next(), x, y);
         }
 
         /** Create an object at the giving touchPos. */
-        public GameObject makeInstanceWithNextUid(Vector2 position) {
+        public final GameObject makeInstanceWithNextUid(Vector2 position) {
             return makeInstanceWithNextUid(position.x, position.y);
         }
 
@@ -393,11 +419,11 @@ public abstract class GameObject implements RenderableProvider, HasState {
 
         public abstract BodyDef.BodyType getBodyType();
 
-        public int getDefNumber() {
+        public final int getDefNumber() {
             return defNumber;
         }
 
-        public void setDefNumber(int defNumber) {
+        public final void setDefNumber(int defNumber) {
             this.defNumber = defNumber;
         }
     }

@@ -6,13 +6,11 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-
 import ru.spbau.blackout.serializationutils.EfficientInputStream;
 import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Uid;
 import ru.spbau.blackout.utils.Utils;
-
 
 /**
  * Unit is a dynamic object which can move by itself and cast abilities.
@@ -20,20 +18,19 @@ import ru.spbau.blackout.utils.Utils;
  */
 public abstract class GameUnit extends DynamicObject {
 
+    private static final float LINEAR_FRICTION = 0.002f;
+
     /** Constant holder class to provide names for animations. */
-    public static class UnitAnimations extends DynamicObject.Animations {
+    protected static class UnitAnimations extends DynamicObject.Animations {
         protected UnitAnimations() {}
         public static final String WALK = "Armature|Walk";
         public static final float WALK_ANIM_SPEED_FACTOR = 3f;
     }
 
-    public static final float SELF_RESISTANCE_FACTOR = 0.02f;
-    public static final float LINEAR_FRICTION = 0.002f;
-
+    private static final float SELF_RESISTANCE_FACTOR = 0.02f;
 
     private final Vector2 selfVelocity = new Vector2();
     private float speed;
-
 
     protected GameUnit(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
@@ -48,20 +45,15 @@ public abstract class GameUnit extends DynamicObject {
     }
 
     @Override
-    public void updateForFirstStep() {
+    public void updateBeforeFirstStep() {
+        super.updateBeforeFirstStep();
+
         // apply friction
         if (!Utils.isZeroVec(velocity)){
             float k = 1f - (getMass() * LINEAR_FRICTION) / velocity.len();
             if (k < 0) k = 0;
             velocity.scl(k);
         }
-        super.updateForFirstStep();
-    }
-
-    /** See <code>GameWorld</code> documentation */
-    @Override
-    public void updateForSecondStep() {
-        super.updateForSecondStep();
 
         // Resistance to external velocity by unit (selfVelocity)
         if (!Utils.isZeroVec(velocity)) {
@@ -75,8 +67,13 @@ public abstract class GameUnit extends DynamicObject {
             if (k < -1) k = -1;
             velocity.mulAdd(velocity, k);
         }
+    }
 
-        body.setLinearVelocity(selfVelocity.x * speed, selfVelocity.y * speed);
+    /** See <code>GameWorld</code> documentation */
+    @Override
+    public void updateBeforeSecondStep() {
+        super.updateBeforeSecondStep();
+        temporaryVelocity.add(selfVelocity.x * speed, selfVelocity.y * speed);
     }
 
     public final synchronized Vector2 getSelfVelocity() {
@@ -121,9 +118,6 @@ public abstract class GameUnit extends DynamicObject {
 
         selfVelocity.set(newVelocity.x, newVelocity.y);
     }
-
-    public void setSelfVelocity(float x, float y) { setSelfVelocity(new Vector2(x, y)); }
-
 
     /** Definition for units. Loads abilities. */
     public static abstract class Definition extends DynamicObject.Definition {

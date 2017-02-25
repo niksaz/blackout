@@ -6,4 +6,5 @@ public interface AbilityObject {
 
     /** Calls when the object contacts with another object. */
     void beginContact(GameObject object);
+    void endContact(GameObject object);
 }

@@ -9,44 +9,51 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ru.spbau.blackout.GameContext;
-import ru.spbau.blackout.abilities.DynamicAbilityObject;
 import ru.spbau.blackout.abilities.StaticAbilityObject;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.entities.Damageable;
 import ru.spbau.blackout.entities.DynamicObject;
 import ru.spbau.blackout.entities.GameObject;
-import ru.spbau.blackout.graphiceffects.ParticleGraphicEffect;
+import ru.spbau.blackout.effects.GradualScaleEffect;
+import ru.spbau.blackout.effects.RotationEffect;
 import ru.spbau.blackout.shapescreators.CircleCreator;
 import ru.spbau.blackout.utils.Particles;
 import ru.spbau.blackout.utils.Uid;
 
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.BACK_SCALE_TIME;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.CAST_SOUND_PATH;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.EXPLOSION_EFFECT_PATH;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.EXPLOSION_TIME;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.IMPULSE;
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.MAX_SCALE;
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.MIN_SCALE;
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.MODEL_PATH;
 import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.RADIUS;
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.ROTATION_SPEED;
+import static ru.spbau.blackout.abilities.forceblast.ForceBlastAbility.SCALE_TIME;
 
 
 public final class ForceBlastObject extends StaticAbilityObject {
 
     private final Set<GameObject> damaged = new HashSet<>();
     private float timeToLive = EXPLOSION_TIME;
+    private boolean done = false;
 
     protected ForceBlastObject(Definition def, Uid uid, float x, float y) {
         super(def, uid, x, y);
 
-        if (def.explosionEffect != null) {
-            graphicEffects.add(new ParticleGraphicEffect(getDef().getContext(), this, def.explosionEffect.copy()));
-        }
+        new GradualScaleEffect(this, MIN_SCALE, MAX_SCALE, SCALE_TIME);
+        new RotationEffect(this, ROTATION_SPEED);
     }
 
     void setCaster(Character caster) {
+        setHeight(caster.getChestPivot().z);
         damaged.add(caster);  // do not damage caster
     }
 
     @Override
     public void beginContact(GameObject go) {
-        if (!damaged.contains(go)) {
+        if (!done && !damaged.contains(go)) {
             damaged.add(go);
 
             if (go instanceof DynamicObject) {
@@ -66,11 +73,17 @@ public final class ForceBlastObject extends StaticAbilityObject {
         super.updateState(delta);
         timeToLive -= delta;
         if (timeToLive <= 0) {
-            kill();
+            if (!done) {
+                done = true;
+                new GradualScaleEffect(this, MAX_SCALE, MIN_SCALE, BACK_SCALE_TIME);
+                timeToLive = BACK_SCALE_TIME;
+            } else {
+                kill();
+            }
         }
     }
 
-    public static class Definition extends StaticAbilityObject.Definition {
+    public final static class Definition extends StaticAbilityObject.Definition {
 
         private static final long serialVersionUID = 1000000000L;
 
@@ -80,7 +93,7 @@ public final class ForceBlastObject extends StaticAbilityObject {
 
 
         public Definition() {
-            super(null, new CircleCreator(RADIUS), null, CAST_SOUND_PATH);
+            super(MODEL_PATH, new CircleCreator(RADIUS), null, CAST_SOUND_PATH);
         }
 
         public void load(GameContext context) {

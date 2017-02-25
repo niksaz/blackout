@@ -39,6 +39,11 @@ public final class Uid implements EfficientSerializable, Serializable {
     }
 
     @Override
+    public String toString() {
+        return "#" + uid;
+    }
+
+    @Override
     public void effectiveWriteObject(EfficientOutputStream out) throws IOException {
         out.writeInt(uid);
     }

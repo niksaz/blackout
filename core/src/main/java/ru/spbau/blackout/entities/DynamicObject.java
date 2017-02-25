@@ -13,27 +13,26 @@ import ru.spbau.blackout.serializationutils.EfficientInputStream;
 import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.utils.Creator;
 import ru.spbau.blackout.utils.Uid;
+import ru.spbau.blackout.utils.Utils;
 
 
 public abstract class DynamicObject extends GameObject {
+
     /** Constant holder class to provide names for animations. */
-    public static class Animations {
+    protected static class Animations {
         protected Animations() {}
         public static final String STAY = "Armature|Stay";
     }
 
-
     /**
-     * It is public because it's safe to updatePhysics in almost any time.
-     * And it allows to do stuff like <code>object.velocity.mulAdd(...)</code>.
-     * It also has getter and setter to have similar interface to
-     * <code>selfVelocity</code> from <code>GameUnit</code>.
+     * Object's natural velocity.
+     * @see ru.spbau.blackout.worlds.GameWorld
      */
     public final Vector2 velocity = new Vector2();
-
+    /** @see ru.spbau.blackout.worlds.GameWorld */
+    public final Vector2 temporaryVelocity = new Vector2();
 
     // Appearance:
-    /** It is empty on server */
     @Nullable protected final AnimationController animation;
     protected float animationSpeed = 1f;
 
@@ -54,22 +53,27 @@ public abstract class DynamicObject extends GameObject {
     public void kill() {
         super.kill();
         velocity.setZero();
+        temporaryVelocity.setZero();
         body.setLinearVelocity(Vector2.Zero);
     }
 
-    public final Vector2 getVelocity() { return velocity; }
-    public final void setVelocity(float x, float y) { velocity.set(x, y); }
-    public final void setVelocity(Vector2 newVelocity) { setVelocity(newVelocity.x, newVelocity.y); }
-
-    public void applyImpulse(float x, float y) {
+    public final void applyImpulse(float x, float y) {
         float mass = getMass();
         velocity.add(x / mass, y / mass);
     }
 
-    public void applyImpulse(Vector2 impulse) {
+    public final void applyImpulse(Vector2 impulse) {
         applyImpulse(impulse.x, impulse.y);
     }
 
+    public final void applyTemporaryImpulse(float x, float y) {
+        float mass = getMass();
+        temporaryVelocity.add(x / mass, y / mass);
+    }
+
+    public final void applyTemporaryImpulse(Vector2 impulse) {
+        applyTemporaryImpulse(impulse.x, impulse.y);
+    }
 
     @Override
     public void updateGraphics(float delta) {
@@ -79,16 +83,24 @@ public abstract class DynamicObject extends GameObject {
         }
     }
 
-    @Override
-    public void updateForFirstStep() {
+    /**
+     * Must be called only by {@link ru.spbau.blackout.worlds.ServerGameWorld} before
+     * the first step processing.
+     */
+    public final void prepareForFirstStep() {
         body.setLinearVelocity(velocity);
         // to take into account velocity changes during the step
-        velocity.set(0, 0);
+        velocity.setZero();
     }
 
-    @Override
-    public void updateForSecondStep() {
+    /**
+     * Must be called only by {@link ru.spbau.blackout.worlds.ServerGameWorld} before
+     * the second step processing.
+     */
+    public final void prepareForSecondStep() {
         velocity.add(body.getLinearVelocity());
+        body.setLinearVelocity(temporaryVelocity);
+        temporaryVelocity.setZero();
     }
 
     @Override
@@ -114,7 +126,7 @@ public abstract class DynamicObject extends GameObject {
         }
 
         @Override
-        public BodyDef.BodyType getBodyType() {
+        public final BodyDef.BodyType getBodyType() {
             return BodyDef.BodyType.DynamicBody;
         }
     }

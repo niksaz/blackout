@@ -24,7 +24,11 @@ public abstract class StaticAbilityObject extends StaticObject implements Abilit
         }
     }
 
+    @Override
+    public void beginContact(GameObject object) {}
 
+    @Override
+    public void endContact(GameObject object) {}
 
     public static abstract class Definition extends StaticObject.Definition {
 
