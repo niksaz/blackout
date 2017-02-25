@@ -12,12 +12,12 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
 
 import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE;
-import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE_COST;
 import static ru.spbau.blackout.database.Database.COINS_EARNED;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
@@ -96,9 +96,11 @@ public class DatabaseAccessor {
 
             case ABILITY_UPGRADE:
                 final int abilityIndex = inputStream.readInt();
-                if (playerProfile.getCurrentCoins() >= ABILITY_UPGRADE_COST) {
-                    definition.abilities[abilityIndex].increaseLevel();
-                    performUpdate(query, generateUpdateOperations(-ABILITY_UPGRADE_COST, definition));
+                final Ability.Definition ability = definition.abilities[abilityIndex];
+                final int abilityUpgradeCost = ability.getUpgradeCost();
+                if (playerProfile.getCurrentCoins() >= abilityUpgradeCost) {
+                    ability.increaseLevel();
+                    performUpdate(query, generateUpdateOperations(-abilityUpgradeCost, definition));
                     successful = true;
                 } else {
                     successful = false;

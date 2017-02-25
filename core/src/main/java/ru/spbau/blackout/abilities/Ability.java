@@ -7,11 +7,14 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import ru.spbau.blackout.GameContext;
+import ru.spbau.blackout.database.Database;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.network.UIServer;
 import ru.spbau.blackout.serializationutils.EfficientInputStream;
 import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.serializationutils.HasState;
+
+import static com.badlogic.gdx.utils.SharedLibraryLoader.abi;
 
 
 /**
@@ -119,6 +122,10 @@ public abstract class Ability implements HasState {
 
         public final void increaseLevel() {
             setLevel(getLevel() + 1);
+        }
+
+        public int getUpgradeCost() {
+            return Database.ABILITY_UPGRADE_COST_PER_LEVEL * getLevel();
         }
 
         public abstract float maxChargeTime();

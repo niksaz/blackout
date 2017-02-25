@@ -8,11 +8,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import ru.spbau.blackout.BlackoutGame;
+import ru.spbau.blackout.abilities.Ability;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.entities.Character;
 import ru.spbau.blackout.screens.MenuScreen;
 
-import static ru.spbau.blackout.database.Database.ABILITY_UPGRADE_COST;
 import static ru.spbau.blackout.database.Database.HEALTH_UPGRADE_COST;
 import static ru.spbau.blackout.screens.MenuScreen.BUTTON_HEIGHT;
 import static ru.spbau.blackout.screens.MenuScreen.BUTTON_PADDING;
@@ -53,11 +53,12 @@ public class UpgradesTable {
         final Character.Definition characterDefinition = entity.getCharacterDefinition();
         for (int abilityIndex = 0; abilityIndex < characterDefinition.abilities.length; abilityIndex++) {
             final int currentAbilityIndex = abilityIndex;
+            final Ability.Definition ability = characterDefinition.abilities[abilityIndex];
             addRowWithButtonAndLabel(
                     middleTable,
                     appendPrice(
-                        ABILITY_UPGRADE + " " + characterDefinition.abilities[currentAbilityIndex].name(),
-                        ABILITY_UPGRADE_COST
+                        ABILITY_UPGRADE + " " + ability.name(),
+                        ability.getUpgradeCost()
                     ),
                     new ClickListener() {
                         @Override
