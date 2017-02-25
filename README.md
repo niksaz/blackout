@@ -1,5 +1,9 @@
-# blackout
+# Blackout
 
-2D-fighting.
+[![Build Status](https://travis-ci.org/niksaz/blackout.svg?branch=master)](https://travis-ci.org/niksaz/blackout)
 
-Authors: Andrey Tonkikh, Nikita Sazanovich
+3D-fighting.
+
+Demo video: https://www.youtube.com/watch?v=HYnNYYEYuck.
+
+Authors: Andrey Tonkikh, Nikita Sazanovich.

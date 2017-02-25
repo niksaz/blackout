@@ -13,8 +13,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.List;
+import java.util.zip.DeflaterOutputStream;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.database.Database;
@@ -25,6 +25,7 @@ import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.screens.GameScreen;
+import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
@@ -108,59 +109,7 @@ public class Game extends Thread implements GameContext {
                 lastWorldUpdateTime = currentTime;
                 server.log("Updating gameWorld: " + worldDeltaInSecs);
 
-                if (aliveCharacters == 1 && !someoneWon) {
-                    final ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-                    final DataOutputStream dataOutput = new DataOutputStream(byteOutput);
-                    dataOutput.writeUTF(clientHandlerWithAliveCharacter.getClientName());
-                    dataOutput.writeUTF(Database.COINS_EARNED);
-                    dataOutput.writeInt(Database.COINS_PER_WIN);
-                    dataOutput.flush();
-
-                    final DataInputStream dataInput =
-                            new DataInputStream(new ByteArrayInputStream(byteOutput.toByteArray()));
-                    DatabaseAccessor.getInstance().handleUpdateFromInputStream(dataInput);
-
-                    int numberOfPlayers = clients.size();
-
-                    // for testing purposes
-                    if (numberOfPlayers > 1) {
-                        double[] rating = new double[numberOfPlayers];
-                        double[] q = new double[numberOfPlayers];
-                        double sum = 0;
-                        for (int i = 0; i < numberOfPlayers; i++) {
-                            rating[i] = clients.get(i).getPlayerProfile().getRating();
-                            q[i] = Math.pow(10.0, rating[i] / 400);
-                            sum += q[i];
-                        }
-
-                        for (int i = 0; i < numberOfPlayers; i++) {
-                            final ClientHandler client = clients.get(i);
-                            // Elo rating formula
-                            final double expectedScore = q[i] / sum;
-                            final double actualScore =
-                                    clientHandlerWithAliveCharacter.getClientName().equals(client.getClientName())
-                                            ? 1.0
-                                            : 0.0;
-
-                            final double clientRatingsChange = 40 * (actualScore - expectedScore);
-
-                            final Query<PlayerProfile> playerProfileQuery =
-                                    DatabaseAccessor.getInstance().queryProfile(client.getClientName());
-                            final UpdateOperations<PlayerProfile> updateOperations =
-                                    DatabaseAccessor.getInstance().getDatastore()
-                                            .createUpdateOperations(PlayerProfile.class)
-                                            .inc("rating", clientRatingsChange);
-                            DatabaseAccessor.getInstance().performUpdate(playerProfileQuery, updateOperations);
-                        }
-                    }
-
-                    for (ClientHandler client : clients) {
-                        if (client.getClientGameState() != GameState.FINISHED) {
-                            client.setWinnerName(clientHandlerWithAliveCharacter.getClientName());
-                        }
-                    }
-                    someoneWon = true;
-                }
+                someoneWon = monitorWinningConditions(someoneWon, aliveCharacters, clientHandlerWithAliveCharacter);
 
                 final byte[] worldInBytes = serializeWorld();
                 System.out.println("World size is " + worldInBytes.length);
@@ -211,6 +160,63 @@ public class Game extends Thread implements GameContext {
         return gameState;
     }
 
+    private boolean monitorWinningConditions(boolean alreadyWon, int aliveCharacters, ClientHandler aliveClient)
+        throws IOException {
+
+        if (aliveCharacters == 1 && !alreadyWon) {
+            final ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+            final DataOutputStream dataOutput = new DataOutputStream(byteOutput);
+            dataOutput.writeUTF(aliveClient.getClientName());
+            dataOutput.writeUTF(Database.COINS_EARNED);
+            dataOutput.writeInt(Database.COINS_PER_WIN);
+            dataOutput.flush();
+
+            final DataInputStream dataInput =
+                    new DataInputStream(new ByteArrayInputStream(byteOutput.toByteArray()));
+            DatabaseAccessor.getInstance().handleUpdateFromInputStream(dataInput);
+
+            int numberOfPlayers = clients.size();
+
+            // for testing purposes
+            if (numberOfPlayers > 1) {
+                final double[] rating = new double[numberOfPlayers];
+                final double[] q = new double[numberOfPlayers];
+                double sum = 0;
+                for (int i = 0; i < numberOfPlayers; i++) {
+                    rating[i] = clients.get(i).getPlayerProfile().getRating();
+                    q[i] = Math.pow(10.0, rating[i] / 400);
+                    sum += q[i];
+                }
+
+                for (int i = 0; i < numberOfPlayers; i++) {
+                    final ClientHandler client = clients.get(i);
+                    // Elo rating formula
+                    final double expectedScore = q[i] / sum;
+                    final double actualScore =
+                            aliveClient.getClientName().equals(client.getClientName()) ? 1.0 : 0.0;
+
+                    final double clientRatingsChange = 40 * (actualScore - expectedScore);
+
+                    final Query<PlayerProfile> playerProfileQuery =
+                            DatabaseAccessor.getInstance().queryProfile(client.getClientName());
+                    final UpdateOperations<PlayerProfile> updateOperations =
+                            DatabaseAccessor.getInstance().getDatastore()
+                                    .createUpdateOperations(PlayerProfile.class)
+                                    .inc("rating", clientRatingsChange);
+                    DatabaseAccessor.getInstance().performUpdate(playerProfileQuery, updateOperations);
+                }
+            }
+
+            for (ClientHandler client : clients) {
+                if (client.getClientGameState() != GameState.FINISHED) {
+                    client.setWinnerName(aliveClient.getClientName());
+                }
+            }
+            alreadyWon = true;
+        }
+        return alreadyWon;
+    }
+
     private void createRoomAndSendItToClients() throws IOException {
         final Array<Character.Definition> heroes = new Array<>();
         for (ClientHandler client : clients) {
@@ -245,21 +251,18 @@ public class Game extends Thread implements GameContext {
 
         for (int i = 0; i < clients.size(); i++) {
             final ClientHandler client = clients.get(i);
-            client.setGame(this, sessionSettings, new Uid(i + 1));
+            client.setGame(this, sessionSettings, Uid.get(i + 1));
         }
     }
 
     private byte[] serializeWorld() throws IOException {
-        final ByteArrayOutputStream serializedVersionOfWorld = new ByteArrayOutputStream();
-        final ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld);
-        try {
-            gameWorld.getState(objectOutputStreamForWorld);
-            objectOutputStreamForWorld.flush();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            gameState = GameState.FINISHED;
-        }
-        return serializedVersionOfWorld.toByteArray();
+        final ByteArrayOutputStream worldByteStream = new ByteArrayOutputStream();
+        final DeflaterOutputStream worldDeflaterStream = new DeflaterOutputStream(worldByteStream);
+        final EfficientOutputStream worldStream = new EfficientOutputStream(worldDeflaterStream);
+        gameWorld.getState(worldStream);
+        worldDeflaterStream.finish();
+        worldDeflaterStream.flush();
+        return worldByteStream.toByteArray();
     }
 
     private void waitWhileEveryoneIsReady() {
@@ -281,6 +284,13 @@ public class Game extends Thread implements GameContext {
                     }
                 }
             } while (!everyoneIsReady);
+        }
+
+        for (ClientHandler clientHandler : clients) {
+            //noinspection SynchronizationOnLocalVariableOrMethodParameter
+            synchronized (clientHandler) {
+                clientHandler.notify();
+            }
         }
 
         if (gameState != GameState.FINISHED) {

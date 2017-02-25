@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import ru.spbau.blackout.database.PlayerProfile;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
+import ru.spbau.blackout.serializationutils.EfficientInputStream;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
 import ru.spbau.blackout.utils.Uid;
@@ -163,11 +164,11 @@ public class ClientHandler implements Runnable {
             while (clientGameState != GameState.FINISHED) {
                 try {
                     datagramSocket.receive(receivedPacket);
-                    final ObjectInputStream clientsVelocityStream =
-                            new ObjectInputStream(new ByteArrayInputStream(receivedPacket.getData()));
-                    final Vector2 velocity = (Vector2) clientsVelocityStream.readObject();
+                    final EfficientInputStream clientsVelocityStream =
+                            new EfficientInputStream(new ByteArrayInputStream(receivedPacket.getData()));
+                    final Vector2 velocity = clientsVelocityStream.readVector2();
                     velocityFromClient.set(velocity);
-                } catch (ClassNotFoundException | IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                     clientGameState = GameState.FINISHED;
                 }
@@ -233,43 +234,53 @@ public class ClientHandler implements Runnable {
     }
 
     private void gameStartWaiting(ObjectInputStream in, ObjectOutputStream out) throws IOException {
-        do {
-            final Game game = this.game;
-            if (game != null) {
-                clientGameState = game.getGameState();
-            }
-
-            final GameState currentState = clientGameState;
-            out.writeObject(currentState);
-            if (currentState == GameState.READY_TO_START) {
-                out.writeObject(session);
-                out.writeObject(playerUid);
-                out.flush();
-
-                // loading may take a long time
-                socket.setSoTimeout(0);
-                // get boolean from the client when he will load the game components
-                boolean success = in.readBoolean();
-                if (!success) {
-                    clientGameState = GameState.FINISHED;
+        synchronized (this) {
+            do {
+                final Game game = this.game;
+                if (game != null) {
+                    clientGameState = game.getGameState();
                 }
-                assert game != null;
-                //noinspection SynchronizationOnLocalVariableOrMethodParameter
-                synchronized (game) {
-                    game.notify();
-                }
-                socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
-            } else {
-                out.flush();
-            }
 
-            if (clientGameState == GameState.WAITING) {
-                try {
-                    sleep(Network.STATE_UPDATE_CYCLE_MS);
-                } catch (InterruptedException ignored) {
+                final GameState currentState = clientGameState;
+                out.writeObject(currentState);
+                if (currentState == GameState.READY_TO_START) {
+                    out.writeObject(session);
+                    out.writeObject(playerUid);
+                    out.flush();
+
+                    // loading may take a long time
+                    socket.setSoTimeout(0);
+                    // get boolean from the client when he will load the game components
+                    boolean success = in.readBoolean();
+                    if (!success) {
+                        clientGameState = GameState.FINISHED;
+                    }
+                    assert game != null;
+                    //noinspection SynchronizationOnLocalVariableOrMethodParameter
+                    synchronized (game) {
+                        game.notify();
+                    }
+                    socket.setSoTimeout(Network.SOCKET_IO_TIMEOUT_MS);
+                } else {
+                    out.flush();
                 }
+
+                if (clientGameState == GameState.WAITING) {
+                    try {
+                        sleep(Network.STATE_UPDATE_CYCLE_MS);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+            } while (clientGameState == GameState.WAITING);
+
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                clientGameState = GameState.FINISHED;
             }
-        } while (clientGameState == GameState.WAITING);
+        }
+        out.writeBoolean(clientGameState != GameState.FINISHED);
+        out.flush();
     }
 
     public Uid getPlayerUid() {
