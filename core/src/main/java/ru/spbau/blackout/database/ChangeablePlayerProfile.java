@@ -142,10 +142,18 @@ public class ChangeablePlayerProfile extends PlayerProfile {
         }).start();
     }
 
-    private static HttpURLConnection openHttpURLConnectionForServerCommand(String command) throws IOException {
+    public static HttpURLConnection openHttpURLConnectionForServerCommand(String command)
+            throws IOException {
+
+        return openHttpURLConnectionForServerCommand(command, Network.SERVER_IP_ADDRESS);
+    }
+
+    public static HttpURLConnection openHttpURLConnectionForServerCommand(String command, String ipAddress)
+            throws IOException {
+
         final String urlString =
                 "http://" +
-                Network.SERVER_IP_ADDRESS +
+                ipAddress +
                 ':' +
                 Network.SERVER_HTTP_PORT_NUMBER +
                 command;

@@ -10,8 +10,6 @@ android:
     - extra-google-m2repository
     - extra-google-google_play_services
 env:
- - JAVA7_HOME=/usr/lib/jvm/java-7-oracle/jre
+  - JAVA7_HOME=/usr/lib/jvm/java-7-oracle/jre
 services:
   - mongodb
-before_script:
-  - sleep 15

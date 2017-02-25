@@ -8,6 +8,7 @@ import static com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 
 
 public class Textures {
+
     /**
      * Parameters for loading textures with mipmap and antialiasing.
      *

@@ -9,6 +9,7 @@ import static com.badlogic.gdx.math.MathUtils.PI;
 
 
 public final class Utils {
+
     private Utils() {}
 
     /** Just a transparent texture 64x64 pixels. */
@@ -18,6 +19,10 @@ public final class Utils {
     public static final float MILLIS_IN_SECOND = 1000f;
 
     public static boolean floatEq(float a, float b) {
+        return Math.abs(a - b) < EPSILON;
+    }
+
+    public static boolean floatEq(double a, double b) {
         return Math.abs(a - b) < EPSILON;
     }
 
