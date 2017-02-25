@@ -13,8 +13,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.List;
+import java.util.zip.DeflaterOutputStream;
 
 import ru.spbau.blackout.GameContext;
 import ru.spbau.blackout.database.Database;
@@ -25,6 +25,7 @@ import ru.spbau.blackout.network.Events;
 import ru.spbau.blackout.network.GameState;
 import ru.spbau.blackout.network.Network;
 import ru.spbau.blackout.screens.GameScreen;
+import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.serverside.database.DatabaseAccessor;
 import ru.spbau.blackout.serverside.servers.RoomServer;
 import ru.spbau.blackout.sessionsettings.SessionSettings;
@@ -250,21 +251,18 @@ public class Game extends Thread implements GameContext {
 
         for (int i = 0; i < clients.size(); i++) {
             final ClientHandler client = clients.get(i);
-            client.setGame(this, sessionSettings, new Uid(i + 1));
+            client.setGame(this, sessionSettings, Uid.get(i + 1));
         }
     }
 
     private byte[] serializeWorld() throws IOException {
-        final ByteArrayOutputStream serializedVersionOfWorld = new ByteArrayOutputStream();
-        final ObjectOutputStream objectOutputStreamForWorld = new ObjectOutputStream(serializedVersionOfWorld);
-        try {
-            gameWorld.getState(objectOutputStreamForWorld);
-            objectOutputStreamForWorld.flush();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            gameState = GameState.FINISHED;
-        }
-        return serializedVersionOfWorld.toByteArray();
+        final ByteArrayOutputStream worldByteStream = new ByteArrayOutputStream();
+        final DeflaterOutputStream worldDeflaterStream = new DeflaterOutputStream(worldByteStream);
+        final EfficientOutputStream worldStream = new EfficientOutputStream(worldDeflaterStream);
+        gameWorld.getState(worldStream);
+        worldDeflaterStream.finish();
+        worldDeflaterStream.flush();
+        return worldByteStream.toByteArray();
     }
 
     private void waitWhileEveryoneIsReady() {
