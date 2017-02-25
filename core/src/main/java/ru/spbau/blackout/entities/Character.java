@@ -184,7 +184,7 @@ public class Character extends GameUnit implements Damageable  {
                             new ForceBlastAbility.Definition(1),
                             new GravityAbility.Definition(1)
                     },
-                    200
+                    300
             );
         }
 

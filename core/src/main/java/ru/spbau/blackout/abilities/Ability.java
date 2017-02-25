@@ -14,8 +14,6 @@ import ru.spbau.blackout.serializationutils.EfficientInputStream;
 import ru.spbau.blackout.serializationutils.EfficientOutputStream;
 import ru.spbau.blackout.serializationutils.HasState;
 
-import static com.badlogic.gdx.utils.SharedLibraryLoader.abi;
-
 
 /**
  * Abstract class for ability in-game representation.

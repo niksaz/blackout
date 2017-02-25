@@ -12,7 +12,7 @@ import ru.spbau.blackout.shapescreators.CircleCreator;
 
 public final class ForceBlastAbility extends SimpleInstantAbility {
 
-    static final String CAST_SOUND_PATH = "sounds/fire.ogg";
+    static final String CAST_SOUND_PATH = null;
     static final String EXPLOSION_EFFECT_PATH = "effects/small_explosion/small_explosion.pfx";
     static final String ICON_PATH = "abilities/force_blast/icon.png";
     static final String NAME = "Force Blast";

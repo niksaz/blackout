@@ -6,7 +6,7 @@ import ru.spbau.blackout.entities.Character;
 
 public class GravityAbility extends SimpleShellAbility {
 
-    static final String CAST_SOUND_PATH = "sounds/fire.ogg";
+    static final String CAST_SOUND_PATH = null;
     static final String EFFECT_PATH = "effects/gravity/gravity.pfx";;
     static final String ICON_PATH = "abilities/gravity/icon.png";
     static final String NAME = "Gravity";

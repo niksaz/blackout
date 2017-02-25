@@ -2,6 +2,7 @@ package ru.spbau.blackout.screens.tables;
 
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -27,12 +28,13 @@ public class UpgradesTable {
 
     public static Table getTable(final MenuScreen screen) {
         final Table middleTable = new Table();
-
         addBlackoutLabel(middleTable, 2);
 
         addRowWithButtonAndLabel(
                 middleTable,
-                appendPrice(HEALTH_UPGRADE, HEALTH_UPGRADE_COST),
+                new TextButton(
+                        appendPrice(HEALTH_UPGRADE, HEALTH_UPGRADE_COST),
+                        BlackoutGame.get().assets().getDefaultSkin()),
                 new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
@@ -53,13 +55,18 @@ public class UpgradesTable {
         final Character.Definition characterDefinition = entity.getCharacterDefinition();
         for (int abilityIndex = 0; abilityIndex < characterDefinition.abilities.length; abilityIndex++) {
             final int currentAbilityIndex = abilityIndex;
-            final Ability.Definition ability = characterDefinition.abilities[abilityIndex];
             addRowWithButtonAndLabel(
                     middleTable,
-                    appendPrice(
-                        ABILITY_UPGRADE + " " + ability.name(),
-                        ability.getUpgradeCost()
-                    ),
+                    new TextButton("", BlackoutGame.get().assets().getDefaultSkin()) {
+                        @Override
+                        public void act(float delta) {
+                            final Ability.Definition ability =
+                                    BlackoutGame.get().getPlayerEntity().getCharacterDefinition()
+                                    .abilities[currentAbilityIndex];
+                            setText(appendPrice(ABILITY_UPGRADE + " " + ability.name(), ability.getUpgradeCost()));
+                            super.act(delta);
+                        }
+                    },
                     new ClickListener() {
                         @Override
                         public void clicked(InputEvent event, float x, float y) {
@@ -82,9 +89,8 @@ public class UpgradesTable {
         return middleTable;
     }
 
-    private static void addRowWithButtonAndLabel(Table table, String buttonText,
+    private static void addRowWithButtonAndLabel(Table table, Button button,
                                                  EventListener buttonListener, Label labelAfter) {
-        final TextButton button = new TextButton(buttonText, BlackoutGame.get().assets().getDefaultSkin());
         button.addListener(buttonListener);
         table.add(button).fill(true, false).pad(BUTTON_PADDING).height(BUTTON_HEIGHT);
         table.add(labelAfter).row();

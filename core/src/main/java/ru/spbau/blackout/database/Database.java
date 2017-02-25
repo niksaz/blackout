@@ -14,7 +14,7 @@ public class Database {
 
     public static final String HEALTH_UPGRADE = "health";
     public static final int HEALTH_UPGRADE_COST = 100;
-    public static final int HEALTH_UPGRADE_PER_LEVEL = 10;
+    public static final int HEALTH_UPGRADE_PER_LEVEL = 5;
 
     public static final String ABILITY_UPGRADE = "ability";
     public static final int ABILITY_UPGRADE_COST_PER_LEVEL = 100;
