@@ -39,7 +39,6 @@ public class EfficientSerializableTest {
         }
     }
 
-
     @Test
     public void serializeByteTest() throws Exception {
         final int n = 10;
@@ -63,7 +62,6 @@ public class EfficientSerializableTest {
             }
         }
     }
-
 
     @Test
     public void serializeCharTest() throws Exception {
@@ -89,7 +87,6 @@ public class EfficientSerializableTest {
         }
     }
 
-
     @Test
     public void serializeShortTest() throws Exception {
         final int n = 10;
@@ -113,7 +110,6 @@ public class EfficientSerializableTest {
             }
         }
     }
-
 
     @Test
     public void serializeIntTest() throws Exception {
@@ -139,7 +135,6 @@ public class EfficientSerializableTest {
         }
     }
 
-
     @Test
     public void serializeLongTest() throws Exception {
         final int n = 10;
@@ -163,7 +158,6 @@ public class EfficientSerializableTest {
             }
         }
     }
-
 
     @Test
     public void serializeFloatTest() throws Exception {
@@ -189,7 +183,6 @@ public class EfficientSerializableTest {
         }
     }
 
-
     @Test
     public void serializeDoubleTest() throws Exception {
         final int n = 10;
@@ -213,7 +206,6 @@ public class EfficientSerializableTest {
             }
         }
     }
-
 
     @Test
     public void serializeVector2Test() throws Exception {

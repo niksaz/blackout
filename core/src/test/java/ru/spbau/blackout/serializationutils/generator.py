@@ -28,8 +28,7 @@ def generate(type, generator = "default", equals = "assertEquals"):
                 ${equals}(arr[i], is.read${Type}());
             }
         }
-    }
-    """
+    }"""
 
     return Template(template).substitute(type=type, Type=type.title(), generator=generator, equals=equals)
 
