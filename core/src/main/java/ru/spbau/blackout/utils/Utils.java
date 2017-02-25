@@ -21,6 +21,10 @@ public final class Utils {
         return Math.abs(a - b) < EPSILON;
     }
 
+    public static boolean floatEq(double a, double b) {
+        return Math.abs(a - b) < EPSILON;
+    }
+
     public static boolean isZeroVec(Vector2 v) {
         return isZeroVec(v.x, v.y);
     }
