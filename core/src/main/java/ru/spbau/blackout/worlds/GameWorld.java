@@ -51,7 +51,7 @@ public abstract class GameWorld {
 
     private final Map<Uid, GameObject> gameObjectsMap = new HashMap<>();
     protected long stepNumber = 0;
-    transient protected final World box2dWorld;  // FIXME: should be only on server
+    transient protected final World box2dWorld;
     private final List<GameObject.Definition> definitions;
 
 

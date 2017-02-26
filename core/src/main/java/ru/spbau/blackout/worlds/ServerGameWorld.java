@@ -66,16 +66,16 @@ public class ServerGameWorld extends GameWorld {
     private void step() {
         stepNumber += 1;
 
-        for (GameObject object : getGameObjects()) {
-            object.updateState(WORLD_STEP);
-        }
-
         for (Iterator<GameObject> it = getGameObjects().iterator(); it.hasNext();) {
             GameObject object = it.next();
             if (object.isDead()) {
                 removeDeadObject(object);
                 it.remove();
             }
+        }
+
+        for (GameObject object : getGameObjects()) {
+            object.updateState(WORLD_STEP);
         }
 
         for (GameObject go : getGameObjects()) {
