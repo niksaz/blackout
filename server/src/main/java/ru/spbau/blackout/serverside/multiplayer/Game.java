@@ -107,12 +107,10 @@ public class Game extends Thread implements GameContext {
                 final float worldDeltaInSecs = (currentTime - lastWorldUpdateTime) / Utils.MILLIS_IN_SECOND;
                 gameWorld.updatePhysics(worldDeltaInSecs);
                 lastWorldUpdateTime = currentTime;
-                server.log("Updating gameWorld: " + worldDeltaInSecs);
 
                 someoneWon = monitorWinningConditions(someoneWon, aliveCharacters, clientHandlerWithAliveCharacter);
 
                 final byte[] worldInBytes = serializeWorld();
-                System.out.println("World size is " + worldInBytes.length);
                 for (ClientHandler client : clients) {
                     if (client.getClientGameState() != GameState.FINISHED) {
                         client.setWorldToSend(worldInBytes);
@@ -212,8 +210,9 @@ public class Game extends Thread implements GameContext {
                     client.setWinnerName(aliveClient.getClientName());
                 }
             }
-            alreadyWon = true;
+            return true;
         }
+
         return alreadyWon;
     }
 

@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
 import ru.spbau.blackout.abilities.AbilityObject;
-import ru.spbau.blackout.abilities.DynamicAbilityObject;
 import ru.spbau.blackout.entities.GameObject;
 
 public class BlackoutContactListener implements ContactListener {

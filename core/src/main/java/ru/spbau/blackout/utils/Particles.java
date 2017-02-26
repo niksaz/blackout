@@ -2,7 +2,6 @@ package ru.spbau.blackout.utils;
 
 import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect;
 
-import ru.spbau.blackout.BlackoutGame;
 import ru.spbau.blackout.GameContext;
 
 import static com.badlogic.gdx.graphics.g3d.particles.ParticleEffectLoader.ParticleEffectLoadParameter;

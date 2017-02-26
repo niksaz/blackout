@@ -104,7 +104,6 @@ public class AndroidClient implements Runnable, UIServer {
                     final byte[] byteArray = velocityByteStream.toByteArray();
                     velocityDatagram.setData(byteArray);
                     velocityDatagram.setLength(byteArray.length);
-                    System.out.println("VELOCTIY SIZE IS " + byteArray.length);
                     datagramSocket.send(velocityDatagram);
                 } catch (IOException e) {
                     e.printStackTrace();
