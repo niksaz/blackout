@@ -56,31 +56,29 @@
 \frame{\titlepage}
 
 
-\begin{frame}{Idea}
+\begin{frame}{Идея проекта}
     \begin{itemize}
-        \item <1-> Динамические битвы магов, 3D
-        \item <2-> Особое внимание уделено взаимодействию заклинаний между собой
-	\item <3-> Социальные составляющие: рейтинги, достижения, лидеры
-        \item <4-> Возможность игры по сети
+        \item <1-> Динамичная multi-player action-арена с элементами РПГ, необычной физикой и системой взаимодействия заклинаний.
+	      \item <2-> Социальные составляющие: рейтинги, достижения, лидеры
+        \item[] <3-> \begin{center} \includegraphics[width=230pt]{screenshot.png} \end{center}
     \end{itemize}
 \end{frame}
-
-
 
 \begin{frame} {Preview}
 \end{frame}
 
 
-\begin{frame} {Tools}
+\begin{frame} {Инструменты}
     \begin{itemize}
-        \item <1-> Игровой движок libGDX
-        \item <2-> Физический движок Box2D
-        \item <3-> Иные инстерменты: Git, Travis CI, Blender, ...
+        \item Игровой движок libGDX
+        \item Физический движок Box2D
+        \item Иные инстерменты: Git, Travis CI, Blender, GIMP, Inkscape...
     \end{itemize}
 \end{frame}
 
 
-\begin{frame} {Architecture}
+
+\begin{frame} {Архитектура}
 \noindent\makebox[\textwidth]{\includegraphics[width=\paperwidth]{architecture.png}}
 \end{frame}
 
@@ -99,17 +97,37 @@
 \begin{frame} {Synchronization problems}
     \begin{itemize}
     	\item <1-> Какую модель выбрать: peer-to-peer (Google Play Game Services), один из игрков server или client-server?
-	\item <2-> Просчитывать ли дополнительно физику на клиенте?
-	\item <3-> Исследование networking-а: TCP$\rightarrow$UDP, custom serialization
+	    \item <2-> Просчитывать ли дополнительно физику на клиенте?
+	    \item <3-> Исследование networking-а: TCP$\rightarrow$UDP, custom serialization
     \end{itemize}
 \end{frame}
 
 
-\begin{frame} {Andrei's Slide 1}
+\begin{frame} {Одиночная игра}
+    \begin{itemize}
+        \item[] <1-> Задача: одновременная поддержка одиночной и сетевой игры.
+        \item[] <2-> \begin{center} \includegraphics[width=300pt]{singleplayer.png} \end{center}
+    \end{itemize}
 \end{frame}
 
 
-\begin{frame}{Andrei's Slide 2}
+\begin{frame}{Графика и прочие ресурсы}
+    \begin{itemize}
+        \item <1-> Большое спасибо порталу http://opengameart.org/
+        \item <2-> 2D $\rightarrow$ 3D
+        \item <3-> Blender, Inkscape, GIMP
+        \item <4-> Particle effects
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Changelog}
+    \begin{itemize}
+        \item Новое заклинание: Gravity
+        \item За счет своей сериализации и сжатия данных объем объем передаваемых по сети данных уменьшен в 4-5 раз
+        \item Появилась система рейтинга
+        \item Прогрессивная стоимость улучшений
+    \end{itemize}
 \end{frame}
 
 
@@ -117,13 +135,14 @@
     \begin{itemize}
         \item <1-> Создание конкурентоспособного AI
         \item <2-> Добавление новых режимов и способностей
+        \item <3-> Продуманный баланс
     \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Results}
     \begin{itemize}
-        \item <1-> Open alpha testing: \\ https://play.google.com/apps/testing/ru.spbau.blackout.android
+        \item <1-> Google play open alpha testing: \\ https://play.google.com/apps/testing/ru.spbau.blackout.android
         \item <2-> https://github.com/niksaz/blackout
     \end{itemize}
 

@@ -62,3 +62,11 @@ build/
 
 ## OS Specific
 .DS_Store
+
+## latex
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
