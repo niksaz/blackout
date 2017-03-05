@@ -4,6 +4,6 @@
 
 3D-fighting.
 
-Demo video: https://www.youtube.com/watch?v=HYnNYYEYuck.
+Demo video: https://www.youtube.com/watch?v=0VuFQBdPXMM
 
 Authors: Andrey Tonkikh, Nikita Sazanovich.
