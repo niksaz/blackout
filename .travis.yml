@@ -1,7 +1,6 @@
 language: android
 jdk:
   - oraclejdk8
-  - oraclejdk7
 android:
   components:
     - tools
@@ -14,3 +13,7 @@ env:
   - JAVA7_HOME=/usr/lib/jvm/java-7-oracle/jre
 services:
   - mongodb
+addons:
+  apt:
+    packages:
+    - oracle-java7-installer
