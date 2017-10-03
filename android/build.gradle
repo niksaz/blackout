@@ -21,6 +21,9 @@ android {
     targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
 }
 // called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders
@@ -119,3 +122,4 @@ idea {
 }
 dependencies {
 }
+
