@@ -1,4 +1,6 @@
 language: android
+before_install:
+  - sudo apt-get update
 jdk:
   - oraclejdk8
 android:
